@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.2-pg17-bookworm
+    container_name: context-pilot-postgres
+    environment:
+      POSTGRES_DB: context_pilot
+      POSTGRES_USER: context_pilot
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-context_pilot_local_dev}
+    ports:
+      - "127.0.0.1:15432:5432"
+    volumes:
+      - context_pilot_postgres_data:/var/lib/postgresql/data
+      - ./deploy/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U context_pilot -d context_pilot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  context_pilot_postgres_data:

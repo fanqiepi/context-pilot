@@ -1,0 +1,21 @@
+* text=auto
+.gitattributes text eol=lf
+
+# Cross-platform source and configuration files
+*.css text eol=lf
+*.html text eol=lf
+*.java text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.properties text eol=lf
+*.sql text eol=lf
+*.ts text eol=lf
+*.vue text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+mvnw text eol=lf
+
+# Windows command scripts
+*.bat text eol=crlf
+*.cmd text eol=crlf
