@@ -50,6 +50,23 @@ class DatabaseMigrationTests {
                           AND table_name = 'vector_store'
                     )
                     """)).isTrue();
+            assertThat(queryBoolean(connection, """
+                    SELECT EXISTS (
+                        SELECT 1
+                        FROM information_schema.tables
+                        WHERE table_schema = 'public'
+                          AND table_name = 'knowledge_base'
+                    )
+                    """)).isTrue();
+            assertThat(queryBoolean(connection, """
+                    SELECT EXISTS (
+                        SELECT 1
+                        FROM pg_indexes
+                        WHERE schemaname = 'public'
+                          AND tablename = 'knowledge_base'
+                          AND indexname = 'knowledge_base_name_ci_uq'
+                    )
+                    """)).isTrue();
             assertThat(queryString(connection, """
                     SELECT format_type(attribute.atttypid, attribute.atttypmod)
                     FROM pg_attribute attribute
