@@ -8,8 +8,8 @@
 
 ## Sources of truth
 
-- `AI应用开发练习项目规划.md` defines the product background, MVP boundary, safety requirements, and completion criteria.
-- `技术选型与项目结构.md` defines the approved technology stack and repository layout.
+- This `AGENTS.md` defines the committed MVP boundary, safety requirements, approved technology stack, and repository layout.
+- Local planning notes may provide additional background, but they are intentionally not tracked and must not be required to build, test, or understand the repository.
 - When implementation and documentation disagree, do not silently choose one. Report the conflict and update the relevant document after the decision is confirmed.
 
 ## Approved architecture

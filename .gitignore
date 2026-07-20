@@ -16,3 +16,7 @@ frontend/dist/
 *.log
 .DS_Store
 Thumbs.db
+
+# Local planning notes (kept on the development machine only)
+/AI应用开发练习项目规划.md
+/技术选型与项目结构.md
