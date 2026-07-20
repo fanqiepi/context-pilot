@@ -24,3 +24,15 @@
 - `vector_store.metadata` 只保存检索和引用需要的非敏感标识，不保存完整私密文档副本。
 - 模型调用错误只保存可诊断的脱敏摘要，不保存 API Key 或默认记录完整请求。
 - 删除知识库时，业务记录、向量和本地文件需要采用明确且可重试的清理顺序。
+
+## 已实施的知识库结构
+
+`V2__create_knowledge_base.sql` 已创建 `knowledge_base` 表：
+
+- `id` 使用应用生成的 UUID。
+- `name` 最长 100 个字符，并通过 `lower(name)` 唯一索引保证大小写不敏感唯一。
+- `description` 可空，最长 1000 个字符。
+- `status` 当前仅使用 `ACTIVE`，为后续可重试删除状态预留扩展位置。
+- `created_at` 和 `updated_at` 使用带时区时间戳。
+
+知识库当前采用物理删除。`source_document` 实施后，非空知识库禁止直接删除，文件和文档清理通过文档删除流程完成。

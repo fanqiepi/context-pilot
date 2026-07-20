@@ -20,6 +20,22 @@
 - `/api/messages/{id}/feedback`：有用/无用反馈。
 - `/api/model-calls`：最小调用记录查询。
 
+## 知识库接口
+
+知识库 CRUD 当前提供以下接口：
+
+| 方法 | 路径 | 行为 |
+| --- | --- | --- |
+| `POST` | `/api/knowledge-bases` | 创建知识库，成功返回 `201` 和 `Location` 响应头 |
+| `GET` | `/api/knowledge-bases` | 按创建时间和 ID 稳定倒序返回知识库列表 |
+| `GET` | `/api/knowledge-bases/{id}` | 查询单个知识库 |
+| `PATCH` | `/api/knowledge-bases/{id}` | 更新名称或描述 |
+| `DELETE` | `/api/knowledge-bases/{id}` | 删除知识库，成功返回 `204` |
+
+名称去除首尾空白后不能为空，最长 100 个字符，且大小写不敏感唯一；描述最长 1000 个字符。`PATCH` 至少包含一个非 `null` 字段，空字符串描述用于清空描述。重复名称返回 `409 KNOWLEDGE_BASE_NAME_CONFLICT`，资源不存在返回 `404 KNOWLEDGE_BASE_NOT_FOUND`。
+
+当前文档表尚未实施，因此删除只处理知识库记录。文档模块落地后，包含文档的知识库删除将返回 `409 KNOWLEDGE_BASE_NOT_EMPTY`，调用方需要先删除文档。
+
 ## SSE 事件
 
 `POST /api/chat/stream` 使用 `text/event-stream`，客户端通过 `@microsoft/fetch-event-source` 建立连接。事件顺序为：

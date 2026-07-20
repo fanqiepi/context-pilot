@@ -1,7 +1,9 @@
 package io.github.fanqiepi.contextpilot;
 
+import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(properties = {
         "spring.ai.model.chat=none",
@@ -13,6 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
                 + "org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration"
 })
 class ContextPilotApplicationTests {
+
+    @MockitoBean
+    private KnowledgeBaseMapper knowledgeBaseMapper;
 
     @Test
     void contextLoads() {
