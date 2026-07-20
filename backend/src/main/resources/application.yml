@@ -27,9 +27,18 @@ spring:
     vectorstore:
       pgvector:
         initialize-schema: false
+        schema-validation: true
+        schema-name: public
+        table-name: vector_store
+        id-type: UUID
         index-type: HNSW
         distance-type: COSINE_DISTANCE
         dimensions: 1024
+
+contextpilot:
+  storage:
+    # Relative paths are resolved from the backend process working directory.
+    root: ${STORAGE_ROOT:../data/uploads}
 
 server:
   port: ${SERVER_PORT:8080}
