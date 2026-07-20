@@ -29,6 +29,9 @@
 
 ## Working agreements
 
+- Use `develop` as the integration and day-to-day development branch. Create feature branches from `develop` when isolation is useful.
+- Do not commit directly to `main`. Changes reach `main` only through a reviewed pull request or an explicitly reviewed merge from `develop`.
+- Keep `main` releasable. Before merging `develop` into `main`, run the relevant backend and frontend verification commands and review the complete diff.
 - Organize backend code by business capability, not as one repository-wide controller/service/mapper hierarchy.
 - Keep model-provider details behind Spring AI or a small application-level abstraction.
 - Use package root `io.github.fanqiepi.contextpilot` and database name `context_pilot`.
