@@ -84,8 +84,15 @@ public class KnowledgeBaseService {
 
     @Transactional
     public void delete(UUID id) {
-        if (knowledgeBaseMapper.deleteById(id) == 0) {
-            throw notFound(id);
+        try {
+            if (knowledgeBaseMapper.deleteById(id) == 0) {
+                throw notFound(id);
+            }
+        } catch (DataIntegrityViolationException exception) {
+            throw new ConflictException(
+                    "KNOWLEDGE_BASE_NOT_EMPTY",
+                    "Delete all documents before deleting the knowledge base",
+                    exception);
         }
     }
 

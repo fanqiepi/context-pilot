@@ -34,7 +34,20 @@
 
 名称去除首尾空白后不能为空，最长 100 个字符，且大小写不敏感唯一；描述最长 1000 个字符。`PATCH` 至少包含一个非 `null` 字段，空字符串描述用于清空描述。重复名称返回 `409 KNOWLEDGE_BASE_NAME_CONFLICT`，资源不存在返回 `404 KNOWLEDGE_BASE_NOT_FOUND`。
 
-当前文档表尚未实施，因此删除只处理知识库记录。文档模块落地后，包含文档的知识库删除将返回 `409 KNOWLEDGE_BASE_NOT_EMPTY`，调用方需要先删除文档。
+知识库存在文档时，删除返回 `409 KNOWLEDGE_BASE_NOT_EMPTY`，调用方需要先删除文档。
+
+## 文档接口
+
+| 方法 | 路径 | 行为 |
+| --- | --- | --- |
+| `POST` | `/api/knowledge-bases/{id}/documents` | 使用名为 `file` 的 multipart part 上传文档，成功返回 `201` 和 `Location` 响应头 |
+| `GET` | `/api/knowledge-bases/{id}/documents` | 按创建时间和 ID 稳定倒序返回知识库下的文档 |
+| `GET` | `/api/documents/{id}` | 查询文档元数据和处理状态 |
+| `DELETE` | `/api/documents/{id}` | 删除文件和元数据，成功返回 `204` |
+
+上传支持 TXT、Markdown（`.md` 或 `.markdown`）和 PDF，默认最大文件大小为 20 MiB。TXT 和 Markdown 必须使用 UTF-8；PDF 上传阶段校验文件头，是否包含可提取文本留到解析阶段判断。客户端文件名只用于展示，不能决定实际存储路径。上传成功后的状态为 `PENDING`，本阶段不会自动解析或向量化。
+
+文件过大返回 `413 DOCUMENT_FILE_TOO_LARGE`，类型不支持或文件内容无效返回 `400`。上传先写入文件，再在数据库事务中保存元数据；数据库写入失败时补偿删除文件。删除时先把状态更新为 `DELETING`，随后幂等删除文件和元数据，以便失败后重试。
 
 ## SSE 事件
 

@@ -13,6 +13,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
@@ -39,6 +40,34 @@ public class ApiExceptionHandler {
             ConflictException exception,
             HttpServletRequest request) {
         return response(HttpStatus.CONFLICT, exception.getCode(), exception.getMessage(), request);
+    }
+
+    @ExceptionHandler(PayloadTooLargeException.class)
+    public ResponseEntity<ApiErrorResponse> handlePayloadTooLarge(
+            PayloadTooLargeException exception,
+            HttpServletRequest request) {
+        return response(HttpStatus.CONTENT_TOO_LARGE, exception.getCode(), exception.getMessage(), request);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiErrorResponse> handleMultipartLimit(
+            MaxUploadSizeExceededException exception,
+            HttpServletRequest request) {
+        return response(
+                HttpStatus.CONTENT_TOO_LARGE,
+                "DOCUMENT_FILE_TOO_LARGE",
+                "Uploaded file exceeds the configured size limit",
+                request);
+    }
+
+    @ExceptionHandler(InternalServiceException.class)
+    public ResponseEntity<ApiErrorResponse> handleInternalService(
+            InternalServiceException exception,
+            HttpServletRequest request) {
+        String requestId = requestId(request);
+        LOGGER.error("Internal service error, requestId={}, code={}", requestId, exception.getCode(), exception);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiErrorResponse(exception.getCode(), exception.getMessage(), requestId));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -1,6 +1,10 @@
 spring:
   application:
     name: contextpilot-backend
+  servlet:
+    multipart:
+      max-file-size: ${DOCUMENT_MAX_FILE_SIZE:20MB}
+      max-request-size: ${DOCUMENT_MAX_REQUEST_SIZE:21MB}
   datasource:
     url: ${DB_URL:jdbc:postgresql://127.0.0.1:15432/context_pilot}
     username: ${DB_USERNAME:context_pilot}
@@ -39,6 +43,7 @@ contextpilot:
   storage:
     # Relative paths are resolved from the backend process working directory.
     root: ${STORAGE_ROOT:../data/uploads}
+    max-file-size: ${DOCUMENT_MAX_FILE_SIZE:20MB}
 
 server:
   port: ${SERVER_PORT:8080}

@@ -35,4 +35,17 @@
 - `status` 当前仅使用 `ACTIVE`，为后续可重试删除状态预留扩展位置。
 - `created_at` 和 `updated_at` 使用带时区时间戳。
 
-知识库当前采用物理删除。`source_document` 实施后，非空知识库禁止直接删除，文件和文档清理通过文档删除流程完成。
+知识库当前采用物理删除。非空知识库由 `source_document` 外键阻止直接删除，文件和文档清理通过文档删除流程完成。
+
+## 已实施的文档结构
+
+`V3__create_source_document.sql` 已创建 `source_document` 表：
+
+- 文档通过受限删除外键关联 `knowledge_base`。
+- 原始文件名只用于展示；`storage_key` 由服务端生成并保持唯一。
+- 文件类型限制为 `TXT`、`MARKDOWN` 和 `PDF`，文件大小必须大于 0。
+- SHA-256 使用 64 位小写十六进制字符串保存，为后续完整性校验和重复检测提供依据。
+- 状态包括 `PENDING`、`PROCESSING`、`SUCCEEDED`、`FAILED` 和 `DELETING`。
+- 列表查询使用知识库、创建时间和 ID 的组合索引。
+
+上传成功只创建 `PENDING` 文档。处理任务、错误重试、分段和向量记录将在文档处理阶段实施。

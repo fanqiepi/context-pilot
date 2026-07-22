@@ -1,5 +1,6 @@
 package io.github.fanqiepi.contextpilot;
 
+import io.github.fanqiepi.contextpilot.document.DocumentService;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +19,9 @@ class ContextPilotApplicationTests {
 
     @MockitoBean
     private KnowledgeBaseMapper knowledgeBaseMapper;
+
+    @MockitoBean
+    private DocumentService documentService;
 
     @Test
     void contextLoads() {
