@@ -29,6 +29,7 @@ spring:
           model: text-embedding-v4
           dimensions: 1024
     vectorstore:
+      type: ${SPRING_AI_VECTOR_STORE:none}
       pgvector:
         initialize-schema: false
         schema-validation: true
@@ -46,7 +47,7 @@ contextpilot:
     max-file-size: ${DOCUMENT_MAX_FILE_SIZE:20MB}
 
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:18080}
 
 management:
   endpoints:

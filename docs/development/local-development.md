@@ -54,4 +54,6 @@ npm run typecheck
 npm run dev
 ```
 
-模型集成默认关闭。启用前需要在后端进程中设置 `DEEPSEEK_API_KEY`、`DASHSCOPE_API_KEY`、`SPRING_AI_CHAT_MODEL=deepseek` 和 `SPRING_AI_EMBEDDING_MODEL=openai`。
+模型集成和向量存储自动配置默认关闭。启用前需要在后端进程中设置 `DEEPSEEK_API_KEY`、`DASHSCOPE_API_KEY`、`SPRING_AI_CHAT_MODEL=deepseek`、`SPRING_AI_EMBEDDING_MODEL=openai` 和 `SPRING_AI_VECTOR_STORE=pgvector`。
+
+后端默认监听 `18080`，Swagger UI 位于 `http://localhost:18080/swagger-ui.html`。如需使用其他端口，可设置 `SERVER_PORT`；修改后还应同步调整前端开发代理目标。

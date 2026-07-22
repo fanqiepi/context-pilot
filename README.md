@@ -26,7 +26,9 @@ java -version
 5. 启动后端：进入 `backend`，执行 `./mvnw spring-boot:run`；Windows PowerShell 使用 `.\mvnw.cmd spring-boot:run`。
 6. 启动前端：进入 `frontend`，执行 `npm ci` 后运行 `npm run dev`。
 
-本机 PostgreSQL 映射端口为 `15432`，默认数据库名和用户均为 `context_pilot`。后端默认不启用模型调用；配置 `SPRING_AI_CHAT_MODEL=deepseek`、`SPRING_AI_EMBEDDING_MODEL=openai` 及对应 API Key 后再启用。
+本机 PostgreSQL 映射端口为 `15432`，默认数据库名和用户均为 `context_pilot`。后端默认不启用模型调用和向量存储自动配置；配置 `SPRING_AI_CHAT_MODEL=deepseek`、`SPRING_AI_EMBEDDING_MODEL=openai`、`SPRING_AI_VECTOR_STORE=pgvector` 及对应 API Key 后再启用。
+
+后端默认监听 `18080`，可通过 `SERVER_PORT` 覆盖。Swagger UI 地址为 `http://localhost:18080/swagger-ui.html`。
 
 ## 数据流向
 

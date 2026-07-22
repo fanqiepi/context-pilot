@@ -10,16 +10,23 @@ import org.springframework.util.unit.DataSize;
 @ConfigurationProperties(prefix = "contextpilot.storage")
 public class StorageProperties {
 
-    private Path root = Path.of("../data/uploads");
+    private String root = "../data/uploads";
 
     private DataSize maxFileSize = DataSize.ofMegabytes(20);
 
-    public Path getRoot() {
+    public String getRoot() {
         return root;
     }
 
-    public void setRoot(Path root) {
+    public void setRoot(String root) {
         this.root = root;
+    }
+
+    public Path rootPath() {
+        if (root == null || root.isBlank()) {
+            throw new IllegalStateException("contextpilot.storage.root must not be blank");
+        }
+        return Path.of(root);
     }
 
     public DataSize getMaxFileSize() {
