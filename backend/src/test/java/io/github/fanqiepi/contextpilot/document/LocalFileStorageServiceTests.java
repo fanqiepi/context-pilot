@@ -21,7 +21,7 @@ class LocalFileStorageServiceTests {
     @BeforeEach
     void setUp() {
         StorageProperties properties = new StorageProperties();
-        properties.setRoot(temporaryRoot);
+        properties.setRoot(temporaryRoot.toString());
         storageService = new LocalFileStorageService(properties);
     }
 

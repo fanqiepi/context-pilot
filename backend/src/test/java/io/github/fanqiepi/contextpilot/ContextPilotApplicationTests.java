@@ -12,8 +12,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
         "spring.flyway.enabled=false",
         "spring.autoconfigure.exclude="
                 + "org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration,"
-                + "org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration,"
-                + "org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration"
+                + "org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration"
 })
 class ContextPilotApplicationTests {
 

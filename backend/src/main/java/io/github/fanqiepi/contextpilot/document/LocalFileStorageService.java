@@ -23,7 +23,7 @@ public class LocalFileStorageService implements StorageService {
     private final Path root;
 
     public LocalFileStorageService(StorageProperties properties) {
-        this.root = properties.getRoot().toAbsolutePath().normalize();
+        this.root = properties.rootPath().toAbsolutePath().normalize();
     }
 
     @Override
