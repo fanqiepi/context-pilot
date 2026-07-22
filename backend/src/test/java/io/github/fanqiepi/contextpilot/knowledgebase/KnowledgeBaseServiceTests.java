@@ -118,6 +118,16 @@ class KnowledgeBaseServiceTests {
         verify(knowledgeBaseMapper).deleteById(id);
     }
 
+    @Test
+    void rejectsDeletingKnowledgeBaseWithDocuments() {
+        UUID id = UUID.randomUUID();
+        when(knowledgeBaseMapper.deleteById(id)).thenThrow(new DuplicateKeyException("foreign key"));
+
+        assertThatThrownBy(() -> knowledgeBaseService.delete(id))
+                .isInstanceOf(ConflictException.class)
+                .hasMessageContaining("documents");
+    }
+
     private KnowledgeBaseEntity entity(UUID id, String name) {
         OffsetDateTime now = OffsetDateTime.now();
         KnowledgeBaseEntity entity = new KnowledgeBaseEntity();

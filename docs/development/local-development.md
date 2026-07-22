@@ -31,6 +31,10 @@ CREATE EXTENSION IF NOT EXISTS vector;
 
 运行数据不得提交 Git。后续文件读写必须通过 `StorageService`，不能由 controller 或业务服务直接拼接路径。
 
+文档实际存储键由后端生成，结构为 `knowledge-bases/{knowledgeBaseId}/documents/{documentId}/source.{ext}`；原始文件名不会作为磁盘路径。默认单文件限制为 20 MiB，可通过 `DOCUMENT_MAX_FILE_SIZE` 调整；multipart 请求限制通过 `DOCUMENT_MAX_REQUEST_SIZE` 单独配置，并应略大于单文件限制。
+
+上传支持 UTF-8 编码的 TXT、Markdown 和带有效文件头的 PDF。扫描版 PDF 是否可处理将在后续解析阶段判断。
+
 ## 启动和验证
 
 后端：

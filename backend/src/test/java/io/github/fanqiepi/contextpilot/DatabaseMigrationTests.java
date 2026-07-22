@@ -67,6 +67,24 @@ class DatabaseMigrationTests {
                           AND indexname = 'knowledge_base_name_ci_uq'
                     )
                     """)).isTrue();
+            assertThat(queryBoolean(connection, """
+                    SELECT EXISTS (
+                        SELECT 1
+                        FROM information_schema.tables
+                        WHERE table_schema = 'public'
+                          AND table_name = 'source_document'
+                    )
+                    """)).isTrue();
+            assertThat(queryBoolean(connection, """
+                    SELECT EXISTS (
+                        SELECT 1
+                        FROM information_schema.table_constraints
+                        WHERE table_schema = 'public'
+                          AND table_name = 'source_document'
+                          AND constraint_name = 'source_document_knowledge_base_fk'
+                          AND constraint_type = 'FOREIGN KEY'
+                    )
+                    """)).isTrue();
             assertThat(queryString(connection, """
                     SELECT format_type(attribute.atttypid, attribute.atttypmod)
                     FROM pg_attribute attribute
