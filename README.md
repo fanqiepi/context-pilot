@@ -28,7 +28,7 @@ java -version
 
 本机 PostgreSQL 映射端口为 `15432`，默认数据库名和用户均为 `context_pilot`。后端默认不启用模型调用和向量存储自动配置；配置 `SPRING_AI_CHAT_MODEL=deepseek`、`SPRING_AI_EMBEDDING_MODEL=openai`、`SPRING_AI_VECTOR_STORE=pgvector` 及对应 API Key 后再启用。
 
-后端默认监听 `18080`，可通过 `SERVER_PORT` 覆盖。Swagger UI 地址为 `http://localhost:18080/swagger-ui.html`。
+后端默认监听 `18080`，可通过 `SERVER_PORT` 覆盖。Knife4j 接口文档地址为 `http://localhost:18080/doc.html`，原始 OpenAPI JSON 位于 `http://localhost:18080/v3/api-docs`。
 
 ## 数据流向
 

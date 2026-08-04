@@ -22,7 +22,7 @@
         <maven-enforcer.version>3.5.0</maven-enforcer.version>
         <spring-ai.version>2.0.0</spring-ai.version>
         <mybatis-plus.version>3.5.17</mybatis-plus.version>
-        <springdoc.version>3.0.3</springdoc.version>
+        <knife4j.version>5.2.2</knife4j.version>
     </properties>
 
     <dependencyManagement>
@@ -65,8 +65,8 @@
             <version>${mybatis-plus.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -92,9 +92,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>${springdoc.version}</version>
+            <groupId>com.baizhukui</groupId>
+            <artifactId>knife4j-openapi3-boot4-spring-boot-starter</artifactId>
+            <version>${knife4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -4,6 +4,10 @@ public class ConflictException extends RuntimeException {
 
     private final String code;
 
+    public ConflictException(String code, String message) {
+        this(code, message, null);
+    }
+
     public ConflictException(String code, String message, Throwable cause) {
         super(message, cause);
         this.code = code;

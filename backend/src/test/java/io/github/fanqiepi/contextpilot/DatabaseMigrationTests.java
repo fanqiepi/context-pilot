@@ -86,6 +86,20 @@ class DatabaseMigrationTests {
                     )
                     """)).isTrue();
             assertThat(queryString(connection, """
+                    SELECT data_type
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public'
+                      AND table_name = 'knowledge_base'
+                      AND column_name = 'deleted'
+                    """)).isEqualTo("smallint");
+            assertThat(queryString(connection, """
+                    SELECT data_type
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public'
+                      AND table_name = 'source_document'
+                      AND column_name = 'deleted'
+                    """)).isEqualTo("smallint");
+            assertThat(queryString(connection, """
                     SELECT format_type(attribute.atttypid, attribute.atttypmod)
                     FROM pg_attribute attribute
                     JOIN pg_class table_info ON attribute.attrelid = table_info.oid
