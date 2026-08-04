@@ -1,5 +1,10 @@
 # ContextPilot repository guidance
 
+## Required session startup
+
+- At the beginning of every new conversation, read `docs/development/project-context.md` before inspecting, planning, or changing the repository.
+- Use that document as the versioned project overview, then verify any changeable details against the current code and configuration.
+
 ## Project context
 
 - ContextPilot is a learning-oriented knowledge base and task assistant built with Spring AI.
@@ -8,7 +13,9 @@
 
 ## Sources of truth
 
-- This `AGENTS.md` defines the committed MVP boundary, safety requirements, approved technology stack, and repository layout.
+- This committed `AGENTS.md` defines working and safety instructions for repository assistants.
+- `docs/development/project-context.md` is the committed overview that a new conversation must read first.
+- Product requirements, architecture documents, application configuration, and Flyway migrations remain the detailed sources of truth for their respective areas.
 - Local planning notes may provide additional background, but they are intentionally not tracked and must not be required to build, test, or understand the repository.
 - When implementation and documentation disagree, do not silently choose one. Report the conflict and update the relevant document after the decision is confirmed.
 
@@ -51,6 +58,7 @@
 ## Verification
 
 - Run the smallest relevant tests after a change and report what was or was not verified.
+- On the local Windows development machine, JDK 21 is installed at `F:\jdk21weizhi\microsoft-jdk-21.0.3-windows-x64\jdk-21.0.3+9`; set `JAVA_HOME` to this directory before running backend commands when the active JDK is not Java 21.
 - Backend test: from `backend/`, run `.\mvnw.cmd test` on Windows or `./mvnw test` on Unix-like systems.
 - Backend build: from `backend/`, run `.\mvnw.cmd package` on Windows or `./mvnw package` on Unix-like systems.
 - Backend local start: from `backend/`, run `.\mvnw.cmd spring-boot:run` on Windows or `./mvnw spring-boot:run` on Unix-like systems.

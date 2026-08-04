@@ -1,5 +1,6 @@
 # ContextPilot 项目文档
 
+- [新会话项目背景](development/project-context.md)
 - [MVP 产品需求](requirements/product-requirements.md)
 - [技术架构](architecture/technical-architecture.md)
 - [ADR 0001：使用 PostgreSQL 和 pgvector](architecture/decisions/0001-use-pgvector.md)
