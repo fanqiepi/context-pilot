@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName("source_document")
@@ -34,6 +35,9 @@ public class SourceDocumentEntity {
     private OffsetDateTime createdAt;
 
     private OffsetDateTime updatedAt;
+
+    @TableLogic(value = "0", delval = "1")
+    private Integer deleted = 0;
 
     public UUID getId() {
         return id;
@@ -129,5 +133,13 @@ public class SourceDocumentEntity {
 
     public void setUpdatedAt(OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Integer getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Integer deleted) {
+        this.deleted = deleted;
     }
 }

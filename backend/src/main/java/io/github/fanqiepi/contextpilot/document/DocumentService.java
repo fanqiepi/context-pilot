@@ -117,25 +117,9 @@ public class DocumentService {
     }
 
     public void delete(UUID documentId) {
-        SourceDocumentEntity entity = requireEntity(documentId);
-        entity.setStatus(DocumentStatus.DELETING);
-        entity.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        transactionTemplate.executeWithoutResult(status -> {
-            if (sourceDocumentMapper.updateById(entity) == 0) {
-                throw notFound(documentId);
-            }
-        });
-
-        try {
-            storageService.delete(entity.getStorageKey());
-        } catch (StorageException exception) {
-            throw new InternalServiceException(
-                    "DOCUMENT_STORAGE_DELETE_FAILED",
-                    "Document file could not be deleted",
-                    exception);
+        if (sourceDocumentMapper.deleteById(documentId) == 0) {
+            throw notFound(documentId);
         }
-
-        transactionTemplate.executeWithoutResult(status -> sourceDocumentMapper.deleteById(documentId));
     }
 
     private SourceDocumentEntity requireEntity(UUID documentId) {

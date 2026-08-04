@@ -18,6 +18,7 @@ import org.springframework.dao.DuplicateKeyException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -111,21 +112,26 @@ class KnowledgeBaseServiceTests {
     @Test
     void deletesExistingKnowledgeBase() {
         UUID id = UUID.randomUUID();
+        when(knowledgeBaseMapper.selectById(id)).thenReturn(entity(id, "Notes"));
+        when(knowledgeBaseMapper.countActiveDocuments(id)).thenReturn(0L);
         when(knowledgeBaseMapper.deleteById(id)).thenReturn(1);
 
         knowledgeBaseService.delete(id);
 
+        verify(knowledgeBaseMapper).countActiveDocuments(id);
         verify(knowledgeBaseMapper).deleteById(id);
     }
 
     @Test
     void rejectsDeletingKnowledgeBaseWithDocuments() {
         UUID id = UUID.randomUUID();
-        when(knowledgeBaseMapper.deleteById(id)).thenThrow(new DuplicateKeyException("foreign key"));
+        when(knowledgeBaseMapper.selectById(id)).thenReturn(entity(id, "Notes"));
+        when(knowledgeBaseMapper.countActiveDocuments(id)).thenReturn(1L);
 
         assertThatThrownBy(() -> knowledgeBaseService.delete(id))
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("documents");
+        verify(knowledgeBaseMapper, never()).deleteById(id);
     }
 
     private KnowledgeBaseEntity entity(UUID id, String name) {

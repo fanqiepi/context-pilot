@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api")
+@Tag(name = "文档管理", description = "上传、查询和逻辑删除知识库文档")
 public class DocumentController {
 
     private final DocumentService documentService;
@@ -28,6 +31,7 @@ public class DocumentController {
     @PostMapping(
             path = "/knowledge-bases/{knowledgeBaseId}/documents",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "上传文档")
     public ResponseEntity<DocumentResponse> upload(
             @PathVariable UUID knowledgeBaseId,
             @RequestPart("file") MultipartFile file) {
@@ -36,16 +40,19 @@ public class DocumentController {
     }
 
     @GetMapping("/knowledge-bases/{knowledgeBaseId}/documents")
+    @Operation(summary = "查询知识库下的文档列表")
     public List<DocumentResponse> list(@PathVariable UUID knowledgeBaseId) {
         return documentService.list(knowledgeBaseId);
     }
 
     @GetMapping("/documents/{documentId}")
+    @Operation(summary = "查询单个文档")
     public DocumentResponse get(@PathVariable UUID documentId) {
         return documentService.get(documentId);
     }
 
     @DeleteMapping("/documents/{documentId}")
+    @Operation(summary = "逻辑删除文档")
     public ResponseEntity<Void> delete(@PathVariable UUID documentId) {
         documentService.delete(documentId);
         return ResponseEntity.noContent().build();

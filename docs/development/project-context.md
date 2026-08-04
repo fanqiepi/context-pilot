@@ -23,6 +23,7 @@ MVP 不引入 Agent、工作流引擎、微服务、消息队列、多租户、�
 - 聊天模型：DeepSeek `deepseek-v4-flash`。
 - Embedding：DashScope `text-embedding-v4`，固定 1024 维。
 - 向量存储：Spring AI `PgVectorStore`，使用 `public.vector_store`、UUID、HNSW 和余弦距离。
+- 接口文档：Knife4j Next 5.2.x 的 Spring Boot 4 OpenAPI3 starter。
 
 ## 本地环境
 
@@ -45,7 +46,7 @@ Node.js 要求不低于 22.12.0。后端使用仓库内 Maven Wrapper；本地�
 ## 服务与配置
 
 - 前端开发服务器：`http://localhost:5173`。
-- 后端默认端口：`18080`；Swagger UI：`http://localhost:18080/swagger-ui.html`。
+- 后端默认端口：`18080`；Knife4j：`http://localhost:18080/doc.html`；OpenAPI JSON：`http://localhost:18080/v3/api-docs`。
 - 前端 `/api` 和 `/actuator` 代理到 `http://127.0.0.1:18080`。
 - PostgreSQL：`127.0.0.1:15432/context_pilot`。
 - 上传目录：仓库根目录下 Git 忽略的 `data/uploads/`；从 `backend/` 启动时默认值为 `../data/uploads`。

@@ -168,18 +168,14 @@ class DocumentServiceTests {
     }
 
     @Test
-    void marksDocumentDeletingBeforeRemovingFileAndMetadata() {
-        enableTransactions();
+    void logicallyDeletesDocumentWithoutRemovingStoredFile() {
         UUID documentId = UUID.randomUUID();
-        SourceDocumentEntity entity = document(documentId);
-        when(sourceDocumentMapper.selectById(documentId)).thenReturn(entity);
-        when(sourceDocumentMapper.updateById(entity)).thenReturn(1);
+        when(sourceDocumentMapper.deleteById(documentId)).thenReturn(1);
 
         documentService.delete(documentId);
 
-        assertThat(entity.getStatus()).isEqualTo(DocumentStatus.DELETING);
-        verify(storageService).delete(entity.getStorageKey());
         verify(sourceDocumentMapper).deleteById(documentId);
+        verifyNoInteractions(storageService);
     }
 
     private void enableTransactions() {
@@ -195,20 +191,4 @@ class DocumentServiceTests {
         return new KnowledgeBaseResponse(id, "Notes", null, KnowledgeBaseStatus.ACTIVE, now, now);
     }
 
-    private SourceDocumentEntity document(UUID id) {
-        OffsetDateTime now = OffsetDateTime.now();
-        SourceDocumentEntity entity = new SourceDocumentEntity();
-        entity.setId(id);
-        entity.setKnowledgeBaseId(UUID.randomUUID());
-        entity.setOriginalFilename("notes.txt");
-        entity.setFileType(DocumentFileType.TXT);
-        entity.setMediaType("text/plain");
-        entity.setSizeBytes(5);
-        entity.setStorageKey("documents/" + id + "/source.txt");
-        entity.setSha256(SHA256);
-        entity.setStatus(DocumentStatus.PENDING);
-        entity.setCreatedAt(now);
-        entity.setUpdatedAt(now);
-        return entity;
-    }
 }

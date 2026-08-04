@@ -43,6 +43,7 @@
 - Organize backend code by business capability, not as one repository-wide controller/service/mapper hierarchy.
 - Keep model-provider details behind Spring AI or a small application-level abstraction.
 - Use package root `io.github.fanqiepi.contextpilot` and database name `context_pilot`.
+- Business tables use MyBatis-Plus logical deletion with `deleted = 0` for active rows and `deleted = 1` for deleted rows. Ordinary CRUD must not physically delete business records or uploaded files; any future purge must be an explicit maintenance workflow.
 - Treat prompts, evaluation cases, database migrations, and architecture decisions as versioned project assets.
 - Prefer the smallest change that completes the current requirement. Explain any new production dependency before adding it.
 - Preserve user changes and avoid unrelated rewrites.
