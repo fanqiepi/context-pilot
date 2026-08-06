@@ -25,13 +25,33 @@
 文档上传 -> StorageService -> 有界 TaskExecutor -> 解析与切分 -> EmbeddingModel
          -> PgVectorStore/PostgreSQL
 
-用户问题 -> DashScope Embedding -> pgvector 检索 -> DeepSeek ChatModel
-         -> SSE 回答与引用 -> 会话、调用记录和反馈
+用户问题 -> 会话/知识库校验 -> DashScope Embedding -> pgvector 隔离检索
+         -> 证据校验/拒答 -> DeepSeek ChatModel -> SSE 回答与引用
+         -> 会话、调用记录、trace ID 和反馈
 ```
 
 文档解析使用 Spring AI 的 `TextReader`、`MarkdownDocumentReader` 和 `PagePdfDocumentReader`。PDF 按页解析以保留引用页码；切分采用确定性的字符窗口，默认最大 1200 个字符并重叠 150 个字符。上传后由有界 `TaskExecutor` 编排 `PENDING -> PROCESSING -> SUCCEEDED/FAILED`，原子状态更新防止重复处理。重试和删除均先按文档标识清理旧向量，向量 ID 保持确定性。
 
 默认配置关闭自动处理和向量存储。显式启用 `offline` Profile 时，使用本地确定性 1024 维 Embedding 和 `PgVectorStore` 打通无网络测试闭环；该 Embedding 只用于开发和测试，不能用于评估真实语义检索质量。正式集成仍使用 DashScope `text-embedding-v4`。
+
+## 聊天编排边界
+
+MVP 的 `ChatApplicationService` 是确定性 RAG 编排器：读取会话和选定知识库、执行隔离检索、校验证据、组装版本化提示词、调用 `ChatModel`，并保存消息、引用和调用记录。检索不是由模型决定是否执行的工具，因此不增加 SkillRouter、ToolExecutionGateway 或自主工具循环。
+
+缺少知识库、问题为空或必要上下文不足时，由请求校验和固定规则返回澄清提示；检索无可靠依据时明确拒答。模型可以改善用户可读文案，但不能改变校验结论、伪造引用或扩大知识库范围。
+
+HTTP request ID 作为 MVP trace ID 的起点，后续贯穿 SSE、消息和 `model_call`。它用于关联与诊断，不承担身份或权限功能。
+
+## 后续演进边界
+
+MVP 稳定后可按以下顺序扩展，但每一阶段都需要独立用例、测试和 ADR：
+
+1. 固定能力路由：应用内显式注册、可版本化，不加载动态插件。
+2. 受控工具网关：静态白名单、强类型参数、Schema、权限、次数、超时、错误分类和审计。
+3. 项目结构化数据端口：通过领域查询服务只读访问 PostgreSQL，使用参数化 SQL、字段白名单、限行和 `dataAsOf`。
+4. Agent/工作流评估：仅在固定编排不足时考虑，并要求步骤预算、循环上限和人工确认。
+
+完整组件映射和风险见 [Agent Skill 与工具调用时序图适配评估](agent-skill-tool-adaptation.md)。
 
 ## 基础设施职责
 

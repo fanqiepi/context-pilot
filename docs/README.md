@@ -1,8 +1,9 @@
 # ContextPilot 项目文档
 
 - [新会话项目背景](development/project-context.md)
-- [MVP 产品需求](requirements/product-requirements.md)
+- [产品需求与分阶段路线图](requirements/product-requirements.md)
 - [技术架构](architecture/technical-architecture.md)
+- [Agent Skill 与工具调用时序图适配评估](architecture/agent-skill-tool-adaptation.md)
 - [ADR 0001：使用 PostgreSQL 和 pgvector](architecture/decisions/0001-use-pgvector.md)
 - [MVP 数据模型](data/data-model.md)
 - [REST API 与 SSE 约定](api/api-design.md)
