@@ -51,6 +51,12 @@ public class DocumentController {
         return documentService.get(documentId);
     }
 
+    @PostMapping("/documents/{documentId}/retry")
+    @Operation(summary = "重试处理失败的文档")
+    public ResponseEntity<DocumentResponse> retry(@PathVariable UUID documentId) {
+        return ResponseEntity.accepted().body(documentService.retry(documentId));
+    }
+
     @DeleteMapping("/documents/{documentId}")
     @Operation(summary = "逻辑删除文档")
     public ResponseEntity<Void> delete(@PathVariable UUID documentId) {

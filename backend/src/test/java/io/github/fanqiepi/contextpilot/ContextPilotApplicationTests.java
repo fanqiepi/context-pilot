@@ -1,6 +1,7 @@
 package io.github.fanqiepi.contextpilot;
 
 import io.github.fanqiepi.contextpilot.document.DocumentService;
+import io.github.fanqiepi.contextpilot.document.SourceDocumentMapper;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ class ContextPilotApplicationTests {
     private KnowledgeBaseMapper knowledgeBaseMapper;
 
     @MockitoBean
+    private SourceDocumentMapper sourceDocumentMapper;
+
+    @MockitoBean
     private DocumentService documentService;
 
     @Test
@@ -46,7 +50,9 @@ class ContextPilotApplicationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.info.title").value("ContextPilot API"))
                 .andExpect(jsonPath("$.paths['/api/knowledge-bases']").exists())
-                .andExpect(jsonPath("$.paths['/api/knowledge-bases/{id}']").exists());
+                .andExpect(jsonPath("$.paths['/api/knowledge-bases/{id}']").exists())
+                .andExpect(jsonPath("$.paths['/api/documents/{documentId}/retry']").exists())
+                .andExpect(jsonPath("$.paths['/api/knowledge-bases/{knowledgeBaseId}/search']").exists());
         mockMvc.perform(get("/v3/api-docs/swagger-config"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.url").value("/v3/api-docs"));

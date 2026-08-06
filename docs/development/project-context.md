@@ -10,9 +10,9 @@ MVP 不引入 Agent、工作流引擎、微服务、消息队列、多租户、�
 
 ## 当前状态
 
-- 已完成工程基线、PostgreSQL/pgvector 与 Flyway、知识库 CRUD、文档上传和本地存储。
+- 已完成工程基线、PostgreSQL/pgvector 与 Flyway、知识库 CRUD，以及文档上传、异步解析切分、状态与有限重试、pgvector 索引、知识库隔离检索和逻辑删除后的向量清理。
 - 前端目前主要是工程基线和欢迎页。
-- 待实现文档解析切分、Embedding、向量检索、DeepSeek SSE 问答、引用、会话历史、调用记录和反馈。
+- 已提供无需 API Key 的 `offline` Profile 和确定性 1024 维测试 Embedding；待接入真实 DashScope Embedding，以及 DeepSeek SSE 问答、引用、会话历史、调用记录和反馈。
 - 日常开发和集成分支为 `develop`，不得直接提交到 `main`。
 
 ## 技术栈
@@ -51,6 +51,7 @@ Node.js 要求不低于 22.12.0。后端使用仓库内 Maven Wrapper；本地�
 - PostgreSQL：`127.0.0.1:15432/context_pilot`。
 - 上传目录：仓库根目录下 Git 忽略的 `data/uploads/`；从 `backend/` 启动时默认值为 `../data/uploads`。
 - 支持 UTF-8 TXT、Markdown 和文本型 PDF，默认单文件上限 20 MiB。
+- 文本切分默认最大 1200 个字符、重叠 150 个字符；默认 Profile 不自动处理，`offline` Profile 自动完成入库与检索。
 
 常用环境变量：
 
@@ -62,6 +63,14 @@ Node.js 要求不低于 22.12.0。后端使用仓库内 Maven Wrapper；本地�
 | `STORAGE_ROOT` | `../data/uploads` |
 | `DOCUMENT_MAX_FILE_SIZE` | `20MB` |
 | `DOCUMENT_MAX_REQUEST_SIZE` | `21MB` |
+| `DOCUMENT_CHUNK_MAX_CHARACTERS` | `1200` |
+| `DOCUMENT_CHUNK_OVERLAP_CHARACTERS` | `150` |
+| `DOCUMENT_PROCESSING_ENABLED` | 默认 `false`；显式开启上传后的异步处理 |
+| `DOCUMENT_PROCESSING_CORE_POOL_SIZE` | `1` |
+| `DOCUMENT_PROCESSING_MAX_POOL_SIZE` | `2` |
+| `DOCUMENT_PROCESSING_QUEUE_CAPACITY` | `50` |
+| `DOCUMENT_PROCESSING_MAX_ATTEMPTS` | `3`，包含首次处理 |
+| `SPRING_PROFILES_ACTIVE` | 本地无密钥闭环测试时设为 `offline` |
 | `SERVER_PORT` | `18080` |
 | `SPRING_AI_CHAT_MODEL` | 启用时设为 `deepseek` |
 | `SPRING_AI_EMBEDDING_MODEL` | 启用时设为 `openai` |

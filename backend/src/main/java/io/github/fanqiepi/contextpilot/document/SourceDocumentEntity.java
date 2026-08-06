@@ -32,6 +32,8 @@ public class SourceDocumentEntity {
 
     private String errorSummary;
 
+    private int processingAttempts;
+
     private OffsetDateTime createdAt;
 
     private OffsetDateTime updatedAt;
@@ -117,6 +119,14 @@ public class SourceDocumentEntity {
 
     public void setErrorSummary(String errorSummary) {
         this.errorSummary = errorSummary;
+    }
+
+    public int getProcessingAttempts() {
+        return processingAttempts;
+    }
+
+    public void setProcessingAttempts(int processingAttempts) {
+        this.processingAttempts = processingAttempts;
     }
 
     public OffsetDateTime getCreatedAt() {

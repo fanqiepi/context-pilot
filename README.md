@@ -22,11 +22,13 @@ java -version
 1. 执行 `java -version`，确认当前终端使用的是 JDK 21；Maven 构建会拒绝其他 Java 版本。
 2. 复制 `.env.example` 为 `.env`，供 Docker Compose 读取本地数据库密码。不要提交 `.env`。
 3. 启动 PostgreSQL 与 pgvector：`docker compose up -d`。
-4. 在 IDEA 运行配置或当前终端中设置模型相关环境变量；Spring Boot 不会自动读取根目录 `.env`。从其他工作目录启动后端时，还需要将 `STORAGE_ROOT` 设置为仓库根目录下 `data/uploads/` 的绝对路径。
+4. Spring Boot 不会自动读取根目录 `.env`。从其他工作目录启动后端时，需要将 `STORAGE_ROOT` 设置为仓库根目录下 `data/uploads/` 的绝对路径；当前无需配置真实模型密钥。
 5. 启动后端：进入 `backend`，执行 `./mvnw spring-boot:run`；Windows PowerShell 使用 `.\mvnw.cmd spring-boot:run`。
 6. 启动前端：进入 `frontend`，执行 `npm ci` 后运行 `npm run dev`。
 
 本机 PostgreSQL 映射端口为 `15432`，默认数据库名和用户均为 `context_pilot`。后端默认不启用模型调用和向量存储自动配置；配置 `SPRING_AI_CHAT_MODEL=deepseek`、`SPRING_AI_EMBEDDING_MODEL=openai`、`SPRING_AI_VECTOR_STORE=pgvector` 及对应 API Key 后再启用。
+
+无需 API Key 验证文档处理与检索时，在启动后端前设置 `$env:SPRING_PROFILES_ACTIVE = 'offline'`。该 Profile 使用确定性测试 Embedding 自动完成异步解析、切分、pgvector 入库和知识库隔离检索，不代表真实语义质量。
 
 后端默认监听 `18080`，可通过 `SERVER_PORT` 覆盖。Knife4j 接口文档地址为 `http://localhost:18080/doc.html`，原始 OpenAPI JSON 位于 `http://localhost:18080/v3/api-docs`。
 

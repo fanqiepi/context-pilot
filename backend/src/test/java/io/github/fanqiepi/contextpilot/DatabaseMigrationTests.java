@@ -97,6 +97,13 @@ class DatabaseMigrationTests {
                     FROM information_schema.columns
                     WHERE table_schema = 'public'
                       AND table_name = 'source_document'
+                      AND column_name = 'processing_attempts'
+                    """)).isEqualTo("integer");
+            assertThat(queryString(connection, """
+                    SELECT data_type
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public'
+                      AND table_name = 'source_document'
                       AND column_name = 'deleted'
                     """)).isEqualTo("smallint");
             assertThat(queryString(connection, """

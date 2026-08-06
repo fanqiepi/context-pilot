@@ -45,6 +45,17 @@ contextpilot:
     # Relative paths are resolved from the backend process working directory.
     root: ${STORAGE_ROOT:../data/uploads}
     max-file-size: ${DOCUMENT_MAX_FILE_SIZE:20MB}
+  document:
+    chunking:
+      max-characters: ${DOCUMENT_CHUNK_MAX_CHARACTERS:1200}
+      overlap-characters: ${DOCUMENT_CHUNK_OVERLAP_CHARACTERS:150}
+    processing:
+      enabled: ${DOCUMENT_PROCESSING_ENABLED:false}
+      core-pool-size: ${DOCUMENT_PROCESSING_CORE_POOL_SIZE:1}
+      max-pool-size: ${DOCUMENT_PROCESSING_MAX_POOL_SIZE:2}
+      queue-capacity: ${DOCUMENT_PROCESSING_QUEUE_CAPACITY:50}
+      max-attempts: ${DOCUMENT_PROCESSING_MAX_ATTEMPTS:3}
+
 
 server:
   port: ${SERVER_PORT:18080}

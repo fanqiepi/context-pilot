@@ -13,6 +13,7 @@ public record DocumentResponse(
         String sha256,
         DocumentStatus status,
         String errorSummary,
+        int processingAttempts,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt) {
 
@@ -27,6 +28,7 @@ public record DocumentResponse(
                 entity.getSha256(),
                 entity.getStatus(),
                 entity.getErrorSummary(),
+                entity.getProcessingAttempts(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt());
     }

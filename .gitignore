@@ -1,6 +1,7 @@
 .env
 data/uploads/*
 !data/uploads/.gitkeep
+data/test-documents/
 
 # IDE and local editor state
 .idea/

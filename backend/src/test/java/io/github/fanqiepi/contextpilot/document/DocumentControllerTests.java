@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -82,6 +83,19 @@ class DocumentControllerTests {
     }
 
     @Test
+    void retriesDocumentProcessing() throws Exception {
+        UUID documentId = UUID.randomUUID();
+        UUID knowledgeBaseId = UUID.randomUUID();
+        DocumentResponse response = response(documentId, knowledgeBaseId);
+        when(documentService.retry(documentId)).thenReturn(response);
+
+        mockMvc.perform(post("/api/documents/{id}/retry", documentId))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.id").value(documentId.toString()))
+                .andExpect(jsonPath("$.status").value("PENDING"));
+    }
+
+    @Test
     void returnsPayloadTooLarge() throws Exception {
         UUID knowledgeBaseId = UUID.randomUUID();
         when(documentService.upload(any(), any())).thenThrow(new PayloadTooLargeException(
@@ -110,6 +124,7 @@ class DocumentControllerTests {
                 "0".repeat(64),
                 DocumentStatus.PENDING,
                 null,
+                0,
                 now,
                 now);
     }
