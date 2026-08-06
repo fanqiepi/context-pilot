@@ -1,0 +1,9 @@
+spring:
+  ai:
+    vectorstore:
+      type: pgvector
+
+contextpilot:
+  document:
+    processing:
+      enabled: true

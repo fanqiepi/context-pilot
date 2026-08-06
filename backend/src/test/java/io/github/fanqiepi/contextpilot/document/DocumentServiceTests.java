@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -47,6 +48,12 @@ class DocumentServiceTests {
     @Mock
     private TransactionTemplate transactionTemplate;
 
+    @Mock
+    private DocumentProcessingCoordinator processingCoordinator;
+
+    @Mock
+    private DocumentVectorIndex documentVectorIndex;
+
     private StorageProperties storageProperties;
 
     private DocumentService documentService;
@@ -60,7 +67,9 @@ class DocumentServiceTests {
                 knowledgeBaseService,
                 storageService,
                 storageProperties,
-                transactionTemplate);
+                transactionTemplate,
+                processingCoordinator,
+                documentVectorIndex);
     }
 
     @Test
@@ -84,6 +93,7 @@ class DocumentServiceTests {
         assertThat(entity.getStatus()).isEqualTo(DocumentStatus.PENDING);
         assertThat(entity.getStorageKey()).startsWith("knowledge-bases/" + knowledgeBaseId + "/documents/");
         assertThat(response.status()).isEqualTo(DocumentStatus.PENDING);
+        verify(processingCoordinator).submit(entity.getId());
     }
 
     @Test
@@ -170,12 +180,74 @@ class DocumentServiceTests {
     @Test
     void logicallyDeletesDocumentWithoutRemovingStoredFile() {
         UUID documentId = UUID.randomUUID();
+        SourceDocumentEntity indexed = document(documentId, DocumentStatus.SUCCEEDED);
+        indexed.setProcessingAttempts(1);
+        when(sourceDocumentMapper.selectById(documentId)).thenReturn(indexed);
+        when(documentVectorIndex.isAvailable()).thenReturn(true);
+        when(sourceDocumentMapper.markDeleting(documentId)).thenReturn(1);
         when(sourceDocumentMapper.deleteById(documentId)).thenReturn(1);
 
         documentService.delete(documentId);
 
+        verify(sourceDocumentMapper).markDeleting(documentId);
+        verify(documentVectorIndex).deleteByDocumentId(documentId);
         verify(sourceDocumentMapper).deleteById(documentId);
         verifyNoInteractions(storageService);
+    }
+
+    @Test
+    void refusesToDeleteIndexedDocumentWithoutVectorStore() {
+        UUID documentId = UUID.randomUUID();
+        SourceDocumentEntity indexed = document(documentId, DocumentStatus.SUCCEEDED);
+        indexed.setProcessingAttempts(1);
+        when(sourceDocumentMapper.selectById(documentId)).thenReturn(indexed);
+
+        assertThatThrownBy(() -> documentService.delete(documentId))
+                .isInstanceOf(InternalServiceException.class)
+                .hasMessageContaining("vector storage is disabled");
+
+        verify(sourceDocumentMapper, never()).markDeleting(documentId);
+        verify(sourceDocumentMapper, never()).deleteById(documentId);
+    }
+
+    @Test
+    void retriesFailedDocument() {
+        UUID documentId = UUID.randomUUID();
+        when(processingCoordinator.isEnabled()).thenReturn(true);
+        when(processingCoordinator.canRetry(1)).thenReturn(true);
+        when(sourceDocumentMapper.prepareRetry(documentId)).thenReturn(1);
+        SourceDocumentEntity failed = document(documentId, DocumentStatus.FAILED);
+        failed.setProcessingAttempts(1);
+        SourceDocumentEntity pending = document(documentId, DocumentStatus.PENDING);
+        pending.setProcessingAttempts(1);
+        when(sourceDocumentMapper.selectById(documentId)).thenReturn(failed, pending);
+
+        DocumentResponse response = documentService.retry(documentId);
+
+        assertThat(response.status()).isEqualTo(DocumentStatus.PENDING);
+        verify(processingCoordinator).submit(documentId);
+    }
+
+    @Test
+    void rejectsRetryWhenProcessingIsDisabled() {
+        UUID documentId = UUID.randomUUID();
+
+        assertThatThrownBy(() -> documentService.retry(documentId))
+                .isInstanceOf(io.github.fanqiepi.contextpilot.common.ConflictException.class)
+                .hasMessageContaining("not enabled");
+    }
+
+    @Test
+    void rejectsRetryAfterAttemptLimit() {
+        UUID documentId = UUID.randomUUID();
+        SourceDocumentEntity failed = document(documentId, DocumentStatus.FAILED);
+        failed.setProcessingAttempts(3);
+        when(processingCoordinator.isEnabled()).thenReturn(true);
+        when(sourceDocumentMapper.selectById(documentId)).thenReturn(failed);
+
+        assertThatThrownBy(() -> documentService.retry(documentId))
+                .isInstanceOf(io.github.fanqiepi.contextpilot.common.ConflictException.class)
+                .hasMessageContaining("retry limit");
     }
 
     private void enableTransactions() {
@@ -189,6 +261,21 @@ class DocumentServiceTests {
     private KnowledgeBaseResponse knowledgeBase(UUID id) {
         OffsetDateTime now = OffsetDateTime.now();
         return new KnowledgeBaseResponse(id, "Notes", null, KnowledgeBaseStatus.ACTIVE, now, now);
+    }
+
+    private SourceDocumentEntity document(UUID id, DocumentStatus status) {
+        SourceDocumentEntity entity = new SourceDocumentEntity();
+        entity.setId(id);
+        entity.setKnowledgeBaseId(UUID.randomUUID());
+        entity.setOriginalFilename("notes.txt");
+        entity.setFileType(DocumentFileType.TXT);
+        entity.setMediaType("text/plain");
+        entity.setSizeBytes(5);
+        entity.setSha256(SHA256);
+        entity.setStatus(status);
+        entity.setCreatedAt(OffsetDateTime.now());
+        entity.setUpdatedAt(OffsetDateTime.now());
+        return entity;
     }
 
 }

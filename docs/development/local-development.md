@@ -33,7 +33,9 @@ CREATE EXTENSION IF NOT EXISTS vector;
 
 文档实际存储键由后端生成，结构为 `knowledge-bases/{knowledgeBaseId}/documents/{documentId}/source.{ext}`；原始文件名不会作为磁盘路径。默认单文件限制为 20 MiB，可通过 `DOCUMENT_MAX_FILE_SIZE` 调整；multipart 请求限制通过 `DOCUMENT_MAX_REQUEST_SIZE` 单独配置，并应略大于单文件限制。
 
-上传支持 UTF-8 编码的 TXT、Markdown 和带有效文件头的 PDF。扫描版 PDF 是否可处理将在后续解析阶段判断。
+上传支持 UTF-8 编码的 TXT、Markdown 和带有效文件头的 PDF。文档解析使用 Spring AI 的文本、Markdown 和按页 PDF reader；不含可提取文本的扫描版 PDF 会被拒绝，MVP 不提供 OCR。
+
+文本切分默认每块最多 1200 个字符并重叠 150 个字符，可分别通过 `DOCUMENT_CHUNK_MAX_CHARACTERS` 和 `DOCUMENT_CHUNK_OVERLAP_CHARACTERS` 覆盖。重叠值必须大于等于 0 且小于块大小。自动处理使用有界线程池，默认 1 个核心线程、最多 2 个线程、队列容量 50；每个文档默认最多进行 3 次处理尝试。
 
 ## 启动和验证
 
@@ -45,6 +47,15 @@ cd backend
 .\mvnw.cmd spring-boot:run
 ```
 
+不配置任何模型 API Key 时，可使用离线 Profile 验证“上传、异步解析、切分、pgvector 入库、检索、删除清理”完整流程：
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE = 'offline'
+.\mvnw.cmd spring-boot:run
+```
+
+离线 Profile 使用确定性的 1024 维测试向量，只适合功能测试，不代表真实语义检索效果。默认 Profile 不自动处理新上传文档，文档会保持 `PENDING`。
+
 前端：
 
 ```powershell
@@ -54,6 +65,6 @@ npm run typecheck
 npm run dev
 ```
 
-模型集成和向量存储自动配置默认关闭。启用前需要在后端进程中设置 `DEEPSEEK_API_KEY`、`DASHSCOPE_API_KEY`、`SPRING_AI_CHAT_MODEL=deepseek`、`SPRING_AI_EMBEDDING_MODEL=openai` 和 `SPRING_AI_VECTOR_STORE=pgvector`。
+真实模型集成默认关闭。后续启用真实服务时，才需要在后端进程中设置 `DEEPSEEK_API_KEY`、`DASHSCOPE_API_KEY` 和对应 Spring AI 模型配置。
 
 后端默认监听 `18080`，Knife4j 接口文档位于 `http://localhost:18080/doc.html`，原始 OpenAPI JSON 位于 `http://localhost:18080/v3/api-docs`。如需使用其他端口，可设置 `SERVER_PORT`；修改后还应同步调整前端开发代理目标。

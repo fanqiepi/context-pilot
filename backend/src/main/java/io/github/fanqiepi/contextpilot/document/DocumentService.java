@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.fanqiepi.contextpilot.common.BadRequestException;
+import io.github.fanqiepi.contextpilot.common.ConflictException;
 import io.github.fanqiepi.contextpilot.common.InternalServiceException;
 import io.github.fanqiepi.contextpilot.common.PayloadTooLargeException;
 import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
@@ -33,18 +34,24 @@ public class DocumentService {
     private final StorageService storageService;
     private final StorageProperties storageProperties;
     private final TransactionTemplate transactionTemplate;
+    private final DocumentProcessingCoordinator processingCoordinator;
+    private final DocumentVectorIndex documentVectorIndex;
 
     public DocumentService(
             SourceDocumentMapper sourceDocumentMapper,
             KnowledgeBaseService knowledgeBaseService,
             StorageService storageService,
             StorageProperties storageProperties,
-            TransactionTemplate transactionTemplate) {
+            TransactionTemplate transactionTemplate,
+            DocumentProcessingCoordinator processingCoordinator,
+            DocumentVectorIndex documentVectorIndex) {
         this.sourceDocumentMapper = sourceDocumentMapper;
         this.knowledgeBaseService = knowledgeBaseService;
         this.storageService = storageService;
         this.storageProperties = storageProperties;
         this.transactionTemplate = transactionTemplate;
+        this.processingCoordinator = processingCoordinator;
+        this.documentVectorIndex = documentVectorIndex;
     }
 
     public DocumentResponse upload(UUID knowledgeBaseId, MultipartFile file) {
@@ -97,6 +104,7 @@ public class DocumentService {
                     "Document metadata could not be saved",
                     exception);
         }
+        processingCoordinator.submit(documentId);
         return DocumentResponse.from(entity);
     }
 
@@ -116,7 +124,49 @@ public class DocumentService {
         return DocumentResponse.from(requireEntity(documentId));
     }
 
+    public DocumentResponse retry(UUID documentId) {
+        if (!processingCoordinator.isEnabled()) {
+            throw new ConflictException(
+                    "DOCUMENT_PROCESSING_DISABLED",
+                    "Document processing is not enabled");
+        }
+        SourceDocumentEntity current = requireEntity(documentId);
+        if (current.getStatus() != DocumentStatus.FAILED) {
+            throw retryNotAllowed(documentId, current);
+        }
+        if (!processingCoordinator.canRetry(current.getProcessingAttempts())) {
+            throw new ConflictException(
+                    "DOCUMENT_RETRY_LIMIT_REACHED",
+                    "Document " + documentId + " has reached the processing retry limit");
+        }
+        if (sourceDocumentMapper.prepareRetry(documentId) == 0) {
+            SourceDocumentEntity entity = requireEntity(documentId);
+            throw retryNotAllowed(documentId, entity);
+        }
+        SourceDocumentEntity entity = requireEntity(documentId);
+        processingCoordinator.submit(documentId);
+        return DocumentResponse.from(entity);
+    }
+
     public void delete(UUID documentId) {
+        SourceDocumentEntity entity = requireEntity(documentId);
+        if (entity.getProcessingAttempts() > 0 && !documentVectorIndex.isAvailable()) {
+            throw new InternalServiceException(
+                    "DOCUMENT_DELETE_FAILED",
+                    "Document index cannot be removed while vector storage is disabled",
+                    new IllegalStateException("VectorStore bean is not available"));
+        }
+        if (sourceDocumentMapper.markDeleting(documentId) == 0) {
+            throw notFound(documentId);
+        }
+        try {
+            documentVectorIndex.deleteByDocumentId(documentId);
+        } catch (RuntimeException exception) {
+            throw new InternalServiceException(
+                    "DOCUMENT_DELETE_FAILED",
+                    "Document index could not be removed",
+                    exception);
+        }
         if (sourceDocumentMapper.deleteById(documentId) == 0) {
             throw notFound(documentId);
         }
@@ -246,5 +296,11 @@ public class DocumentService {
         return new ResourceNotFoundException(
                 "DOCUMENT_NOT_FOUND",
                 "Document " + documentId + " was not found");
+    }
+
+    private ConflictException retryNotAllowed(UUID documentId, SourceDocumentEntity entity) {
+        return new ConflictException(
+                "DOCUMENT_RETRY_NOT_ALLOWED",
+                "Document " + documentId + " cannot be retried from status " + entity.getStatus());
     }
 }

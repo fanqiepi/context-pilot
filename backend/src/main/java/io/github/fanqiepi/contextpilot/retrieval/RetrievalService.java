@@ -1,0 +1,84 @@
+package io.github.fanqiepi.contextpilot.retrieval;
+
+import java.util.Map;
+import java.util.UUID;
+
+import io.github.fanqiepi.contextpilot.common.InternalServiceException;
+import io.github.fanqiepi.contextpilot.document.DocumentVectorIndex;
+import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseService;
+import org.springframework.ai.document.Document;
+import org.springframework.stereotype.Service;
+
+@Service
+public class RetrievalService {
+
+    private final KnowledgeBaseService knowledgeBaseService;
+    private final DocumentVectorIndex documentVectorIndex;
+
+    public RetrievalService(
+            KnowledgeBaseService knowledgeBaseService,
+            DocumentVectorIndex documentVectorIndex) {
+        this.knowledgeBaseService = knowledgeBaseService;
+        this.documentVectorIndex = documentVectorIndex;
+    }
+
+    public java.util.List<RetrievalResultResponse> search(
+            UUID knowledgeBaseId,
+            RetrievalSearchRequest request) {
+        knowledgeBaseService.get(knowledgeBaseId);
+        if (!documentVectorIndex.isAvailable()) {
+            throw unavailable();
+        }
+        try {
+            return documentVectorIndex.search(
+                            knowledgeBaseId,
+                            request.query().strip(),
+                            request.effectiveTopK())
+                    .stream()
+                    .map(this::toResponse)
+                    .toList();
+        } catch (RuntimeException exception) {
+            if (exception instanceof InternalServiceException internal) {
+                throw internal;
+            }
+            throw new InternalServiceException(
+                    "RETRIEVAL_FAILED",
+                    "Knowledge base retrieval failed",
+                    exception);
+        }
+    }
+
+    private RetrievalResultResponse toResponse(Document document) {
+        Map<String, Object> metadata = document.getMetadata();
+        return new RetrievalResultResponse(
+                document.getId(),
+                UUID.fromString(metadata.get("document_id").toString()),
+                metadata.get("original_filename").toString(),
+                number(metadata.get("chunk_index"), 0),
+                pageNumber(metadata),
+                document.getText(),
+                document.getScore());
+    }
+
+    private Integer pageNumber(Map<String, Object> metadata) {
+        Object value = metadata.get("page_number");
+        if (value == null) {
+            value = metadata.get("start_page_number");
+        }
+        return value == null ? null : number(value, 0);
+    }
+
+    private int number(Object value, int defaultValue) {
+        if (value instanceof Number number) {
+            return number.intValue();
+        }
+        return value == null ? defaultValue : Integer.parseInt(value.toString());
+    }
+
+    private InternalServiceException unavailable() {
+        return new InternalServiceException(
+                "VECTOR_STORE_UNAVAILABLE",
+                "Vector retrieval is not enabled",
+                new IllegalStateException("VectorStore bean is not available"));
+    }
+}

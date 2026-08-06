@@ -16,6 +16,8 @@
 - `/api/knowledge-bases`：知识库创建、查询和删除。
 - `/api/knowledge-bases/{id}/documents`：文档上传和列表。
 - `/api/documents/{id}`：文档状态、错误摘要和删除。
+- `/api/documents/{id}/retry`：重试处理失败且未达到次数上限的文档。
+- `/api/knowledge-bases/{id}/search`：知识库内 Top-K 文档片段检索。
 - `/api/conversations`：会话和历史消息。
 - `/api/chat/stream`：POST SSE 流式问答。
 - `/api/messages/{id}/feedback`：有用/无用反馈。
@@ -45,11 +47,18 @@
 | `POST` | `/api/knowledge-bases/{id}/documents` | 使用名为 `file` 的 multipart part 上传文档，成功返回 `201` 和 `Location` 响应头 |
 | `GET` | `/api/knowledge-bases/{id}/documents` | 按创建时间和 ID 稳定倒序返回知识库下的文档 |
 | `GET` | `/api/documents/{id}` | 查询文档元数据和处理状态 |
+| `POST` | `/api/documents/{id}/retry` | 将可重试的失败文档恢复为 `PENDING` 并返回 `202` |
 | `DELETE` | `/api/documents/{id}` | 逻辑删除文档元数据，成功返回 `204` |
 
-上传支持 TXT、Markdown（`.md` 或 `.markdown`）和 PDF，默认最大文件大小为 20 MiB。TXT 和 Markdown 必须使用 UTF-8；PDF 上传阶段校验文件头，是否包含可提取文本留到解析阶段判断。客户端文件名只用于展示，不能决定实际存储路径。上传成功后的状态为 `PENDING`，本阶段不会自动解析或向量化。
+上传支持 TXT、Markdown（`.md` 或 `.markdown`）和 PDF，默认最大文件大小为 20 MiB。TXT 和 Markdown 必须使用 UTF-8；PDF 上传阶段校验文件头，是否包含可提取文本留到解析阶段判断。客户端文件名只用于展示，不能决定实际存储路径。上传成功时先返回 `PENDING`；处理开关启用后，后台异步流转为 `PROCESSING`，最终进入 `SUCCEEDED` 或 `FAILED`。
 
-文件过大返回 `413 DOCUMENT_FILE_TOO_LARGE`，类型不支持或文件内容无效返回 `400`。上传先写入文件，再在数据库事务中保存元数据；数据库写入失败时补偿删除文件。普通删除只将文档元数据标记为已删除并保留原始文件，后续如需物理清理必须由单独、可审计且可重试的维护流程完成。
+文件过大返回 `413 DOCUMENT_FILE_TOO_LARGE`，类型不支持或文件内容无效返回 `400`。上传先写入文件，再在数据库事务中保存元数据；数据库写入失败时补偿删除文件。普通删除只将文档元数据标记为已删除并保留原始文件，后续如需物理清理必须由单独、可审计且可重试的维护流程完成。已开始处理的文档必须在 VectorStore 可用时删除，以确保派生向量先被清理；否则返回 `DOCUMENT_DELETE_FAILED`，不会留下“业务记录已删除但向量仍可检索”的状态。
+
+TXT、Markdown 和文本型 PDF 分别通过 Spring AI 对应 reader 解析；PDF 按页保留页码元数据，没有可提取文本的文件会解析失败。切分默认每块最多 1200 个字符、相邻块重叠 150 个字符，并优先在段落或句末断开。每块带有稳定的 `chunk_index`，同时保留文件名、文件类型、原始 part 序号和 PDF 页码等来源元数据。状态响应包含 `processingAttempts`，默认最多 3 次处理尝试；超出上限返回 `409 DOCUMENT_RETRY_LIMIT_REACHED`。
+
+## 检索接口
+
+`POST /api/knowledge-bases/{id}/search` 请求体包含非空 `query` 和可选 `topK`。`topK` 默认为 5，范围为 1 到 20。检索强制通过向量元数据中的 `knowledge_base_id` 隔离结果，返回 chunk ID、文档 ID、原始文件名、chunk 序号、可用时的 PDF 页码、正文和相似度分数。未启用向量存储时返回安全的服务错误，不会回退为跨知识库或无过滤检索。
 
 ## SSE 事件
 
