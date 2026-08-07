@@ -12,12 +12,12 @@ MVP 不引入 Agent、工作流引擎、微服务、消息队列、多租户、�
 
 - 已完成工程基线、PostgreSQL/pgvector 与 Flyway、知识库 CRUD，以及文档上传、异步解析切分、状态与有限重试、pgvector 索引、知识库隔离检索和逻辑删除后的向量清理。
 - 前端目前主要是工程基线和欢迎页。
-- 已提供无需 API Key 的 `offline` Profile 和确定性 1024 维测试 Embedding；待接入真实 DashScope Embedding，以及 DeepSeek SSE 问答、引用、会话历史、调用记录和反馈。
+- 已提供无需 API Key 的 `offline` Profile 和确定性 1024 维测试 Embedding；真实 DashScope `qwen3.7-text-embedding` 与非流式 RAG 问答后端均已通过本地真实链路验证，下一阶段进入 DeepSeek SSE 与可观察性开发。
 - 日常开发和集成分支为 `develop`，不得直接提交到 `main`。
 
 ## 路线图边界
 
-- MVP 下一阶段依次完成真实 DashScope Embedding、确定性 RAG 问答编排、DeepSeek SSE、引用与 trace、会话历史、前端闭环、反馈和评估。
+- MVP 下一阶段依次完成确定性 RAG 问答编排、DeepSeek SSE、引用与 trace、会话历史、前端闭环、反馈和评估。
 - MVP 可以吸收 Agent 时序中的上下文校验、澄清、证据验证、来源和可追踪性，但不实现 SkillRouter、通用 ToolExecutionGateway 或模型驱动的数据库查询。
 - MVP 完成后，只有真实多能力需求出现时才评估固定能力路由；只有明确工具用例和威胁模型完成后才增加白名单工具网关；项目 PostgreSQL 数据必须通过领域化只读 DataPort 查询。
 - 完整阶段计划见 `docs/requirements/product-requirements.md`，参考时序图适配结论见 `docs/architecture/agent-skill-tool-adaptation.md`。

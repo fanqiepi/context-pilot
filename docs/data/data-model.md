@@ -51,3 +51,7 @@
 - `V4__add_logical_delete.sql` 增加 `deleted` 字段；文档删除仅逻辑删除元数据并保留原始文件，未来物理清理由显式维护流程负责。
 
 处理状态、错误摘要和尝试次数直接保存在 `source_document`，MVP 不单独创建任务表。处理器通过带状态条件的原子更新取得处理权，避免同一文档并发执行。向量使用由 `documentId + chunkIndex` 派生的确定性 UUID，重试前先删除该文档旧向量，避免重复索引。
+
+## 已实现的对话结构
+
+`V6__create_chat_tables.sql` 创建 `conversation`、`chat_message`、`message_citation` 和 `model_call`。会话固定关联一个知识库；用户消息直接完成，助手消息按 `PENDING -> COMPLETED/FAILED` 流转。引用保存文档、chunk、页码、顺序、相似度和受限摘录；模型调用只保存供应商、模型、Prompt 版本、Token、耗时、状态、trace ID 和脱敏错误摘要，不保存完整 Prompt 或密钥。四张表均使用逻辑删除字段。

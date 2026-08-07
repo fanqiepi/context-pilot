@@ -42,6 +42,18 @@ class DatabaseMigrationTests {
                         WHERE extname = 'vector'
                     )
                     """)).isTrue();
+            for (String tableName : new String[] {
+                    "conversation", "chat_message", "message_citation", "model_call"
+            }) {
+                assertThat(queryBoolean(connection, """
+                        SELECT EXISTS (
+                            SELECT 1
+                            FROM information_schema.tables
+                            WHERE table_schema = 'public'
+                              AND table_name = '%s'
+                        )
+                        """.formatted(tableName))).isTrue();
+            }
             assertThat(queryBoolean(connection, """
                     SELECT EXISTS (
                         SELECT 1

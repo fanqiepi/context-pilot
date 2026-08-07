@@ -48,8 +48,8 @@ ContextPilot 是一个面向学习和作品展示的单用户知识库与任务�
 | 优先级 | 阶段 | 主要交付 | 完成标准 |
 | --- | --- | --- | --- |
 | P0 | 摄取与检索基线 | 文档处理、离线 Embedding、pgvector 检索 | 已完成；自动化测试和 Knife4j 手工验证通过 |
-| P1 | 真实 Embedding | 接入 DashScope `qwen3.7-text-embedding`、配置校验、重新索引说明 | 真实模型可完成文档入库和知识库隔离检索；密钥不进入 Git 或日志 |
-| P2 | RAG 问答后端 | `conversation`、`chat_message`、`message_citation`、`model_call`；检索证据校验、提示词组装、DeepSeek 调用 | 单次非流式集成测试可得到有依据回答、引用或明确拒答 |
+| P1 | 真实 Embedding | 接入 DashScope `qwen3.7-text-embedding`、配置校验、重新索引说明 | 已完成；真实模型文档入库、知识库隔离和检索手工验证通过，密钥未进入 Git 或日志 |
+| P2 | RAG 问答后端 | `conversation`、`chat_message`、`message_citation`、`model_call`；检索证据校验、提示词组装、DeepSeek 调用 | 已完成；本地真实链路可返回有依据回答、结构化引用、usage 和 trace ID |
 | P3 | SSE 与可观察性 | `/api/chat/stream`、增量事件、引用、usage、trace ID、失败状态落库 | 中断和失败可诊断；SSE 事件顺序稳定且不泄漏内部提示词或密钥 |
 | P4 | 前端闭环 | 知识库与文档页面、独立聊天页面、历史消息、引用展示、处理状态与错误提示 | 用户可仅通过前端完成上传、提问、查看引用和历史记录 |
 | P5 | 反馈与评估 | 有用/无用反馈、固定评估集、检索/引用/拒答/延迟基线 | 配置变化可重复对比，主要失败类型有自动化或评估用例覆盖 |
