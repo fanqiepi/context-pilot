@@ -128,8 +128,11 @@ public class ChatPersistenceService {
     }
 
     @Transactional
-    public void completeFailure(UUID assistantMessageId, UUID modelCallId, long latencyMs) {
-        String summary = "Chat model call failed";
+    public void completeFailure(
+            UUID assistantMessageId,
+            UUID modelCallId,
+            long latencyMs,
+            String summary) {
         completeMessage(assistantMessageId, "", ChatMessageStatus.FAILED, summary);
         ModelCallEntity call = requireModelCall(modelCallId);
         call.setStatus(ModelCallStatus.FAILED);

@@ -25,6 +25,18 @@ public class ChatProperties {
     @Max(20000)
     private int maxEvidenceCharacters = 6000;
 
+    @Min(1)
+    private int streamCorePoolSize = 2;
+
+    @Min(1)
+    private int streamMaxPoolSize = 8;
+
+    @Min(1)
+    private int streamQueueCapacity = 100;
+
+    @Min(1000)
+    private long streamTimeoutMillis = 120000;
+
     public int getRetrievalTopK() { return retrievalTopK; }
     public void setRetrievalTopK(int retrievalTopK) { this.retrievalTopK = retrievalTopK; }
     public double getMinSimilarity() { return minSimilarity; }
@@ -32,5 +44,21 @@ public class ChatProperties {
     public int getMaxEvidenceCharacters() { return maxEvidenceCharacters; }
     public void setMaxEvidenceCharacters(int maxEvidenceCharacters) {
         this.maxEvidenceCharacters = maxEvidenceCharacters;
+    }
+    public int getStreamCorePoolSize() { return streamCorePoolSize; }
+    public void setStreamCorePoolSize(int streamCorePoolSize) {
+        this.streamCorePoolSize = streamCorePoolSize;
+    }
+    public int getStreamMaxPoolSize() { return streamMaxPoolSize; }
+    public void setStreamMaxPoolSize(int streamMaxPoolSize) {
+        this.streamMaxPoolSize = streamMaxPoolSize;
+    }
+    public int getStreamQueueCapacity() { return streamQueueCapacity; }
+    public void setStreamQueueCapacity(int streamQueueCapacity) {
+        this.streamQueueCapacity = streamQueueCapacity;
+    }
+    public long getStreamTimeoutMillis() { return streamTimeoutMillis; }
+    public void setStreamTimeoutMillis(long streamTimeoutMillis) {
+        this.streamTimeoutMillis = streamTimeoutMillis;
     }
 }

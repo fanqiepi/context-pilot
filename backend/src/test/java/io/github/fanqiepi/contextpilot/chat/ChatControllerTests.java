@@ -13,13 +13,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.codec.ServerSentEvent;
+import reactor.core.publisher.Flux;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,12 +32,15 @@ class ChatControllerTests {
 
     @Mock
     private ChatApplicationService chatApplicationService;
+    @Mock
+    private ChatStreamingService chatStreamingService;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new ChatController(chatApplicationService))
+        mockMvc = MockMvcBuilders.standaloneSetup(new ChatController(
+                        chatApplicationService, chatStreamingService))
                 .setControllerAdvice(new ApiExceptionHandler())
                 .addFilters(new RequestIdFilter())
                 .build();
@@ -81,5 +89,33 @@ class ChatControllerTests {
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void streamsServerSentEventsWithRequestId() throws Exception {
+        UUID knowledgeBaseId = UUID.randomUUID();
+        String traceId = "stream-test-123";
+        when(chatStreamingService.stream(any(), eq(traceId))).thenReturn(Flux.just(
+                ServerSentEvent.<ChatStreamPayload>builder(
+                                new ChatStreamPayload.Done("COMPLETED", traceId))
+                        .event("done")
+                        .build()));
+
+        var pending = mockMvc.perform(post("/api/chat/stream")
+                        .header("X-Request-Id", traceId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.TEXT_EVENT_STREAM)
+                        .content("""
+                                {"knowledgeBaseId":"%s","question":"Question"}
+                                """.formatted(knowledgeBaseId)))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(pending))
+                .andExpect(status().isOk())
+                .andExpect(header().string("X-Request-Id", traceId))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("event:done")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(traceId)));
     }
 }

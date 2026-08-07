@@ -6,8 +6,6 @@ import java.util.UUID;
 import io.github.fanqiepi.contextpilot.common.InternalServiceException;
 import io.github.fanqiepi.contextpilot.model.ChatModelGateway;
 import io.github.fanqiepi.contextpilot.model.ChatModelResult;
-import io.github.fanqiepi.contextpilot.retrieval.RetrievalResultResponse;
-import io.github.fanqiepi.contextpilot.retrieval.RetrievalService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,11 +25,9 @@ import static org.mockito.Mockito.when;
 class ChatApplicationServiceTests {
 
     @Mock
-    private RetrievalService retrievalService;
+    private ChatPreparationService preparationService;
     @Mock
     private ChatPersistenceService persistenceService;
-    @Mock
-    private ChatPromptComposer promptComposer;
     @Mock
     private ChatModelGateway chatModelGateway;
 
@@ -39,30 +35,26 @@ class ChatApplicationServiceTests {
 
     @BeforeEach
     void setUp() {
-        ChatProperties properties = new ChatProperties();
-        properties.setMinSimilarity(0.5);
-        properties.setRetrievalTopK(5);
         service = new ChatApplicationService(
-                retrievalService,
+                preparationService,
                 persistenceService,
-                promptComposer,
-                chatModelGateway,
-                properties);
+                chatModelGateway);
     }
 
     @Test
     void answersFromReliableEvidenceAndPersistsCitation() {
         UUID knowledgeBaseId = UUID.randomUUID();
-        UUID documentId = UUID.randomUUID();
         PendingChatExchange exchange = exchange();
-        RetrievalResultResponse evidence = new RetrievalResultResponse(
+        UUID documentId = UUID.randomUUID();
+        ChatCitationResponse citation = new ChatCitationResponse(
+                1,
                 UUID.randomUUID().toString(),
                 documentId,
                 "architecture.md",
                 2,
                 null,
-                "ContextPilot stores vectors in PostgreSQL with pgvector.",
-                0.91);
+                0.91,
+                "ContextPilot stores vectors in PostgreSQL with pgvector.");
         ChatRequest request = new ChatRequest(null, knowledgeBaseId, "Where are vectors stored?");
         UUID modelCallId = UUID.randomUUID();
         ChatModelResult modelResult = new ChatModelResult(
@@ -72,11 +64,10 @@ class ChatApplicationServiceTests {
                 12,
                 42);
 
-        when(retrievalService.search(eq(knowledgeBaseId), any())).thenReturn(List.of(evidence));
-        when(persistenceService.begin(null, knowledgeBaseId, request.question(), "trace-1"))
-                .thenReturn(exchange);
-        when(promptComposer.compose(request.question(), List.of(evidence)))
-                .thenReturn(new ChatPrompt("system", "user", "v1"));
+        when(preparationService.prepare(request, "trace-1")).thenReturn(new PreparedChat(
+                exchange,
+                new ChatPrompt("system", "user", "v1"),
+                List.of(citation)));
         when(chatModelGateway.provider()).thenReturn("DEEPSEEK");
         when(chatModelGateway.configuredModel()).thenReturn("deepseek-v4-flash");
         when(persistenceService.beginModelCall(
@@ -106,17 +97,8 @@ class ChatApplicationServiceTests {
         UUID knowledgeBaseId = UUID.randomUUID();
         PendingChatExchange exchange = exchange();
         ChatRequest request = new ChatRequest(null, knowledgeBaseId, "Unknown question");
-        RetrievalResultResponse weakResult = new RetrievalResultResponse(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID(),
-                "notes.txt",
-                0,
-                null,
-                "Unrelated content",
-                0.2);
-        when(retrievalService.search(eq(knowledgeBaseId), any())).thenReturn(List.of(weakResult));
-        when(persistenceService.begin(null, knowledgeBaseId, request.question(), "trace-2"))
-                .thenReturn(exchange);
+        when(preparationService.prepare(request, "trace-2"))
+                .thenReturn(new PreparedChat(exchange, null, List.of()));
 
         ChatAnswerResponse response = service.answer(request, "trace-2");
 
@@ -134,20 +116,19 @@ class ChatApplicationServiceTests {
         UUID knowledgeBaseId = UUID.randomUUID();
         PendingChatExchange exchange = exchange();
         ChatRequest request = new ChatRequest(null, knowledgeBaseId, "Question");
-        RetrievalResultResponse evidence = new RetrievalResultResponse(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID(),
-                "notes.txt",
-                0,
-                null,
-                "Relevant content",
-                0.9);
         UUID modelCallId = UUID.randomUUID();
-        when(retrievalService.search(eq(knowledgeBaseId), any())).thenReturn(List.of(evidence));
-        when(persistenceService.begin(null, knowledgeBaseId, request.question(), "trace-3"))
-                .thenReturn(exchange);
-        when(promptComposer.compose(request.question(), List.of(evidence)))
-                .thenReturn(new ChatPrompt("system", "user", "v1"));
+        when(preparationService.prepare(request, "trace-3")).thenReturn(new PreparedChat(
+                exchange,
+                new ChatPrompt("system", "user", "v1"),
+                List.of(new ChatCitationResponse(
+                        1,
+                        UUID.randomUUID().toString(),
+                        UUID.randomUUID(),
+                        "notes.txt",
+                        0,
+                        null,
+                        0.9,
+                        "Relevant content"))));
         when(chatModelGateway.provider()).thenReturn("DEEPSEEK");
         when(chatModelGateway.configuredModel()).thenReturn("deepseek-v4-flash");
         when(persistenceService.beginModelCall(any(), anyString(), anyString(), anyString(), anyString()))
@@ -159,7 +140,10 @@ class ChatApplicationServiceTests {
                 .isInstanceOf(InternalServiceException.class)
                 .hasMessage("Chat model call failed");
         verify(persistenceService).completeFailure(
-                eq(exchange.assistantMessageId()), eq(modelCallId), any(Long.class));
+                eq(exchange.assistantMessageId()),
+                eq(modelCallId),
+                any(Long.class),
+                eq("Chat model call failed"));
     }
 
     private PendingChatExchange exchange() {

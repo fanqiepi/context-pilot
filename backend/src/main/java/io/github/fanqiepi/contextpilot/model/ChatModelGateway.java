@@ -13,6 +13,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 @Component
 public class ChatModelGateway {
@@ -37,17 +38,9 @@ public class ChatModelGateway {
     }
 
     public ChatModelResult generate(String systemText, String userText) {
-        ChatModel chatModel = chatModelProvider.getIfAvailable();
-        if (chatModel == null) {
-            throw new InternalServiceException(
-                    "CHAT_MODEL_UNAVAILABLE",
-                    "Chat model is not enabled",
-                    new IllegalStateException("ChatModel bean is not available"));
-        }
+        ChatModel chatModel = requireChatModel();
         try {
-            ChatResponse response = chatModel.call(new Prompt(List.of(
-                    new SystemMessage(systemText),
-                    new UserMessage(userText))));
+            ChatResponse response = chatModel.call(prompt(systemText, userText));
             if (response == null || response.getResult() == null
                     || response.getResult().getOutput() == null
                     || response.getResult().getOutput().getText() == null
@@ -74,5 +67,60 @@ public class ChatModelGateway {
                     "Chat model call failed",
                     exception);
         }
+    }
+
+    public Flux<ChatModelChunk> stream(String systemText, String userText) {
+        return Flux.defer(() -> {
+                    ChatModel chatModel = requireChatModel();
+                    try {
+                        return chatModel.stream(prompt(systemText, userText)).map(this::toChunk);
+                    } catch (RuntimeException exception) {
+                        return Flux.error(streamFailure(exception));
+                    }
+                })
+                .onErrorMap(exception -> exception instanceof InternalServiceException
+                        ? exception
+                        : streamFailure(exception));
+    }
+
+    private ChatModelChunk toChunk(ChatResponse response) {
+        String content = response == null || response.getResult() == null
+                || response.getResult().getOutput() == null
+                || response.getResult().getOutput().getText() == null
+                ? ""
+                : response.getResult().getOutput().getText();
+        ChatResponseMetadata metadata = response == null ? null : response.getMetadata();
+        Usage usage = metadata == null ? null : metadata.getUsage();
+        String model = metadata == null || metadata.getModel() == null
+                ? configuredModel
+                : metadata.getModel();
+        return new ChatModelChunk(
+                content,
+                model,
+                usage == null ? null : usage.getPromptTokens(),
+                usage == null ? null : usage.getCompletionTokens(),
+                usage == null ? null : usage.getTotalTokens());
+    }
+
+    private Prompt prompt(String systemText, String userText) {
+        return new Prompt(List.of(new SystemMessage(systemText), new UserMessage(userText)));
+    }
+
+    private ChatModel requireChatModel() {
+        ChatModel chatModel = chatModelProvider.getIfAvailable();
+        if (chatModel == null) {
+            throw new InternalServiceException(
+                    "CHAT_MODEL_UNAVAILABLE",
+                    "Chat model is not enabled",
+                    new IllegalStateException("ChatModel bean is not available"));
+        }
+        return chatModel;
+    }
+
+    private InternalServiceException streamFailure(Throwable cause) {
+        return new InternalServiceException(
+                "CHAT_MODEL_STREAM_FAILED",
+                "Chat model stream failed",
+                cause);
     }
 }

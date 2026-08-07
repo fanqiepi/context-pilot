@@ -12,7 +12,7 @@ MVP 不引入 Agent、工作流引擎、微服务、消息队列、多租户、�
 
 - 已完成工程基线、PostgreSQL/pgvector 与 Flyway、知识库 CRUD，以及文档上传、异步解析切分、状态与有限重试、pgvector 索引、知识库隔离检索和逻辑删除后的向量清理。
 - 前端目前主要是工程基线和欢迎页。
-- 已提供无需 API Key 的 `offline` Profile 和确定性 1024 维测试 Embedding；真实 DashScope `qwen3.7-text-embedding` 与非流式 RAG 问答后端均已通过本地真实链路验证，下一阶段进入 DeepSeek SSE 与可观察性开发。
+- 已提供无需 API Key 的 `offline` Profile 和确定性 1024 维测试 Embedding；真实 DashScope `qwen3.7-text-embedding`、非流式 RAG 问答和 DeepSeek SSE 均已通过本地真实链路验证。SSE 事件顺序、取消和失败落库已有自动化测试覆盖。
 - 日常开发和集成分支为 `develop`，不得直接提交到 `main`。
 
 ## 路线图边界
@@ -77,6 +77,10 @@ Node.js 要求不低于 22.12.0。后端使用仓库内 Maven Wrapper；本地�
 | `DOCUMENT_PROCESSING_MAX_POOL_SIZE` | `2` |
 | `DOCUMENT_PROCESSING_QUEUE_CAPACITY` | `50` |
 | `DOCUMENT_PROCESSING_MAX_ATTEMPTS` | `3`，包含首次处理 |
+| `CHAT_STREAM_CORE_POOL_SIZE` | SSE 异步执行器核心线程数，默认 `2` |
+| `CHAT_STREAM_MAX_POOL_SIZE` | SSE 异步执行器最大线程数，默认 `8` |
+| `CHAT_STREAM_QUEUE_CAPACITY` | SSE 异步执行器队列容量，默认 `100` |
+| `CHAT_STREAM_TIMEOUT_MILLIS` | MVC SSE 请求超时，默认 `120000` 毫秒 |
 | `SPRING_PROFILES_ACTIVE` | 本地无密钥闭环测试时设为 `offline` |
 | `SERVER_PORT` | `18080` |
 | `SPRING_AI_CHAT_MODEL` | 启用时设为 `deepseek` |
