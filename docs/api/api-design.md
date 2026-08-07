@@ -19,6 +19,7 @@
 - `/api/documents/{id}/retry`：重试处理失败且未达到次数上限的文档。
 - `/api/knowledge-bases/{id}/search`：知识库内 Top-K 文档片段检索。
 - `/api/conversations`：会话和历史消息。
+- `/api/chat`：POST 非流式 RAG 问答，用于 P2 闭环和集成验证。
 - `/api/chat/stream`：POST SSE 流式问答。
 - `/api/messages/{id}/feedback`：有用/无用反馈。
 - `/api/model-calls`：最小调用记录查询。
@@ -61,6 +62,8 @@ TXT、Markdown 和文本型 PDF 分别通过 Spring AI 对应 reader 解析；PD
 `POST /api/knowledge-bases/{id}/search` 请求体包含非空 `query` 和可选 `topK`。`topK` 默认为 5，范围为 1 到 20。检索强制通过向量元数据中的 `knowledge_base_id` 隔离结果，返回 chunk ID、文档 ID、原始文件名、chunk 序号、可用时的 PDF 页码、正文和相似度分数。未启用向量存储时返回安全的服务错误，不会回退为跨知识库或无过滤检索。
 
 ## SSE 事件
+
+`POST /api/chat` 请求体包含必填的 `knowledgeBaseId`、必填的 `question` 和可选的 `conversationId`。未提供会话 ID 时自动创建会话；提供时必须与所选知识库一致。接口先执行知识库隔离检索和相似度校验，无可靠依据时保存固定拒答且不调用模型；有依据时调用 DeepSeek，并返回会话、用户消息、助手消息、回答、结构化引用、模型、usage 和 trace ID。该接口与后续 SSE 接口复用同一个确定性 RAG 编排核心。
 
 `POST /api/chat/stream` 使用 `text/event-stream`，客户端通过 `@microsoft/fetch-event-source` 建立连接。事件顺序为：
 
