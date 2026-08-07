@@ -24,7 +24,7 @@
 - Backend: Java 21, Spring Boot 4.1.x, Spring AI 2.0.x, Maven.
 - Frontend: Vue 3, TypeScript, Vite, Element Plus.
 - Chat model: DeepSeek API through Spring AI's native DeepSeek integration; use `deepseek-v4-flash` as the default model.
-- Embedding model: DashScope `text-embedding-v4` through its OpenAI-compatible endpoint, fixed at 1024 dimensions for the MVP.
+- Embedding model: DashScope `qwen3.7-text-embedding` through its OpenAI-compatible endpoint, fixed at 1024 dimensions for the MVP.
 - Storage: PostgreSQL with pgvector; do not add a separate vector database for the MVP.
 - Persistence: use MyBatis-Plus for business tables and Spring AI `PgVectorStore` for vector operations.
 - Documents: support TXT, Markdown, and text-based PDF through Spring AI readers; scanned-PDF OCR is out of scope.

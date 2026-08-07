@@ -28,7 +28,7 @@ MVP 不引入 Agent、工作流引擎、微服务、消息队列、多租户、�
 - 前端：Vue 3、TypeScript、Vite、Element Plus、Pinia、Vue Router。
 - 数据库：PostgreSQL 17 + pgvector，数据库名和用户名均为 `context_pilot`。
 - 聊天模型：DeepSeek `deepseek-v4-flash`。
-- Embedding：DashScope `text-embedding-v4`，固定 1024 维。
+- Embedding：DashScope `qwen3.7-text-embedding`，固定 1024 维。
 - 向量存储：Spring AI `PgVectorStore`，使用 `public.vector_store`、UUID、HNSW 和余弦距离。
 - 接口文档：Knife4j Next 5.2.x 的 Spring Boot 4 OpenAPI3 starter。
 

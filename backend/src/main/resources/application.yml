@@ -26,7 +26,7 @@ spring:
       api-key: ${DASHSCOPE_API_KEY:}
       embedding:
         options:
-          model: text-embedding-v4
+          model: qwen3.7-text-embedding
           dimensions: 1024
     vectorstore:
       type: ${SPRING_AI_VECTOR_STORE:none}
