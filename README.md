@@ -34,6 +34,6 @@ java -version
 
 ## 数据流向
 
-上传文件保存在被 Git 忽略的 `data/uploads/`。文档分段发送到阿里云百炼 `text-embedding-v4` 生成 1024 维向量，检索命中的分段发送到 DeepSeek 生成回答；模型密钥只允许保存在后端环境变量中。
+上传文件保存在被 Git 忽略的 `data/uploads/`。文档分段发送到阿里云百炼 `qwen3.7-text-embedding` 生成 1024 维向量，检索命中的分段发送到 DeepSeek 生成回答；模型密钥只允许保存在后端环境变量中。
 
 正式的需求、架构、数据模型、接口、评估和本地开发约定位于 [`docs/`](docs/)；数据库结构以 Flyway 迁移脚本为准。
