@@ -75,3 +75,5 @@ TXT、Markdown 和文本型 PDF 分别通过 Spring AI 对应 reader 解析；PD
 6. `error`：返回安全错误码和可展示消息，随后结束连接。
 
 连接断开不等于模型调用必然取消；服务端必须记录最终状态。任何 SSE 事件都不能携带 API Key、完整提示词或未截断的内部异常。
+
+`message` 数据包含 `conversationId`、`userMessageId`、`assistantMessageId` 和 `traceId`；`delta` 数据包含本次增量文本；`citation` 与非流式接口使用相同的结构化引用；`usage` 包含模型、Token 和耗时；`done` 包含 `COMPLETED` 或 `REFUSED` 状态及 `traceId`。模型流失败时在已发送的事件之后追加一个安全的 `error` 事件并结束，不再发送引用、usage 或 done。客户端在模型完成前断开时，待处理的助手消息和模型调用记录为失败，并保存脱敏的取消摘要。

@@ -12,7 +12,7 @@ public record ChatCitationResponse(
         int chunkIndex,
         Integer pageNumber,
         Double score,
-        String excerpt) {
+        String excerpt) implements ChatStreamPayload {
 
     private static final int MAX_EXCERPT_CHARACTERS = 2000;
 

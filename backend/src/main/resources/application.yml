@@ -59,6 +59,10 @@ contextpilot:
     retrieval-top-k: ${CHAT_RETRIEVAL_TOP_K:5}
     min-similarity: ${CHAT_MIN_SIMILARITY:0.5}
     max-evidence-characters: ${CHAT_MAX_EVIDENCE_CHARACTERS:6000}
+    stream-core-pool-size: ${CHAT_STREAM_CORE_POOL_SIZE:2}
+    stream-max-pool-size: ${CHAT_STREAM_MAX_POOL_SIZE:8}
+    stream-queue-capacity: ${CHAT_STREAM_QUEUE_CAPACITY:100}
+    stream-timeout-millis: ${CHAT_STREAM_TIMEOUT_MILLIS:120000}
 
 
 server:
