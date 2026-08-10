@@ -28,6 +28,18 @@ public record ChatCitationResponse(
                 excerpt(result.content()));
     }
 
+    static ChatCitationResponse from(MessageCitationEntity entity) {
+        return new ChatCitationResponse(
+                entity.getRankIndex(),
+                entity.getChunkId(),
+                entity.getDocumentId(),
+                entity.getOriginalFilename(),
+                entity.getChunkIndex(),
+                entity.getPageNumber(),
+                entity.getScore(),
+                entity.getExcerpt());
+    }
+
     private static String excerpt(String content) {
         if (content == null || content.length() <= MAX_EXCERPT_CHARACTERS) {
             return content;

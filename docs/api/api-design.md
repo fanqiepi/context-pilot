@@ -61,6 +61,15 @@ TXT、Markdown 和文本型 PDF 分别通过 Spring AI 对应 reader 解析；PD
 
 `POST /api/knowledge-bases/{id}/search` 请求体包含非空 `query` 和可选 `topK`。`topK` 默认为 5，范围为 1 到 20。检索强制通过向量元数据中的 `knowledge_base_id` 隔离结果，返回 chunk ID、文档 ID、原始文件名、chunk 序号、可用时的 PDF 页码、正文和相似度分数。未启用向量存储时返回安全的服务错误，不会回退为跨知识库或无过滤检索。
 
+## 会话历史接口
+
+| 方法 | 路径 | 行为 |
+| --- | --- | --- |
+| `GET` | `/api/conversations?knowledgeBaseId={id}` | 查询指定知识库下的会话，按更新时间和 ID 稳定倒序返回 |
+| `GET` | `/api/conversations/{conversationId}/messages` | 查询会话消息，按创建时间、角色和 ID 稳定正序返回 |
+
+会话列表会先校验知识库存在，并通过 `knowledgeBaseId` 强制隔离结果；知识库不存在时返回 `404 KNOWLEDGE_BASE_NOT_FOUND`。会话消息包含角色、正文、状态、安全错误摘要、trace ID、时间和结构化引用；同一时间戳下用户消息排在助手消息之前，引用按 rank 正序返回，并通过一次批量查询关联到各条消息。逻辑删除的会话、消息和引用不会出现在查询结果中。会话不存在时返回 `404 CONVERSATION_NOT_FOUND`。
+
 ## SSE 事件
 
 `POST /api/chat` 请求体包含必填的 `knowledgeBaseId`、必填的 `question` 和可选的 `conversationId`。未提供会话 ID 时自动创建会话；提供时必须与所选知识库一致。接口先执行知识库隔离检索和相似度校验，无可靠依据时保存固定拒答且不调用模型；有依据时调用 DeepSeek，并返回会话、用户消息、助手消息、回答、结构化引用、模型、usage 和 trace ID。该接口与后续 SSE 接口复用同一个确定性 RAG 编排核心。
