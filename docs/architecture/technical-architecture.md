@@ -42,6 +42,8 @@ P2 先通过 `POST /api/chat` 提供非流式闭环，验证持久化、拒答�
 
 SSE 使用 Spring AI `ChatModel.stream` 生成真实增量，正常路径固定为 `message -> delta* -> citation* -> usage -> done`。模型完成并成功落库后才发送引用、usage 和 done；异常路径发送安全 `error` 后结束，客户端提前取消则将仍在处理的助手消息和模型调用标记为失败。Spring MVC 使用独立有界执行器承载异步响应，避免占用文档处理线程池。
 
+会话历史由只读的 `ConversationHistoryService` 查询：会话始终按知识库 ID 过滤，消息按时间稳定排序，引用按消息 ID 批量加载后在应用层关联，避免逐条消息产生 N+1 查询。MyBatis-Plus 逻辑删除规则统一过滤已删除记录。
+
 缺少知识库、问题为空或必要上下文不足时，由请求校验和固定规则返回澄清提示；检索无可靠依据时明确拒答。模型可以改善用户可读文案，但不能改变校验结论、伪造引用或扩大知识库范围。
 
 HTTP request ID 作为 MVP trace ID 的起点，后续贯穿 SSE、消息和 `model_call`。它用于关联与诊断，不承担身份或权限功能。

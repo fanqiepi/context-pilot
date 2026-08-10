@@ -70,7 +70,9 @@ class ContextPilotApplicationTests {
                 .andExpect(jsonPath("$.paths['/api/documents/{documentId}/retry']").exists())
                 .andExpect(jsonPath("$.paths['/api/knowledge-bases/{knowledgeBaseId}/search']").exists())
                 .andExpect(jsonPath("$.paths['/api/chat']").exists())
-                .andExpect(jsonPath("$.paths['/api/chat/stream']").exists());
+                .andExpect(jsonPath("$.paths['/api/chat/stream']").exists())
+                .andExpect(jsonPath("$.paths['/api/conversations']").exists())
+                .andExpect(jsonPath("$.paths['/api/conversations/{conversationId}/messages']").exists());
         mockMvc.perform(get("/v3/api-docs/swagger-config"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.url").value("/v3/api-docs"));
