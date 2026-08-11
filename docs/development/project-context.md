@@ -11,14 +11,14 @@ MVP 不引入 Agent、工作流引擎、微服务、消息队列、多租户、�
 ## 当前状态
 
 - 已完成工程基线、PostgreSQL/pgvector 与 Flyway、知识库 CRUD，以及文档上传、异步解析切分、状态与有限重试、pgvector 索引、知识库隔离检索和逻辑删除后的向量清理。
-- 前端目前主要是工程基线和欢迎页。
+- 前端已实现知识库与文档管理、文档处理状态轮询、独立聊天、SSE 增量回答、引用展示和会话历史恢复；类型检查和生产构建已通过，仍需在本地真实后端链路上完成页面级验收。
 - 已提供无需 API Key 的 `offline` Profile 和确定性 1024 维测试 Embedding；真实 DashScope `qwen3.7-text-embedding`、非流式 RAG 问答和 DeepSeek SSE 均已通过本地真实链路验证。SSE 事件顺序、取消和失败落库已有自动化测试覆盖。
-- 已提供按知识库查询会话列表和读取会话消息、引用的后端接口，下一步继续完成前端知识库、文档与聊天闭环。
+- 已提供按知识库查询会话列表和读取会话消息、引用的后端接口，前端通过这些接口恢复历史记录，并通过 `/api/chat/stream` 完成流式问答。
 - 日常开发和集成分支为 `develop`，不得直接提交到 `main`。
 
 ## 路线图边界
 
-- MVP 下一阶段依次完成前端闭环、反馈、评估和发布前加固。
+- MVP 下一阶段先完成前端真实链路验收，再依次完成反馈、评估和发布前加固。
 - MVP 可以吸收 Agent 时序中的上下文校验、澄清、证据验证、来源和可追踪性，但不实现 SkillRouter、通用 ToolExecutionGateway 或模型驱动的数据库查询。
 - MVP 完成后，只有真实多能力需求出现时才评估固定能力路由；只有明确工具用例和威胁模型完成后才增加白名单工具网关；项目 PostgreSQL 数据必须通过领域化只读 DataPort 查询。
 - 完整阶段计划见 `docs/requirements/product-requirements.md`，参考时序图适配结论见 `docs/architecture/agent-skill-tool-adaptation.md`。

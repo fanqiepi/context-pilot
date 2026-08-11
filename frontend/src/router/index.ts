@@ -5,8 +5,17 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: () => import('@/views/HomeView.vue'),
+      redirect: '/library',
+    },
+    {
+      path: '/library',
+      name: 'library',
+      component: () => import('@/views/KnowledgeBaseView.vue'),
+    },
+    {
+      path: '/chat',
+      name: 'chat',
+      component: () => import('@/views/ChatView.vue'),
     },
   ],
 })
