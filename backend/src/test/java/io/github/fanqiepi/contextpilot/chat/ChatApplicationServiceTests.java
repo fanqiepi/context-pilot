@@ -112,6 +112,26 @@ class ChatApplicationServiceTests {
     }
 
     @Test
+    void returnsDirectAnswerWithoutCallingModel() {
+        UUID knowledgeBaseId = UUID.randomUUID();
+        PendingChatExchange exchange = exchange();
+        ChatRequest request = new ChatRequest(null, knowledgeBaseId, "你是谁？");
+        when(preparationService.prepare(request, "trace-direct"))
+                .thenReturn(PreparedChat.direct(exchange, SimpleChatReplyPolicy.IDENTITY_REPLY));
+
+        ChatAnswerResponse response = service.answer(request, "trace-direct");
+
+        assertThat(response.refused()).isFalse();
+        assertThat(response.answer()).isEqualTo(SimpleChatReplyPolicy.IDENTITY_REPLY);
+        assertThat(response.citations()).isEmpty();
+        assertThat(response.model()).isNull();
+        assertThat(response.usage()).isNull();
+        verify(persistenceService).completeWithoutModel(
+                exchange.assistantMessageId(), SimpleChatReplyPolicy.IDENTITY_REPLY);
+        verify(chatModelGateway, never()).generate(anyString(), anyString());
+    }
+
+    @Test
     void recordsModelFailureBeforeReturningSafeError() {
         UUID knowledgeBaseId = UUID.randomUUID();
         PendingChatExchange exchange = exchange();

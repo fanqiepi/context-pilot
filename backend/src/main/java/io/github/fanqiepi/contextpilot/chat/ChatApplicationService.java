@@ -30,6 +30,20 @@ public class ChatApplicationService {
     public ChatAnswerResponse answer(ChatRequest request, String traceId) {
         PreparedChat prepared = preparationService.prepare(request, traceId);
         PendingChatExchange exchange = prepared.exchange();
+        if (prepared.hasDirectAnswer()) {
+            persistenceService.completeWithoutModel(
+                    exchange.assistantMessageId(), prepared.directAnswer());
+            return new ChatAnswerResponse(
+                    exchange.conversationId(),
+                    exchange.userMessageId(),
+                    exchange.assistantMessageId(),
+                    prepared.directAnswer(),
+                    false,
+                    List.of(),
+                    null,
+                    null,
+                    traceId);
+        }
         if (prepared.refused()) {
             persistenceService.completeWithoutModel(
                     exchange.assistantMessageId(), INSUFFICIENT_EVIDENCE_ANSWER);

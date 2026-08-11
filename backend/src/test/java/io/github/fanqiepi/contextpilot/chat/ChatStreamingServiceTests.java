@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -109,6 +110,30 @@ class ChatStreamingServiceTests {
         verify(persistenceService).completeWithoutModel(
                 exchange.assistantMessageId(),
                 ChatApplicationService.INSUFFICIENT_EVIDENCE_ANSWER);
+    }
+
+    @Test
+    void emitsCompletedDirectAnswerWithoutModelCall() {
+        ChatRequest request = request();
+        PendingChatExchange exchange = exchange();
+        when(preparationService.prepare(request, "trace-direct"))
+                .thenReturn(PreparedChat.direct(exchange, SimpleChatReplyPolicy.IDENTITY_REPLY));
+
+        List<ServerSentEvent<ChatStreamPayload>> events = service
+                .stream(request, "trace-direct")
+                .collectList()
+                .block(Duration.ofSeconds(5));
+
+        assertThat(events).isNotNull();
+        assertThat(events.stream().map(ServerSentEvent::event).toList())
+                .containsExactly("message", "delta", "done");
+        ChatStreamPayload.Delta delta = (ChatStreamPayload.Delta) events.get(1).data();
+        assertThat(delta.content()).isEqualTo(SimpleChatReplyPolicy.IDENTITY_REPLY);
+        ChatStreamPayload.Done done = (ChatStreamPayload.Done) events.getLast().data();
+        assertThat(done.status()).isEqualTo("COMPLETED");
+        verify(persistenceService).completeWithoutModel(
+                exchange.assistantMessageId(), SimpleChatReplyPolicy.IDENTITY_REPLY);
+        verifyNoInteractions(chatModelGateway);
     }
 
     @Test

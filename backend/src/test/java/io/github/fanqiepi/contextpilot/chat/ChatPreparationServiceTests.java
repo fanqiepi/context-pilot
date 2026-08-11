@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,7 +39,8 @@ class ChatPreparationServiceTests {
                 retrievalService,
                 persistenceService,
                 promptComposer,
-                properties);
+                properties,
+                new SimpleChatReplyPolicy());
     }
 
     @Test
@@ -95,6 +97,24 @@ class ChatPreparationServiceTests {
 
         assertThat(prepared.refused()).isTrue();
         assertThat(prepared.citations()).isEmpty();
+    }
+
+    @Test
+    void preparesDirectAnswerWithoutRetrievalForWhitelistedInteraction() {
+        UUID knowledgeBaseId = UUID.randomUUID();
+        PendingChatExchange exchange = exchange();
+        ChatRequest request = new ChatRequest(null, knowledgeBaseId, " 你是谁？ ");
+        when(persistenceService.begin(null, knowledgeBaseId, "你是谁？", "trace-direct"))
+                .thenReturn(exchange);
+
+        PreparedChat prepared = service.prepare(request, "trace-direct");
+
+        assertThat(prepared.hasDirectAnswer()).isTrue();
+        assertThat(prepared.directAnswer()).isEqualTo(SimpleChatReplyPolicy.IDENTITY_REPLY);
+        assertThat(prepared.refused()).isFalse();
+        assertThat(prepared.citations()).isEmpty();
+        verify(persistenceService).validateConversation(null, knowledgeBaseId);
+        verifyNoInteractions(retrievalService, promptComposer);
     }
 
     private PendingChatExchange exchange() {
