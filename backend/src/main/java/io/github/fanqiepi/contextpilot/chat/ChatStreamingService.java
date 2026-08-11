@@ -53,6 +53,14 @@ public class ChatStreamingService {
                         exchange.userMessageId(),
                         exchange.assistantMessageId(),
                         traceId));
+        if (prepared.hasDirectAnswer()) {
+            persistenceService.completeWithoutModel(
+                    exchange.assistantMessageId(), prepared.directAnswer());
+            return Flux.just(
+                    message,
+                    event("delta", new ChatStreamPayload.Delta(prepared.directAnswer())),
+                    event("done", new ChatStreamPayload.Done("COMPLETED", traceId)));
+        }
         if (prepared.refused()) {
             persistenceService.completeWithoutModel(
                     exchange.assistantMessageId(),

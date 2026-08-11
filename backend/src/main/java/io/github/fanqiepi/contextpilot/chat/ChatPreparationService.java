@@ -2,6 +2,7 @@ package io.github.fanqiepi.contextpilot.chat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalResultResponse;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalSearchRequest;
@@ -15,21 +16,30 @@ public class ChatPreparationService {
     private final ChatPersistenceService persistenceService;
     private final ChatPromptComposer promptComposer;
     private final ChatProperties properties;
+    private final SimpleChatReplyPolicy simpleReplyPolicy;
 
     public ChatPreparationService(
             RetrievalService retrievalService,
             ChatPersistenceService persistenceService,
             ChatPromptComposer promptComposer,
-            ChatProperties properties) {
+            ChatProperties properties,
+            SimpleChatReplyPolicy simpleReplyPolicy) {
         this.retrievalService = retrievalService;
         this.persistenceService = persistenceService;
         this.promptComposer = promptComposer;
         this.properties = properties;
+        this.simpleReplyPolicy = simpleReplyPolicy;
     }
 
     PreparedChat prepare(ChatRequest request, String traceId) {
         String question = request.question().strip();
         persistenceService.validateConversation(request.conversationId(), request.knowledgeBaseId());
+        Optional<String> directAnswer = simpleReplyPolicy.replyTo(question);
+        if (directAnswer.isPresent()) {
+            PendingChatExchange exchange = persistenceService.begin(
+                    request.conversationId(), request.knowledgeBaseId(), question, traceId);
+            return PreparedChat.direct(exchange, directAnswer.get());
+        }
         List<RetrievalResultResponse> results = retrievalService.search(
                 request.knowledgeBaseId(),
                 new RetrievalSearchRequest(question, properties.getRetrievalTopK()));

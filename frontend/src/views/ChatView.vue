@@ -11,11 +11,18 @@ import {
 } from '@/api/contextPilot'
 import { errorMessage } from '@/api/client'
 import type {
+  Citation,
   ConversationMessage,
   ConversationSummary,
   KnowledgeBase,
+  StreamDoneEvent,
+  StreamErrorEvent,
   StreamUsageEvent,
 } from '@/api/types'
+import {
+  createStreamTextRenderer,
+  type StreamTextRenderer,
+} from '@/utils/streamTextRenderer'
 
 interface UiMessage extends ConversationMessage {
   usage?: StreamUsageEvent
@@ -33,6 +40,7 @@ const loadingMessages = ref(false)
 const sending = ref(false)
 const messageScroller = ref<HTMLElement>()
 let streamController: AbortController | undefined
+let activeTextRenderer: StreamTextRenderer | undefined
 
 const activeKnowledgeBase = computed(
   () => knowledgeBases.value.find((item) => item.id === activeKnowledgeBaseId.value) ?? null,
@@ -58,6 +66,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   streamController?.abort()
+  activeTextRenderer?.cancel()
 })
 
 async function initialize(): Promise<void> {
@@ -177,8 +186,17 @@ async function sendQuestion(): Promise<void> {
   messages.value.push(userMessage, assistantMessage)
   draft.value = ''
   sending.value = true
-  streamController = new AbortController()
-  let terminalEventReceived = false
+  const requestController = new AbortController()
+  streamController = requestController
+  const textRenderer = createStreamTextRenderer((content) => {
+    assistantMessage.content += content
+    void scrollToBottom()
+  })
+  activeTextRenderer = textRenderer
+  const pendingCitations: Citation[] = []
+  let pendingUsage: StreamUsageEvent | undefined
+  let doneEvent: StreamDoneEvent | undefined
+  let streamErrorEvent: StreamErrorEvent | undefined
   await scrollToBottom()
 
   try {
@@ -201,54 +219,79 @@ async function sendQuestion(): Promise<void> {
           assistantMessage.traceId = event.traceId
         },
         onDelta(event) {
-          assistantMessage.content += event.content
-          void scrollToBottom()
+          textRenderer.enqueue(event.content)
         },
         onCitation(event) {
-          assistantMessage.citations.push(event)
+          pendingCitations.push(event)
         },
         onUsage(event) {
-          assistantMessage.usage = event
+          pendingUsage = event
         },
         onDone(event) {
-          terminalEventReceived = true
-          assistantMessage.status = 'COMPLETED'
-          assistantMessage.traceId = event.traceId
-          assistantMessage.updatedAt = new Date().toISOString()
+          doneEvent = event
         },
         onError(event) {
-          terminalEventReceived = true
-          assistantMessage.status = 'FAILED'
-          assistantMessage.errorSummary = event.message
-          assistantMessage.traceId = event.traceId
-          assistantMessage.updatedAt = new Date().toISOString()
+          streamErrorEvent = event
         },
       },
-      streamController.signal,
+      requestController.signal,
     )
 
-    if (!terminalEventReceived && !streamController.signal.aborted) {
+    if (requestController.signal.aborted) {
+      textRenderer.cancel()
+      assistantMessage.status = 'FAILED'
+      assistantMessage.errorSummary = '回答已停止'
+      return
+    }
+    streamController = undefined
+    await textRenderer.drain()
+    assistantMessage.citations.push(...pendingCitations)
+    assistantMessage.usage = pendingUsage
+    if (streamErrorEvent) {
+      assistantMessage.status = 'FAILED'
+      assistantMessage.errorSummary = streamErrorEvent.message
+      assistantMessage.traceId = streamErrorEvent.traceId
+      assistantMessage.updatedAt = new Date().toISOString()
+    } else if (doneEvent) {
+      assistantMessage.status = 'COMPLETED'
+      assistantMessage.traceId = doneEvent.traceId
+      assistantMessage.updatedAt = new Date().toISOString()
+    } else {
       assistantMessage.status = 'FAILED'
       assistantMessage.errorSummary = '流式连接提前结束，请重试'
     }
   } catch (error) {
+    const aborted = requestController.signal.aborted
+    if (aborted) {
+      textRenderer.cancel()
+    } else {
+      await textRenderer.drain()
+    }
     assistantMessage.status = 'FAILED'
-    assistantMessage.errorSummary = streamController.signal.aborted
+    assistantMessage.errorSummary = aborted
       ? '回答已停止'
       : errorMessage(error, '回答生成失败')
-    if (!streamController.signal.aborted) {
+    if (!aborted) {
       ElMessage.error(assistantMessage.errorSummary)
     }
   } finally {
     sending.value = false
     streamController = undefined
+    if (activeTextRenderer === textRenderer) {
+      activeTextRenderer = undefined
+    }
     await refreshConversations(false)
     await scrollToBottom()
   }
 }
 
 function stopGeneration(): void {
-  streamController?.abort()
+  if (streamController) {
+    activeTextRenderer?.cancel()
+    streamController.abort()
+    return
+  }
+  activeTextRenderer?.flush()
 }
 
 async function scrollToBottom(): Promise<void> {
