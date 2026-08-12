@@ -1,6 +1,6 @@
-# MVP 数据模型
+# ContextPilot 数据模型
 
-> 本文定义逻辑模型；已经实施的物理结构以 Flyway 迁移为事实来源。
+> 本文定义已实现逻辑模型和已授权的下一阶段规划；已经实施的物理结构以 Flyway 迁移为事实来源，规划结构在对应迁移落地前不得视为已存在。
 
 ## 核心实体
 
@@ -14,6 +14,12 @@
 | `message_citation` | 引用的文档、页码、分段和排序 | 属于助手消息 |
 | `model_call` | 模型、耗时、Token、状态和脱敏错误 | 关联消息或文档任务 |
 | `answer_feedback` | “有用”正向反馈 | 每条助手消息最多一条当前反馈 |
+
+## 下一阶段规划实体（尚未实现）
+
+| 实体 | 主要职责 | 关键关系 |
+| --- | --- | --- |
+| `action_request` | 保存需人工确认的业务操作提案、状态和安全结果摘要 | 关联会话、用户消息和提案助手消息 |
 
 ## 数据约定
 
@@ -61,3 +67,23 @@
 `V7__create_answer_feedback.sql` 创建 `answer_feedback`。一条未删除记录表示对应回答被用户标记为“有用”，不保存“无用”值或原因。`message_id` 通过受限删除外键关联 `chat_message`，并由唯一约束保证每条消息最多对应一条反馈记录；取消反馈时设置 `deleted = 1`，再次标记时原子恢复同一记录，避免重复数据。
 
 只有已完成的助手消息可以接收反馈。知识库 ID 和 trace ID 不由客户端提交，也不在反馈表重复保存；后端通过 `chat_message -> conversation -> knowledge_base` 及消息自身的 `trace_id` 可信关联，避免冗余字段漂移或客户端伪造上下文。
+
+## 下一阶段操作结构规划（尚未实现）
+
+下一次数据库迁移计划创建 `action_request`，至少包含：
+
+- `id`：应用生成 UUID。
+- `conversation_id`、`user_message_id`、`assistant_message_id`：通过受限删除外键关联提案产生时的聊天上下文。
+- `capability_id`、`capability_version`：当前固定为业务操作能力及其版本。
+- `action_type`：静态白名单动作；首个且当前唯一允许值为 `CREATE_KNOWLEDGE_BASE`。
+- `parameters`：JSONB，只保存服务端完成强类型解析、规范化和校验后的必要参数。
+- `display_summary`：确认卡片使用的安全影响摘要，不包含密钥或原始模型请求。
+- `status`：`PENDING_CONFIRMATION`、`EXECUTING`、`SUCCEEDED`、`FAILED`、`REJECTED` 或 `EXPIRED`。
+- `result_summary`、`error_summary`：成功结果或脱敏失败摘要；不得保存堆栈、SQL、密钥或完整模型请求。
+- `trace_id`、`expires_at`、`confirmed_at`、`executed_at`、`created_at`、`updated_at` 和 `deleted`。
+
+`assistant_message_id` 应具有唯一约束，使一条提案消息最多关联一条业务操作。新产生的聊天消息还计划记录可空的 `capability_id` 和 `capability_version`；历史行保持为空，读取时不得错误推断。
+
+操作执行使用带期望状态的原子更新：只有成功把 `PENDING_CONFIRMATION` 改为 `EXECUTING` 的请求可以调用业务服务。重复或并发确认读取现有状态，不再次执行。首个 `CREATE_KNOWLEDGE_BASE` 操作的状态迁移、知识库写入和成功结果写入使用同一个本地数据库事务；可预期业务失败在事务内转为 `FAILED` 和脱敏摘要。终态不能回退，普通删除继续使用逻辑删除。
+
+客户端不能提交或覆盖持久化后的 `action_type`、`parameters`、消息关系或 trace ID。模型输出只作为候选输入，必须在保存提案前转换为明确 DTO 并通过领域校验。

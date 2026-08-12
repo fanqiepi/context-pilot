@@ -8,8 +8,20 @@
 ## Project context
 
 - ContextPilot is a learning-oriented knowledge base and task assistant built with Spring AI.
-- The MVP focuses on document ingestion, retrieval-augmented generation, citations, streaming responses, conversation history, call records, and feedback.
-- Keep the MVP small. Do not introduce agents, workflow engines, microservices, message queues, multi-tenancy, or plugin systems unless a later decision explicitly requires them.
+- The functional MVP covers document ingestion, retrieval-augmented generation, citations, streaming responses, conversation history, call records, and positive-only helpful feedback.
+- The product owner considers the functional MVP complete. Remaining page-level acceptance, fixed evaluation baselines, and release hardening are deferred work and do not block the currently authorized next phase.
+- The authorized next phase adds fixed capability routing and one confirmable business action while preserving the modular monolith. Do not introduce agents, LangGraph or other workflow engines, microservices, message queues, multi-tenancy, plugin systems, dynamic tools, or model-generated SQL.
+
+## Current authorized next phase
+
+- Route each chat request to one of three explicit, versioned capabilities: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, or `BUSINESS_ACTION`.
+- Keep `SIMPLE_CHAT` narrow: identity, greeting, capability description, thanks, and farewell continue to use deterministic replies. Do not silently turn it into unrestricted open-domain model answering.
+- Preserve the current grounded RAG path for `KNOWLEDGE_QA`, including knowledge-base isolation, evidence validation, citations, refusal behavior, SSE, persistence, and trace IDs.
+- The first authorized business action is `CREATE_KNOWLEDGE_BASE`, exposed through a statically registered, strongly typed application action that delegates to the existing `KnowledgeBaseService`.
+- A business request must produce a validated, persisted action proposal first. The real action must not execute until the user explicitly confirms it through a separate request.
+- Persist an auditable action state machine such as `PENDING_CONFIRMATION -> EXECUTING -> SUCCEEDED/FAILED`, with `REJECTED` and `EXPIRED` terminal alternatives. Confirmation must be atomic and idempotent so repeated requests cannot execute the action twice.
+- Route matching should start with deterministic rules and default safely to `KNOWLEDGE_QA`; do not add an extra model classification call until measured ambiguity justifies it.
+- Keep the implementation specific to the approved capability and action. A generic Skill registry, generic `ToolExecutionGateway`, arbitrary reflection, arbitrary HTTP/file/shell access, and autonomous tool loops remain out of scope.
 
 ## Sources of truth
 
@@ -33,6 +45,7 @@
 - Architecture: frontend/backend separation with a modular monolith backend.
 - Streaming: SSE. Secrets and model credentials remain backend-only environment variables.
 - MVP access model: single user with no login or role system.
+- Next-phase orchestration: explicit Java application services and persisted state transitions; no LangGraph dependency or external workflow runtime.
 
 ## Working agreements
 
@@ -54,7 +67,8 @@
 - Never commit `.env`, API keys, database passwords, private documents, or sensitive evaluation data.
 - Do not log complete secrets, full private document contents, or unredacted model requests by default.
 - Treat retrieved documents and model output as untrusted data. Do not convert them directly into executable commands or unrestricted tool calls.
-- Any future tool calling must use an allowlist, validated parameters, least privilege, and auditable records.
+- Business actions must use a static allowlist, strong request types, server-side validation, least privilege, bounded execution, trace IDs, and auditable records.
+- Never execute a side-effecting action before an active persisted proposal has been explicitly confirmed. Model output may suggest an action but cannot confirm it or bypass the application service that owns the business operation.
 
 ## Verification
 
