@@ -13,12 +13,14 @@ public record ConversationMessageResponse(
         String errorSummary,
         String traceId,
         List<ChatCitationResponse> citations,
+        boolean helpful,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt) {
 
     static ConversationMessageResponse from(
             ChatMessageEntity entity,
-            List<ChatCitationResponse> citations) {
+            List<ChatCitationResponse> citations,
+            boolean helpful) {
         return new ConversationMessageResponse(
                 entity.getId(),
                 entity.getConversationId(),
@@ -28,6 +30,7 @@ public record ConversationMessageResponse(
                 entity.getErrorSummary(),
                 entity.getTraceId(),
                 List.copyOf(citations),
+                helpful,
                 entity.getCreatedAt(),
                 entity.getUpdatedAt());
     }

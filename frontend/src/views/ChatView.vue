@@ -7,6 +7,8 @@ import {
   listConversationMessages,
   listConversations,
   listKnowledgeBases,
+  markMessageHelpful,
+  removeMessageHelpful,
   streamChat,
 } from '@/api/contextPilot'
 import { errorMessage } from '@/api/client'
@@ -38,6 +40,7 @@ const draft = ref('')
 const loadingWorkspace = ref(false)
 const loadingMessages = ref(false)
 const sending = ref(false)
+const feedbackSavingIds = reactive(new Set<string>())
 const messageScroller = ref<HTMLElement>()
 let streamController: AbortController | undefined
 let activeTextRenderer: StreamTextRenderer | undefined
@@ -168,6 +171,7 @@ async function sendQuestion(): Promise<void> {
     errorSummary: null,
     traceId: '',
     citations: [],
+    helpful: false,
     createdAt: now,
     updatedAt: now,
   })
@@ -180,6 +184,7 @@ async function sendQuestion(): Promise<void> {
     errorSummary: null,
     traceId: '',
     citations: [],
+    helpful: false,
     createdAt: now,
     updatedAt: now,
   })
@@ -292,6 +297,32 @@ function stopGeneration(): void {
     return
   }
   activeTextRenderer?.flush()
+}
+
+async function toggleHelpful(message: UiMessage): Promise<void> {
+  if (
+    message.role !== 'ASSISTANT' ||
+    message.status !== 'COMPLETED' ||
+    feedbackSavingIds.has(message.id)
+  ) {
+    return
+  }
+
+  const wasHelpful = message.helpful
+  feedbackSavingIds.add(message.id)
+  message.helpful = !wasHelpful
+  try {
+    if (wasHelpful) {
+      await removeMessageHelpful(message.id)
+    } else {
+      await markMessageHelpful(message.id)
+    }
+  } catch (error) {
+    message.helpful = wasHelpful
+    ElMessage.error(errorMessage(error, wasHelpful ? '取消反馈失败' : '提交反馈失败'))
+  } finally {
+    feedbackSavingIds.delete(message.id)
+  }
 }
 
 async function scrollToBottom(): Promise<void> {
@@ -439,6 +470,24 @@ function formatScore(score: number | null): string {
                       · <span class="mono">{{ citation.chunkId }}</span>
                     </footer>
                   </details>
+                </div>
+
+                <div
+                  v-if="message.role === 'ASSISTANT' && message.status === 'COMPLETED'"
+                  class="feedback-actions"
+                >
+                  <ElButton
+                    size="small"
+                    round
+                    plain
+                    :type="message.helpful ? 'success' : 'default'"
+                    :loading="feedbackSavingIds.has(message.id)"
+                    :aria-pressed="message.helpful"
+                    :aria-label="message.helpful ? '取消有用标记' : '标记这个回答有用'"
+                    @click="toggleHelpful(message)"
+                  >
+                    👍 {{ message.helpful ? '已标记有用' : '有用' }}
+                  </ElButton>
                 </div>
 
                 <div v-if="message.usage" class="usage-line">
@@ -878,6 +927,16 @@ function formatScore(score: number | null): string {
   color: #7e8981;
   font-size: 10px;
   overflow-wrap: anywhere;
+}
+
+.feedback-actions {
+  display: flex;
+  margin-top: 14px;
+}
+
+.feedback-actions :deep(.el-button) {
+  min-width: 78px;
+  transition: 150ms ease;
 }
 
 .usage-line,

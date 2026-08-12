@@ -62,6 +62,17 @@ export interface ConversationMessage {
   errorSummary: string | null
   traceId: string
   citations: Citation[]
+  helpful: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AnswerFeedback {
+  id: string
+  messageId: string
+  knowledgeBaseId: string
+  traceId: string
+  helpful: true
   createdAt: string
   updatedAt: string
 }

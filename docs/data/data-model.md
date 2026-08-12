@@ -13,7 +13,7 @@
 | `chat_message` | 用户问题、助手回答和状态 | 属于一个会话 |
 | `message_citation` | 引用的文档、页码、分段和排序 | 属于助手消息 |
 | `model_call` | 模型、耗时、Token、状态和脱敏错误 | 关联消息或文档任务 |
-| `answer_feedback` | 有用/无用反馈 | 每条助手消息最多一条当前反馈 |
+| `answer_feedback` | “有用”正向反馈 | 每条助手消息最多一条当前反馈 |
 
 ## 数据约定
 
@@ -55,3 +55,9 @@
 ## 已实现的对话结构
 
 `V6__create_chat_tables.sql` 创建 `conversation`、`chat_message`、`message_citation` 和 `model_call`。会话固定关联一个知识库；用户消息直接完成，助手消息按 `PENDING -> COMPLETED/FAILED` 流转。引用保存文档、chunk、页码、顺序、相似度和受限摘录；模型调用只保存供应商、模型、Prompt 版本、Token、耗时、状态、trace ID 和脱敏错误摘要，不保存完整 Prompt 或密钥。四张表均使用逻辑删除字段。
+
+## 已实现的反馈结构
+
+`V7__create_answer_feedback.sql` 创建 `answer_feedback`。一条未删除记录表示对应回答被用户标记为“有用”，不保存“无用”值或原因。`message_id` 通过受限删除外键关联 `chat_message`，并由唯一约束保证每条消息最多对应一条反馈记录；取消反馈时设置 `deleted = 1`，再次标记时原子恢复同一记录，避免重复数据。
+
+只有已完成的助手消息可以接收反馈。知识库 ID 和 trace ID 不由客户端提交，也不在反馈表重复保存；后端通过 `chat_message -> conversation -> knowledge_base` 及消息自身的 `trace_id` 可信关联，避免冗余字段漂移或客户端伪造上下文。

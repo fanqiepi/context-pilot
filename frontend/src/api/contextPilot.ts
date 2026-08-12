@@ -2,6 +2,7 @@ import { fetchEventSource } from '@microsoft/fetch-event-source'
 
 import { apiClient, responseError } from './client'
 import type {
+  AnswerFeedback,
   ChatRequest,
   Citation,
   ConversationMessage,
@@ -81,6 +82,15 @@ export async function listConversationMessages(
     `/conversations/${conversationId}/messages`,
   )
   return response.data
+}
+
+export async function markMessageHelpful(messageId: string): Promise<AnswerFeedback> {
+  const response = await apiClient.put<AnswerFeedback>(`/messages/${messageId}/feedback`)
+  return response.data
+}
+
+export async function removeMessageHelpful(messageId: string): Promise<void> {
+  await apiClient.delete(`/messages/${messageId}/feedback`)
 }
 
 export interface ChatStreamHandlers {

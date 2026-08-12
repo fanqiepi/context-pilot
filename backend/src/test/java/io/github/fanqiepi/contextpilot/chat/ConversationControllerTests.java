@@ -84,6 +84,7 @@ class ConversationControllerTests {
                                 null,
                                 0.91,
                                 "PostgreSQL with pgvector")),
+                        true,
                         createdAt,
                         createdAt.plusSeconds(1))));
 
@@ -93,6 +94,7 @@ class ConversationControllerTests {
                 .andExpect(jsonPath("$[0].role").value("ASSISTANT"))
                 .andExpect(jsonPath("$[0].status").value("COMPLETED"))
                 .andExpect(jsonPath("$[0].traceId").value("history-trace"))
+                .andExpect(jsonPath("$[0].helpful").value(true))
                 .andExpect(jsonPath("$[0].citations[0].rank").value(1))
                 .andExpect(jsonPath("$[0].citations[0].documentId").value(documentId.toString()));
     }

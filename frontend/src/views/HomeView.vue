@@ -9,7 +9,7 @@ import 'element-plus/es/components/tag/style/css'
       <p class="eyebrow">CONTEXTPILOT</p>
       <h1>知识库与任务助手</h1>
       <p class="description">
-        项目基础环境已就绪。知识库、文档处理、检索问答和反馈能力将在后续迭代中逐步实现。
+        创建知识库、上传资料并开始可追踪的检索问答，也可以为真正有帮助的回答留下反馈。
       </p>
       <ElTag type="success" effect="light">Vue 3 + TypeScript + Vite</ElTag>
     </section>
