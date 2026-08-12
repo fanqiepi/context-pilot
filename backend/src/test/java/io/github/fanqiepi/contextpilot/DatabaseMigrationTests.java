@@ -43,7 +43,7 @@ class DatabaseMigrationTests {
                     )
                     """)).isTrue();
             for (String tableName : new String[] {
-                    "conversation", "chat_message", "message_citation", "model_call"
+                    "conversation", "chat_message", "message_citation", "model_call", "answer_feedback"
             }) {
                 assertThat(queryBoolean(connection, """
                         SELECT EXISTS (
@@ -54,6 +54,26 @@ class DatabaseMigrationTests {
                         )
                         """.formatted(tableName))).isTrue();
             }
+            assertThat(queryBoolean(connection, """
+                    SELECT EXISTS (
+                        SELECT 1
+                        FROM information_schema.table_constraints
+                        WHERE table_schema = 'public'
+                          AND table_name = 'answer_feedback'
+                          AND constraint_name = 'answer_feedback_message_fk'
+                          AND constraint_type = 'FOREIGN KEY'
+                    )
+                    """)).isTrue();
+            assertThat(queryBoolean(connection, """
+                    SELECT EXISTS (
+                        SELECT 1
+                        FROM information_schema.table_constraints
+                        WHERE table_schema = 'public'
+                          AND table_name = 'answer_feedback'
+                          AND constraint_name = 'answer_feedback_message_uq'
+                          AND constraint_type = 'UNIQUE'
+                    )
+                    """)).isTrue();
             assertThat(queryBoolean(connection, """
                     SELECT EXISTS (
                         SELECT 1

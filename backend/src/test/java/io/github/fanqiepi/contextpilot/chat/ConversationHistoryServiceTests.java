@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
+import io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackEntity;
+import io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackMapper;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseService;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +37,7 @@ class ConversationHistoryServiceTests {
         TableInfoHelper.initTableInfo(assistant, ConversationEntity.class);
         TableInfoHelper.initTableInfo(assistant, ChatMessageEntity.class);
         TableInfoHelper.initTableInfo(assistant, MessageCitationEntity.class);
+        TableInfoHelper.initTableInfo(assistant, AnswerFeedbackEntity.class);
     }
 
     @Mock
@@ -45,6 +48,8 @@ class ConversationHistoryServiceTests {
     private ChatMessageMapper chatMessageMapper;
     @Mock
     private MessageCitationMapper messageCitationMapper;
+    @Mock
+    private AnswerFeedbackMapper answerFeedbackMapper;
 
     private ConversationHistoryService service;
 
@@ -54,7 +59,8 @@ class ConversationHistoryServiceTests {
                 knowledgeBaseService,
                 conversationMapper,
                 chatMessageMapper,
-                messageCitationMapper);
+                messageCitationMapper,
+                answerFeedbackMapper);
     }
 
     @Test
@@ -117,18 +123,28 @@ class ConversationHistoryServiceTests {
                     citation(assistantMessageId, 1, "first.txt"),
                     citation(assistantMessageId, 2, "second.md"));
         });
+        when(answerFeedbackMapper.selectList(any())).thenAnswer(invocation -> {
+            LambdaQueryWrapper<AnswerFeedbackEntity> wrapper = invocation.getArgument(0);
+            assertThat(normalizedSql(wrapper.getSqlSegment())).contains("message_id in");
+            assertThat(wrapper.getParamNameValuePairs())
+                    .containsValue(userMessageId)
+                    .containsValue(assistantMessageId);
+            return List.of(feedback(assistantMessageId));
+        });
 
         List<ConversationMessageResponse> result = service.messages(conversationId);
 
         assertThat(result).hasSize(2);
         assertThat(result.getFirst().role()).isEqualTo(ChatMessageRole.USER);
         assertThat(result.getFirst().citations()).isEmpty();
+        assertThat(result.getFirst().helpful()).isFalse();
         assertThat(result.getLast().content()).isEqualTo("Answer [1].");
         assertThat(result.getLast().traceId()).isEqualTo("trace-answer");
         assertThat(result.getLast().citations())
                 .extracting(ChatCitationResponse::rank)
                 .containsExactly(1, 2);
         assertThat(result.getLast().citations().getFirst().originalFilename()).isEqualTo("first.txt");
+        assertThat(result.getLast().helpful()).isTrue();
     }
 
     @Test
@@ -141,6 +157,7 @@ class ConversationHistoryServiceTests {
         assertThat(service.messages(conversationId)).isEmpty();
 
         verify(messageCitationMapper, never()).selectList(any());
+        verify(answerFeedbackMapper, never()).selectList(any());
     }
 
     @Test
@@ -154,6 +171,7 @@ class ConversationHistoryServiceTests {
 
         verify(chatMessageMapper, never()).selectList(any());
         verify(messageCitationMapper, never()).selectList(any());
+        verify(answerFeedbackMapper, never()).selectList(any());
     }
 
     private ConversationEntity conversation(
@@ -199,6 +217,15 @@ class ConversationHistoryServiceTests {
         entity.setRankIndex(rank);
         entity.setScore(0.9 - rank * 0.1);
         entity.setExcerpt("Excerpt " + rank);
+        return entity;
+    }
+
+    private AnswerFeedbackEntity feedback(UUID messageId) {
+        AnswerFeedbackEntity entity = new AnswerFeedbackEntity();
+        entity.setId(UUID.randomUUID());
+        entity.setMessageId(messageId);
+        entity.setCreatedAt(OffsetDateTime.parse("2026-08-10T08:00:02Z"));
+        entity.setUpdatedAt(OffsetDateTime.parse("2026-08-10T08:00:02Z"));
         return entity;
     }
 

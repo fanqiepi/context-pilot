@@ -6,6 +6,7 @@ import io.github.fanqiepi.contextpilot.chat.MessageCitationMapper;
 import io.github.fanqiepi.contextpilot.chat.ModelCallMapper;
 import io.github.fanqiepi.contextpilot.document.DocumentService;
 import io.github.fanqiepi.contextpilot.document.SourceDocumentMapper;
+import io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackMapper;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,9 @@ class ContextPilotApplicationTests {
     @MockitoBean
     private ModelCallMapper modelCallMapper;
 
+    @MockitoBean
+    private AnswerFeedbackMapper answerFeedbackMapper;
+
     @Test
     void contextLoads() {
     }
@@ -72,7 +76,8 @@ class ContextPilotApplicationTests {
                 .andExpect(jsonPath("$.paths['/api/chat']").exists())
                 .andExpect(jsonPath("$.paths['/api/chat/stream']").exists())
                 .andExpect(jsonPath("$.paths['/api/conversations']").exists())
-                .andExpect(jsonPath("$.paths['/api/conversations/{conversationId}/messages']").exists());
+                .andExpect(jsonPath("$.paths['/api/conversations/{conversationId}/messages']").exists())
+                .andExpect(jsonPath("$.paths['/api/messages/{messageId}/feedback']").exists());
         mockMvc.perform(get("/v3/api-docs/swagger-config"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.url").value("/v3/api-docs"));

@@ -21,7 +21,7 @@
 - `/api/conversations`：会话和历史消息。
 - `/api/chat`：POST 非流式 RAG 问答，用于 P2 闭环和集成验证。
 - `/api/chat/stream`：POST SSE 流式问答。
-- `/api/messages/{id}/feedback`：有用/无用反馈。
+- `/api/messages/{id}/feedback`：标记或取消“有用”反馈。
 - `/api/model-calls`：最小调用记录查询。
 
 ## 知识库接口
@@ -68,7 +68,18 @@ TXT、Markdown 和文本型 PDF 分别通过 Spring AI 对应 reader 解析；PD
 | `GET` | `/api/conversations?knowledgeBaseId={id}` | 查询指定知识库下的会话，按更新时间和 ID 稳定倒序返回 |
 | `GET` | `/api/conversations/{conversationId}/messages` | 查询会话消息，按创建时间、角色和 ID 稳定正序返回 |
 
-会话列表会先校验知识库存在，并通过 `knowledgeBaseId` 强制隔离结果；知识库不存在时返回 `404 KNOWLEDGE_BASE_NOT_FOUND`。会话消息包含角色、正文、状态、安全错误摘要、trace ID、时间和结构化引用；同一时间戳下用户消息排在助手消息之前，引用按 rank 正序返回，并通过一次批量查询关联到各条消息。逻辑删除的会话、消息和引用不会出现在查询结果中。会话不存在时返回 `404 CONVERSATION_NOT_FOUND`。
+会话列表会先校验知识库存在，并通过 `knowledgeBaseId` 强制隔离结果；知识库不存在时返回 `404 KNOWLEDGE_BASE_NOT_FOUND`。会话消息包含角色、正文、状态、安全错误摘要、trace ID、时间、结构化引用和 `helpful` 布尔值；同一时间戳下用户消息排在助手消息之前，引用和反馈分别批量查询后关联到各条消息，避免逐条查询。逻辑删除的会话、消息、引用和反馈不会出现在查询结果中。会话不存在时返回 `404 CONVERSATION_NOT_FOUND`。
+
+## 回答反馈接口
+
+| 方法 | 路径 | 行为 |
+| --- | --- | --- |
+| `PUT` | `/api/messages/{messageId}/feedback` | 将已完成的助手回答标记为“有用”，重复请求保持同一状态 |
+| `DELETE` | `/api/messages/{messageId}/feedback` | 取消“有用”标记，重复取消仍返回 `204` |
+
+`PUT` 不接收请求体。成功响应包含反馈 ID、消息 ID、后端解析出的知识库 ID、消息 trace ID、`helpful: true` 和时间信息。知识库 ID 与 trace ID 不接受客户端覆盖。
+
+只有状态为 `COMPLETED` 的 `ASSISTANT` 消息允许反馈；用户消息、处理中消息或失败消息返回 `409 MESSAGE_FEEDBACK_NOT_ALLOWED`。消息不存在返回 `404 MESSAGE_NOT_FOUND`。取消采用逻辑删除，再次标记会恢复原反馈记录。
 
 ## SSE 事件
 
