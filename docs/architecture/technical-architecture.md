@@ -1,10 +1,10 @@
 # ContextPilot 技术架构
 
-> 状态：MVP 架构基线
+> 状态：功能型 MVP 架构基线 + 已授权的固定能力路由与受控业务操作设计
 
 ## 架构形式
 
-系统采用 Vue 前端与 Spring Boot 后端分离的模块化单体。后端使用 Java 21、Spring Boot 4.1.x 和 Spring AI 2.0.x；不拆分微服务，不引入消息队列、Agent 或工作流引擎。
+系统采用 Vue 前端与 Spring Boot 后端分离的模块化单体。后端使用 Java 21、Spring Boot 4.1.x 和 Spring AI 2.0.x；下一阶段继续使用显式 Java 应用服务和持久化状态迁移，不拆分微服务，不引入消息队列、Agent、LangGraph 或其他工作流引擎。
 
 前端使用 Vue 3、TypeScript、Vue Router 和 Element Plus。`/library` 承载知识库、文档上传与处理状态管理，`/chat` 承载知识库选择、会话历史、流式问答和单向“有用”反馈。普通 HTTP 请求统一通过 Axios 访问 `/api`，SSE 使用 `@microsoft/fetch-event-source` 解析具名事件；聊天页对突发到达的 `delta` 使用短缓冲渐进渲染，并在缓冲区清空后再展示引用和完成状态。开发服务器将 `/api` 和 `/actuator` 代理到后端。模型密钥不进入浏览器，回答和引用按纯文本渲染，不信任模型输出或文档内容中的 HTML。
 
@@ -17,6 +17,8 @@
 - `model`：ChatModel 和 EmbeddingModel 的应用级边界。
 - `observation`：模型调用记录和最小指标。
 - `feedback`：已完成助手回答的“有用”标记、取消和可信上下文关联。
+- `capability`（下一阶段）：固定能力定义、版本和确定性路由，不加载动态 Skill 或插件。
+- `action`（下一阶段）：已校验操作提案、人工确认状态和静态白名单业务执行；首个动作只委托 `KnowledgeBaseService` 创建知识库。
 - `common`：少量跨模块配置、错误类型和基础约定，不承载业务实现。
 
 模块按业务能力组织，简单功能不强制创建空的 controller/service/mapper 层。`chat` 可以编排检索与模型调用，供应商专用配置不得散落到业务模块。
@@ -30,6 +32,15 @@
 用户问题 -> 会话/知识库校验 -> DashScope Embedding -> pgvector 隔离检索
          -> 证据校验/拒答 -> DeepSeek ChatModel -> SSE 回答与引用
          -> 会话、调用记录、trace ID 和反馈
+
+下一阶段：
+用户问题 -> CapabilityRouter
+         -> SIMPLE_CHAT -> 固定回答
+         -> KNOWLEDGE_QA -> 复用上述 RAG 链路
+         -> BUSINESS_ACTION -> 校验参数 -> 保存待确认提案
+                            -> 用户独立确认 -> 原子取得执行权
+                            -> 白名单应用动作 -> KnowledgeBaseService
+                            -> 保存结果并回显状态
 ```
 
 文档解析使用 Spring AI 的 `TextReader`、`MarkdownDocumentReader` 和 `PagePdfDocumentReader`。PDF 按页解析以保留引用页码；切分采用确定性的字符窗口，默认最大 1200 个字符并重叠 150 个字符。上传后由有界 `TaskExecutor` 编排 `PENDING -> PROCESSING -> SUCCEEDED/FAILED`，原子状态更新防止重复处理。重试和删除均先按文档标识清理旧向量，向量 ID 保持确定性。
@@ -52,14 +63,32 @@ SSE 使用 Spring AI `ChatModel.stream` 生成真实增量，RAG 正常路径固
 
 HTTP request ID 作为 MVP trace ID 的起点，后续贯穿 SSE、消息和 `model_call`。它用于关联与诊断，不承担身份或权限功能。
 
+## 已授权的下一阶段编排
+
+`ChatApplicationService` 仍是聊天总入口，并在进入现有 RAG 流程前调用轻量 `CapabilityRouter`。路由器只返回应用定义的能力 ID、版本和匹配依据，不返回可执行类名、SQL、URL 或任意工具描述。
+
+第一版路由顺序固定：
+
+1. `SimpleChatReplyPolicy` 命中时选择 `SIMPLE_CHAT`。
+2. 明确匹配创建知识库意图时选择 `BUSINESS_ACTION`。
+3. 其余请求选择 `KNOWLEDGE_QA`，继续执行知识库隔离检索和证据校验。
+
+路由默认不增加独立模型调用。只有后续评估数据证明确定性规则无法满足真实表达时，才允许设计结构化分类器；分类结果仍只是候选能力，不能作为业务操作确认。
+
+业务操作采用“两次请求”协议。聊天流只创建并返回 `PENDING_CONFIRMATION` 提案；真正执行由独立确认接口触发，因此 SSE 连接不需要为人工决定长期保持。确认服务通过带期望状态的原子更新把提案从 `PENDING_CONFIRMATION` 转为 `EXECUTING`，只有更新成功的请求可以调用动作。重复确认返回已有状态或结果，不能再次产生副作用。首个创建知识库动作与状态更新都在同一个 PostgreSQL 本地事务中完成，避免出现“知识库已经创建但操作仍显示未执行”的提交间隙。
+
+首个 `CREATE_KNOWLEDGE_BASE` 动作使用强类型名称和可选描述，复用 `KnowledgeBaseService` 的规范化、唯一约束和错误语义。模型文本、检索文档和客户端提交的动作类型都不能绕过静态注册和服务端校验。提案参数只保存规范化后的必要字段，结果和错误只保存安全摘要。
+
+前端在聊天消息下展示可恢复的操作卡片。卡片必须在确认前清楚展示操作类型、参数和影响；确认、拒绝、执行中、成功、失败及过期状态均以后端记录为准。
+
 ## 后续演进边界
 
-MVP 稳定后可按以下顺序扩展，但每一阶段都需要独立用例、测试和 ADR：
+当前已批准固定能力路由和首个受控业务操作。再往后仍按以下顺序扩展，每个新增操作都需要独立用例、测试和安全边界：
 
-1. 固定能力路由：应用内显式注册、可版本化，不加载动态插件。
-2. 受控工具网关：静态白名单、强类型参数、Schema、权限、次数、超时、错误分类和审计。
-3. 项目结构化数据端口：通过领域查询服务只读访问 PostgreSQL，使用参数化 SQL、字段白名单、限行和 `dataAsOf`。
-4. Agent/工作流评估：仅在固定编排不足时考虑，并要求步骤预算、循环上限和人工确认。
+1. 增加经过单独批准的固定能力或业务动作，不引入动态注册。
+2. 只有多个真实动作形成共同需求时，才提取有限的共享执行边界；不能演变成任意工具平台。
+3. 项目结构化数据端口通过领域查询服务只读访问 PostgreSQL，使用参数化 SQL、字段白名单、限行和 `dataAsOf`。
+4. Agent/工作流评估仅在固定编排不足时考虑，并要求步骤预算、循环上限、人工确认和评估数据；当前未授权。
 
 完整组件映射和风险见 [Agent Skill 与工具调用时序图适配评估](agent-skill-tool-adaptation.md)。
 

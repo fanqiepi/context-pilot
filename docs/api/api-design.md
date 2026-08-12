@@ -1,6 +1,6 @@
-# REST API 与 SSE 约定
+# REST API、SSE 与操作确认约定
 
-> 当前为 MVP 跨接口约定。接口实现后，字段细节以 OpenAPI 为主要事实来源。
+> 本文同时记录已实现接口与已授权但尚未实现的下一阶段合同。已实现字段以 OpenAPI 为主要事实来源；标注“规划”的内容不能当作当前可调用接口。
 
 ## 通用约定
 
@@ -23,6 +23,14 @@
 - `/api/chat/stream`：POST SSE 流式问答。
 - `/api/messages/{id}/feedback`：标记或取消“有用”反馈。
 - `/api/model-calls`：最小调用记录查询。
+
+## 下一阶段规划资源（尚未实现）
+
+- `/api/action-requests/{id}`：查询持久化业务操作提案及状态。
+- `/api/action-requests/{id}/confirm`：人工确认后原子取得执行权并执行白名单操作。
+- `/api/action-requests/{id}/reject`：拒绝仍在等待确认的操作。
+
+第一阶段只允许 `CREATE_KNOWLEDGE_BASE`，不提供客户端可枚举或动态注册任意工具的接口。
 
 ## 知识库接口
 
@@ -99,3 +107,37 @@ TXT、Markdown 和文本型 PDF 分别通过 Spring AI 对应 reader 解析；PD
 `message` 数据包含 `conversationId`、`userMessageId`、`assistantMessageId` 和 `traceId`；`delta` 数据包含本次增量文本；`citation` 与非流式接口使用相同的结构化引用；`usage` 包含模型、Token 和耗时；`done` 包含 `COMPLETED` 或 `REFUSED` 状态及 `traceId`。模型流失败时在已发送的事件之后追加一个安全的 `error` 事件并结束，不再发送引用、usage 或 done。客户端在模型完成前断开时，待处理的助手消息和模型调用记录为失败，并保存脱敏的取消摘要。
 
 固定白名单内的身份介绍、问候、能力说明、感谢和告别不调用模型，事件顺序为 `message -> delta -> done(COMPLETED)`，不发送 `citation` 或 `usage`。其他无可靠知识库证据的问题仍使用 `done(REFUSED)`。
+
+## 下一阶段 SSE 规划（尚未实现）
+
+下一阶段在保持 `/api/chat/stream` 路径兼容的前提下增加：
+
+- `route`：包含固定 `capabilityId`、`capabilityVersion`、安全的匹配依据和 trace ID。
+- `action_required`：包含 `actionRequestId`、固定 `actionType`、服务端规范化后的展示参数、影响摘要、状态和过期时间。
+
+三条规划事件序列为：
+
+```text
+SIMPLE_CHAT:
+message -> route -> delta -> done(COMPLETED)
+
+KNOWLEDGE_QA:
+message -> route -> delta* -> citation* -> usage? -> done(COMPLETED|REFUSED)
+
+BUSINESS_ACTION:
+message -> route -> action_required -> done(AWAITING_CONFIRMATION)
+```
+
+`action_required` 只表示提案已保存，绝不表示操作已经执行。服务端不得为等待人工确认而长期保持 SSE 连接。
+
+## 下一阶段操作确认接口规划（尚未实现）
+
+| 方法 | 路径 | 规划行为 |
+| --- | --- | --- |
+| `GET` | `/api/action-requests/{id}` | 返回提案类型、展示参数、影响摘要、当前状态、结果摘要和 trace ID |
+| `POST` | `/api/action-requests/{id}/confirm` | 仅对等待确认的提案原子取得执行权；重复确认返回已有状态或结果，不重复执行 |
+| `POST` | `/api/action-requests/{id}/reject` | 将等待确认的提案标记为拒绝；已执行或已过期操作不能改为拒绝 |
+
+确认和拒绝接口不接受客户端覆盖 `actionType`、参数、会话、消息或 trace ID。执行参数完全来自服务端已校验并持久化的提案。状态冲突返回 `409`，提案不存在或已逻辑删除返回 `404`。
+
+`CREATE_KNOWLEDGE_BASE` 提案只包含规范化后的 `name` 和可选 `description`。确认成功后调用现有知识库领域服务；名称冲突沿用 `KNOWLEDGE_BASE_NAME_CONFLICT` 语义。执行错误保存并返回安全摘要，不暴露堆栈、SQL 或内部类名。
