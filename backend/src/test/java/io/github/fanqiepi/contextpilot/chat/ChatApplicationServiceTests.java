@@ -65,6 +65,7 @@ class ChatApplicationServiceTests {
                 42);
 
         when(preparationService.prepare(request, "trace-1")).thenReturn(new PreparedChat(
+                knowledgeRoute("trace-1"),
                 exchange,
                 new ChatPrompt("system", "user", "v1"),
                 List.of(citation)));
@@ -83,6 +84,8 @@ class ChatApplicationServiceTests {
         assertThat(response.citations().getFirst().documentId()).isEqualTo(documentId);
         assertThat(response.citations().getFirst().rank()).isOne();
         assertThat(response.usage().totalTokens()).isEqualTo(42);
+        assertThat(response.capabilityId()).isEqualTo(CapabilityId.KNOWLEDGE_QA);
+        assertThat(response.capabilityVersion()).isEqualTo("v1");
         verify(persistenceService).completeSuccess(
                 eq(exchange.assistantMessageId()),
                 eq(modelCallId),
@@ -98,7 +101,7 @@ class ChatApplicationServiceTests {
         PendingChatExchange exchange = exchange();
         ChatRequest request = new ChatRequest(null, knowledgeBaseId, "Unknown question");
         when(preparationService.prepare(request, "trace-2"))
-                .thenReturn(new PreparedChat(exchange, null, List.of()));
+                .thenReturn(new PreparedChat(knowledgeRoute("trace-2"), exchange, null, List.of()));
 
         ChatAnswerResponse response = service.answer(request, "trace-2");
 
@@ -117,7 +120,10 @@ class ChatApplicationServiceTests {
         PendingChatExchange exchange = exchange();
         ChatRequest request = new ChatRequest(null, knowledgeBaseId, "你是谁？");
         when(preparationService.prepare(request, "trace-direct"))
-                .thenReturn(PreparedChat.direct(exchange, SimpleChatReplyPolicy.IDENTITY_REPLY));
+                .thenReturn(PreparedChat.direct(
+                        simpleRoute("trace-direct"),
+                        exchange,
+                        SimpleChatReplyPolicy.IDENTITY_REPLY));
 
         ChatAnswerResponse response = service.answer(request, "trace-direct");
 
@@ -126,6 +132,9 @@ class ChatApplicationServiceTests {
         assertThat(response.citations()).isEmpty();
         assertThat(response.model()).isNull();
         assertThat(response.usage()).isNull();
+        assertThat(response.capabilityId()).isEqualTo(CapabilityId.SIMPLE_CHAT);
+        assertThat(response.capabilityMatchReason())
+                .isEqualTo(CapabilityMatchReason.SIMPLE_INTERACTION_WHITELIST);
         verify(persistenceService).completeWithoutModel(
                 exchange.assistantMessageId(), SimpleChatReplyPolicy.IDENTITY_REPLY);
         verify(chatModelGateway, never()).generate(anyString(), anyString());
@@ -138,6 +147,7 @@ class ChatApplicationServiceTests {
         ChatRequest request = new ChatRequest(null, knowledgeBaseId, "Question");
         UUID modelCallId = UUID.randomUUID();
         when(preparationService.prepare(request, "trace-3")).thenReturn(new PreparedChat(
+                knowledgeRoute("trace-3"),
                 exchange,
                 new ChatPrompt("system", "user", "v1"),
                 List.of(new ChatCitationResponse(
@@ -168,5 +178,19 @@ class ChatApplicationServiceTests {
 
     private PendingChatExchange exchange() {
         return new PendingChatExchange(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+    }
+
+    private CapabilityRoute knowledgeRoute(String traceId) {
+        return CapabilityRoute.matched(
+                CapabilityId.KNOWLEDGE_QA,
+                CapabilityMatchReason.DEFAULT_KNOWLEDGE_QA,
+                traceId);
+    }
+
+    private CapabilityRoute simpleRoute(String traceId) {
+        return CapabilityRoute.matched(
+                CapabilityId.SIMPLE_CHAT,
+                CapabilityMatchReason.SIMPLE_INTERACTION_WHITELIST,
+                traceId);
     }
 }

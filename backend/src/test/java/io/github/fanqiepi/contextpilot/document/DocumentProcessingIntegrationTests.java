@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
+import io.github.fanqiepi.contextpilot.common.ConflictException;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseCreateRequest;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseResponse;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseService;
@@ -90,7 +91,12 @@ class DocumentProcessingIntegrationTests {
         DocumentResponse succeeded = awaitStatus(uploaded.id(), DocumentStatus.SUCCEEDED);
 
         assertThat(succeeded.errorSummary()).isNull();
+        assertThat(succeeded.embeddingIndexCompatibility()).isEqualTo(EmbeddingIndexCompatibility.CURRENT);
+        assertThat(succeeded.embeddingIndex()).isNotNull();
+        assertThat(succeeded.embeddingIndex().profileId()).isEqualTo("offline_deterministic_1024_v1");
         assertThat(vectorCount(uploaded.id())).isPositive();
+        assertThat(vectorProfileCount(uploaded.id(), succeeded.embeddingIndex().profileId()))
+                .isEqualTo(vectorCount(uploaded.id()));
         List<RetrievalResultResponse> results = retrievalService.search(
                 primary.id(), new RetrievalSearchRequest("Spring dependency injection", 5));
         assertThat(results)
@@ -102,6 +108,24 @@ class DocumentProcessingIntegrationTests {
 
         int indexedChunks = vectorCount(uploaded.id());
         processingService.process(uploaded.id());
+        assertThat(vectorCount(uploaded.id())).isEqualTo(indexedChunks);
+
+        assertThatThrownBy(() -> documentService.reindex(uploaded.id()))
+                .isInstanceOfSatisfying(ConflictException.class, exception ->
+                        assertThat(exception.getCode()).isEqualTo("DOCUMENT_REINDEX_NOT_REQUIRED"));
+        jdbcTemplate.update(
+                "UPDATE source_document SET embedding_profile_id = ? WHERE id = ?",
+                "offline_deterministic_1024_v0",
+                uploaded.id());
+        assertThat(documentService.get(uploaded.id()).embeddingIndexCompatibility())
+                .isEqualTo(EmbeddingIndexCompatibility.OUTDATED);
+
+        DocumentResponse reindexing = documentService.reindex(uploaded.id());
+        assertThat(reindexing.status()).isEqualTo(DocumentStatus.PENDING);
+        assertThat(reindexing.embeddingIndexCompatibility()).isEqualTo(EmbeddingIndexCompatibility.NOT_INDEXED);
+        DocumentResponse reindexed = awaitStatus(uploaded.id(), DocumentStatus.SUCCEEDED);
+        assertThat(reindexed.embeddingIndexCompatibility()).isEqualTo(EmbeddingIndexCompatibility.CURRENT);
+        assertThat(reindexed.processingAttempts()).isEqualTo(1);
         assertThat(vectorCount(uploaded.id())).isEqualTo(indexedChunks);
 
         documentService.delete(uploaded.id());
@@ -159,6 +183,20 @@ class DocumentProcessingIntegrationTests {
                 "SELECT COUNT(*) FROM vector_store WHERE metadata->>'document_id' = ?",
                 Integer.class,
                 documentId.toString());
+        return count == null ? 0 : count;
+    }
+
+    private int vectorProfileCount(UUID documentId, String profileId) {
+        Integer count = jdbcTemplate.queryForObject(
+                """
+                SELECT COUNT(*)
+                FROM vector_store
+                WHERE metadata->>'document_id' = ?
+                  AND metadata->>'embedding_profile_id' = ?
+                """,
+                Integer.class,
+                documentId.toString(),
+                profileId);
         return count == null ? 0 : count;
     }
 }

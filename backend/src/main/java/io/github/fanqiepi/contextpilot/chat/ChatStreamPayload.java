@@ -8,7 +8,10 @@ public interface ChatStreamPayload {
             UUID conversationId,
             UUID userMessageId,
             UUID assistantMessageId,
-            String traceId) implements ChatStreamPayload {
+            String traceId,
+            CapabilityId capabilityId,
+            String capabilityVersion,
+            CapabilityMatchReason capabilityMatchReason) implements ChatStreamPayload {
     }
 
     record Delta(String content) implements ChatStreamPayload {

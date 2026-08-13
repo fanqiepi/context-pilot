@@ -96,6 +96,20 @@ class DocumentControllerTests {
     }
 
     @Test
+    void rebuildsDocumentIndex() throws Exception {
+        UUID documentId = UUID.randomUUID();
+        UUID knowledgeBaseId = UUID.randomUUID();
+        DocumentResponse response = response(documentId, knowledgeBaseId);
+        when(documentService.reindex(documentId)).thenReturn(response);
+
+        mockMvc.perform(post("/api/documents/{id}/reindex", documentId))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.id").value(documentId.toString()));
+
+        verify(documentService).reindex(documentId);
+    }
+
+    @Test
     void returnsPayloadTooLarge() throws Exception {
         UUID knowledgeBaseId = UUID.randomUUID();
         when(documentService.upload(any(), any())).thenThrow(new PayloadTooLargeException(
@@ -125,6 +139,8 @@ class DocumentControllerTests {
                 DocumentStatus.PENDING,
                 null,
                 0,
+                null,
+                EmbeddingIndexCompatibility.NOT_INDEXED,
                 now,
                 now);
     }

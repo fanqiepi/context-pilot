@@ -55,6 +55,7 @@ class DocumentServiceTests {
     private DocumentVectorIndex documentVectorIndex;
 
     private StorageProperties storageProperties;
+    private EmbeddingIndexProperties embeddingIndexProperties;
 
     private DocumentService documentService;
 
@@ -62,6 +63,7 @@ class DocumentServiceTests {
     void setUp() {
         storageProperties = new StorageProperties();
         storageProperties.setMaxFileSize(DataSize.ofMegabytes(20));
+        embeddingIndexProperties = new EmbeddingIndexProperties();
         documentService = new DocumentService(
                 sourceDocumentMapper,
                 knowledgeBaseService,
@@ -69,7 +71,8 @@ class DocumentServiceTests {
                 storageProperties,
                 transactionTemplate,
                 processingCoordinator,
-                documentVectorIndex);
+                documentVectorIndex,
+                embeddingIndexProperties);
     }
 
     @Test
@@ -248,6 +251,63 @@ class DocumentServiceTests {
         assertThatThrownBy(() -> documentService.retry(documentId))
                 .isInstanceOf(io.github.fanqiepi.contextpilot.common.ConflictException.class)
                 .hasMessageContaining("retry limit");
+    }
+
+    @Test
+    void submitsSucceededDocumentForReindexing() {
+        UUID documentId = UUID.randomUUID();
+        SourceDocumentEntity succeeded = document(documentId, DocumentStatus.SUCCEEDED);
+        SourceDocumentEntity pending = document(documentId, DocumentStatus.PENDING);
+        when(processingCoordinator.isEnabled()).thenReturn(true);
+        when(documentVectorIndex.isAvailable()).thenReturn(true);
+        when(sourceDocumentMapper.selectById(documentId)).thenReturn(succeeded, pending);
+        when(sourceDocumentMapper.prepareReindex(
+                documentId,
+                embeddingIndexProperties.currentProfile().id())).thenReturn(1);
+
+        DocumentResponse response = documentService.reindex(documentId);
+
+        assertThat(response.status()).isEqualTo(DocumentStatus.PENDING);
+        assertThat(response.embeddingIndexCompatibility()).isEqualTo(EmbeddingIndexCompatibility.NOT_INDEXED);
+        verify(sourceDocumentMapper).prepareReindex(
+                documentId,
+                embeddingIndexProperties.currentProfile().id());
+        verify(processingCoordinator).submit(documentId);
+    }
+
+    @Test
+    void rejectsReindexWhileDocumentIsProcessing() {
+        UUID documentId = UUID.randomUUID();
+        SourceDocumentEntity processing = document(documentId, DocumentStatus.PROCESSING);
+        when(sourceDocumentMapper.selectById(documentId)).thenReturn(processing);
+
+        assertThatThrownBy(() -> documentService.reindex(documentId))
+                .isInstanceOf(io.github.fanqiepi.contextpilot.common.ConflictException.class)
+                .hasMessageContaining("cannot be reindexed");
+
+        verify(sourceDocumentMapper, never()).prepareReindex(
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any());
+        verifyNoInteractions(processingCoordinator, documentVectorIndex);
+    }
+
+    @Test
+    void rejectsReindexWhenDocumentAlreadyUsesCurrentProfile() {
+        UUID documentId = UUID.randomUUID();
+        SourceDocumentEntity succeeded = document(documentId, DocumentStatus.SUCCEEDED);
+        succeeded.setEmbeddingProfileId(embeddingIndexProperties.currentProfile().id());
+        when(sourceDocumentMapper.selectById(documentId)).thenReturn(succeeded);
+
+        assertThatThrownBy(() -> documentService.reindex(documentId))
+                .isInstanceOfSatisfying(
+                        io.github.fanqiepi.contextpilot.common.ConflictException.class,
+                        exception -> assertThat(exception.getCode())
+                                .isEqualTo("DOCUMENT_REINDEX_NOT_REQUIRED"));
+
+        verify(sourceDocumentMapper, never()).prepareReindex(
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any());
+        verifyNoInteractions(processingCoordinator);
     }
 
     private void enableTransactions() {

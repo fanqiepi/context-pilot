@@ -64,6 +64,11 @@ export async function retryDocument(documentId: string): Promise<SourceDocument>
   return response.data
 }
 
+export async function reindexDocument(documentId: string): Promise<SourceDocument> {
+  const response = await apiClient.post<SourceDocument>(`/documents/${documentId}/reindex`)
+  return response.data
+}
+
 export async function deleteDocument(documentId: string): Promise<void> {
   await apiClient.delete(`/documents/${documentId}`)
 }

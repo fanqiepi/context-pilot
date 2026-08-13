@@ -9,6 +9,7 @@ import {
   deleteKnowledgeBase,
   listDocuments,
   listKnowledgeBases,
+  reindexDocument,
   retryDocument,
   updateKnowledgeBase,
   uploadDocument,
@@ -16,6 +17,7 @@ import {
 import { errorMessage } from '@/api/client'
 import type {
   DocumentStatus,
+  EmbeddingIndexCompatibility,
   KnowledgeBase,
   KnowledgeBaseInput,
   SourceDocument,
@@ -29,6 +31,7 @@ const loadingKnowledgeBases = ref(false)
 const loadingDocuments = ref(false)
 const uploading = ref(false)
 const savingKnowledgeBase = ref(false)
+const reindexingDocumentIds = ref(new Set<string>())
 const fileInput = ref<HTMLInputElement>()
 const knowledgeDialogVisible = ref(false)
 const editingKnowledgeBaseId = ref<string>()
@@ -55,6 +58,16 @@ const statusMeta: Record<
   SUCCEEDED: { label: '已就绪', type: 'success' },
   FAILED: { label: '处理失败', type: 'danger' },
   DELETING: { label: '删除中', type: 'warning' },
+}
+
+const indexCompatibilityMeta: Record<
+  EmbeddingIndexCompatibility,
+  { label: string; type: 'info' | 'success' | 'warning' | 'danger' }
+> = {
+  CURRENT: { label: '索引版本一致', type: 'success' },
+  OUTDATED: { label: '索引待升级', type: 'warning' },
+  UNKNOWN: { label: '索引来源未知', type: 'danger' },
+  NOT_INDEXED: { label: '尚未建立索引', type: 'info' },
 }
 
 onMounted(() => {
@@ -222,6 +235,33 @@ async function retry(document: SourceDocument): Promise<void> {
   }
 }
 
+function canReindex(document: SourceDocument): boolean {
+  return (
+    document.status === 'SUCCEEDED' &&
+    ['OUTDATED', 'UNKNOWN'].includes(document.embeddingIndexCompatibility)
+  )
+}
+
+async function reindex(document: SourceDocument): Promise<void> {
+  try {
+    await ElMessageBox.confirm(
+      `确定使用当前 Embedding 配置重建“${document.originalFilename}”的索引吗？`,
+      '重建索引',
+      { type: 'warning', confirmButtonText: '开始重建', cancelButtonText: '取消' },
+    )
+    reindexingDocumentIds.value.add(document.id)
+    await reindexDocument(document.id)
+    await loadActiveDocuments()
+    ElMessage.success('已提交重建索引任务')
+  } catch (error) {
+    if (error !== 'cancel' && error !== 'close') {
+      ElMessage.error(errorMessage(error, '重建索引失败'))
+    }
+  } finally {
+    reindexingDocumentIds.value.delete(document.id)
+  }
+}
+
 async function removeDocument(document: SourceDocument): Promise<void> {
   try {
     await ElMessageBox.confirm(`确定删除“${document.originalFilename}”吗？`, '删除文档', {
@@ -352,6 +392,14 @@ function formatDate(value: string): string {
                     <ElTag :type="statusMeta[document.status].type" effect="light" round>
                       {{ statusMeta[document.status].label }}
                     </ElTag>
+                    <ElTag
+                      v-if="document.status === 'SUCCEEDED'"
+                      :type="indexCompatibilityMeta[document.embeddingIndexCompatibility].type"
+                      effect="plain"
+                      round
+                    >
+                      {{ indexCompatibilityMeta[document.embeddingIndexCompatibility].label }}
+                    </ElTag>
                   </div>
                   <p v-if="document.errorSummary" class="document-error">
                     {{ document.errorSummary }}
@@ -359,6 +407,10 @@ function formatDate(value: string): string {
                   <p v-else>
                     {{ formatBytes(document.sizeBytes) }} · 第 {{ document.processingAttempts }} 次处理 ·
                     {{ formatDate(document.updatedAt) }}
+                  </p>
+                  <p v-if="document.embeddingIndex" class="embedding-index-detail">
+                    {{ document.embeddingIndex.model }} · {{ document.embeddingIndex.dimensions }} 维 ·
+                    {{ document.embeddingIndex.profileVersion }}
                   </p>
                 </div>
                 <div class="document-actions">
@@ -369,6 +421,15 @@ function formatDate(value: string): string {
                     @click="retry(document)"
                   >
                     重试
+                  </ElButton>
+                  <ElButton
+                    v-if="canReindex(document)"
+                    text
+                    type="primary"
+                    :loading="reindexingDocumentIds.has(document.id)"
+                    @click="reindex(document)"
+                  >
+                    重建索引
                   </ElButton>
                   <ElButton text type="danger" @click="removeDocument(document)">删除</ElButton>
                 </div>
@@ -612,6 +673,11 @@ function formatDate(value: string): string {
 
 .document-main .document-error {
   color: #b84a43;
+}
+
+.document-main .embedding-index-detail {
+  color: #708078;
+  font-size: 11px;
 }
 
 .document-actions {

@@ -42,15 +42,19 @@ class DocumentProcessingServiceTests {
     private DocumentVectorIndex documentVectorIndex;
 
     private DocumentProcessingService processingService;
+    private EmbeddingIndexProfile currentProfile;
 
     @BeforeEach
     void setUp() {
+        EmbeddingIndexProperties embeddingIndexProperties = new EmbeddingIndexProperties();
+        currentProfile = embeddingIndexProperties.currentProfile();
         processingService = new DocumentProcessingService(
                 sourceDocumentMapper,
                 storageService,
                 documentParser,
                 documentChunker,
-                documentVectorIndex);
+                documentVectorIndex,
+                embeddingIndexProperties);
     }
 
     @Test
@@ -68,12 +72,12 @@ class DocumentProcessingServiceTests {
                 org.mockito.ArgumentMatchers.eq(entity.getOriginalFilename()),
                 org.mockito.ArgumentMatchers.any())).thenReturn(List.of(part));
         when(documentChunker.chunk(List.of(part))).thenReturn(List.of(chunk));
-        when(sourceDocumentMapper.markSucceeded(documentId)).thenReturn(1);
+        when(sourceDocumentMapper.markSucceeded(documentId, currentProfile)).thenReturn(1);
 
         processingService.process(documentId);
 
         verify(documentVectorIndex).replace(entity, List.of(chunk));
-        verify(sourceDocumentMapper).markSucceeded(documentId);
+        verify(sourceDocumentMapper).markSucceeded(documentId, currentProfile);
         verify(sourceDocumentMapper, never()).markFailed(
                 org.mockito.ArgumentMatchers.any(),
                 org.mockito.ArgumentMatchers.any());
@@ -98,7 +102,9 @@ class DocumentProcessingServiceTests {
         verify(sourceDocumentMapper).markFailed(
                 org.mockito.ArgumentMatchers.eq(documentId),
                 contains("extractable text"));
-        verify(sourceDocumentMapper, never()).markSucceeded(documentId);
+        verify(sourceDocumentMapper, never()).markSucceeded(
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any());
     }
 
     @Test

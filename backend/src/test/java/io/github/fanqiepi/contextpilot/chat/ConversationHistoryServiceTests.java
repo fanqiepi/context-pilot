@@ -140,6 +140,10 @@ class ConversationHistoryServiceTests {
         assertThat(result.getFirst().helpful()).isFalse();
         assertThat(result.getLast().content()).isEqualTo("Answer [1].");
         assertThat(result.getLast().traceId()).isEqualTo("trace-answer");
+        assertThat(result.getLast().capabilityId()).isEqualTo(CapabilityId.KNOWLEDGE_QA);
+        assertThat(result.getLast().capabilityVersion()).isEqualTo("v1");
+        assertThat(result.getLast().capabilityMatchReason())
+                .isEqualTo(CapabilityMatchReason.DEFAULT_KNOWLEDGE_QA);
         assertThat(result.getLast().citations())
                 .extracting(ChatCitationResponse::rank)
                 .containsExactly(1, 2);
@@ -201,6 +205,9 @@ class ConversationHistoryServiceTests {
         entity.setContent(content);
         entity.setStatus(ChatMessageStatus.COMPLETED);
         entity.setTraceId(traceId);
+        entity.setCapabilityId(CapabilityId.KNOWLEDGE_QA);
+        entity.setCapabilityVersion("v1");
+        entity.setCapabilityMatchReason(CapabilityMatchReason.DEFAULT_KNOWLEDGE_QA);
         entity.setCreatedAt(OffsetDateTime.parse("2026-08-10T08:00:00Z"));
         entity.setUpdatedAt(OffsetDateTime.parse("2026-08-10T08:00:01Z"));
         return entity;

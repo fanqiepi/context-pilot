@@ -75,6 +75,9 @@ class ConversationControllerTests {
                         ChatMessageStatus.COMPLETED,
                         null,
                         "history-trace",
+                        CapabilityId.KNOWLEDGE_QA,
+                        "v1",
+                        CapabilityMatchReason.DEFAULT_KNOWLEDGE_QA,
                         List.of(new ChatCitationResponse(
                                 1,
                                 "chunk-1",
@@ -94,6 +97,9 @@ class ConversationControllerTests {
                 .andExpect(jsonPath("$[0].role").value("ASSISTANT"))
                 .andExpect(jsonPath("$[0].status").value("COMPLETED"))
                 .andExpect(jsonPath("$[0].traceId").value("history-trace"))
+                .andExpect(jsonPath("$[0].capabilityId").value("KNOWLEDGE_QA"))
+                .andExpect(jsonPath("$[0].capabilityVersion").value("v1"))
+                .andExpect(jsonPath("$[0].capabilityMatchReason").value("DEFAULT_KNOWLEDGE_QA"))
                 .andExpect(jsonPath("$[0].helpful").value(true))
                 .andExpect(jsonPath("$[0].citations[0].rank").value(1))
                 .andExpect(jsonPath("$[0].citations[0].documentId").value(documentId.toString()));

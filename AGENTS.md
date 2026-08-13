@@ -9,10 +9,12 @@
 
 - ContextPilot is a learning-oriented knowledge base and task assistant built with Spring AI.
 - The functional MVP covers document ingestion, retrieval-augmented generation, citations, streaming responses, conversation history, call records, and positive-only helpful feedback.
-- The product owner considers the functional MVP complete. Remaining page-level acceptance, fixed evaluation baselines, and release hardening are deferred work and do not block the currently authorized next phase.
+- The product owner considers the functional MVP complete. The project is now in a broader improvement phase that incrementally addresses capability routing, controlled actions, retrieval quality, page-level acceptance, evaluation baselines, and release hardening.
 - The authorized next phase adds fixed capability routing and one confirmable business action while preserving the modular monolith. Do not introduce agents, LangGraph or other workflow engines, microservices, message queues, multi-tenancy, plugin systems, dynamic tools, or model-generated SQL.
 
-## Current authorized next phase
+## Current authorized improvement scope
+
+- Treat this work as post-MVP product improvement, not as unfinished MVP delivery. Preserve the completed RAG baseline while improving traceability, isolation, evaluation, and controlled capabilities.
 
 - Route each chat request to one of three explicit, versioned capabilities: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, or `BUSINESS_ACTION`.
 - Keep `SIMPLE_CHAT` narrow: identity, greeting, capability description, thanks, and farewell continue to use deterministic replies. Do not silently turn it into unrestricted open-domain model answering.

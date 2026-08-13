@@ -4,6 +4,13 @@ spring:
       type: pgvector
 
 contextpilot:
+  embedding:
+    index:
+      profile-id: offline_deterministic_1024_v1
+      provider: CONTEXTPILOT
+      model: deterministic-embedding
+      dimensions: 1024
+      version: v1
   document:
     processing:
       enabled: true

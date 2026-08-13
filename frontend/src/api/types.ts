@@ -15,6 +15,16 @@ export interface KnowledgeBaseInput {
 }
 
 export type DocumentStatus = 'PENDING' | 'PROCESSING' | 'SUCCEEDED' | 'FAILED' | 'DELETING'
+export type EmbeddingIndexCompatibility = 'CURRENT' | 'OUTDATED' | 'UNKNOWN' | 'NOT_INDEXED'
+
+export interface EmbeddingIndexInfo {
+  profileId: string
+  provider: string
+  model: string
+  dimensions: number
+  profileVersion: string
+  indexedAt: string
+}
 
 export interface SourceDocument {
   id: string
@@ -27,6 +37,8 @@ export interface SourceDocument {
   status: DocumentStatus
   errorSummary: string | null
   processingAttempts: number
+  embeddingIndex: EmbeddingIndexInfo | null
+  embeddingIndexCompatibility: EmbeddingIndexCompatibility
   createdAt: string
   updatedAt: string
 }
@@ -52,6 +64,11 @@ export interface ConversationSummary {
 
 export type ChatMessageRole = 'USER' | 'ASSISTANT'
 export type ChatMessageStatus = 'PENDING' | 'COMPLETED' | 'FAILED'
+export type CapabilityId = 'SIMPLE_CHAT' | 'KNOWLEDGE_QA' | 'BUSINESS_ACTION'
+export type CapabilityMatchReason =
+  | 'SIMPLE_INTERACTION_WHITELIST'
+  | 'EXPLICIT_CREATE_KNOWLEDGE_BASE'
+  | 'DEFAULT_KNOWLEDGE_QA'
 
 export interface ConversationMessage {
   id: string
@@ -61,6 +78,9 @@ export interface ConversationMessage {
   status: ChatMessageStatus
   errorSummary: string | null
   traceId: string
+  capabilityId: CapabilityId | null
+  capabilityVersion: string | null
+  capabilityMatchReason: CapabilityMatchReason | null
   citations: Citation[]
   helpful: boolean
   createdAt: string
@@ -88,6 +108,9 @@ export interface StreamMessageEvent {
   userMessageId: string
   assistantMessageId: string
   traceId: string
+  capabilityId: CapabilityId
+  capabilityVersion: string
+  capabilityMatchReason: CapabilityMatchReason
 }
 
 export interface StreamDeltaEvent {

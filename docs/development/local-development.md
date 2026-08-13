@@ -35,6 +35,8 @@ CREATE EXTENSION IF NOT EXISTS vector;
 
 上传支持 UTF-8 编码的 TXT、Markdown 和带有效文件头的 PDF。文档解析使用 Spring AI 的文本、Markdown 和按页 PDF reader；不含可提取文本的扫描版 PDF 会被拒绝，MVP 不提供 OCR。
 
+真实 Embedding 默认索引身份为 `dashscope_qwen3_7_1024_v1`，`offline` Profile 使用隔离的 `offline_deterministic_1024_v1`。不要让两个环境复用同一个 `EMBEDDING_PROFILE_ID`。模型、维度或影响向量语义的预处理变化后，应设置新的 profile ID，启动应用完成迁移，再在资料库页面对旧文档执行“重建索引”。
+
 文本切分默认每块最多 1200 个字符并重叠 150 个字符，可分别通过 `DOCUMENT_CHUNK_MAX_CHARACTERS` 和 `DOCUMENT_CHUNK_OVERLAP_CHARACTERS` 覆盖。重叠值必须大于等于 0 且小于块大小。自动处理使用有界线程池，默认 1 个核心线程、最多 2 个线程、队列容量 50；每个文档默认最多进行 3 次处理尝试。
 
 ## 启动和验证

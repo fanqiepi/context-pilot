@@ -19,6 +19,9 @@ public class ChatMessageEntity {
     private ChatMessageStatus status;
     private String errorSummary;
     private String traceId;
+    private CapabilityId capabilityId;
+    private String capabilityVersion;
+    private CapabilityMatchReason capabilityMatchReason;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
     @TableLogic(value = "0", delval = "1")
@@ -78,6 +81,30 @@ public class ChatMessageEntity {
 
     public void setTraceId(String traceId) {
         this.traceId = traceId;
+    }
+
+    public CapabilityId getCapabilityId() {
+        return capabilityId;
+    }
+
+    public void setCapabilityId(CapabilityId capabilityId) {
+        this.capabilityId = capabilityId;
+    }
+
+    public String getCapabilityVersion() {
+        return capabilityVersion;
+    }
+
+    public void setCapabilityVersion(String capabilityVersion) {
+        this.capabilityVersion = capabilityVersion;
+    }
+
+    public CapabilityMatchReason getCapabilityMatchReason() {
+        return capabilityMatchReason;
+    }
+
+    public void setCapabilityMatchReason(CapabilityMatchReason capabilityMatchReason) {
+        this.capabilityMatchReason = capabilityMatchReason;
     }
 
     public OffsetDateTime getCreatedAt() {

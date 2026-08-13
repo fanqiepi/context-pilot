@@ -3,7 +3,9 @@ package io.github.fanqiepi.contextpilot.retrieval;
 import java.util.Map;
 import java.util.UUID;
 
+import io.github.fanqiepi.contextpilot.common.ConflictException;
 import io.github.fanqiepi.contextpilot.common.InternalServiceException;
+import io.github.fanqiepi.contextpilot.document.DocumentIndexStatusService;
 import io.github.fanqiepi.contextpilot.document.DocumentVectorIndex;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseService;
 import org.springframework.ai.document.Document;
@@ -14,12 +16,15 @@ public class RetrievalService {
 
     private final KnowledgeBaseService knowledgeBaseService;
     private final DocumentVectorIndex documentVectorIndex;
+    private final DocumentIndexStatusService documentIndexStatusService;
 
     public RetrievalService(
             KnowledgeBaseService knowledgeBaseService,
-            DocumentVectorIndex documentVectorIndex) {
+            DocumentVectorIndex documentVectorIndex,
+            DocumentIndexStatusService documentIndexStatusService) {
         this.knowledgeBaseService = knowledgeBaseService;
         this.documentVectorIndex = documentVectorIndex;
+        this.documentIndexStatusService = documentIndexStatusService;
     }
 
     public java.util.List<RetrievalResultResponse> search(
@@ -28,6 +33,11 @@ public class RetrievalService {
         knowledgeBaseService.get(knowledgeBaseId);
         if (!documentVectorIndex.isAvailable()) {
             throw unavailable();
+        }
+        if (documentIndexStatusService.requiresReindex(knowledgeBaseId)) {
+            throw new ConflictException(
+                    "KNOWLEDGE_BASE_REINDEX_REQUIRED",
+                    "Knowledge base documents must be reindexed with the current embedding profile");
         }
         try {
             return documentVectorIndex.search(

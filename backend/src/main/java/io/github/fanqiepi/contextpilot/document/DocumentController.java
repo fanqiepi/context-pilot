@@ -57,6 +57,12 @@ public class DocumentController {
         return ResponseEntity.accepted().body(documentService.retry(documentId));
     }
 
+    @PostMapping("/documents/{documentId}/reindex")
+    @Operation(summary = "使用当前 Embedding 索引配置重建文档索引")
+    public ResponseEntity<DocumentResponse> reindex(@PathVariable UUID documentId) {
+        return ResponseEntity.accepted().body(documentService.reindex(documentId));
+    }
+
     @DeleteMapping("/documents/{documentId}")
     @Operation(summary = "逻辑删除文档")
     public ResponseEntity<Void> delete(@PathVariable UUID documentId) {

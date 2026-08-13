@@ -30,6 +30,7 @@ public class ChatApplicationService {
     public ChatAnswerResponse answer(ChatRequest request, String traceId) {
         PreparedChat prepared = preparationService.prepare(request, traceId);
         PendingChatExchange exchange = prepared.exchange();
+        CapabilityRoute route = prepared.route();
         if (prepared.hasDirectAnswer()) {
             persistenceService.completeWithoutModel(
                     exchange.assistantMessageId(), prepared.directAnswer());
@@ -42,7 +43,10 @@ public class ChatApplicationService {
                     List.of(),
                     null,
                     null,
-                    traceId);
+                    traceId,
+                    route.capabilityId(),
+                    route.capabilityVersion(),
+                    route.matchReason());
         }
         if (prepared.refused()) {
             persistenceService.completeWithoutModel(
@@ -56,7 +60,10 @@ public class ChatApplicationService {
                     List.of(),
                     null,
                     null,
-                    traceId);
+                    traceId,
+                    route.capabilityId(),
+                    route.capabilityVersion(),
+                    route.matchReason());
         }
 
         ChatPrompt prompt = prepared.prompt();
@@ -91,7 +98,10 @@ public class ChatApplicationService {
                             result.completionTokens(),
                             result.totalTokens(),
                             latencyMs),
-                    traceId);
+                    traceId,
+                    route.capabilityId(),
+                    route.capabilityVersion(),
+                    route.matchReason());
         } catch (RuntimeException exception) {
             persistenceService.completeFailure(
                     exchange.assistantMessageId(),

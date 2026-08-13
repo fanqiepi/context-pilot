@@ -62,7 +62,10 @@ class ChatControllerTests {
                 List.of(),
                 "deepseek-v4-flash",
                 new ChatUsageResponse(10, 5, 15, 20),
-                traceId));
+                traceId,
+                CapabilityId.KNOWLEDGE_QA,
+                "v1",
+                CapabilityMatchReason.DEFAULT_KNOWLEDGE_QA));
 
         mockMvc.perform(post("/api/chat")
                         .header("X-Request-Id", traceId)
@@ -77,7 +80,10 @@ class ChatControllerTests {
                 .andExpect(jsonPath("$.answer").value("PostgreSQL is used [1]."))
                 .andExpect(jsonPath("$.refused").value(false))
                 .andExpect(jsonPath("$.model").value("deepseek-v4-flash"))
-                .andExpect(jsonPath("$.traceId").value(traceId));
+                .andExpect(jsonPath("$.traceId").value(traceId))
+                .andExpect(jsonPath("$.capabilityId").value("KNOWLEDGE_QA"))
+                .andExpect(jsonPath("$.capabilityVersion").value("v1"))
+                .andExpect(jsonPath("$.capabilityMatchReason").value("DEFAULT_KNOWLEDGE_QA"));
     }
 
     @Test

@@ -36,6 +36,7 @@ public class DocumentService {
     private final TransactionTemplate transactionTemplate;
     private final DocumentProcessingCoordinator processingCoordinator;
     private final DocumentVectorIndex documentVectorIndex;
+    private final EmbeddingIndexProperties embeddingIndexProperties;
 
     public DocumentService(
             SourceDocumentMapper sourceDocumentMapper,
@@ -44,7 +45,8 @@ public class DocumentService {
             StorageProperties storageProperties,
             TransactionTemplate transactionTemplate,
             DocumentProcessingCoordinator processingCoordinator,
-            DocumentVectorIndex documentVectorIndex) {
+            DocumentVectorIndex documentVectorIndex,
+            EmbeddingIndexProperties embeddingIndexProperties) {
         this.sourceDocumentMapper = sourceDocumentMapper;
         this.knowledgeBaseService = knowledgeBaseService;
         this.storageService = storageService;
@@ -52,6 +54,7 @@ public class DocumentService {
         this.transactionTemplate = transactionTemplate;
         this.processingCoordinator = processingCoordinator;
         this.documentVectorIndex = documentVectorIndex;
+        this.embeddingIndexProperties = embeddingIndexProperties;
     }
 
     public DocumentResponse upload(UUID knowledgeBaseId, MultipartFile file) {
@@ -105,7 +108,7 @@ public class DocumentService {
                     exception);
         }
         processingCoordinator.submit(documentId);
-        return DocumentResponse.from(entity);
+        return response(entity);
     }
 
     public List<DocumentResponse> list(UUID knowledgeBaseId) {
@@ -116,12 +119,12 @@ public class DocumentService {
                                 .orderByDesc(SourceDocumentEntity::getCreatedAt)
                                 .orderByDesc(SourceDocumentEntity::getId))
                 .stream()
-                .map(DocumentResponse::from)
+                .map(this::response)
                 .toList();
     }
 
     public DocumentResponse get(UUID documentId) {
-        return DocumentResponse.from(requireEntity(documentId));
+        return response(requireEntity(documentId));
     }
 
     public DocumentResponse retry(UUID documentId) {
@@ -145,7 +148,39 @@ public class DocumentService {
         }
         SourceDocumentEntity entity = requireEntity(documentId);
         processingCoordinator.submit(documentId);
-        return DocumentResponse.from(entity);
+        return response(entity);
+    }
+
+    public DocumentResponse reindex(UUID documentId) {
+        SourceDocumentEntity current = requireEntity(documentId);
+        if (current.getStatus() != DocumentStatus.SUCCEEDED) {
+            throw reindexNotAllowed(documentId, current);
+        }
+        EmbeddingIndexProfile currentProfile = embeddingIndexProperties.currentProfile();
+        if (currentProfile.id().equals(current.getEmbeddingProfileId())) {
+            throw reindexNotRequired(documentId);
+        }
+        if (!processingCoordinator.isEnabled()) {
+            throw new ConflictException(
+                    "DOCUMENT_PROCESSING_DISABLED",
+                    "Document processing is not enabled");
+        }
+        if (!documentVectorIndex.isAvailable()) {
+            throw new ConflictException(
+                    "VECTOR_STORE_UNAVAILABLE",
+                    "Document index cannot be rebuilt while vector storage is disabled");
+        }
+        if (sourceDocumentMapper.prepareReindex(documentId, currentProfile.id()) == 0) {
+            SourceDocumentEntity latest = requireEntity(documentId);
+            if (latest.getStatus() == DocumentStatus.SUCCEEDED
+                    && currentProfile.id().equals(latest.getEmbeddingProfileId())) {
+                throw reindexNotRequired(documentId);
+            }
+            throw reindexNotAllowed(documentId, latest);
+        }
+        SourceDocumentEntity pending = requireEntity(documentId);
+        processingCoordinator.submit(documentId);
+        return response(pending);
     }
 
     public void delete(UUID documentId) {
@@ -178,6 +213,10 @@ public class DocumentService {
             throw notFound(documentId);
         }
         return entity;
+    }
+
+    private DocumentResponse response(SourceDocumentEntity entity) {
+        return DocumentResponse.from(entity, embeddingIndexProperties.currentProfile());
     }
 
     private String validateFilename(String originalFilename) {
@@ -302,5 +341,17 @@ public class DocumentService {
         return new ConflictException(
                 "DOCUMENT_RETRY_NOT_ALLOWED",
                 "Document " + documentId + " cannot be retried from status " + entity.getStatus());
+    }
+
+    private ConflictException reindexNotAllowed(UUID documentId, SourceDocumentEntity entity) {
+        return new ConflictException(
+                "DOCUMENT_REINDEX_NOT_ALLOWED",
+                "Document " + documentId + " cannot be reindexed from status " + entity.getStatus());
+    }
+
+    private ConflictException reindexNotRequired(UUID documentId) {
+        return new ConflictException(
+                "DOCUMENT_REINDEX_NOT_REQUIRED",
+                "Document " + documentId + " already uses the current embedding profile");
     }
 }

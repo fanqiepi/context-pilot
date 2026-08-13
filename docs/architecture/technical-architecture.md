@@ -1,10 +1,10 @@
 # ContextPilot 技术架构
 
-> 状态：功能型 MVP 架构基线 + 已授权的固定能力路由与受控业务操作设计
+> 状态：功能型 MVP 已完成，当前记录持续完善阶段的架构基线
 
 ## 架构形式
 
-系统采用 Vue 前端与 Spring Boot 后端分离的模块化单体。后端使用 Java 21、Spring Boot 4.1.x 和 Spring AI 2.0.x；下一阶段继续使用显式 Java 应用服务和持久化状态迁移，不拆分微服务，不引入消息队列、Agent、LangGraph 或其他工作流引擎。
+系统采用 Vue 前端与 Spring Boot 后端分离的模块化单体。后端使用 Java 21、Spring Boot 4.1.x 和 Spring AI 2.0.x；完善阶段继续使用显式 Java 应用服务和持久化状态迁移，不拆分微服务，不引入消息队列、Agent、LangGraph 或其他工作流引擎。
 
 前端使用 Vue 3、TypeScript、Vue Router 和 Element Plus。`/library` 承载知识库、文档上传与处理状态管理，`/chat` 承载知识库选择、会话历史、流式问答和单向“有用”反馈。普通 HTTP 请求统一通过 Axios 访问 `/api`，SSE 使用 `@microsoft/fetch-event-source` 解析具名事件；聊天页对突发到达的 `delta` 使用短缓冲渐进渲染，并在缓冲区清空后再展示引用和完成状态。开发服务器将 `/api` 和 `/actuator` 代理到后端。模型密钥不进入浏览器，回答和引用按纯文本渲染，不信任模型输出或文档内容中的 HTML。
 
@@ -27,9 +27,9 @@
 
 ```text
 文档上传 -> StorageService -> 有界 TaskExecutor -> 解析与切分 -> EmbeddingModel
-         -> PgVectorStore/PostgreSQL
+         -> 写入 embedding profile 元数据 -> PgVectorStore/PostgreSQL
 
-用户问题 -> 会话/知识库校验 -> DashScope Embedding -> pgvector 隔离检索
+用户问题 -> 会话/知识库校验 -> DashScope Embedding -> 知识库 + embedding profile 隔离检索
          -> 证据校验/拒答 -> DeepSeek ChatModel -> SSE 回答与引用
          -> 会话、调用记录、trace ID 和反馈
 
@@ -43,9 +43,11 @@
                             -> 保存结果并回显状态
 ```
 
-文档解析使用 Spring AI 的 `TextReader`、`MarkdownDocumentReader` 和 `PagePdfDocumentReader`。PDF 按页解析以保留引用页码；切分采用确定性的字符窗口，默认最大 1200 个字符并重叠 150 个字符。上传后由有界 `TaskExecutor` 编排 `PENDING -> PROCESSING -> SUCCEEDED/FAILED`，原子状态更新防止重复处理。重试和删除均先按文档标识清理旧向量，向量 ID 保持确定性。
+文档解析使用 Spring AI 的 `TextReader`、`MarkdownDocumentReader` 和 `PagePdfDocumentReader`。PDF 按页解析以保留引用页码；切分采用确定性的字符窗口，默认最大 1200 个字符并重叠 150 个字符。上传后由有界 `TaskExecutor` 编排 `PENDING -> PROCESSING -> SUCCEEDED/FAILED`，原子状态更新防止重复处理。重试、重建索引和删除均按文档标识替换或清理派生向量，向量 ID 保持确定性。
 
 默认配置关闭自动处理和向量存储。显式启用 `offline` Profile 时，使用本地确定性 1024 维 Embedding 和 `PgVectorStore` 打通无网络测试闭环；该 Embedding 只用于开发和测试，不能用于评估真实语义检索质量。正式集成使用 DashScope `qwen3.7-text-embedding`。
+
+Embedding 索引由应用级 `EmbeddingIndexProfile` 标识，默认真实模型使用 `dashscope_qwen3_7_1024_v1`，离线确定性模型使用独立的 `offline_deterministic_1024_v1`。文档成功处理时，`source_document` 记录 profile、供应商、模型、维度、版本和索引时间；每个向量片段记录相同的 profile 来源字段。检索过滤条件固定包含知识库 ID 与当前 profile ID，因此离线、旧模型和当前真实模型的向量不会混入同一结果集。模型、维度或影响向量语义的预处理发生变化时应分配新 profile，并通过显式重建索引迁移文档。
 
 ## 聊天编排边界
 
