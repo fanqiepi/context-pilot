@@ -12,5 +12,8 @@ public record ChatAnswerResponse(
         List<ChatCitationResponse> citations,
         String model,
         ChatUsageResponse usage,
-        String traceId) {
+        String traceId,
+        CapabilityId capabilityId,
+        String capabilityVersion,
+        CapabilityMatchReason capabilityMatchReason) {
 }

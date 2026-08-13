@@ -124,6 +124,34 @@ class DatabaseMigrationTests {
                       AND table_name = 'knowledge_base'
                       AND column_name = 'deleted'
                     """)).isEqualTo("smallint");
+            for (String columnName : new String[] {
+                    "embedding_profile_id", "embedding_provider", "embedding_model", "embedding_profile_version"
+            }) {
+                assertThat(queryString(connection, """
+                        SELECT data_type
+                        FROM information_schema.columns
+                        WHERE table_schema = 'public'
+                          AND table_name = 'source_document'
+                          AND column_name = '%s'
+                        """.formatted(columnName))).isEqualTo("character varying");
+            }
+            assertThat(queryString(connection, """
+                    SELECT data_type
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public'
+                      AND table_name = 'source_document'
+                      AND column_name = 'embedding_dimensions'
+                    """)).isEqualTo("integer");
+            assertThat(queryBoolean(connection, """
+                    SELECT EXISTS (
+                        SELECT 1
+                        FROM information_schema.table_constraints
+                        WHERE table_schema = 'public'
+                          AND table_name = 'source_document'
+                          AND constraint_name = 'source_document_embedding_index_complete_check'
+                          AND constraint_type = 'CHECK'
+                    )
+                    """)).isTrue();
             assertThat(queryString(connection, """
                     SELECT data_type
                     FROM information_schema.columns
@@ -138,6 +166,27 @@ class DatabaseMigrationTests {
                       AND table_name = 'source_document'
                       AND column_name = 'deleted'
                     """)).isEqualTo("smallint");
+            for (String columnName : new String[] {
+                    "capability_id", "capability_version", "capability_match_reason"
+            }) {
+                assertThat(queryString(connection, """
+                        SELECT data_type
+                        FROM information_schema.columns
+                        WHERE table_schema = 'public'
+                          AND table_name = 'chat_message'
+                          AND column_name = '%s'
+                        """.formatted(columnName))).isEqualTo("character varying");
+            }
+            assertThat(queryBoolean(connection, """
+                    SELECT EXISTS (
+                        SELECT 1
+                        FROM information_schema.table_constraints
+                        WHERE table_schema = 'public'
+                          AND table_name = 'chat_message'
+                          AND constraint_name = 'chat_message_capability_route_check'
+                          AND constraint_type = 'CHECK'
+                    )
+                    """)).isTrue();
             assertThat(queryString(connection, """
                     SELECT format_type(attribute.atttypid, attribute.atttypmod)
                     FROM pg_attribute attribute

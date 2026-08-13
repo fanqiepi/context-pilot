@@ -3,20 +3,25 @@ package io.github.fanqiepi.contextpilot.chat;
 import java.util.List;
 
 record PreparedChat(
+        CapabilityRoute route,
         PendingChatExchange exchange,
         ChatPrompt prompt,
         List<ChatCitationResponse> citations,
         String directAnswer) {
 
     PreparedChat(
+            CapabilityRoute route,
             PendingChatExchange exchange,
             ChatPrompt prompt,
             List<ChatCitationResponse> citations) {
-        this(exchange, prompt, citations, null);
+        this(route, exchange, prompt, citations, null);
     }
 
-    static PreparedChat direct(PendingChatExchange exchange, String answer) {
-        return new PreparedChat(exchange, null, List.of(), answer);
+    static PreparedChat direct(
+            CapabilityRoute route,
+            PendingChatExchange exchange,
+            String answer) {
+        return new PreparedChat(route, exchange, null, List.of(), answer);
     }
 
     boolean refused() {

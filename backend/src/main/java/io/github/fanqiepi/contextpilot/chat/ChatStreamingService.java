@@ -52,7 +52,10 @@ public class ChatStreamingService {
                         exchange.conversationId(),
                         exchange.userMessageId(),
                         exchange.assistantMessageId(),
-                        traceId));
+                        traceId,
+                        prepared.route().capabilityId(),
+                        prepared.route().capabilityVersion(),
+                        prepared.route().matchReason()));
         if (prepared.hasDirectAnswer()) {
             persistenceService.completeWithoutModel(
                     exchange.assistantMessageId(), prepared.directAnswer());

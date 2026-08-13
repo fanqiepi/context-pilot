@@ -35,7 +35,7 @@ public class ChatPersistenceService {
             UUID requestedConversationId,
             UUID knowledgeBaseId,
             String question,
-            String traceId) {
+            CapabilityRoute route) {
         OffsetDateTime now = now();
         ConversationEntity conversation = requestedConversationId == null
                 ? createConversation(knowledgeBaseId, question, now)
@@ -43,10 +43,10 @@ public class ChatPersistenceService {
 
         ChatMessageEntity userMessage = message(
                 conversation.getId(), ChatMessageRole.USER, question,
-                ChatMessageStatus.COMPLETED, traceId, now);
+                ChatMessageStatus.COMPLETED, route, now);
         ChatMessageEntity assistantMessage = message(
                 conversation.getId(), ChatMessageRole.ASSISTANT, "",
-                ChatMessageStatus.PENDING, traceId, now);
+                ChatMessageStatus.PENDING, route, now);
         chatMessageMapper.insert(userMessage);
         chatMessageMapper.insert(assistantMessage);
 
@@ -176,7 +176,7 @@ public class ChatPersistenceService {
             ChatMessageRole role,
             String content,
             ChatMessageStatus status,
-            String traceId,
+            CapabilityRoute route,
             OffsetDateTime now) {
         ChatMessageEntity message = new ChatMessageEntity();
         message.setId(UUID.randomUUID());
@@ -184,7 +184,10 @@ public class ChatPersistenceService {
         message.setRole(role);
         message.setContent(content);
         message.setStatus(status);
-        message.setTraceId(traceId);
+        message.setTraceId(route.traceId());
+        message.setCapabilityId(route.capabilityId());
+        message.setCapabilityVersion(route.capabilityVersion());
+        message.setCapabilityMatchReason(route.matchReason());
         message.setCreatedAt(now);
         message.setUpdatedAt(now);
         return message;

@@ -170,6 +170,9 @@ async function sendQuestion(): Promise<void> {
     status: 'COMPLETED',
     errorSummary: null,
     traceId: '',
+    capabilityId: null,
+    capabilityVersion: null,
+    capabilityMatchReason: null,
     citations: [],
     helpful: false,
     createdAt: now,
@@ -183,6 +186,9 @@ async function sendQuestion(): Promise<void> {
     status: 'PENDING',
     errorSummary: null,
     traceId: '',
+    capabilityId: null,
+    capabilityVersion: null,
+    capabilityMatchReason: null,
     citations: [],
     helpful: false,
     createdAt: now,
@@ -219,9 +225,15 @@ async function sendQuestion(): Promise<void> {
           userMessage.id = event.userMessageId
           userMessage.conversationId = event.conversationId
           userMessage.traceId = event.traceId
+          userMessage.capabilityId = event.capabilityId
+          userMessage.capabilityVersion = event.capabilityVersion
+          userMessage.capabilityMatchReason = event.capabilityMatchReason
           assistantMessage.id = event.assistantMessageId
           assistantMessage.conversationId = event.conversationId
           assistantMessage.traceId = event.traceId
+          assistantMessage.capabilityId = event.capabilityId
+          assistantMessage.capabilityVersion = event.capabilityVersion
+          assistantMessage.capabilityMatchReason = event.capabilityMatchReason
         },
         onDelta(event) {
           textRenderer.enqueue(event.content)

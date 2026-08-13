@@ -1,6 +1,6 @@
 # REST API、SSE 与操作确认约定
 
-> 本文同时记录已实现接口与已授权但尚未实现的下一阶段合同。已实现字段以 OpenAPI 为主要事实来源；标注“规划”的内容不能当作当前可调用接口。
+> 本文同时记录已实现接口与完善阶段中已授权但尚未实现的合同。已实现字段以 OpenAPI 为主要事实来源；标注“规划”的内容不能当作当前可调用接口。
 
 ## 通用约定
 
@@ -17,6 +17,7 @@
 - `/api/knowledge-bases/{id}/documents`：文档上传和列表。
 - `/api/documents/{id}`：文档状态、错误摘要和删除。
 - `/api/documents/{id}/retry`：重试处理失败且未达到次数上限的文档。
+- `/api/documents/{id}/reindex`：使用服务器当前 Embedding profile 重建成功文档的派生索引。
 - `/api/knowledge-bases/{id}/search`：知识库内 Top-K 文档片段检索。
 - `/api/conversations`：会话和历史消息。
 - `/api/chat`：POST 非流式 RAG 问答，用于 P2 闭环和集成验证。
@@ -24,7 +25,7 @@
 - `/api/messages/{id}/feedback`：标记或取消“有用”反馈。
 - `/api/model-calls`：最小调用记录查询。
 
-## 下一阶段规划资源（尚未实现）
+## 完善阶段规划资源（尚未实现）
 
 - `/api/action-requests/{id}`：查询持久化业务操作提案及状态。
 - `/api/action-requests/{id}/confirm`：人工确认后原子取得执行权并执行白名单操作。
@@ -57,6 +58,7 @@
 | `GET` | `/api/knowledge-bases/{id}/documents` | 按创建时间和 ID 稳定倒序返回知识库下的文档 |
 | `GET` | `/api/documents/{id}` | 查询文档元数据和处理状态 |
 | `POST` | `/api/documents/{id}/retry` | 将可重试的失败文档恢复为 `PENDING` 并返回 `202` |
+| `POST` | `/api/documents/{id}/reindex` | 将索引来源为 `UNKNOWN` 或 `OUTDATED` 的 `SUCCEEDED` 文档原子恢复为 `PENDING`，使用服务器当前 Embedding profile 异步重建并返回 `202` |
 | `DELETE` | `/api/documents/{id}` | 逻辑删除文档元数据，成功返回 `204` |
 
 上传支持 TXT、Markdown（`.md` 或 `.markdown`）和 PDF，默认最大文件大小为 20 MiB。TXT 和 Markdown 必须使用 UTF-8；PDF 上传阶段校验文件头，是否包含可提取文本留到解析阶段判断。客户端文件名只用于展示，不能决定实际存储路径。上传成功时先返回 `PENDING`；处理开关启用后，后台异步流转为 `PROCESSING`，最终进入 `SUCCEEDED` 或 `FAILED`。
@@ -65,9 +67,11 @@
 
 TXT、Markdown 和文本型 PDF 分别通过 Spring AI 对应 reader 解析；PDF 按页保留页码元数据，没有可提取文本的文件会解析失败。切分默认每块最多 1200 个字符、相邻块重叠 150 个字符，并优先在段落或句末断开。每块带有稳定的 `chunk_index`，同时保留文件名、文件类型、原始 part 序号和 PDF 页码等来源元数据。状态响应包含 `processingAttempts`，默认最多 3 次处理尝试；超出上限返回 `409 DOCUMENT_RETRY_LIMIT_REACHED`。
 
+文档响应还包含可空的 `embeddingIndex` 和 `embeddingIndexCompatibility`。索引来源记录 profile、供应商、模型、维度、配置版本和完成时间；兼容性取值为 `CURRENT`、`OUTDATED`、`UNKNOWN` 或 `NOT_INDEXED`。迁移前成功文档保持 `UNKNOWN`，必须显式调用重建接口，不进行猜测性回填。重建接口不接受模型参数，只允许 `UNKNOWN` 或 `OUTDATED` 的成功文档；已经是 `CURRENT` 时返回 `409 DOCUMENT_REINDEX_NOT_REQUIRED`，页面也不展示重建入口。处理开关或 VectorStore 未启用时返回 `409`，文档不在 `SUCCEEDED` 状态时返回 `409 DOCUMENT_REINDEX_NOT_ALLOWED`。
+
 ## 检索接口
 
-`POST /api/knowledge-bases/{id}/search` 请求体包含非空 `query` 和可选 `topK`。`topK` 默认为 5，范围为 1 到 20。检索强制通过向量元数据中的 `knowledge_base_id` 隔离结果，返回 chunk ID、文档 ID、原始文件名、chunk 序号、可用时的 PDF 页码、正文和相似度分数。未启用向量存储时返回安全的服务错误，不会回退为跨知识库或无过滤检索。
+`POST /api/knowledge-bases/{id}/search` 请求体包含非空 `query` 和可选 `topK`。`topK` 默认为 5，范围为 1 到 20。检索强制通过向量元数据中的 `knowledge_base_id` 与当前 `embedding_profile_id` 双重隔离结果，返回 chunk ID、文档 ID、原始文件名、chunk 序号、可用时的 PDF 页码、正文和相似度分数。未启用向量存储时返回安全的服务错误，不会回退为跨知识库或无过滤检索。知识库存在成功文档但没有当前 profile 索引时返回 `409 KNOWLEDGE_BASE_REINDEX_REQUIRED`。
 
 ## 会话历史接口
 

@@ -1,21 +1,21 @@
 # ContextPilot 数据模型
 
-> 本文定义已实现逻辑模型和已授权的下一阶段规划；已经实施的物理结构以 Flyway 迁移为事实来源，规划结构在对应迁移落地前不得视为已存在。
+> 本文定义已实现逻辑模型和完善阶段的已授权规划；已经实施的物理结构以 Flyway 迁移为事实来源，规划结构在对应迁移落地前不得视为已存在。
 
 ## 核心实体
 
 | 实体 | 主要职责 | 关键关系 |
 | --- | --- | --- |
 | `knowledge_base` | 知识库名称、描述和状态 | 包含多个文档 |
-| `source_document` | 原始文件、类型、存储键和处理状态 | 属于一个知识库 |
-| `vector_store` | 分段正文、元数据和 1024 维向量 | 元数据关联知识库、文档、页码和分段 |
+| `source_document` | 原始文件、类型、存储键、处理状态和 Embedding 索引来源 | 属于一个知识库 |
+| `vector_store` | 分段正文、元数据和 1024 维向量 | 元数据关联知识库、文档、页码、分段和 Embedding profile |
 | `conversation` | 会话标题和时间信息 | 包含多条消息 |
 | `chat_message` | 用户问题、助手回答和状态 | 属于一个会话 |
 | `message_citation` | 引用的文档、页码、分段和排序 | 属于助手消息 |
 | `model_call` | 模型、耗时、Token、状态和脱敏错误 | 关联消息或文档任务 |
 | `answer_feedback` | “有用”正向反馈 | 每条助手消息最多一条当前反馈 |
 
-## 下一阶段规划实体（尚未实现）
+## 完善阶段规划实体（尚未实现）
 
 | 实体 | 主要职责 | 关键关系 |
 | --- | --- | --- |
@@ -55,8 +55,9 @@
 - `V5__add_document_processing_attempts.sql` 增加非负的 `processing_attempts`，每次成功取得处理权时递增；默认最多进行 3 次处理尝试。
 - 列表查询使用知识库、创建时间和 ID 的组合索引。
 - `V4__add_logical_delete.sql` 增加 `deleted` 字段；文档删除仅逻辑删除元数据并保留原始文件，未来物理清理由显式维护流程负责。
+- `V9__track_document_embedding_index.sql` 增加 `embedding_profile_id`、`embedding_provider`、`embedding_model`、`embedding_dimensions`、`embedding_profile_version` 和 `indexed_at`。约束要求这些字段要么全部为空，要么全部存在；历史成功文档保持为空，表示来源未知。
 
-处理状态、错误摘要和尝试次数直接保存在 `source_document`，MVP 不单独创建任务表。处理器通过带状态条件的原子更新取得处理权，避免同一文档并发执行。向量使用由 `documentId + chunkIndex` 派生的确定性 UUID，重试前先删除该文档旧向量，避免重复索引。
+处理状态、错误摘要和尝试次数直接保存在 `source_document`，当前不单独创建任务表。处理器通过带状态条件的原子更新取得处理权，避免同一文档并发执行。向量使用由 `documentId + chunkIndex` 派生的确定性 UUID，写入前先删除该文档旧向量，避免重复索引。重建索引仅允许来源未知或不同于当前 profile 的成功文档，通过带状态与 profile 条件的 `SUCCEEDED -> PENDING` 原子迁移取得任务权并重置本轮尝试次数；处理成功后才写入当前 profile，失败时清空来源字段并清理派生向量。
 
 ## 已实现的对话结构
 

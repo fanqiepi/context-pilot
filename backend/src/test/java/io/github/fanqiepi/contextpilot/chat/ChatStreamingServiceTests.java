@@ -55,7 +55,8 @@ class ChatStreamingServiceTests {
         ChatPrompt prompt = new ChatPrompt("system", "user", "v1");
         UUID modelCallId = UUID.randomUUID();
         when(preparationService.prepare(request, "trace-success"))
-                .thenReturn(new PreparedChat(exchange, prompt, List.of(citation)));
+                .thenReturn(new PreparedChat(
+                        knowledgeRoute("trace-success"), exchange, prompt, List.of(citation)));
         stubModelCall(exchange, modelCallId);
         when(chatModelGateway.stream("system", "user")).thenReturn(Flux.just(
                 new ChatModelChunk("Hello ", "deepseek-v4-flash", null, null, null),
@@ -71,6 +72,8 @@ class ChatStreamingServiceTests {
                 .containsExactly("message", "delta", "delta", "citation", "usage", "done");
         ChatStreamPayload.Message message = (ChatStreamPayload.Message) events.getFirst().data();
         assertThat(message.traceId()).isEqualTo("trace-success");
+        assertThat(message.capabilityId()).isEqualTo(CapabilityId.KNOWLEDGE_QA);
+        assertThat(message.capabilityVersion()).isEqualTo("v1");
         ChatStreamPayload.Usage usage = (ChatStreamPayload.Usage) events.get(4).data();
         assertThat(usage.totalTokens()).isEqualTo(24);
         ChatStreamPayload.Done done = (ChatStreamPayload.Done) events.getLast().data();
@@ -95,7 +98,8 @@ class ChatStreamingServiceTests {
         ChatRequest request = request();
         PendingChatExchange exchange = exchange();
         when(preparationService.prepare(request, "trace-refused"))
-                .thenReturn(new PreparedChat(exchange, null, List.of()));
+                .thenReturn(new PreparedChat(
+                        knowledgeRoute("trace-refused"), exchange, null, List.of()));
 
         List<ServerSentEvent<ChatStreamPayload>> events = service
                 .stream(request, "trace-refused")
@@ -117,7 +121,10 @@ class ChatStreamingServiceTests {
         ChatRequest request = request();
         PendingChatExchange exchange = exchange();
         when(preparationService.prepare(request, "trace-direct"))
-                .thenReturn(PreparedChat.direct(exchange, SimpleChatReplyPolicy.IDENTITY_REPLY));
+                .thenReturn(PreparedChat.direct(
+                        simpleRoute("trace-direct"),
+                        exchange,
+                        SimpleChatReplyPolicy.IDENTITY_REPLY));
 
         List<ServerSentEvent<ChatStreamPayload>> events = service
                 .stream(request, "trace-direct")
@@ -143,7 +150,8 @@ class ChatStreamingServiceTests {
         ChatPrompt prompt = new ChatPrompt("system", "user", "v1");
         UUID modelCallId = UUID.randomUUID();
         when(preparationService.prepare(request, "trace-error"))
-                .thenReturn(new PreparedChat(exchange, prompt, List.of(citation())));
+                .thenReturn(new PreparedChat(
+                        knowledgeRoute("trace-error"), exchange, prompt, List.of(citation())));
         stubModelCall(exchange, modelCallId);
         when(chatModelGateway.stream("system", "user")).thenReturn(Flux.error(
                 new InternalServiceException(
@@ -177,7 +185,8 @@ class ChatStreamingServiceTests {
         ChatPrompt prompt = new ChatPrompt("system", "user", "v1");
         UUID modelCallId = UUID.randomUUID();
         when(preparationService.prepare(request, "trace-cancel"))
-                .thenReturn(new PreparedChat(exchange, prompt, List.of(citation())));
+                .thenReturn(new PreparedChat(
+                        knowledgeRoute("trace-cancel"), exchange, prompt, List.of(citation())));
         stubModelCall(exchange, modelCallId);
         when(chatModelGateway.stream("system", "user")).thenReturn(Flux.never());
 
@@ -229,5 +238,19 @@ class ChatStreamingServiceTests {
                 null,
                 0.9,
                 "Evidence");
+    }
+
+    private CapabilityRoute knowledgeRoute(String traceId) {
+        return CapabilityRoute.matched(
+                CapabilityId.KNOWLEDGE_QA,
+                CapabilityMatchReason.DEFAULT_KNOWLEDGE_QA,
+                traceId);
+    }
+
+    private CapabilityRoute simpleRoute(String traceId) {
+        return CapabilityRoute.matched(
+                CapabilityId.SIMPLE_CHAT,
+                CapabilityMatchReason.SIMPLE_INTERACTION_WHITELIST,
+                traceId);
     }
 }

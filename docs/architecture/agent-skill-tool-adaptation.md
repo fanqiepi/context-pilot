@@ -2,7 +2,7 @@
 
 > 评估对象：包含聊天页面、ChatController、ChatApplicationService、SkillRouter/Registry、LLM、ToolExecutionGateway、QueryTool、DataPort 和数据库的参考时序图；其中数据库在 ContextPilot 中映射为项目自己的 PostgreSQL。
 >
-> 结论：该图的可靠性思想与 ContextPilot 高度相关，但完整组件结构不能直接照搬。功能型 MVP 已完成；下一阶段已授权固定能力路由和首个需人工确认的创建知识库操作，仍不采用 Agent、LangGraph、通用工具网关或模型驱动的结构化查询。
+> 结论：该图的可靠性思想与 ContextPilot 高度相关，但完整组件结构不能直接照搬。功能型 MVP 已完成，项目进入持续完善阶段；固定能力路由已经实现，首个需人工确认的创建知识库操作已授权，仍不采用 Agent、LangGraph、通用工具网关或模型驱动的结构化查询。
 
 ## 总体适配度
 
@@ -17,9 +17,9 @@
 | --- | --- | --- | --- |
 | 独立聊天页面 | 高 | 已建设 Vue 聊天页、历史消息、引用和反馈 | 下一阶段增加可恢复的操作确认卡片 |
 | `ChatController` | 高 | 使用现有 `/api/chat/stream`，负责校验、SSE 协议和 request/trace ID | 不因增加工具而另起不兼容的 `/api/v1/chat` |
-| `ChatApplicationService` | 高 | 编排会话、检索、证据校验、模型调用和持久化 | 仍是总入口，并调用固定 `CapabilityRouter`；控制器不能直接驱动操作 |
+| `ChatApplicationService` | 高 | 编排会话、检索、证据校验、模型调用和持久化，并已通过共享准备链路调用固定 `CapabilityRouter` | 仍是总入口；控制器不能直接驱动操作 |
 | 会话上下文 | 高 | 保存 conversation/message 和选定 knowledgeBase | 下一阶段为新消息记录能力 ID 和版本，并关联操作提案 |
-| 候选 Skill 匹配 | 中 | MVP 未实现 | 下一阶段只实现三个固定能力，不建设动态 Skill 匹配或注册表 |
+| 候选 Skill 匹配 | 中 | 已实现三个固定能力的确定性路由，不建设动态 Skill 匹配或注册表 | 后续新增能力仍需逐项批准并保持显式合同 |
 | `SkillDefinition`/版本 | 中 | 提示词和评估配置已作为版本化资产 | 使用代码内固定能力合同，包含输入、输出、数据源和是否允许业务操作 |
 | `LlmClient` | 高 | 通过 Spring AI `ChatModel` 或小型应用边界调用 DeepSeek | 工具调用仍不得绕过应用网关 |
 | 模型返回澄清问题 | 中 | 已用固定规则处理缺少知识库、空问题和证据不足 | 业务参数缺失或歧义时由能力合同返回结构化澄清，不猜测关键参数 |
@@ -32,7 +32,7 @@
 | `ToolResult` 来源/时间/质量 | 高 | 映射为 RAG 检索上下文和 citation；保留文档、页码、分段和分数 | 外部结果增加 `dataAsOf`、质量标记和来源系统 |
 | `ResultValidator` | 高 | 实现证据存在性、知识库隔离、引用支持和无依据拒答 | 后续增加每个工具的结果合同与质量校验 |
 | `AnswerComposer` | 高 | 使用版本化提示词组装问题、检索证据和引用约束 | 多来源回答必须保留来源边界，禁止伪造引用 |
-| trace ID | 高 | 贯穿 HTTP、SSE、message 和 model_call | 下一阶段贯穿路由、操作提案、确认和执行结果 |
+| trace ID | 高 | 贯穿 HTTP、SSE、message、model_call 和固定能力路由 | N2 继续贯穿操作提案、确认和执行结果 |
 
 ## MVP 应采用的简化时序
 

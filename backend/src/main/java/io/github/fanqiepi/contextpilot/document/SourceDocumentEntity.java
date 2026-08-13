@@ -34,6 +34,18 @@ public class SourceDocumentEntity {
 
     private int processingAttempts;
 
+    private String embeddingProfileId;
+
+    private String embeddingProvider;
+
+    private String embeddingModel;
+
+    private Integer embeddingDimensions;
+
+    private String embeddingProfileVersion;
+
+    private OffsetDateTime indexedAt;
+
     private OffsetDateTime createdAt;
 
     private OffsetDateTime updatedAt;
@@ -127,6 +139,54 @@ public class SourceDocumentEntity {
 
     public void setProcessingAttempts(int processingAttempts) {
         this.processingAttempts = processingAttempts;
+    }
+
+    public String getEmbeddingProfileId() {
+        return embeddingProfileId;
+    }
+
+    public void setEmbeddingProfileId(String embeddingProfileId) {
+        this.embeddingProfileId = embeddingProfileId;
+    }
+
+    public String getEmbeddingProvider() {
+        return embeddingProvider;
+    }
+
+    public void setEmbeddingProvider(String embeddingProvider) {
+        this.embeddingProvider = embeddingProvider;
+    }
+
+    public String getEmbeddingModel() {
+        return embeddingModel;
+    }
+
+    public void setEmbeddingModel(String embeddingModel) {
+        this.embeddingModel = embeddingModel;
+    }
+
+    public Integer getEmbeddingDimensions() {
+        return embeddingDimensions;
+    }
+
+    public void setEmbeddingDimensions(Integer embeddingDimensions) {
+        this.embeddingDimensions = embeddingDimensions;
+    }
+
+    public String getEmbeddingProfileVersion() {
+        return embeddingProfileVersion;
+    }
+
+    public void setEmbeddingProfileVersion(String embeddingProfileVersion) {
+        this.embeddingProfileVersion = embeddingProfileVersion;
+    }
+
+    public OffsetDateTime getIndexedAt() {
+        return indexedAt;
+    }
+
+    public void setIndexedAt(OffsetDateTime indexedAt) {
+        this.indexedAt = indexedAt;
     }
 
     public OffsetDateTime getCreatedAt() {

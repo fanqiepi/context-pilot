@@ -35,12 +35,17 @@ class ChatPreparationServiceTests {
         ChatProperties properties = new ChatProperties();
         properties.setMinSimilarity(0.5);
         properties.setRetrievalTopK(5);
+        SimpleChatReplyPolicy simpleReplyPolicy = new SimpleChatReplyPolicy();
+        CreateKnowledgeBaseIntentPolicy createKnowledgeBaseIntentPolicy =
+                new CreateKnowledgeBaseIntentPolicy();
         service = new ChatPreparationService(
                 retrievalService,
                 persistenceService,
                 promptComposer,
                 properties,
-                new SimpleChatReplyPolicy());
+                simpleReplyPolicy,
+                new CapabilityRouter(simpleReplyPolicy, createKnowledgeBaseIntentPolicy),
+                createKnowledgeBaseIntentPolicy);
     }
 
     @Test
@@ -60,13 +65,14 @@ class ChatPreparationServiceTests {
         ChatPrompt prompt = new ChatPrompt("system", "user", "v1");
         when(retrievalService.search(eq(knowledgeBaseId), any())).thenReturn(List.of(evidence));
         when(persistenceService.begin(
-                conversationId, knowledgeBaseId, "Question?", "trace-1"))
+                eq(conversationId), eq(knowledgeBaseId), eq("Question?"), any(CapabilityRoute.class)))
                 .thenReturn(exchange);
         when(promptComposer.compose("Question?", List.of(evidence))).thenReturn(prompt);
 
         PreparedChat prepared = service.prepare(request, "trace-1");
 
         assertThat(prepared.refused()).isFalse();
+        assertThat(prepared.route().capabilityId()).isEqualTo(CapabilityId.KNOWLEDGE_QA);
         assertThat(prepared.prompt()).isEqualTo(prompt);
         assertThat(prepared.citations()).singleElement()
                 .satisfies(citation -> {
@@ -90,12 +96,13 @@ class ChatPreparationServiceTests {
                 "Weak evidence",
                 0.2);
         when(retrievalService.search(eq(knowledgeBaseId), any())).thenReturn(List.of(weakEvidence));
-        when(persistenceService.begin(null, knowledgeBaseId, "Unknown", "trace-2"))
+        when(persistenceService.begin(eq(null), eq(knowledgeBaseId), eq("Unknown"), any(CapabilityRoute.class)))
                 .thenReturn(exchange);
 
         PreparedChat prepared = service.prepare(request, "trace-2");
 
         assertThat(prepared.refused()).isTrue();
+        assertThat(prepared.route().matchReason()).isEqualTo(CapabilityMatchReason.DEFAULT_KNOWLEDGE_QA);
         assertThat(prepared.citations()).isEmpty();
     }
 
@@ -104,16 +111,54 @@ class ChatPreparationServiceTests {
         UUID knowledgeBaseId = UUID.randomUUID();
         PendingChatExchange exchange = exchange();
         ChatRequest request = new ChatRequest(null, knowledgeBaseId, " 你是谁？ ");
-        when(persistenceService.begin(null, knowledgeBaseId, "你是谁？", "trace-direct"))
+        when(persistenceService.begin(
+                eq(null), eq(knowledgeBaseId), eq("你是谁？"), any(CapabilityRoute.class)))
                 .thenReturn(exchange);
 
         PreparedChat prepared = service.prepare(request, "trace-direct");
 
         assertThat(prepared.hasDirectAnswer()).isTrue();
+        assertThat(prepared.route().capabilityId()).isEqualTo(CapabilityId.SIMPLE_CHAT);
         assertThat(prepared.directAnswer()).isEqualTo(SimpleChatReplyPolicy.IDENTITY_REPLY);
         assertThat(prepared.refused()).isFalse();
         assertThat(prepared.citations()).isEmpty();
         verify(persistenceService).validateConversation(null, knowledgeBaseId);
+        verifyNoInteractions(retrievalService, promptComposer);
+    }
+
+    @Test
+    void clarifiesMissingBusinessActionNameWithoutExecutingOrRetrieving() {
+        UUID knowledgeBaseId = UUID.randomUUID();
+        PendingChatExchange exchange = exchange();
+        ChatRequest request = new ChatRequest(null, knowledgeBaseId, "创建知识库");
+        when(persistenceService.begin(
+                eq(null), eq(knowledgeBaseId), eq("创建知识库"), any(CapabilityRoute.class)))
+                .thenReturn(exchange);
+
+        PreparedChat prepared = service.prepare(request, "trace-action-clarification");
+
+        assertThat(prepared.route().capabilityId()).isEqualTo(CapabilityId.BUSINESS_ACTION);
+        assertThat(prepared.directAnswer())
+                .isEqualTo(ChatPreparationService.CREATE_KNOWLEDGE_BASE_NAME_CLARIFICATION);
+        verifyNoInteractions(retrievalService, promptComposer);
+    }
+
+    @Test
+    void preparesSafeDirectAnswerForBusinessActionWithoutExecutingOrRetrieving() {
+        UUID knowledgeBaseId = UUID.randomUUID();
+        PendingChatExchange exchange = exchange();
+        ChatRequest request = new ChatRequest(null, knowledgeBaseId, "创建知识库：Java 学习");
+        when(persistenceService.begin(
+                eq(null), eq(knowledgeBaseId), eq("创建知识库：Java 学习"), any(CapabilityRoute.class)))
+                .thenReturn(exchange);
+
+        PreparedChat prepared = service.prepare(request, "trace-action");
+
+        assertThat(prepared.route().capabilityId()).isEqualTo(CapabilityId.BUSINESS_ACTION);
+        assertThat(prepared.route().matchReason())
+                .isEqualTo(CapabilityMatchReason.EXPLICIT_CREATE_KNOWLEDGE_BASE);
+        assertThat(prepared.directAnswer())
+                .isEqualTo(ChatPreparationService.BUSINESS_ACTION_NOT_AVAILABLE_ANSWER);
         verifyNoInteractions(retrievalService, promptComposer);
     }
 

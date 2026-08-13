@@ -41,6 +41,13 @@ spring:
         dimensions: 1024
 
 contextpilot:
+  embedding:
+    index:
+      profile-id: ${EMBEDDING_PROFILE_ID:dashscope_qwen3_7_1024_v1}
+      provider: ${EMBEDDING_PROVIDER:DASHSCOPE}
+      model: ${EMBEDDING_MODEL:qwen3.7-text-embedding}
+      dimensions: ${EMBEDDING_DIMENSIONS:1024}
+      version: ${EMBEDDING_PROFILE_VERSION:v1}
   storage:
     # Relative paths are resolved from the backend process working directory.
     root: ${STORAGE_ROOT:../data/uploads}

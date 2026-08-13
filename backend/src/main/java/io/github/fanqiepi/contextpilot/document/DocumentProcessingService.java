@@ -24,18 +24,21 @@ public class DocumentProcessingService {
     private final SpringAiDocumentParser documentParser;
     private final DocumentChunker documentChunker;
     private final DocumentVectorIndex documentVectorIndex;
+    private final EmbeddingIndexProperties embeddingIndexProperties;
 
     public DocumentProcessingService(
             SourceDocumentMapper sourceDocumentMapper,
             StorageService storageService,
             SpringAiDocumentParser documentParser,
             DocumentChunker documentChunker,
-            DocumentVectorIndex documentVectorIndex) {
+            DocumentVectorIndex documentVectorIndex,
+            EmbeddingIndexProperties embeddingIndexProperties) {
         this.sourceDocumentMapper = sourceDocumentMapper;
         this.storageService = storageService;
         this.documentParser = documentParser;
         this.documentChunker = documentChunker;
         this.documentVectorIndex = documentVectorIndex;
+        this.embeddingIndexProperties = embeddingIndexProperties;
     }
 
     public void process(UUID documentId) {
@@ -55,7 +58,7 @@ public class DocumentProcessingService {
                     content);
             List<DocumentChunk> chunks = documentChunker.chunk(parts);
             documentVectorIndex.replace(entity, chunks);
-            if (sourceDocumentMapper.markSucceeded(documentId) == 0) {
+            if (sourceDocumentMapper.markSucceeded(documentId, embeddingIndexProperties.currentProfile()) == 0) {
                 documentVectorIndex.deleteByDocumentId(documentId);
             }
         } catch (Exception exception) {

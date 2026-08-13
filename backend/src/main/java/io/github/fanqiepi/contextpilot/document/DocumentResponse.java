@@ -14,10 +14,12 @@ public record DocumentResponse(
         DocumentStatus status,
         String errorSummary,
         int processingAttempts,
+        EmbeddingIndexResponse embeddingIndex,
+        EmbeddingIndexCompatibility embeddingIndexCompatibility,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt) {
 
-    static DocumentResponse from(SourceDocumentEntity entity) {
+    static DocumentResponse from(SourceDocumentEntity entity, EmbeddingIndexProfile currentProfile) {
         return new DocumentResponse(
                 entity.getId(),
                 entity.getKnowledgeBaseId(),
@@ -29,7 +31,23 @@ public record DocumentResponse(
                 entity.getStatus(),
                 entity.getErrorSummary(),
                 entity.getProcessingAttempts(),
+                EmbeddingIndexResponse.from(entity),
+                compatibility(entity, currentProfile),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt());
+    }
+
+    private static EmbeddingIndexCompatibility compatibility(
+            SourceDocumentEntity entity,
+            EmbeddingIndexProfile currentProfile) {
+        if (entity.getStatus() != DocumentStatus.SUCCEEDED) {
+            return EmbeddingIndexCompatibility.NOT_INDEXED;
+        }
+        if (entity.getEmbeddingProfileId() == null) {
+            return EmbeddingIndexCompatibility.UNKNOWN;
+        }
+        return currentProfile.id().equals(entity.getEmbeddingProfileId())
+                ? EmbeddingIndexCompatibility.CURRENT
+                : EmbeddingIndexCompatibility.OUTDATED;
     }
 }
