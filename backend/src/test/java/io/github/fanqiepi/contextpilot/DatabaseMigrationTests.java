@@ -43,7 +43,8 @@ class DatabaseMigrationTests {
                     )
                     """)).isTrue();
             for (String tableName : new String[] {
-                    "conversation", "chat_message", "message_citation", "model_call", "answer_feedback"
+                    "conversation", "chat_message", "message_citation", "model_call", "answer_feedback",
+                    "action_request"
             }) {
                 assertThat(queryBoolean(connection, """
                         SELECT EXISTS (
@@ -62,6 +63,23 @@ class DatabaseMigrationTests {
                           AND table_name = 'answer_feedback'
                           AND constraint_name = 'answer_feedback_message_fk'
                           AND constraint_type = 'FOREIGN KEY'
+                    )
+                    """)).isTrue();
+            assertThat(queryString(connection, """
+                    SELECT data_type
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public'
+                      AND table_name = 'action_request'
+                      AND column_name = 'parameters'
+                    """)).isEqualTo("jsonb");
+            assertThat(queryBoolean(connection, """
+                    SELECT EXISTS (
+                        SELECT 1
+                        FROM information_schema.table_constraints
+                        WHERE table_schema = 'public'
+                          AND table_name = 'action_request'
+                          AND constraint_name = 'action_request_assistant_message_uq'
+                          AND constraint_type = 'UNIQUE'
                     )
                     """)).isTrue();
             assertThat(queryBoolean(connection, """

@@ -4,6 +4,10 @@ import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
+import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
+import io.github.fanqiepi.contextpilot.action.ActionRequestStatus;
+import io.github.fanqiepi.contextpilot.action.ActionType;
+import io.github.fanqiepi.contextpilot.action.CreateKnowledgeBaseActionParameters;
 import io.github.fanqiepi.contextpilot.common.InternalServiceException;
 import io.github.fanqiepi.contextpilot.model.ChatModelChunk;
 import io.github.fanqiepi.contextpilot.model.ChatModelGateway;
@@ -69,12 +73,12 @@ class ChatStreamingServiceTests {
 
         assertThat(events).isNotNull();
         assertThat(events.stream().map(ServerSentEvent::event).toList())
-                .containsExactly("message", "delta", "delta", "citation", "usage", "done");
+                .containsExactly("message", "route", "delta", "delta", "citation", "usage", "done");
         ChatStreamPayload.Message message = (ChatStreamPayload.Message) events.getFirst().data();
         assertThat(message.traceId()).isEqualTo("trace-success");
         assertThat(message.capabilityId()).isEqualTo(CapabilityId.KNOWLEDGE_QA);
         assertThat(message.capabilityVersion()).isEqualTo("v1");
-        ChatStreamPayload.Usage usage = (ChatStreamPayload.Usage) events.get(4).data();
+        ChatStreamPayload.Usage usage = (ChatStreamPayload.Usage) events.get(5).data();
         assertThat(usage.totalTokens()).isEqualTo(24);
         ChatStreamPayload.Done done = (ChatStreamPayload.Done) events.getLast().data();
         assertThat(done.traceId()).isEqualTo("trace-success");
@@ -108,7 +112,7 @@ class ChatStreamingServiceTests {
 
         assertThat(events).isNotNull();
         assertThat(events.stream().map(ServerSentEvent::event).toList())
-                .containsExactly("message", "delta", "done");
+                .containsExactly("message", "route", "delta", "done");
         ChatStreamPayload.Done done = (ChatStreamPayload.Done) events.getLast().data();
         assertThat(done.status()).isEqualTo("REFUSED");
         verify(persistenceService).completeWithoutModel(
@@ -133,13 +137,46 @@ class ChatStreamingServiceTests {
 
         assertThat(events).isNotNull();
         assertThat(events.stream().map(ServerSentEvent::event).toList())
-                .containsExactly("message", "delta", "done");
-        ChatStreamPayload.Delta delta = (ChatStreamPayload.Delta) events.get(1).data();
+                .containsExactly("message", "route", "delta", "done");
+        ChatStreamPayload.Delta delta = (ChatStreamPayload.Delta) events.get(2).data();
         assertThat(delta.content()).isEqualTo(SimpleChatReplyPolicy.IDENTITY_REPLY);
         ChatStreamPayload.Done done = (ChatStreamPayload.Done) events.getLast().data();
         assertThat(done.status()).isEqualTo("COMPLETED");
         verify(persistenceService).completeWithoutModel(
                 exchange.assistantMessageId(), SimpleChatReplyPolicy.IDENTITY_REPLY);
+        verifyNoInteractions(chatModelGateway);
+    }
+
+    @Test
+    void emitsPersistedActionProposalWithoutDeltaOrModelCall() {
+        ChatRequest request = request();
+        PendingChatExchange exchange = exchange();
+        CapabilityRoute route = CapabilityRoute.matched(
+                CapabilityId.BUSINESS_ACTION,
+                CapabilityMatchReason.EXPLICIT_CREATE_KNOWLEDGE_BASE,
+                "trace-action");
+        ActionRequestResponse actionRequest = actionRequest(exchange);
+        when(preparationService.prepare(request, "trace-action"))
+                .thenReturn(PreparedChat.action(
+                        route,
+                        exchange,
+                        ChatPreparationService.BUSINESS_ACTION_PROPOSAL_ANSWER,
+                        actionRequest));
+
+        List<ServerSentEvent<ChatStreamPayload>> events = service
+                .stream(request, "trace-action")
+                .collectList()
+                .block(Duration.ofSeconds(5));
+
+        assertThat(events).isNotNull();
+        assertThat(events.stream().map(ServerSentEvent::event).toList())
+                .containsExactly("message", "route", "action_required", "done");
+        ChatStreamPayload.ActionRequired required =
+                (ChatStreamPayload.ActionRequired) events.get(2).data();
+        assertThat(required.actionRequestId()).isEqualTo(actionRequest.id());
+        assertThat(required.parameters()).isEqualTo(actionRequest.parameters());
+        ChatStreamPayload.Done done = (ChatStreamPayload.Done) events.getLast().data();
+        assertThat(done.status()).isEqualTo("AWAITING_CONFIRMATION");
         verifyNoInteractions(chatModelGateway);
     }
 
@@ -166,7 +203,7 @@ class ChatStreamingServiceTests {
 
         assertThat(events).isNotNull();
         assertThat(events.stream().map(ServerSentEvent::event).toList())
-                .containsExactly("message", "error");
+                .containsExactly("message", "route", "error");
         ChatStreamPayload.Error error = (ChatStreamPayload.Error) events.getLast().data();
         assertThat(error.code()).isEqualTo("CHAT_MODEL_STREAM_FAILED");
         assertThat(error.message()).doesNotContain("private provider detail");
@@ -238,6 +275,29 @@ class ChatStreamingServiceTests {
                 null,
                 0.9,
                 "Evidence");
+    }
+
+    private ActionRequestResponse actionRequest(PendingChatExchange exchange) {
+        java.time.OffsetDateTime now = java.time.OffsetDateTime.parse("2026-08-13T08:00:00Z");
+        return new ActionRequestResponse(
+                UUID.randomUUID(),
+                exchange.conversationId(),
+                exchange.userMessageId(),
+                exchange.assistantMessageId(),
+                CapabilityId.BUSINESS_ACTION,
+                "v1",
+                ActionType.CREATE_KNOWLEDGE_BASE,
+                new CreateKnowledgeBaseActionParameters("Java 学习", null),
+                "确认后将创建知识库“Java 学习”。",
+                ActionRequestStatus.PENDING_CONFIRMATION,
+                null,
+                null,
+                "trace-action",
+                now.plusMinutes(30),
+                null,
+                null,
+                now,
+                now);
     }
 
     private CapabilityRoute knowledgeRoute(String traceId) {

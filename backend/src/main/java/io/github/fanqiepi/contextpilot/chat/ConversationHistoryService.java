@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
+import io.github.fanqiepi.contextpilot.action.ActionRequestService;
 import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
 import io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackEntity;
 import io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackMapper;
@@ -28,18 +30,21 @@ public class ConversationHistoryService {
     private final ChatMessageMapper chatMessageMapper;
     private final MessageCitationMapper messageCitationMapper;
     private final AnswerFeedbackMapper answerFeedbackMapper;
+    private final ActionRequestService actionRequestService;
 
     public ConversationHistoryService(
             KnowledgeBaseService knowledgeBaseService,
             ConversationMapper conversationMapper,
             ChatMessageMapper chatMessageMapper,
             MessageCitationMapper messageCitationMapper,
-            AnswerFeedbackMapper answerFeedbackMapper) {
+            AnswerFeedbackMapper answerFeedbackMapper,
+            ActionRequestService actionRequestService) {
         this.knowledgeBaseService = knowledgeBaseService;
         this.conversationMapper = conversationMapper;
         this.chatMessageMapper = chatMessageMapper;
         this.messageCitationMapper = messageCitationMapper;
         this.answerFeedbackMapper = answerFeedbackMapper;
+        this.actionRequestService = actionRequestService;
     }
 
     @Transactional(readOnly = true)
@@ -55,7 +60,7 @@ public class ConversationHistoryService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<ConversationMessageResponse> messages(UUID conversationId) {
         requireConversation(conversationId);
         List<ChatMessageEntity> messages = chatMessageMapper.selectList(
@@ -86,10 +91,13 @@ public class ConversationHistoryService {
                 .stream()
                 .map(AnswerFeedbackEntity::getMessageId)
                 .collect(Collectors.toUnmodifiableSet());
+        Map<UUID, ActionRequestResponse> actionsByMessage =
+                actionRequestService.findByAssistantMessageIds(messageIds);
 
         return messages.stream()
                 .map(message -> ConversationMessageResponse.from(
                         message,
+                        actionsByMessage.get(message.getId()),
                         citationsByMessage.getOrDefault(message.getId(), List.of()),
                         helpfulMessageIds.contains(message.getId())))
                 .toList();

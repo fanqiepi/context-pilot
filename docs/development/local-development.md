@@ -67,6 +67,8 @@ npm run typecheck
 npm run dev
 ```
 
+前端开发代理默认指向 `http://127.0.0.1:18080`；后端使用其他端口时，可通过 `VITE_API_PROXY_TARGET` 覆盖代理目标。
+
 真实模型集成默认关闭。后续启用真实服务时，才需要在后端进程中设置 `DEEPSEEK_API_KEY`、`DASHSCOPE_API_KEY` 和对应 Spring AI 模型配置。
 
 后端默认监听 `18080`，Knife4j 接口文档位于 `http://localhost:18080/doc.html`，原始 OpenAPI JSON 位于 `http://localhost:18080/v3/api-docs`。如需使用其他端口，可设置 `SERVER_PORT`；修改后还应同步调整前端开发代理目标。

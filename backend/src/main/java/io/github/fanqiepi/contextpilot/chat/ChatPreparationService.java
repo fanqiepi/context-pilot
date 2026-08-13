@@ -4,17 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
+import io.github.fanqiepi.contextpilot.action.ActionRequestService;
+import io.github.fanqiepi.contextpilot.action.CreateKnowledgeBaseActionParameters;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalResultResponse;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalSearchRequest;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ChatPreparationService {
 
-    static final String BUSINESS_ACTION_NOT_AVAILABLE_ANSWER =
-            "已识别到创建知识库请求。该操作需要先生成提案并由你明确确认；"
-                    + "当前尚未创建知识库。";
+    static final String BUSINESS_ACTION_PROPOSAL_ANSWER =
+            "已生成创建知识库提案。请核对名称、描述和影响，并通过操作卡片明确确认或取消。";
     static final String CREATE_KNOWLEDGE_BASE_NAME_CLARIFICATION =
             "请提供要创建的知识库名称，例如：创建一个名为 Java 学习的知识库。"
                     + "在你明确确认前不会创建知识库。";
@@ -26,6 +29,7 @@ public class ChatPreparationService {
     private final SimpleChatReplyPolicy simpleReplyPolicy;
     private final CapabilityRouter capabilityRouter;
     private final CreateKnowledgeBaseIntentPolicy createKnowledgeBaseIntentPolicy;
+    private final ActionRequestService actionRequestService;
 
     public ChatPreparationService(
             RetrievalService retrievalService,
@@ -34,7 +38,8 @@ public class ChatPreparationService {
             ChatProperties properties,
             SimpleChatReplyPolicy simpleReplyPolicy,
             CapabilityRouter capabilityRouter,
-            CreateKnowledgeBaseIntentPolicy createKnowledgeBaseIntentPolicy) {
+            CreateKnowledgeBaseIntentPolicy createKnowledgeBaseIntentPolicy,
+            ActionRequestService actionRequestService) {
         this.retrievalService = retrievalService;
         this.persistenceService = persistenceService;
         this.promptComposer = promptComposer;
@@ -42,9 +47,11 @@ public class ChatPreparationService {
         this.simpleReplyPolicy = simpleReplyPolicy;
         this.capabilityRouter = capabilityRouter;
         this.createKnowledgeBaseIntentPolicy = createKnowledgeBaseIntentPolicy;
+        this.actionRequestService = actionRequestService;
     }
 
-    PreparedChat prepare(ChatRequest request, String traceId) {
+    @Transactional
+    public PreparedChat prepare(ChatRequest request, String traceId) {
         String question = request.question().strip();
         persistenceService.validateConversation(request.conversationId(), request.knowledgeBaseId());
         CapabilityRoute route = capabilityRouter.route(question, traceId);
@@ -92,12 +99,31 @@ public class ChatPreparationService {
             ChatRequest request,
             String question,
             CapabilityRoute route) {
+        CreateKnowledgeBaseIntentPolicy.CreateKnowledgeBaseIntent intent =
+                createKnowledgeBaseIntentPolicy.parse(question)
+                        .orElseThrow(() -> new IllegalStateException(
+                                "BUSINESS_ACTION route did not contain a supported action request"));
+        if (intent.name() == null) {
+            PendingChatExchange exchange = persistenceService.begin(
+                    request.conversationId(), request.knowledgeBaseId(), question, route);
+            return PreparedChat.direct(route, exchange, CREATE_KNOWLEDGE_BASE_NAME_CLARIFICATION);
+        }
+        CreateKnowledgeBaseActionParameters parameters = new CreateKnowledgeBaseActionParameters(
+                intent.name(), intent.description());
         PendingChatExchange exchange = persistenceService.begin(
                 request.conversationId(), request.knowledgeBaseId(), question, route);
-        String answer = createKnowledgeBaseIntentPolicy.hasExplicitName(question)
-                ? BUSINESS_ACTION_NOT_AVAILABLE_ANSWER
-                : CREATE_KNOWLEDGE_BASE_NAME_CLARIFICATION;
-        return PreparedChat.direct(route, exchange, answer);
+        ActionRequestResponse actionRequest = actionRequestService.proposeCreateKnowledgeBase(
+                exchange.conversationId(),
+                exchange.userMessageId(),
+                exchange.assistantMessageId(),
+                route.capabilityId(),
+                route.capabilityVersion(),
+                route.traceId(),
+                parameters);
+        persistenceService.completeWithoutModel(
+                exchange.assistantMessageId(), BUSINESS_ACTION_PROPOSAL_ANSWER);
+        return PreparedChat.action(
+                route, exchange, BUSINESS_ACTION_PROPOSAL_ANSWER, actionRequest);
     }
 
     private List<RetrievalResultResponse> selectEvidence(List<RetrievalResultResponse> results) {

@@ -2,6 +2,7 @@ import { fetchEventSource } from '@microsoft/fetch-event-source'
 
 import { apiClient, responseError } from './client'
 import type {
+  ActionRequest,
   AnswerFeedback,
   ChatRequest,
   Citation,
@@ -13,7 +14,9 @@ import type {
   StreamDeltaEvent,
   StreamDoneEvent,
   StreamErrorEvent,
+  StreamActionRequiredEvent,
   StreamMessageEvent,
+  StreamRouteEvent,
   StreamUsageEvent,
 } from './types'
 
@@ -98,8 +101,25 @@ export async function removeMessageHelpful(messageId: string): Promise<void> {
   await apiClient.delete(`/messages/${messageId}/feedback`)
 }
 
+export async function getActionRequest(id: string): Promise<ActionRequest> {
+  const response = await apiClient.get<ActionRequest>(`/action-requests/${id}`)
+  return response.data
+}
+
+export async function confirmActionRequest(id: string): Promise<ActionRequest> {
+  const response = await apiClient.post<ActionRequest>(`/action-requests/${id}/confirm`)
+  return response.data
+}
+
+export async function rejectActionRequest(id: string): Promise<ActionRequest> {
+  const response = await apiClient.post<ActionRequest>(`/action-requests/${id}/reject`)
+  return response.data
+}
+
 export interface ChatStreamHandlers {
   onMessage: (event: StreamMessageEvent) => void
+  onRoute?: (event: StreamRouteEvent) => void
+  onActionRequired: (event: StreamActionRequiredEvent) => void
   onDelta: (event: StreamDeltaEvent) => void
   onCitation: (event: Citation) => void
   onUsage: (event: StreamUsageEvent) => void
@@ -135,6 +155,12 @@ export async function streamChat(
       switch (message.event) {
         case 'message':
           handlers.onMessage(payload as StreamMessageEvent)
+          break
+        case 'route':
+          handlers.onRoute?.(payload as StreamRouteEvent)
+          break
+        case 'action_required':
+          handlers.onActionRequired(payload as StreamActionRequiredEvent)
           break
         case 'delta':
           handlers.onDelta(payload as StreamDeltaEvent)

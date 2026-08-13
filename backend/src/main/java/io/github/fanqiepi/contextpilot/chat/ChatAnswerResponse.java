@@ -3,6 +3,8 @@ package io.github.fanqiepi.contextpilot.chat;
 import java.util.List;
 import java.util.UUID;
 
+import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
+
 public record ChatAnswerResponse(
         UUID conversationId,
         UUID userMessageId,
@@ -15,5 +17,6 @@ public record ChatAnswerResponse(
         String traceId,
         CapabilityId capabilityId,
         String capabilityVersion,
-        CapabilityMatchReason capabilityMatchReason) {
+        CapabilityMatchReason capabilityMatchReason,
+        ActionRequestResponse actionRequest) {
 }

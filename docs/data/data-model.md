@@ -1,6 +1,6 @@
 # ContextPilot 数据模型
 
-> 本文定义 V1 已实现逻辑模型和 V2 已授权规划；已经实施的物理结构以 Flyway 迁移为事实来源，规划结构在对应迁移落地前不得视为已存在。
+> 本文定义 V1 与当前 V2 已实现逻辑模型；已经实施的物理结构以 Flyway 迁移为事实来源。
 
 ## 核心实体
 
@@ -14,11 +14,6 @@
 | `message_citation` | 引用的文档、页码、分段和排序 | 属于助手消息 |
 | `model_call` | 模型、耗时、Token、状态和脱敏错误 | 关联消息或文档任务 |
 | `answer_feedback` | “有用”正向反馈 | 每条助手消息最多一条当前反馈 |
-
-## V2 规划实体（尚未实现）
-
-| 实体 | 主要职责 | 关键关系 |
-| --- | --- | --- |
 | `action_request` | 保存需人工确认的业务操作提案、状态和安全结果摘要 | 关联会话、用户消息和提案助手消息 |
 
 ## 数据约定
@@ -69,9 +64,9 @@
 
 只有已完成的助手消息可以接收反馈。知识库 ID 和 trace ID 不由客户端提交，也不在反馈表重复保存；后端通过 `chat_message -> conversation -> knowledge_base` 及消息自身的 `trace_id` 可信关联，避免冗余字段漂移或客户端伪造上下文。
 
-## V2 操作结构规划（尚未实现）
+## V2 已实现操作结构
 
-下一次数据库迁移计划创建 `action_request`，至少包含：
+`V10__create_action_request.sql` 创建 `action_request`，包含：
 
 - `id`：应用生成 UUID。
 - `conversation_id`、`user_message_id`、`assistant_message_id`：通过受限删除外键关联提案产生时的聊天上下文。

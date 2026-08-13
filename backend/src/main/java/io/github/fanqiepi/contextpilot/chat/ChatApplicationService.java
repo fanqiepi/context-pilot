@@ -31,6 +31,22 @@ public class ChatApplicationService {
         PreparedChat prepared = preparationService.prepare(request, traceId);
         PendingChatExchange exchange = prepared.exchange();
         CapabilityRoute route = prepared.route();
+        if (prepared.actionRequired()) {
+            return new ChatAnswerResponse(
+                    exchange.conversationId(),
+                    exchange.userMessageId(),
+                    exchange.assistantMessageId(),
+                    prepared.directAnswer(),
+                    false,
+                    List.of(),
+                    null,
+                    null,
+                    traceId,
+                    route.capabilityId(),
+                    route.capabilityVersion(),
+                    route.matchReason(),
+                    prepared.actionRequest());
+        }
         if (prepared.hasDirectAnswer()) {
             persistenceService.completeWithoutModel(
                     exchange.assistantMessageId(), prepared.directAnswer());
@@ -46,7 +62,8 @@ public class ChatApplicationService {
                     traceId,
                     route.capabilityId(),
                     route.capabilityVersion(),
-                    route.matchReason());
+                    route.matchReason(),
+                    null);
         }
         if (prepared.refused()) {
             persistenceService.completeWithoutModel(
@@ -63,7 +80,8 @@ public class ChatApplicationService {
                     traceId,
                     route.capabilityId(),
                     route.capabilityVersion(),
-                    route.matchReason());
+                    route.matchReason(),
+                    null);
         }
 
         ChatPrompt prompt = prepared.prompt();
@@ -101,7 +119,8 @@ public class ChatApplicationService {
                     traceId,
                     route.capabilityId(),
                     route.capabilityVersion(),
-                    route.matchReason());
+                    route.matchReason(),
+                    null);
         } catch (RuntimeException exception) {
             persistenceService.completeFailure(
                     exchange.assistantMessageId(),

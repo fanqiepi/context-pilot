@@ -4,15 +4,18 @@ import { ElMessage } from 'element-plus'
 import { useRoute } from 'vue-router'
 
 import {
+  confirmActionRequest,
   listConversationMessages,
   listConversations,
   listKnowledgeBases,
   markMessageHelpful,
   removeMessageHelpful,
+  rejectActionRequest,
   streamChat,
 } from '@/api/contextPilot'
 import { errorMessage } from '@/api/client'
 import type {
+  ActionRequestStatus,
   Citation,
   ConversationMessage,
   ConversationSummary,
@@ -41,6 +44,7 @@ const loadingWorkspace = ref(false)
 const loadingMessages = ref(false)
 const sending = ref(false)
 const feedbackSavingIds = reactive(new Set<string>())
+const actionSavingIds = reactive(new Set<string>())
 const messageScroller = ref<HTMLElement>()
 let streamController: AbortController | undefined
 let activeTextRenderer: StreamTextRenderer | undefined
@@ -173,6 +177,7 @@ async function sendQuestion(): Promise<void> {
     capabilityId: null,
     capabilityVersion: null,
     capabilityMatchReason: null,
+    actionRequest: null,
     citations: [],
     helpful: false,
     createdAt: now,
@@ -189,6 +194,7 @@ async function sendQuestion(): Promise<void> {
     capabilityId: null,
     capabilityVersion: null,
     capabilityMatchReason: null,
+    actionRequest: null,
     citations: [],
     helpful: false,
     createdAt: now,
@@ -234,6 +240,10 @@ async function sendQuestion(): Promise<void> {
           assistantMessage.capabilityId = event.capabilityId
           assistantMessage.capabilityVersion = event.capabilityVersion
           assistantMessage.capabilityMatchReason = event.capabilityMatchReason
+        },
+        onActionRequired(event) {
+          const { actionRequestId, ...actionRequest } = event
+          assistantMessage.actionRequest = { id: actionRequestId, ...actionRequest }
         },
         onDelta(event) {
           textRenderer.enqueue(event.content)
@@ -335,6 +345,67 @@ async function toggleHelpful(message: UiMessage): Promise<void> {
   } finally {
     feedbackSavingIds.delete(message.id)
   }
+}
+
+async function confirmAction(message: UiMessage): Promise<void> {
+  const actionRequest = message.actionRequest
+  if (!actionRequest || actionRequest.status !== 'PENDING_CONFIRMATION') {
+    return
+  }
+  actionSavingIds.add(actionRequest.id)
+  try {
+    const updated = await confirmActionRequest(actionRequest.id)
+    message.actionRequest = updated
+    if (updated.status === 'SUCCEEDED') {
+      knowledgeBases.value = await listKnowledgeBases()
+      ElMessage.success(updated.resultSummary ?? '知识库已创建')
+    } else if (updated.status === 'FAILED') {
+      ElMessage.error(updated.errorSummary ?? '操作执行失败')
+    } else if (updated.status === 'EXPIRED') {
+      ElMessage.warning('提案已过期，未执行任何操作')
+    }
+  } catch (error) {
+    ElMessage.error(errorMessage(error, '确认操作失败'))
+  } finally {
+    actionSavingIds.delete(actionRequest.id)
+  }
+}
+
+async function rejectAction(message: UiMessage): Promise<void> {
+  const actionRequest = message.actionRequest
+  if (!actionRequest || actionRequest.status !== 'PENDING_CONFIRMATION') {
+    return
+  }
+  actionSavingIds.add(actionRequest.id)
+  try {
+    message.actionRequest = await rejectActionRequest(actionRequest.id)
+    ElMessage.info('已取消操作，未创建知识库')
+  } catch (error) {
+    ElMessage.error(errorMessage(error, '取消操作失败'))
+  } finally {
+    actionSavingIds.delete(actionRequest.id)
+  }
+}
+
+function actionStatusLabel(status: ActionRequestStatus): string {
+  return {
+    PENDING_CONFIRMATION: '等待确认',
+    EXECUTING: '执行中',
+    SUCCEEDED: '已完成',
+    FAILED: '执行失败',
+    REJECTED: '已取消',
+    EXPIRED: '已过期',
+  }[status]
+}
+
+function actionStatusType(
+  status: ActionRequestStatus,
+): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
+  if (status === 'SUCCEEDED') return 'success'
+  if (status === 'FAILED') return 'danger'
+  if (status === 'PENDING_CONFIRMATION') return 'warning'
+  if (status === 'EXECUTING') return 'primary'
+  return 'info'
 }
 
 async function scrollToBottom(): Promise<void> {
@@ -469,6 +540,58 @@ function formatScore(score: number | null): string {
                   {{ message.errorSummary }}
                 </div>
 
+                <section v-if="message.actionRequest" class="action-card">
+                  <header>
+                    <div>
+                      <small>受控业务操作</small>
+                      <strong>创建知识库</strong>
+                    </div>
+                    <ElTag
+                      :type="actionStatusType(message.actionRequest.status)"
+                      effect="light"
+                      round
+                    >
+                      {{ actionStatusLabel(message.actionRequest.status) }}
+                    </ElTag>
+                  </header>
+                  <dl>
+                    <div>
+                      <dt>名称</dt>
+                      <dd>{{ message.actionRequest.parameters.name }}</dd>
+                    </div>
+                    <div>
+                      <dt>描述</dt>
+                      <dd>{{ message.actionRequest.parameters.description || '未填写' }}</dd>
+                    </div>
+                    <div>
+                      <dt>确认期限</dt>
+                      <dd>{{ formatDate(message.actionRequest.expiresAt) }}</dd>
+                    </div>
+                  </dl>
+                  <p class="action-impact">{{ message.actionRequest.displaySummary }}</p>
+                  <p v-if="message.actionRequest.resultSummary" class="action-result success">
+                    {{ message.actionRequest.resultSummary }}
+                  </p>
+                  <p v-if="message.actionRequest.errorSummary" class="action-result failure">
+                    {{ message.actionRequest.errorSummary }}
+                  </p>
+                  <footer v-if="message.actionRequest.status === 'PENDING_CONFIRMATION'">
+                    <ElButton
+                      type="primary"
+                      :loading="actionSavingIds.has(message.actionRequest.id)"
+                      @click="confirmAction(message)"
+                    >
+                      确认创建
+                    </ElButton>
+                    <ElButton
+                      :disabled="actionSavingIds.has(message.actionRequest.id)"
+                      @click="rejectAction(message)"
+                    >
+                      取消
+                    </ElButton>
+                  </footer>
+                </section>
+
                 <div v-if="message.citations.length" class="citation-list">
                   <details v-for="citation in message.citations" :key="citation.rank">
                     <summary>
@@ -485,7 +608,11 @@ function formatScore(score: number | null): string {
                 </div>
 
                 <div
-                  v-if="message.role === 'ASSISTANT' && message.status === 'COMPLETED'"
+                  v-if="
+                    message.role === 'ASSISTANT' &&
+                    message.status === 'COMPLETED' &&
+                    !message.actionRequest
+                  "
                   class="feedback-actions"
                 >
                   <ElButton
@@ -858,6 +985,100 @@ function formatScore(score: number | null): string {
   color: #a63f38;
   background: #fff1f0;
   font-size: 12px;
+}
+
+.action-card {
+  display: grid;
+  gap: 14px;
+  max-width: 680px;
+  margin-top: 14px;
+  padding: 17px;
+  border: 1px solid #cbdccf;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #f7fbf7, #eef6f0);
+  box-shadow: 0 10px 24px rgb(43 91 66 / 8%);
+}
+
+.action-card > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.action-card > header div {
+  display: grid;
+  gap: 3px;
+}
+
+.action-card > header small {
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.action-card > header strong {
+  color: #26392d;
+  font-size: 15px;
+}
+
+.action-card dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.action-card dl div {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.action-card dt,
+.action-card dd {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.action-card dt {
+  color: #748178;
+}
+
+.action-card dd {
+  color: #35463b;
+  overflow-wrap: anywhere;
+}
+
+.action-impact,
+.action-result {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.action-impact {
+  color: #5b4b2f;
+  background: #fff6df;
+}
+
+.action-result.success {
+  color: #226a43;
+  background: #e2f4e8;
+}
+
+.action-result.failure {
+  color: #a63f38;
+  background: #fff1f0;
+}
+
+.action-card > footer {
+  display: flex;
+  gap: 8px;
 }
 
 .typing-indicator {

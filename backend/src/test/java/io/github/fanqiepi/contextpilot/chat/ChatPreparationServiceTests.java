@@ -3,6 +3,11 @@ package io.github.fanqiepi.contextpilot.chat;
 import java.util.List;
 import java.util.UUID;
 
+import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
+import io.github.fanqiepi.contextpilot.action.ActionRequestService;
+import io.github.fanqiepi.contextpilot.action.ActionRequestStatus;
+import io.github.fanqiepi.contextpilot.action.ActionType;
+import io.github.fanqiepi.contextpilot.action.CreateKnowledgeBaseActionParameters;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalResultResponse;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalService;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +32,8 @@ class ChatPreparationServiceTests {
     private ChatPersistenceService persistenceService;
     @Mock
     private ChatPromptComposer promptComposer;
+    @Mock
+    private ActionRequestService actionRequestService;
 
     private ChatPreparationService service;
 
@@ -45,7 +52,8 @@ class ChatPreparationServiceTests {
                 properties,
                 simpleReplyPolicy,
                 new CapabilityRouter(simpleReplyPolicy, createKnowledgeBaseIntentPolicy),
-                createKnowledgeBaseIntentPolicy);
+                createKnowledgeBaseIntentPolicy,
+                actionRequestService);
     }
 
     @Test
@@ -144,22 +152,59 @@ class ChatPreparationServiceTests {
     }
 
     @Test
-    void preparesSafeDirectAnswerForBusinessActionWithoutExecutingOrRetrieving() {
+    void persistsProposalForNamedBusinessActionWithoutRetrieving() {
         UUID knowledgeBaseId = UUID.randomUUID();
         PendingChatExchange exchange = exchange();
         ChatRequest request = new ChatRequest(null, knowledgeBaseId, "创建知识库：Java 学习");
         when(persistenceService.begin(
                 eq(null), eq(knowledgeBaseId), eq("创建知识库：Java 学习"), any(CapabilityRoute.class)))
                 .thenReturn(exchange);
+        ActionRequestResponse actionRequest = actionRequest(exchange, "Java 学习");
+        when(actionRequestService.proposeCreateKnowledgeBase(
+                eq(exchange.conversationId()),
+                eq(exchange.userMessageId()),
+                eq(exchange.assistantMessageId()),
+                eq(CapabilityId.BUSINESS_ACTION),
+                eq("v1"),
+                eq("trace-action"),
+                eq(new CreateKnowledgeBaseActionParameters("Java 学习", null))))
+                .thenReturn(actionRequest);
 
         PreparedChat prepared = service.prepare(request, "trace-action");
 
         assertThat(prepared.route().capabilityId()).isEqualTo(CapabilityId.BUSINESS_ACTION);
         assertThat(prepared.route().matchReason())
                 .isEqualTo(CapabilityMatchReason.EXPLICIT_CREATE_KNOWLEDGE_BASE);
+        assertThat(prepared.actionRequired()).isTrue();
+        assertThat(prepared.actionRequest()).isEqualTo(actionRequest);
         assertThat(prepared.directAnswer())
-                .isEqualTo(ChatPreparationService.BUSINESS_ACTION_NOT_AVAILABLE_ANSWER);
+                .isEqualTo(ChatPreparationService.BUSINESS_ACTION_PROPOSAL_ANSWER);
+        verify(persistenceService).completeWithoutModel(
+                exchange.assistantMessageId(), ChatPreparationService.BUSINESS_ACTION_PROPOSAL_ANSWER);
         verifyNoInteractions(retrievalService, promptComposer);
+    }
+
+    private ActionRequestResponse actionRequest(PendingChatExchange exchange, String name) {
+        java.time.OffsetDateTime now = java.time.OffsetDateTime.parse("2026-08-13T08:00:00Z");
+        return new ActionRequestResponse(
+                UUID.randomUUID(),
+                exchange.conversationId(),
+                exchange.userMessageId(),
+                exchange.assistantMessageId(),
+                CapabilityId.BUSINESS_ACTION,
+                "v1",
+                ActionType.CREATE_KNOWLEDGE_BASE,
+                new CreateKnowledgeBaseActionParameters(name, null),
+                "确认后将创建知识库“%s”。".formatted(name),
+                ActionRequestStatus.PENDING_CONFIRMATION,
+                null,
+                null,
+                "trace-action",
+                now.plusMinutes(30),
+                null,
+                null,
+                now,
+                now);
     }
 
     private PendingChatExchange exchange() {
