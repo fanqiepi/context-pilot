@@ -1,10 +1,10 @@
 # ContextPilot 技术架构
 
-> 状态：功能型 MVP 已完成，当前记录持续完善阶段的架构基线
+> 状态：V1 知识库问答基线已完成；当前记录 V2 可控行动助手的已授权架构，以及 V3 以后尚未授权的演进边界
 
 ## 架构形式
 
-系统采用 Vue 前端与 Spring Boot 后端分离的模块化单体。后端使用 Java 21、Spring Boot 4.1.x 和 Spring AI 2.0.x；完善阶段继续使用显式 Java 应用服务和持久化状态迁移，不拆分微服务，不引入消息队列、Agent、LangGraph 或其他工作流引擎。
+系统采用 Vue 前端与 Spring Boot 后端分离的模块化单体。后端使用 Java 21、Spring Boot 4.1.x 和 Spring AI 2.0.x；V2 继续使用显式 Java 应用服务和持久化状态迁移，不拆分微服务，不引入消息队列、Agent、LangGraph、MCP 或其他工作流运行时。更远版本是否采用这些技术，必须由已经确认的用户场景和评估数据决定。
 
 前端使用 Vue 3、TypeScript、Vue Router 和 Element Plus。`/library` 承载知识库、文档上传与处理状态管理，`/chat` 承载知识库选择、会话历史、流式问答和单向“有用”反馈。普通 HTTP 请求统一通过 Axios 访问 `/api`，SSE 使用 `@microsoft/fetch-event-source` 解析具名事件；聊天页对突发到达的 `delta` 使用短缓冲渐进渲染，并在缓冲区清空后再展示引用和完成状态。开发服务器将 `/api` 和 `/actuator` 代理到后端。模型密钥不进入浏览器，回答和引用按纯文本渲染，不信任模型输出或文档内容中的 HTML。
 
@@ -17,8 +17,8 @@
 - `model`：ChatModel 和 EmbeddingModel 的应用级边界。
 - `observation`：模型调用记录和最小指标。
 - `feedback`：已完成助手回答的“有用”标记、取消和可信上下文关联。
-- `capability`（下一阶段）：固定能力定义、版本和确定性路由，不加载动态 Skill 或插件。
-- `action`（下一阶段）：已校验操作提案、人工确认状态和静态白名单业务执行；首个动作只委托 `KnowledgeBaseService` 创建知识库。
+- `capability`（逻辑边界）：固定能力定义、版本和确定性路由；当前实现保持轻量，不加载动态 Skill 或插件。
+- `action`（V2 规划边界）：已校验操作提案、人工确认状态和静态白名单业务执行；V2 只委托 `KnowledgeBaseService` 创建知识库。
 - `common`：少量跨模块配置、错误类型和基础约定，不承载业务实现。
 
 模块按业务能力组织，简单功能不强制创建空的 controller/service/mapper 层。`chat` 可以编排检索与模型调用，供应商专用配置不得散落到业务模块。
@@ -33,7 +33,7 @@
          -> 证据校验/拒答 -> DeepSeek ChatModel -> SSE 回答与引用
          -> 会话、调用记录、trace ID 和反馈
 
-下一阶段：
+V2：
 用户问题 -> CapabilityRouter
          -> SIMPLE_CHAT -> 固定回答
          -> KNOWLEDGE_QA -> 复用上述 RAG 链路
@@ -51,11 +51,11 @@ Embedding 索引由应用级 `EmbeddingIndexProfile` 标识，默认真实模型
 
 ## 聊天编排边界
 
-MVP 的 `ChatApplicationService` 是确定性 RAG 编排器：读取会话和选定知识库、执行隔离检索、校验证据、组装版本化提示词、调用 `ChatModel`，并保存消息、引用和调用记录。检索不是由模型决定是否执行的工具，因此不增加 SkillRouter、ToolExecutionGateway 或自主工具循环。
+V1 的 `ChatApplicationService` 是确定性 RAG 编排器：读取会话和选定知识库、执行隔离检索、校验证据、组装版本化提示词、调用 `ChatModel`，并保存消息、引用和调用记录。检索不是由模型决定是否执行的工具，因此不增加 SkillRouter、ToolExecutionGateway 或自主工具循环。
 
 检索前由 `SimpleChatReplyPolicy` 对规范化后的完整问题进行精确白名单匹配，仅处理身份介绍、问候、能力说明、感谢和告别，并返回版本内固定文案。这条路径不执行向量检索、不调用模型、不生成引用，但仍保存会话和消息；附加其他指令或未命中白名单的问题必须继续进入 RAG 流程，不能利用简单交互绕过知识库边界。
 
-P2 先通过 `POST /api/chat` 提供非流式闭环，验证持久化、拒答、引用和真实 DeepSeek 调用；P3 的 `POST /api/chat/stream` 复用相同编排与持久化边界，只增加增量传输、取消和流式失败语义。
+V1 先通过 `POST /api/chat` 提供非流式闭环，验证持久化、拒答、引用和真实 DeepSeek 调用；随后实现的 `POST /api/chat/stream` 复用相同编排与持久化边界，只增加增量传输、取消和流式失败语义。
 
 SSE 使用 Spring AI `ChatModel.stream` 生成真实增量，RAG 正常路径固定为 `message -> delta* -> citation* -> usage -> done`；固定简单回复路径为 `message -> delta -> done(COMPLETED)`，拒答路径为 `message -> delta -> done(REFUSED)`。模型完成并成功落库后才发送引用、usage 和 done；异常路径发送安全 `error` 后结束，客户端提前取消则将仍在处理的助手消息和模型调用标记为失败。Spring MVC 使用独立有界执行器承载异步响应，避免占用文档处理线程池。
 
@@ -63,9 +63,9 @@ SSE 使用 Spring AI `ChatModel.stream` 生成真实增量，RAG 正常路径固
 
 缺少知识库、问题为空或必要上下文不足时，由请求校验和固定规则返回澄清提示；固定简单交互之外，检索无可靠依据时明确拒答。模型可以改善用户可读文案，但不能改变校验结论、伪造引用或扩大知识库范围。
 
-HTTP request ID 作为 MVP trace ID 的起点，后续贯穿 SSE、消息和 `model_call`。它用于关联与诊断，不承担身份或权限功能。
+HTTP request ID 作为 V1 trace ID 的起点，后续贯穿 SSE、消息和 `model_call`。它用于关联与诊断，不承担身份或权限功能。
 
-## 已授权的下一阶段编排
+## V2 已授权编排
 
 `ChatApplicationService` 仍是聊天总入口，并在进入现有 RAG 流程前调用轻量 `CapabilityRouter`。路由器只返回应用定义的能力 ID、版本和匹配依据，不返回可执行类名、SQL、URL 或任意工具描述。
 
@@ -83,16 +83,11 @@ HTTP request ID 作为 MVP trace ID 的起点，后续贯穿 SSE、消息和 `mo
 
 前端在聊天消息下展示可恢复的操作卡片。卡片必须在确认前清楚展示操作类型、参数和影响；确认、拒绝、执行中、成功、失败及过期状态均以后端记录为准。
 
-## 后续演进边界
+## V3 场景雏形与后续边界
 
-当前已批准固定能力路由和首个受控业务操作。再往后仍按以下顺序扩展，每个新增操作都需要独立用例、测试和安全边界：
+V3 候选场景是“知识库健康检查与维护助手”。如果后续获批，只能通过专用只读领域查询生成健康摘要，并复用 V2 的提案、人工确认、幂等和审计协议提交文档重试或索引重建任务。V2 完成并复盘前不定义 V3 数据或 API 合同，也不抽取通用工具执行网关。
 
-1. 增加经过单独批准的固定能力或业务动作，不引入动态注册。
-2. 只有多个真实动作形成共同需求时，才提取有限的共享执行边界；不能演变成任意工具平台。
-3. 项目结构化数据端口通过领域查询服务只读访问 PostgreSQL，使用参数化 SQL、字段白名单、限行和 `dataAsOf`。
-4. Agent/工作流评估仅在固定编排不足时考虑，并要求步骤预算、循环上限、人工确认和评估数据；当前未授权。
-
-完整组件映射和风险见 [Agent Skill 与工具调用时序图适配评估](agent-skill-tool-adaptation.md)。
+V4 以后才可能研究有限规划、显式长期记忆、MCP 等外部工具互操作和多 Agent。只有固定编排无法满足经过评估的用户任务时才选择相关框架，并必须具备步骤预算、循环上限、人工确认、来源约束、恢复和评估数据。路线候选不构成当前实施授权。
 
 ## 基础设施职责
 
