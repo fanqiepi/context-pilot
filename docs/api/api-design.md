@@ -1,6 +1,6 @@
 # REST API、SSE 与操作确认约定
 
-> 本文同时记录已实现接口与完善阶段中已授权但尚未实现的合同。已实现字段以 OpenAPI 为主要事实来源；标注“规划”的内容不能当作当前可调用接口。
+> 本文同时记录 V1 已实现接口与 V2 已授权但尚未实现的合同。已实现字段以 OpenAPI 为主要事实来源；标注“规划”的内容不能当作当前可调用接口。
 
 ## 通用约定
 
@@ -11,7 +11,7 @@
 - 删除和重试接口必须考虑重复请求，避免重复向量和重复模型费用。
 - 业务删除统一采用逻辑删除，`deleted = 0` 表示未删除、`deleted = 1` 表示已删除；被删除资源对普通查询表现为不存在。
 
-## MVP 资源
+## V1 已实现资源
 
 - `/api/knowledge-bases`：知识库创建、查询和删除。
 - `/api/knowledge-bases/{id}/documents`：文档上传和列表。
@@ -20,18 +20,18 @@
 - `/api/documents/{id}/reindex`：使用服务器当前 Embedding profile 重建成功文档的派生索引。
 - `/api/knowledge-bases/{id}/search`：知识库内 Top-K 文档片段检索。
 - `/api/conversations`：会话和历史消息。
-- `/api/chat`：POST 非流式 RAG 问答，用于 P2 闭环和集成验证。
+- `/api/chat`：POST 非流式 RAG 问答，用于 V1 闭环和集成验证。
 - `/api/chat/stream`：POST SSE 流式问答。
 - `/api/messages/{id}/feedback`：标记或取消“有用”反馈。
 - `/api/model-calls`：最小调用记录查询。
 
-## 完善阶段规划资源（尚未实现）
+## V2 规划资源（尚未实现）
 
 - `/api/action-requests/{id}`：查询持久化业务操作提案及状态。
 - `/api/action-requests/{id}/confirm`：人工确认后原子取得执行权并执行白名单操作。
 - `/api/action-requests/{id}/reject`：拒绝仍在等待确认的操作。
 
-第一阶段只允许 `CREATE_KNOWLEDGE_BASE`，不提供客户端可枚举或动态注册任意工具的接口。
+V2 只允许 `CREATE_KNOWLEDGE_BASE`，不提供客户端可枚举或动态注册任意工具的接口。
 
 ## 知识库接口
 
@@ -112,9 +112,9 @@ TXT、Markdown 和文本型 PDF 分别通过 Spring AI 对应 reader 解析；PD
 
 固定白名单内的身份介绍、问候、能力说明、感谢和告别不调用模型，事件顺序为 `message -> delta -> done(COMPLETED)`，不发送 `citation` 或 `usage`。其他无可靠知识库证据的问题仍使用 `done(REFUSED)`。
 
-## 下一阶段 SSE 规划（尚未实现）
+## V2 SSE 规划（尚未实现）
 
-下一阶段在保持 `/api/chat/stream` 路径兼容的前提下增加：
+V2 在保持 `/api/chat/stream` 路径兼容的前提下增加：
 
 - `route`：包含固定 `capabilityId`、`capabilityVersion`、安全的匹配依据和 trace ID。
 - `action_required`：包含 `actionRequestId`、固定 `actionType`、服务端规范化后的展示参数、影响摘要、状态和过期时间。
@@ -134,7 +134,7 @@ message -> route -> action_required -> done(AWAITING_CONFIRMATION)
 
 `action_required` 只表示提案已保存，绝不表示操作已经执行。服务端不得为等待人工确认而长期保持 SSE 连接。
 
-## 下一阶段操作确认接口规划（尚未实现）
+## V2 操作确认接口规划（尚未实现）
 
 | 方法 | 路径 | 规划行为 |
 | --- | --- | --- |

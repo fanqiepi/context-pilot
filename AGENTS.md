@@ -7,14 +7,16 @@
 
 ## Project context
 
-- ContextPilot is a learning-oriented knowledge base and task assistant built with Spring AI.
-- The functional MVP covers document ingestion, retrieval-augmented generation, citations, streaming responses, conversation history, call records, and positive-only helpful feedback.
-- The product owner considers the functional MVP complete. The project is now in a broader improvement phase that incrementally addresses capability routing, controlled actions, retrieval quality, page-level acceptance, evaluation baselines, and release hardening.
-- The authorized next phase adds fixed capability routing and one confirmable business action while preserving the modular monolith. Do not introduce agents, LangGraph or other workflow engines, microservices, message queues, multi-tenancy, plugin systems, dynamic tools, or model-generated SQL.
+- ContextPilot is a learning-oriented, controllable, and evaluable personal knowledge-work assistant built with Spring AI. Its user-facing product carrier is a single-user knowledge workspace; its engineering purpose is to explore modern agent capabilities through coherent, testable scenarios rather than by accumulating frameworks.
+- V1, the functional RAG baseline, is complete. It covers document ingestion, retrieval-augmented generation, citations, streaming responses, conversation history, call records, positive-only helpful feedback, fixed capability routing, and embedding-index governance.
+- The roadmap advances by major version. Only the current version is specified in implementation detail; the next version defines a scenario and boundary; later versions are directional candidates and are not implementation authorization.
+- V2 is the current authorized version. It adds the persisted, confirmable `CREATE_KNOWLEDGE_BASE` business action while preserving the modular monolith and existing RAG behavior.
+- V3 is only a planned outline for a knowledge-base maintenance assistant that can inspect health and, after confirmation, retry document processing or request reindexing. Do not implement V3 until V2 is complete and the V3 contracts are explicitly approved.
+- V4 and later may explore bounded planning, explicit memory, external-tool interoperability such as MCP, and multi-agent patterns, but none of these are currently authorized. Do not introduce agents, LangGraph or other workflow engines, MCP integration, microservices, message queues, multi-tenancy, plugin systems, dynamic tools, or model-generated SQL under the current scope.
 
 ## Current authorized improvement scope
 
-- Treat this work as post-MVP product improvement, not as unfinished MVP delivery. Preserve the completed RAG baseline while improving traceability, isolation, evaluation, and controlled capabilities.
+- Treat current work as V2, not as unfinished MVP delivery and not as permission to implement later roadmap versions. Preserve the completed V1 baseline while adding one controlled action.
 
 - Route each chat request to one of three explicit, versioned capabilities: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, or `BUSINESS_ACTION`.
 - Keep `SIMPLE_CHAT` narrow: identity, greeting, capability description, thanks, and farewell continue to use deterministic replies. Do not silently turn it into unrestricted open-domain model answering.
@@ -24,6 +26,15 @@
 - Persist an auditable action state machine such as `PENDING_CONFIRMATION -> EXECUTING -> SUCCEEDED/FAILED`, with `REJECTED` and `EXPIRED` terminal alternatives. Confirmation must be atomic and idempotent so repeated requests cannot execute the action twice.
 - Route matching should start with deterministic rules and default safely to `KNOWLEDGE_QA`; do not add an extra model classification call until measured ambiguity justifies it.
 - Keep the implementation specific to the approved capability and action. A generic Skill registry, generic `ToolExecutionGateway`, arbitrary reflection, arbitrary HTTP/file/shell access, and autonomous tool loops remain out of scope.
+
+## Roadmap governance
+
+- Use `docs/requirements/product-requirements.md` as the single detailed roadmap. Avoid parallel phase systems such as P/N/I/A-D numbering for future work.
+- Describe V1 as a completed baseline, V2 in full detail, V3 as a bounded scenario outline, and V4+ only as goals and entry conditions.
+- A roadmap candidate is not authorization. Before starting a later major version, update this file and the relevant requirements, architecture, data, API, and evaluation documents with an explicitly approved scope.
+- Plan capabilities from user scenarios first. Frameworks such as LangGraph, MCP, workflow runtimes, or multi-agent libraries are implementation candidates, not roadmap goals by themselves.
+- Keep the three top-level routing classes stable for the current scope: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, and `BUSINESS_ACTION`. Future knowledge tasks or business actions should normally be modeled beneath these classes unless a later approved design demonstrates the need for another top-level route.
+- Evaluation, traceability, human confirmation, bounded execution, and failure semantics are cross-version quality gates rather than optional cleanup work.
 
 ## Sources of truth
 
@@ -38,16 +49,16 @@
 - Backend: Java 21, Spring Boot 4.1.x, Spring AI 2.0.x, Maven.
 - Frontend: Vue 3, TypeScript, Vite, Element Plus.
 - Chat model: DeepSeek API through Spring AI's native DeepSeek integration; use `deepseek-v4-flash` as the default model.
-- Embedding model: DashScope `qwen3.7-text-embedding` through its OpenAI-compatible endpoint, fixed at 1024 dimensions for the MVP.
-- Storage: PostgreSQL with pgvector; do not add a separate vector database for the MVP.
+- Embedding model: DashScope `qwen3.7-text-embedding` through its OpenAI-compatible endpoint, fixed at 1024 dimensions for the current index profile.
+- Storage: PostgreSQL with pgvector; do not add a separate vector database under the current authorized scope.
 - Persistence: use MyBatis-Plus for business tables and Spring AI `PgVectorStore` for vector operations.
-- Documents: support TXT, Markdown, and text-based PDF through Spring AI readers; scanned-PDF OCR is out of scope.
+- Documents: support TXT, Markdown, and text-based PDF through Spring AI readers; scanned-PDF OCR is outside the current authorized scope.
 - Files: store uploads behind a `StorageService` in the gitignored `data/uploads/` directory.
-- Background processing: use a bounded application `TaskExecutor`; do not add a message queue for the MVP.
+- Background processing: use a bounded application `TaskExecutor`; do not add a message queue under the current authorized scope.
 - Architecture: frontend/backend separation with a modular monolith backend.
 - Streaming: SSE. Secrets and model credentials remain backend-only environment variables.
-- MVP access model: single user with no login or role system.
-- Next-phase orchestration: explicit Java application services and persisted state transitions; no LangGraph dependency or external workflow runtime.
+- Current access model: single user with no login or role system.
+- V2 orchestration: explicit Java application services and persisted state transitions; no LangGraph dependency or external workflow runtime.
 
 ## Working agreements
 
