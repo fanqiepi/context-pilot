@@ -32,6 +32,18 @@ class CapabilityRouterTests {
     }
 
     @Test
+    void parsesOptionalDescriptionFromStrictCreateSyntax() {
+        CreateKnowledgeBaseIntentPolicy policy = new CreateKnowledgeBaseIntentPolicy();
+
+        CreateKnowledgeBaseIntentPolicy.CreateKnowledgeBaseIntent intent = policy
+                .parse("创建一个名为 Java 学习的知识库，描述为后端学习资料")
+                .orElseThrow();
+
+        assertThat(intent.name()).isEqualTo("Java 学习");
+        assertThat(intent.description()).isEqualTo("后端学习资料");
+    }
+
+    @Test
     void safelyDefaultsKnowledgeQuestionsWithoutTreatingHowToQuestionsAsActions() {
         assertThat(router.route("项目使用了什么数据库？", "trace-qa").capabilityId())
                 .isEqualTo(CapabilityId.KNOWLEDGE_QA);

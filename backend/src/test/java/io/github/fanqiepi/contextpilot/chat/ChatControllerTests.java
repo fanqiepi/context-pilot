@@ -65,7 +65,8 @@ class ChatControllerTests {
                 traceId,
                 CapabilityId.KNOWLEDGE_QA,
                 "v1",
-                CapabilityMatchReason.DEFAULT_KNOWLEDGE_QA));
+                CapabilityMatchReason.DEFAULT_KNOWLEDGE_QA,
+                null));
 
         mockMvc.perform(post("/api/chat")
                         .header("X-Request-Id", traceId)

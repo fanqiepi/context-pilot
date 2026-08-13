@@ -4,6 +4,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
+
 public record ConversationMessageResponse(
         UUID id,
         UUID conversationId,
@@ -15,6 +17,7 @@ public record ConversationMessageResponse(
         CapabilityId capabilityId,
         String capabilityVersion,
         CapabilityMatchReason capabilityMatchReason,
+        ActionRequestResponse actionRequest,
         List<ChatCitationResponse> citations,
         boolean helpful,
         OffsetDateTime createdAt,
@@ -22,6 +25,7 @@ public record ConversationMessageResponse(
 
     static ConversationMessageResponse from(
             ChatMessageEntity entity,
+            ActionRequestResponse actionRequest,
             List<ChatCitationResponse> citations,
             boolean helpful) {
         return new ConversationMessageResponse(
@@ -35,6 +39,7 @@ public record ConversationMessageResponse(
                 entity.getCapabilityId(),
                 entity.getCapabilityVersion(),
                 entity.getCapabilityMatchReason(),
+                actionRequest,
                 List.copyOf(citations),
                 helpful,
                 entity.getCreatedAt(),

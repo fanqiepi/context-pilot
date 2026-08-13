@@ -41,6 +41,8 @@ spring:
         dimensions: 1024
 
 contextpilot:
+  action-request:
+    confirmation-timeout-minutes: ${ACTION_CONFIRMATION_TIMEOUT_MINUTES:30}
   embedding:
     index:
       profile-id: ${EMBEDDING_PROFILE_ID:dashscope_qwen3_7_1024_v1}

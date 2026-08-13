@@ -70,6 +70,41 @@ export type CapabilityMatchReason =
   | 'EXPLICIT_CREATE_KNOWLEDGE_BASE'
   | 'DEFAULT_KNOWLEDGE_QA'
 
+export type ActionType = 'CREATE_KNOWLEDGE_BASE'
+export type ActionRequestStatus =
+  | 'PENDING_CONFIRMATION'
+  | 'EXECUTING'
+  | 'SUCCEEDED'
+  | 'FAILED'
+  | 'REJECTED'
+  | 'EXPIRED'
+
+export interface CreateKnowledgeBaseActionParameters {
+  name: string
+  description: string | null
+}
+
+export interface ActionRequest {
+  id: string
+  conversationId: string
+  userMessageId: string
+  assistantMessageId: string
+  capabilityId: 'BUSINESS_ACTION'
+  capabilityVersion: string
+  actionType: ActionType
+  parameters: CreateKnowledgeBaseActionParameters
+  displaySummary: string
+  status: ActionRequestStatus
+  resultSummary: string | null
+  errorSummary: string | null
+  traceId: string
+  expiresAt: string
+  confirmedAt: string | null
+  executedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
 export interface ConversationMessage {
   id: string
   conversationId: string
@@ -81,6 +116,7 @@ export interface ConversationMessage {
   capabilityId: CapabilityId | null
   capabilityVersion: string | null
   capabilityMatchReason: CapabilityMatchReason | null
+  actionRequest: ActionRequest | null
   citations: Citation[]
   helpful: boolean
   createdAt: string
@@ -117,6 +153,17 @@ export interface StreamDeltaEvent {
   content: string
 }
 
+export interface StreamRouteEvent {
+  capabilityId: CapabilityId
+  capabilityVersion: string
+  capabilityMatchReason: CapabilityMatchReason
+  traceId: string
+}
+
+export type StreamActionRequiredEvent = Omit<ActionRequest, 'id'> & {
+  actionRequestId: string
+}
+
 export interface StreamUsageEvent {
   model: string
   promptTokens: number | null
@@ -126,7 +173,7 @@ export interface StreamUsageEvent {
 }
 
 export interface StreamDoneEvent {
-  status: 'COMPLETED' | 'REFUSED'
+  status: 'COMPLETED' | 'REFUSED' | 'AWAITING_CONFIRMATION'
   traceId: string
 }
 

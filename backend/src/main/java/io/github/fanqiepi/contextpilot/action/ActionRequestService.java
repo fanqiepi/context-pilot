@@ -1,0 +1,203 @@
+package io.github.fanqiepi.contextpilot.action;
+
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import io.github.fanqiepi.contextpilot.chat.CapabilityId;
+import io.github.fanqiepi.contextpilot.common.BadRequestException;
+import io.github.fanqiepi.contextpilot.common.ConflictException;
+import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
+import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class ActionRequestService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActionRequestService.class);
+    private static final String INTERNAL_FAILURE_SUMMARY = "创建知识库失败，请稍后重试";
+
+    private final ActionRequestMapper actionRequestMapper;
+    private final ActionRequestProperties properties;
+    private final CreateKnowledgeBaseActionExecutor executor;
+
+    public ActionRequestService(
+            ActionRequestMapper actionRequestMapper,
+            ActionRequestProperties properties,
+            CreateKnowledgeBaseActionExecutor executor) {
+        this.actionRequestMapper = actionRequestMapper;
+        this.properties = properties;
+        this.executor = executor;
+    }
+
+    @Transactional
+    public ActionRequestResponse proposeCreateKnowledgeBase(
+            UUID conversationId,
+            UUID userMessageId,
+            UUID assistantMessageId,
+            CapabilityId capabilityId,
+            String capabilityVersion,
+            String traceId,
+            CreateKnowledgeBaseActionParameters parameters) {
+        if (capabilityId != CapabilityId.BUSINESS_ACTION) {
+            throw new IllegalArgumentException("Action proposals require the BUSINESS_ACTION capability");
+        }
+        OffsetDateTime now = now();
+        ActionRequestEntity entity = new ActionRequestEntity();
+        entity.setId(UUID.randomUUID());
+        entity.setConversationId(conversationId);
+        entity.setUserMessageId(userMessageId);
+        entity.setAssistantMessageId(assistantMessageId);
+        entity.setCapabilityId(capabilityId);
+        entity.setCapabilityVersion(capabilityVersion);
+        entity.setActionType(ActionType.CREATE_KNOWLEDGE_BASE);
+        entity.setName(parameters.name());
+        entity.setDescription(parameters.description());
+        entity.setDisplaySummary(displaySummary(parameters));
+        entity.setStatus(ActionRequestStatus.PENDING_CONFIRMATION);
+        entity.setTraceId(traceId);
+        entity.setExpiresAt(now.plusMinutes(properties.getConfirmationTimeoutMinutes()));
+        entity.setCreatedAt(now);
+        entity.setUpdatedAt(now);
+        actionRequestMapper.insert(entity);
+        return ActionRequestResponse.from(entity);
+    }
+
+    @Transactional
+    public ActionRequestResponse get(UUID id) {
+        OffsetDateTime now = now();
+        expire(id, now);
+        return ActionRequestResponse.from(requireEntity(id));
+    }
+
+    @Transactional
+    public Map<UUID, ActionRequestResponse> findByAssistantMessageIds(List<UUID> messageIds) {
+        if (messageIds.isEmpty()) {
+            return Map.of();
+        }
+        OffsetDateTime now = now();
+        List<ActionRequestEntity> entities = actionRequestMapper.selectByAssistantMessageIds(messageIds);
+        List<ActionRequestEntity> currentEntities = entities.stream().map(entity -> {
+            if (!isExpiredPending(entity, now)) {
+                return entity;
+            }
+            if (actionRequestMapper.expire(entity.getId(), now) == 1) {
+                entity.setStatus(ActionRequestStatus.EXPIRED);
+                entity.setUpdatedAt(now);
+                return entity;
+            }
+            return requireEntity(entity.getId());
+        }).toList();
+        return currentEntities.stream().collect(Collectors.toMap(
+                ActionRequestEntity::getAssistantMessageId,
+                ActionRequestResponse::from,
+                (left, right) -> left,
+                LinkedHashMap::new));
+    }
+
+    @Transactional
+    public ActionRequestResponse confirm(UUID id) {
+        OffsetDateTime now = now();
+        expire(id, now);
+        ActionRequestEntity current = requireEntity(id);
+        if (current.getStatus() != ActionRequestStatus.PENDING_CONFIRMATION) {
+            return ActionRequestResponse.from(current);
+        }
+        if (actionRequestMapper.claimExecution(id, now) == 0) {
+            return ActionRequestResponse.from(requireEntity(id));
+        }
+
+        CreateKnowledgeBaseActionParameters parameters =
+                new CreateKnowledgeBaseActionParameters(current.getName(), current.getDescription());
+        KnowledgeBaseResponse created;
+        try {
+            created = executor.execute(parameters);
+        } catch (BadRequestException | ConflictException exception) {
+            completeFailure(id, exception.getMessage());
+            return ActionRequestResponse.from(requireEntity(id));
+        } catch (RuntimeException exception) {
+            LOGGER.error("Action execution failed, actionRequestId={}, traceId={}",
+                    id, current.getTraceId(), exception);
+            completeFailure(id, INTERNAL_FAILURE_SUMMARY);
+            return ActionRequestResponse.from(requireEntity(id));
+        }
+        String resultSummary = "知识库“%s”已创建（ID：%s）".formatted(created.name(), created.id());
+        if (actionRequestMapper.completeSuccess(id, resultSummary, now()) != 1) {
+            throw new IllegalStateException("Claimed action request could not be completed");
+        }
+        return ActionRequestResponse.from(requireEntity(id));
+    }
+
+    @Transactional
+    public ActionRequestResponse reject(UUID id) {
+        OffsetDateTime now = now();
+        expire(id, now);
+        ActionRequestEntity current = requireEntity(id);
+        if (current.getStatus() == ActionRequestStatus.REJECTED) {
+            return ActionRequestResponse.from(current);
+        }
+        if (current.getStatus() != ActionRequestStatus.PENDING_CONFIRMATION) {
+            throw new ConflictException(
+                    "ACTION_REQUEST_STATUS_CONFLICT",
+                    "Only a pending action request can be rejected");
+        }
+        if (actionRequestMapper.reject(id, now) != 1) {
+            throw new ConflictException(
+                    "ACTION_REQUEST_STATUS_CONFLICT",
+                    "Action request status changed before it could be rejected");
+        }
+        return ActionRequestResponse.from(requireEntity(id));
+    }
+
+    private void completeFailure(UUID id, String summary) {
+        if (actionRequestMapper.completeFailure(id, safeSummary(summary), now()) != 1) {
+            throw new IllegalStateException("Claimed action request could not be marked failed");
+        }
+    }
+
+    private void expire(UUID id, OffsetDateTime now) {
+        actionRequestMapper.expire(id, now);
+    }
+
+    private ActionRequestEntity requireEntity(UUID id) {
+        ActionRequestEntity entity = actionRequestMapper.selectById(id);
+        if (entity == null) {
+            throw new ResourceNotFoundException(
+                    "ACTION_REQUEST_NOT_FOUND",
+                    "Action request " + id + " was not found");
+        }
+        return entity;
+    }
+
+    private boolean isExpiredPending(ActionRequestEntity entity, OffsetDateTime now) {
+        return entity.getStatus() == ActionRequestStatus.PENDING_CONFIRMATION
+                && !entity.getExpiresAt().isAfter(now);
+    }
+
+    private String displaySummary(CreateKnowledgeBaseActionParameters parameters) {
+        if (parameters.description() == null) {
+            return "确认后将创建知识库“%s”。".formatted(parameters.name());
+        }
+        return "确认后将创建知识库“%s”，描述为“%s”。"
+                .formatted(parameters.name(), parameters.description());
+    }
+
+    private String safeSummary(String value) {
+        String normalized = value == null ? INTERNAL_FAILURE_SUMMARY : value.strip();
+        if (normalized.isEmpty()) {
+            return INTERNAL_FAILURE_SUMMARY;
+        }
+        return normalized.length() <= 1000 ? normalized : normalized.substring(0, 1000);
+    }
+
+    private OffsetDateTime now() {
+        return OffsetDateTime.now(ZoneOffset.UTC);
+    }
+}

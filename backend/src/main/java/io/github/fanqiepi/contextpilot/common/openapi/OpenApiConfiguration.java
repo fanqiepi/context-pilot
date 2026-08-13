@@ -12,7 +12,7 @@ public class OpenApiConfiguration {
     OpenAPI contextPilotOpenApi() {
         return new OpenAPI().info(new Info()
                 .title("ContextPilot API")
-                .description("知识库与文档管理接口")
+                .description("知识库、知识问答与受控业务操作接口")
                 .version("0.0.1"));
     }
 }

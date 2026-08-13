@@ -9,6 +9,7 @@ import java.util.UUID;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import io.github.fanqiepi.contextpilot.action.ActionRequestService;
 import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
 import io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackEntity;
 import io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackMapper;
@@ -50,6 +51,8 @@ class ConversationHistoryServiceTests {
     private MessageCitationMapper messageCitationMapper;
     @Mock
     private AnswerFeedbackMapper answerFeedbackMapper;
+    @Mock
+    private ActionRequestService actionRequestService;
 
     private ConversationHistoryService service;
 
@@ -60,7 +63,8 @@ class ConversationHistoryServiceTests {
                 conversationMapper,
                 chatMessageMapper,
                 messageCitationMapper,
-                answerFeedbackMapper);
+                answerFeedbackMapper,
+                actionRequestService);
     }
 
     @Test

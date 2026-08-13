@@ -4,7 +4,7 @@
 - [产品定位与大版本路线图](requirements/product-requirements.md)
 - [技术架构](architecture/technical-architecture.md)
 - [ADR 0001：使用 PostgreSQL 和 pgvector](architecture/decisions/0001-use-pgvector.md)
-- [数据模型与 V2 规划边界](data/data-model.md)
+- [数据模型与 V2 操作结构](data/data-model.md)
 - [REST API、SSE 与操作确认约定](api/api-design.md)
 - [ContextPilot 评估计划](evaluation/evaluation-plan.md)
 - [本地开发](development/local-development.md)

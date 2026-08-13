@@ -56,11 +56,27 @@ public class ChatStreamingService {
                         prepared.route().capabilityId(),
                         prepared.route().capabilityVersion(),
                         prepared.route().matchReason()));
+        ServerSentEvent<ChatStreamPayload> route = event(
+                "route",
+                new ChatStreamPayload.Route(
+                        prepared.route().capabilityId(),
+                        prepared.route().capabilityVersion(),
+                        prepared.route().matchReason(),
+                        traceId));
+        if (prepared.actionRequired()) {
+            return Flux.just(
+                    message,
+                    route,
+                    event("action_required", ChatStreamPayload.ActionRequired.from(
+                            prepared.actionRequest())),
+                    event("done", new ChatStreamPayload.Done("AWAITING_CONFIRMATION", traceId)));
+        }
         if (prepared.hasDirectAnswer()) {
             persistenceService.completeWithoutModel(
                     exchange.assistantMessageId(), prepared.directAnswer());
             return Flux.just(
                     message,
+                    route,
                     event("delta", new ChatStreamPayload.Delta(prepared.directAnswer())),
                     event("done", new ChatStreamPayload.Done("COMPLETED", traceId)));
         }
@@ -70,6 +86,7 @@ public class ChatStreamingService {
                     ChatApplicationService.INSUFFICIENT_EVIDENCE_ANSWER);
             return Flux.just(
                     message,
+                    route,
                     event("delta", new ChatStreamPayload.Delta(
                             ChatApplicationService.INSUFFICIENT_EVIDENCE_ANSWER)),
                     event("done", new ChatStreamPayload.Done("REFUSED", traceId)));
@@ -110,7 +127,7 @@ public class ChatStreamingService {
             return Flux.fromIterable(events);
         });
 
-        return Flux.concat(Flux.just(message), deltas, tail)
+        return Flux.concat(Flux.just(message, route), deltas, tail)
                 .onErrorResume(exception -> {
                     lifecycle.failSafely(FAILED_SUMMARY, exception);
                     return Flux.just(errorEvent(exception, traceId));
