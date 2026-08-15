@@ -7,12 +7,15 @@ class CapabilityRouter {
 
     private final SimpleChatReplyPolicy simpleChatReplyPolicy;
     private final CreateKnowledgeBaseIntentPolicy createKnowledgeBaseIntentPolicy;
+    private final KnowledgeBaseHealthIntentPolicy knowledgeBaseHealthIntentPolicy;
 
     CapabilityRouter(
             SimpleChatReplyPolicy simpleChatReplyPolicy,
-            CreateKnowledgeBaseIntentPolicy createKnowledgeBaseIntentPolicy) {
+            CreateKnowledgeBaseIntentPolicy createKnowledgeBaseIntentPolicy,
+            KnowledgeBaseHealthIntentPolicy knowledgeBaseHealthIntentPolicy) {
         this.simpleChatReplyPolicy = simpleChatReplyPolicy;
         this.createKnowledgeBaseIntentPolicy = createKnowledgeBaseIntentPolicy;
+        this.knowledgeBaseHealthIntentPolicy = knowledgeBaseHealthIntentPolicy;
     }
 
     CapabilityRoute route(String question, String traceId) {
@@ -26,6 +29,13 @@ class CapabilityRouter {
             return CapabilityRoute.matched(
                     CapabilityId.BUSINESS_ACTION,
                     CapabilityMatchReason.EXPLICIT_CREATE_KNOWLEDGE_BASE,
+                    traceId);
+        }
+        if (knowledgeBaseHealthIntentPolicy.matches(question)) {
+            return CapabilityRoute.matched(
+                    CapabilityId.KNOWLEDGE_QA,
+                    "v2",
+                    CapabilityMatchReason.EXPLICIT_KNOWLEDGE_BASE_HEALTH,
                     traceId);
         }
         return CapabilityRoute.matched(

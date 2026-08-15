@@ -8,6 +8,10 @@ import io.github.fanqiepi.contextpilot.action.ActionRequestService;
 import io.github.fanqiepi.contextpilot.action.ActionRequestStatus;
 import io.github.fanqiepi.contextpilot.action.ActionType;
 import io.github.fanqiepi.contextpilot.action.CreateKnowledgeBaseActionParameters;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthAssessment;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportResponse;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportService;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthService;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalResultResponse;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalService;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,6 +39,10 @@ class ChatPreparationServiceTests {
     private ChatPromptComposer promptComposer;
     @Mock
     private ActionRequestService actionRequestService;
+    @Mock
+    private KnowledgeBaseHealthService healthService;
+    @Mock
+    private KnowledgeBaseHealthReportService healthReportService;
 
     private ChatPreparationService service;
 
@@ -51,9 +60,14 @@ class ChatPreparationServiceTests {
                 promptComposer,
                 properties,
                 simpleReplyPolicy,
-                new CapabilityRouter(simpleReplyPolicy, createKnowledgeBaseIntentPolicy),
+                new CapabilityRouter(
+                        simpleReplyPolicy,
+                        createKnowledgeBaseIntentPolicy,
+                        new KnowledgeBaseHealthIntentPolicy()),
                 createKnowledgeBaseIntentPolicy,
-                actionRequestService);
+                actionRequestService,
+                healthService,
+                healthReportService);
     }
 
     @Test
@@ -131,6 +145,35 @@ class ChatPreparationServiceTests {
         assertThat(prepared.refused()).isFalse();
         assertThat(prepared.citations()).isEmpty();
         verify(persistenceService).validateConversation(null, knowledgeBaseId);
+        verifyNoInteractions(retrievalService, promptComposer);
+    }
+
+    @Test
+    void inspectsAndPersistsExplicitHealthRequestWithoutRetrieval() {
+        UUID knowledgeBaseId = UUID.randomUUID();
+        PendingChatExchange exchange = exchange();
+        ChatRequest request = new ChatRequest(null, knowledgeBaseId, "检查这个知识库有没有异常");
+        KnowledgeBaseHealthAssessment assessment = mock(KnowledgeBaseHealthAssessment.class);
+        KnowledgeBaseHealthReportResponse report = mock(KnowledgeBaseHealthReportResponse.class);
+        when(report.summary()).thenReturn("知识库健康，未发现异常。");
+        when(persistenceService.begin(
+                eq(null), eq(knowledgeBaseId), eq("检查这个知识库有没有异常"), any(CapabilityRoute.class)))
+                .thenReturn(exchange);
+        when(healthService.inspect(knowledgeBaseId)).thenReturn(assessment);
+        when(healthReportService.create(
+                exchange.conversationId(),
+                exchange.userMessageId(),
+                exchange.assistantMessageId(),
+                assessment)).thenReturn(report);
+
+        PreparedChat prepared = service.prepare(request, "trace-health");
+
+        assertThat(prepared.healthReportReady()).isTrue();
+        assertThat(prepared.healthReport()).isSameAs(report);
+        assertThat(prepared.directAnswer()).isEqualTo("知识库健康，未发现异常。");
+        assertThat(prepared.route().capabilityVersion()).isEqualTo("v2");
+        assertThat(prepared.route().matchReason())
+                .isEqualTo(CapabilityMatchReason.EXPLICIT_KNOWLEDGE_BASE_HEALTH);
         verifyNoInteractions(retrievalService, promptComposer);
     }
 

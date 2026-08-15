@@ -25,4 +25,12 @@ record CapabilityRoute(
             String traceId) {
         return new CapabilityRoute(capabilityId, capabilityId.version(), matchReason, traceId);
     }
+
+    static CapabilityRoute matched(
+            CapabilityId capabilityId,
+            String capabilityVersion,
+            CapabilityMatchReason matchReason,
+            String traceId) {
+        return new CapabilityRoute(capabilityId, capabilityVersion, matchReason, traceId);
+    }
 }

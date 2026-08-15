@@ -41,6 +41,8 @@ CREATE EXTENSION IF NOT EXISTS vector;
 
 V3 健康检查默认最多返回 100 条异常明细，可通过 `HEALTH_ISSUE_LIMIT` 调整，合法范围为 1 到 500。聚合计数仍覆盖当前知识库的全部活动文档；达到明细上限时结果必须标记为截断。
 
+聊天中输入完整句“检查这个知识库有没有异常”“检查当前知识库的健康状态”或 `knowledge base health check` 可触发确定性健康报告。额外附带总结、修复或自动执行要求的复合请求不会命中健康白名单。健康路径使用 `KNOWLEDGE_QA/v2`，SSE 会发送 `health_report`，且不调用聊天模型。
+
 ## 启动和验证
 
 后端：

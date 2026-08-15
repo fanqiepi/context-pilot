@@ -68,7 +68,85 @@ export type CapabilityId = 'SIMPLE_CHAT' | 'KNOWLEDGE_QA' | 'BUSINESS_ACTION'
 export type CapabilityMatchReason =
   | 'SIMPLE_INTERACTION_WHITELIST'
   | 'EXPLICIT_CREATE_KNOWLEDGE_BASE'
+  | 'EXPLICIT_KNOWLEDGE_BASE_HEALTH'
   | 'DEFAULT_KNOWLEDGE_QA'
+
+export type KnowledgeBaseHealthStatus =
+  | 'EMPTY'
+  | 'HEALTHY'
+  | 'IN_PROGRESS'
+  | 'ATTENTION_REQUIRED'
+  | 'UNKNOWN'
+export type HealthCheckCompleteness = 'COMPLETE' | 'PARTIAL' | 'TRUNCATED'
+export type KnowledgeBaseHealthIssueType =
+  | 'DOCUMENT_PROCESSING_FAILED'
+  | 'EMBEDDING_PROFILE_UNKNOWN'
+  | 'EMBEDDING_PROFILE_OUTDATED'
+  | 'VECTOR_INDEX_MISSING'
+export type HealthIssueSeverity = 'ERROR' | 'WARNING'
+export type HealthRecommendedActionType = 'RETRY_DOCUMENT_PROCESSING' | 'REINDEX_DOCUMENT'
+export type HealthIneligibilityReasonCode =
+  | 'DOCUMENT_PROCESSING_DISABLED'
+  | 'DOCUMENT_RETRY_LIMIT_REACHED'
+  | 'VECTOR_INDEX_CHECK_UNAVAILABLE'
+
+export interface EmbeddingIndexProfile {
+  id: string
+  provider: string
+  model: string
+  dimensions: number
+  version: string
+}
+
+export interface DocumentStatusCounts {
+  total: number
+  pending: number
+  processing: number
+  succeeded: number
+  failed: number
+  deleting: number
+}
+
+export interface KnowledgeBaseHealthIssue {
+  id: string
+  reportId: string
+  documentId: string
+  originalFilename: string
+  issueType: KnowledgeBaseHealthIssueType
+  severity: HealthIssueSeverity
+  observedDocumentStatus: DocumentStatus
+  observedProcessingAttempts: number
+  observedErrorSummary: string | null
+  observedEmbeddingProfileId: string | null
+  observedVectorCount: number | null
+  sourceDocumentUpdatedAt: string
+  recommendedActionType: HealthRecommendedActionType | null
+  actionEligible: boolean
+  ineligibilityReasonCode: HealthIneligibilityReasonCode | null
+  ineligibilitySummary: string | null
+}
+
+export interface KnowledgeBaseHealthReport {
+  id: string
+  knowledgeBaseId: string
+  conversationId: string
+  userMessageId: string
+  assistantMessageId: string
+  capabilityId: 'KNOWLEDGE_QA'
+  capabilityVersion: string
+  healthStatus: KnowledgeBaseHealthStatus
+  completeness: HealthCheckCompleteness
+  completenessReason: string | null
+  dataAsOf: string
+  currentEmbeddingProfile: EmbeddingIndexProfile
+  documentCounts: DocumentStatusCounts
+  issueCount: number
+  returnedIssueCount: number
+  summary: string
+  issues: KnowledgeBaseHealthIssue[]
+  traceId: string
+  createdAt: string
+}
 
 export type ActionType = 'CREATE_KNOWLEDGE_BASE'
 export type ActionRequestStatus =
@@ -116,6 +194,7 @@ export interface ConversationMessage {
   capabilityId: CapabilityId | null
   capabilityVersion: string | null
   capabilityMatchReason: CapabilityMatchReason | null
+  healthReport: KnowledgeBaseHealthReport | null
   actionRequest: ActionRequest | null
   citations: Citation[]
   helpful: boolean
@@ -159,6 +238,8 @@ export interface StreamRouteEvent {
   capabilityMatchReason: CapabilityMatchReason
   traceId: string
 }
+
+export type StreamHealthReportEvent = KnowledgeBaseHealthReport
 
 export type StreamActionRequiredEvent = Omit<ActionRequest, 'id'> & {
   actionRequestId: string

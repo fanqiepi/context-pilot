@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import io.github.fanqiepi.contextpilot.chat.CapabilityId;
+import io.github.fanqiepi.contextpilot.chat.ChatStreamPayload;
 import io.github.fanqiepi.contextpilot.document.EmbeddingIndexProfile;
 
 public record KnowledgeBaseHealthReportResponse(
@@ -26,7 +27,7 @@ public record KnowledgeBaseHealthReportResponse(
         String summary,
         List<KnowledgeBaseHealthIssueResponse> issues,
         String traceId,
-        OffsetDateTime createdAt) {
+        OffsetDateTime createdAt) implements ChatStreamPayload {
 
     public KnowledgeBaseHealthReportResponse {
         issues = List.copyOf(issues);

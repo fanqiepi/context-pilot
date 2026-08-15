@@ -50,7 +50,7 @@ class V2RoutingActionEvaluationTests {
     private final CreateKnowledgeBaseIntentPolicy intentPolicy =
             new CreateKnowledgeBaseIntentPolicy();
     private final CapabilityRouter router = new CapabilityRouter(
-            simpleChatReplyPolicy, intentPolicy);
+            simpleChatReplyPolicy, intentPolicy, new KnowledgeBaseHealthIntentPolicy());
 
     static Stream<V2EvaluationDataset.RoutingCase> routingCases() {
         return DATASET.routingCases().stream();
@@ -103,7 +103,9 @@ class V2RoutingActionEvaluationTests {
                 simpleChatReplyPolicy,
                 router,
                 intentPolicy,
-                actionRequestService);
+                actionRequestService,
+                mock(io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthService.class),
+                mock(io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportService.class));
         UUID knowledgeBaseId = UUID.randomUUID();
         PendingChatExchange exchange = new PendingChatExchange(
                 UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());

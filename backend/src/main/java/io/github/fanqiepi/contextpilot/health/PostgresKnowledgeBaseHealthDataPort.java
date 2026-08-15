@@ -20,6 +20,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
@@ -122,7 +123,11 @@ public class PostgresKnowledgeBaseHealthDataPort implements KnowledgeBaseHealthD
     }
 
     @Override
-    @Transactional(readOnly = true, timeout = 5, isolation = Isolation.REPEATABLE_READ)
+    @Transactional(
+            readOnly = true,
+            timeout = 5,
+            isolation = Isolation.REPEATABLE_READ,
+            propagation = Propagation.REQUIRES_NEW)
     public KnowledgeBaseHealthFacts inspect(
             UUID knowledgeBaseId,
             String currentEmbeddingProfileId,

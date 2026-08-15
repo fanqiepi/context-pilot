@@ -237,6 +237,15 @@ class DatabaseMigrationTests {
                     )
                     """)).isTrue();
             assertThat(queryString(connection, """
+                    SELECT pg_get_constraintdef(constraint_info.oid)
+                    FROM pg_constraint constraint_info
+                    JOIN pg_class table_info ON constraint_info.conrelid = table_info.oid
+                    JOIN pg_namespace schema_info ON table_info.relnamespace = schema_info.oid
+                    WHERE schema_info.nspname = 'public'
+                      AND table_info.relname = 'chat_message'
+                      AND constraint_info.conname = 'chat_message_capability_match_reason_check'
+                    """)).contains("EXPLICIT_KNOWLEDGE_BASE_HEALTH");
+            assertThat(queryString(connection, """
                     SELECT format_type(attribute.atttypid, attribute.atttypmod)
                     FROM pg_attribute attribute
                     JOIN pg_class table_info ON attribute.attrelid = table_info.oid

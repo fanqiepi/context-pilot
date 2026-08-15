@@ -3,6 +3,7 @@ package io.github.fanqiepi.contextpilot.chat;
 import java.util.List;
 
 import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportResponse;
 
 record PreparedChat(
         CapabilityRoute route,
@@ -10,6 +11,7 @@ record PreparedChat(
         ChatPrompt prompt,
         List<ChatCitationResponse> citations,
         String directAnswer,
+        KnowledgeBaseHealthReportResponse healthReport,
         ActionRequestResponse actionRequest) {
 
     PreparedChat(
@@ -17,14 +19,22 @@ record PreparedChat(
             PendingChatExchange exchange,
             ChatPrompt prompt,
             List<ChatCitationResponse> citations) {
-        this(route, exchange, prompt, citations, null, null);
+        this(route, exchange, prompt, citations, null, null, null);
     }
 
     static PreparedChat direct(
             CapabilityRoute route,
             PendingChatExchange exchange,
             String answer) {
-        return new PreparedChat(route, exchange, null, List.of(), answer, null);
+        return new PreparedChat(route, exchange, null, List.of(), answer, null, null);
+    }
+
+    static PreparedChat health(
+            CapabilityRoute route,
+            PendingChatExchange exchange,
+            KnowledgeBaseHealthReportResponse healthReport) {
+        return new PreparedChat(
+                route, exchange, null, List.of(), healthReport.summary(), healthReport, null);
     }
 
     static PreparedChat action(
@@ -32,7 +42,7 @@ record PreparedChat(
             PendingChatExchange exchange,
             String answer,
             ActionRequestResponse actionRequest) {
-        return new PreparedChat(route, exchange, null, List.of(), answer, actionRequest);
+        return new PreparedChat(route, exchange, null, List.of(), answer, null, actionRequest);
     }
 
     boolean refused() {
@@ -45,5 +55,9 @@ record PreparedChat(
 
     boolean actionRequired() {
         return actionRequest != null;
+    }
+
+    boolean healthReportReady() {
+        return healthReport != null;
     }
 }

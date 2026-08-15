@@ -33,18 +33,18 @@
 
 V2 只允许 `CREATE_KNOWLEDGE_BASE`，不提供客户端可枚举或动态注册任意工具的接口。
 
-## V3 已批准资源（按切片实施）
+## V3 资源（按切片实施）
 
-V3 详细合同见 [V3 知识库健康检查与维护助手详细设计](../architecture/v3-knowledge-base-maintenance-design.md)。以下资源已获准新增，但在相应实施切片完成前尚不可用：
+V3 详细合同见 [V3 知识库健康检查与维护助手详细设计](../architecture/v3-knowledge-base-maintenance-design.md)。资源状态如下：
 
 | 方法 | 路径 | 行为 |
 | --- | --- | --- |
-| `GET` | `/api/knowledge-base-health-reports/{id}` | 查询不可变健康报告、`dataAsOf`、完整性、来源和异常明细 |
-| `POST` | `/api/knowledge-base-health-reports/{reportId}/issues/{issueId}/action-request` | 从可信异常明细生成或恢复单文档修复提案，不接受客户端动作参数 |
+| `GET` | `/api/knowledge-base-health-reports/{id}` | 已实现；查询不可变健康报告、`dataAsOf`、完整性、来源和异常明细 |
+| `POST` | `/api/knowledge-base-health-reports/{reportId}/issues/{issueId}/action-request` | 待切片 5/6；从可信异常明细生成或恢复单文档修复提案，不接受客户端动作参数 |
 
-明确健康检查请求继续通过 `/api/chat` 或 `/api/chat/stream` 发起。顶层能力仍为 `KNOWLEDGE_QA`，匹配依据计划增加 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`；服务端使用专用只读 DataPort 生成确定性报告，不调用 ChatModel。
+明确健康检查请求通过 `/api/chat` 或 `/api/chat/stream` 发起。顶层能力仍为 `KNOWLEDGE_QA`，健康路径使用能力版本 `v2` 与匹配依据 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`；普通 RAG 和历史消息保持原版本。服务端使用专用只读 DataPort 生成确定性报告，不调用 ChatModel。
 
-SSE 计划新增 `health_report` 事件：
+SSE 已新增 `health_report` 事件：
 
 ```text
 message -> route -> delta -> health_report -> done(COMPLETED)
@@ -60,7 +60,7 @@ message -> route -> delta -> health_report -> done(COMPLETED)
 
 两个维护动作只接受服务端保存的单个文档目标。操作 `SUCCEEDED` 表示任务已可靠接受，文档处理最终结果仍通过文档查询接口返回。
 
-截至 V3 切片 2，健康评估、不可变报告持久化及历史 `healthReport` 恢复已在后端完成。公开报告查询端点、聊天健康路由和 SSE `health_report` 尚不可用；它们与前端卡片由切片 3 接入。
+截至 V3 切片 3，报告查询端点、同步聊天报告、确定性健康路由、SSE `health_report`、历史 `healthReport` 恢复和前端报告卡片均已可用。前端展示总体状态、检查时间、完整性、当前 profile、文档计数和稳定排序异常；当前只展示建议与可执行性，不提前提供维护动作按钮。
 
 ## 知识库接口
 

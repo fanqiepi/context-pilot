@@ -8,10 +8,13 @@ import java.util.UUID;
 
 import io.github.fanqiepi.contextpilot.chat.CapabilityId;
 import io.github.fanqiepi.contextpilot.chat.CapabilityMatchReason;
+import io.github.fanqiepi.contextpilot.chat.ChatAnswerResponse;
+import io.github.fanqiepi.contextpilot.chat.ChatApplicationService;
 import io.github.fanqiepi.contextpilot.chat.ChatMessageEntity;
 import io.github.fanqiepi.contextpilot.chat.ChatMessageMapper;
 import io.github.fanqiepi.contextpilot.chat.ChatMessageRole;
 import io.github.fanqiepi.contextpilot.chat.ChatMessageStatus;
+import io.github.fanqiepi.contextpilot.chat.ChatRequest;
 import io.github.fanqiepi.contextpilot.chat.ConversationEntity;
 import io.github.fanqiepi.contextpilot.chat.ConversationHistoryService;
 import io.github.fanqiepi.contextpilot.chat.ConversationMapper;
@@ -67,6 +70,8 @@ class KnowledgeBaseHealthReportPersistenceTests {
     @Autowired
     private KnowledgeBaseHealthReportService reportService;
     @Autowired
+    private ChatApplicationService chatApplicationService;
+    @Autowired
     private ConversationHistoryService historyService;
     @Autowired
     private KnowledgeBaseService knowledgeBaseService;
@@ -76,6 +81,34 @@ class KnowledgeBaseHealthReportPersistenceTests {
     private ChatMessageMapper chatMessageMapper;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Test
+    void createsHealthReportThroughDeterministicChatAndRestoresIt() {
+        KnowledgeBaseResponse knowledgeBase = knowledgeBaseService.create(
+                new KnowledgeBaseCreateRequest("Health chat " + UUID.randomUUID(), null));
+
+        ChatAnswerResponse response = chatApplicationService.answer(
+                new ChatRequest(null, knowledgeBase.id(), "检查这个知识库有没有异常"),
+                "trace-health-chat");
+
+        assertThat(response.capabilityId()).isEqualTo(CapabilityId.KNOWLEDGE_QA);
+        assertThat(response.capabilityVersion()).isEqualTo("v2");
+        assertThat(response.capabilityMatchReason())
+                .isEqualTo(CapabilityMatchReason.EXPLICIT_KNOWLEDGE_BASE_HEALTH);
+        assertThat(response.model()).isNull();
+        assertThat(response.usage()).isNull();
+        assertThat(response.citations()).isEmpty();
+        assertThat(response.healthReport()).isNotNull();
+        assertThat(response.healthReport().healthStatus()).isEqualTo(KnowledgeBaseHealthStatus.EMPTY);
+        assertThat(response.answer()).isEqualTo(response.healthReport().summary());
+
+        KnowledgeBaseHealthReportResponse queried = reportService.get(response.healthReport().id());
+        assertThat(queried.traceId()).isEqualTo("trace-health-chat");
+        assertThat(queried.assistantMessageId()).isEqualTo(response.assistantMessageId());
+        List<ConversationMessageResponse> history = historyService.messages(response.conversationId());
+        assertThat(history.getLast().healthReport()).isNotNull();
+        assertThat(history.getLast().healthReport().id()).isEqualTo(queried.id());
+    }
 
     @Test
     void persistsImmutableSnapshotAndRestoresItWithConversationHistory() {

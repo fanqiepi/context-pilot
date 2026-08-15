@@ -45,7 +45,25 @@ public class ChatApplicationService {
                     route.capabilityId(),
                     route.capabilityVersion(),
                     route.matchReason(),
+                    null,
                     prepared.actionRequest());
+        }
+        if (prepared.healthReportReady()) {
+            return new ChatAnswerResponse(
+                    exchange.conversationId(),
+                    exchange.userMessageId(),
+                    exchange.assistantMessageId(),
+                    prepared.directAnswer(),
+                    false,
+                    List.of(),
+                    null,
+                    null,
+                    traceId,
+                    route.capabilityId(),
+                    route.capabilityVersion(),
+                    route.matchReason(),
+                    prepared.healthReport(),
+                    null);
         }
         if (prepared.hasDirectAnswer()) {
             persistenceService.completeWithoutModel(
@@ -63,6 +81,7 @@ public class ChatApplicationService {
                     route.capabilityId(),
                     route.capabilityVersion(),
                     route.matchReason(),
+                    null,
                     null);
         }
         if (prepared.refused()) {
@@ -81,6 +100,7 @@ public class ChatApplicationService {
                     route.capabilityId(),
                     route.capabilityVersion(),
                     route.matchReason(),
+                    null,
                     null);
         }
 
@@ -120,6 +140,7 @@ public class ChatApplicationService {
                     route.capabilityId(),
                     route.capabilityVersion(),
                     route.matchReason(),
+                    null,
                     null);
         } catch (RuntimeException exception) {
             persistenceService.completeFailure(

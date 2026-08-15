@@ -92,7 +92,9 @@ V3 当前场景是“知识库健康检查与维护助手”。批准的详细�
 
 V3 切片 1 已实现 `health` 内部边界：`KnowledgeBaseHealthService` 读取当前 Embedding profile 和处理配置，专用 PostgreSQL DataPort 在只读事务中按知识库查询完整状态计数、已知问题和当前 profile 向量数，确定性规则再生成状态、完整性、稳定建议和受限明细。向量存在性查询失败时通过事务保存点回退到业务表已知事实并标记 `PARTIAL`。
 
-V3 切片 2 已通过 V11 增加 `knowledge_base_health_report` 与 `knowledge_base_health_issue`，保存能力版本、时间点、完整性、profile、计数、来源观察值和建议动作快照；报告服务在同一事务内校验知识库、会话、用户消息、待完成助手消息和 trace 关系，写入报告后完成助手消息。会话历史按助手消息与报告 ID 分两次批量读取报告和明细，不读取当前文档重新计算旧结论。公开健康路由、报告端点、SSE 和前端仍留在切片 3。
+V3 切片 2 已通过 V11 增加 `knowledge_base_health_report` 与 `knowledge_base_health_issue`，保存能力版本、时间点、完整性、profile、计数、来源观察值和建议动作快照；报告服务在同一事务内校验知识库、会话、用户消息、待完成助手消息和 trace 关系，写入报告后完成助手消息。会话历史按助手消息与报告 ID 分两次批量读取报告和明细，不读取当前文档重新计算旧结论。
+
+V3 切片 3 已增加完整句健康意图策略和 V12 路由约束。健康请求使用 `KNOWLEDGE_QA/v2` 与 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`，复合请求仍回落普通 RAG；健康事实查询在独立 `REPEATABLE_READ` 只读事务中完成，报告保存和助手消息完成保持原子。同步聊天直接携带 `healthReport`，SSE 固定发送 `message -> route -> delta -> health_report -> done`，不产生模型调用、引用或 usage。公开 GET 资源和前端卡片读取同一不可变快照，刷新后由历史接口恢复。
 
 V4 以后才可能研究有限规划、显式长期记忆、MCP 等外部工具互操作和多 Agent。只有固定编排无法满足经过评估的用户任务时才选择相关框架，并必须具备步骤预算、循环上限、人工确认、来源约束、恢复和评估数据。路线候选不构成当前实施授权。
 
