@@ -79,6 +79,7 @@ class ConversationControllerTests {
                         "v1",
                         CapabilityMatchReason.DEFAULT_KNOWLEDGE_QA,
                         null,
+                        null,
                         List.of(new ChatCitationResponse(
                                 1,
                                 "chunk-1",

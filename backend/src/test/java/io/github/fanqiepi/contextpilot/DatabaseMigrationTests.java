@@ -44,7 +44,7 @@ class DatabaseMigrationTests {
                     """)).isTrue();
             for (String tableName : new String[] {
                     "conversation", "chat_message", "message_citation", "model_call", "answer_feedback",
-                    "action_request"
+                    "action_request", "knowledge_base_health_report", "knowledge_base_health_issue"
             }) {
                 assertThat(queryBoolean(connection, """
                         SELECT EXISTS (
@@ -203,6 +203,37 @@ class DatabaseMigrationTests {
                           AND table_name = 'chat_message'
                           AND constraint_name = 'chat_message_capability_route_check'
                           AND constraint_type = 'CHECK'
+                    )
+                    """)).isTrue();
+            assertThat(queryString(connection, """
+                    SELECT data_type
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public'
+                      AND table_name = 'knowledge_base_health_report'
+                      AND column_name = 'issue_count'
+                    """)).isEqualTo("bigint");
+            for (String indexName : new String[] {
+                    "knowledge_base_health_report_assistant_message_uq",
+                    "knowledge_base_health_issue_report_document_type_uq",
+                    "vector_store_health_metadata_idx"
+            }) {
+                assertThat(queryBoolean(connection, """
+                        SELECT EXISTS (
+                            SELECT 1
+                            FROM pg_indexes
+                            WHERE schemaname = 'public'
+                              AND indexname = '%s'
+                        )
+                        """.formatted(indexName))).isTrue();
+            }
+            assertThat(queryBoolean(connection, """
+                    SELECT EXISTS (
+                        SELECT 1
+                        FROM information_schema.table_constraints
+                        WHERE table_schema = 'public'
+                          AND table_name = 'knowledge_base_health_issue'
+                          AND constraint_name = 'knowledge_base_health_issue_report_fk'
+                          AND constraint_type = 'FOREIGN KEY'
                     )
                     """)).isTrue();
             assertThat(queryString(connection, """

@@ -8,6 +8,9 @@ import io.github.fanqiepi.contextpilot.chat.ModelCallMapper;
 import io.github.fanqiepi.contextpilot.document.DocumentService;
 import io.github.fanqiepi.contextpilot.document.SourceDocumentMapper;
 import io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackMapper;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthIssueMapper;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportMapper;
+import io.github.fanqiepi.contextpilot.health.PostgresKnowledgeBaseHealthDataPort;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +62,15 @@ class ContextPilotApplicationTests {
 
     @MockitoBean
     private ActionRequestMapper actionRequestMapper;
+
+    @MockitoBean
+    private KnowledgeBaseHealthReportMapper healthReportMapper;
+
+    @MockitoBean
+    private KnowledgeBaseHealthIssueMapper healthIssueMapper;
+
+    @MockitoBean
+    private PostgresKnowledgeBaseHealthDataPort healthDataPort;
 
     @Test
     void contextLoads() {

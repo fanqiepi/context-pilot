@@ -39,6 +39,8 @@ CREATE EXTENSION IF NOT EXISTS vector;
 
 文本切分默认每块最多 1200 个字符并重叠 150 个字符，可分别通过 `DOCUMENT_CHUNK_MAX_CHARACTERS` 和 `DOCUMENT_CHUNK_OVERLAP_CHARACTERS` 覆盖。重叠值必须大于等于 0 且小于块大小。自动处理使用有界线程池，默认 1 个核心线程、最多 2 个线程、队列容量 50；每个文档默认最多进行 3 次处理尝试。
 
+V3 健康检查默认最多返回 100 条异常明细，可通过 `HEALTH_ISSUE_LIMIT` 调整，合法范围为 1 到 500。聚合计数仍覆盖当前知识库的全部活动文档；达到明细上限时结果必须标记为截断。
+
 ## 启动和验证
 
 后端：

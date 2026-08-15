@@ -43,6 +43,8 @@ spring:
 contextpilot:
   action-request:
     confirmation-timeout-minutes: ${ACTION_CONFIRMATION_TIMEOUT_MINUTES:30}
+  health:
+    issue-limit: ${HEALTH_ISSUE_LIMIT:100}
   embedding:
     index:
       profile-id: ${EMBEDDING_PROFILE_ID:dashscope_qwen3_7_1024_v1}

@@ -1,6 +1,6 @@
 # ContextPilot 数据模型
 
-> 本文定义已完成的 V1/V2 逻辑模型和尚未实施的 V3 设计模型；已经实施的物理结构仍以 Flyway 迁移为事实来源。V3 表结构不得在设计获批实现前创建。
+> 本文定义已完成的 V1/V2 逻辑模型和已获准实施的 V3 设计模型；已经实施的物理结构仍以 Flyway 迁移为事实来源。V3 物理结构按批准的实施切片通过后续 Flyway 迁移逐步落地。
 
 ## 核心实体
 
@@ -15,8 +15,8 @@
 | `model_call` | 模型、耗时、Token、状态和脱敏错误 | 关联消息或文档任务 |
 | `answer_feedback` | “有用”正向反馈 | 每条助手消息最多一条当前反馈 |
 | `action_request` | 保存需人工确认的业务操作提案、状态和安全结果摘要 | 关联会话、用户消息和提案助手消息 |
-| `knowledge_base_health_report`（V3 设计） | 保存不可变的知识库健康检查快照 | 关联知识库、会话和检查消息 |
-| `knowledge_base_health_issue`（V3 设计） | 保存报告中的文档异常、观察事实和修复建议 | 关联健康报告和目标文档 |
+| `knowledge_base_health_report`（V3 / V11） | 保存不可变的知识库健康检查快照 | 关联知识库、会话和检查消息 |
+| `knowledge_base_health_issue`（V3 / V11） | 保存报告中的文档异常、观察事实和修复建议 | 关联健康报告和目标文档 |
 
 ## 数据约定
 
@@ -86,9 +86,9 @@
 
 客户端不能提交或覆盖持久化后的 `action_type`、`parameters`、消息关系或 trace ID。模型输出只作为候选输入，必须在保存提案前转换为明确 DTO 并通过领域校验。
 
-## V3 计划数据结构（尚未实施）
+## V3 数据结构（按切片实施）
 
-V3 详细字段与约束见 [V3 知识库健康检查与维护助手详细设计](../architecture/v3-knowledge-base-maintenance-design.md)。计划新增：
+V3 详细字段与约束见 [V3 知识库健康检查与维护助手详细设计](../architecture/v3-knowledge-base-maintenance-design.md)。V11 已新增：
 
 - `knowledge_base_health_report`：保存知识库、会话、触发消息、能力版本、`health_status`、完整性、`data_as_of`、当前 Embedding profile 快照、各文档状态计数、问题计数、确定性摘要和 trace ID。一条活动助手消息最多关联一份报告；报告创建后不刷新或覆盖。
 - `knowledge_base_health_issue`：保存报告时观察到的文档 ID、文件名快照、问题类型、严重程度、文档状态、处理次数、安全错误摘要、Embedding profile、向量计数、来源更新时间、建议动作和不可执行原因。同一报告、文档和问题类型最多一条活动明细。
@@ -97,4 +97,6 @@ V3 详细字段与约束见 [V3 知识库健康检查与维护助手详细设计
 
 V3 还计划通过后续 Flyway 迁移扩展 `action_request`：允许 `RETRY_DOCUMENT_PROCESSING` 和 `REINDEX_DOCUMENT`，增加受限删除外键 `target_document_id` 与可空 `health_issue_id`，并按动作类型约束 JSONB 参数。应用参数使用 sealed 强类型联合和显式静态分派，不把 `action_request` 演进为任意工具载体。
 
-为受控检查实际向量存在性，计划给 `vector_store.metadata` 中的知识库、文档和 Embedding profile 字段增加表达式索引。该索引只优化专用只读 DataPort，不改变 `PgVectorStore` 的写入和检索边界。
+为受控检查实际向量存在性，V11 已给 `vector_store.metadata` 中的知识库、文档和 Embedding profile 字段增加 `vector_store_health_metadata_idx` 表达式索引。该索引只优化专用只读 DataPort，不改变 `PgVectorStore` 的写入和检索边界。
+
+V3 切片 2 通过顺序迁移 V11 落地报告主表、异常明细表和表达式索引，未修改 V1-V10。报告与明细只在创建时写入；历史查询按助手消息批量读取保存快照，不从当前 `source_document` 重新计算。

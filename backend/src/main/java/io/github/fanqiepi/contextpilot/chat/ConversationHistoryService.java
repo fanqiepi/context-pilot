@@ -13,6 +13,8 @@ import io.github.fanqiepi.contextpilot.action.ActionRequestService;
 import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
 import io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackEntity;
 import io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackMapper;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportResponse;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportService;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,7 @@ public class ConversationHistoryService {
     private final MessageCitationMapper messageCitationMapper;
     private final AnswerFeedbackMapper answerFeedbackMapper;
     private final ActionRequestService actionRequestService;
+    private final KnowledgeBaseHealthReportService healthReportService;
 
     public ConversationHistoryService(
             KnowledgeBaseService knowledgeBaseService,
@@ -38,13 +41,15 @@ public class ConversationHistoryService {
             ChatMessageMapper chatMessageMapper,
             MessageCitationMapper messageCitationMapper,
             AnswerFeedbackMapper answerFeedbackMapper,
-            ActionRequestService actionRequestService) {
+            ActionRequestService actionRequestService,
+            KnowledgeBaseHealthReportService healthReportService) {
         this.knowledgeBaseService = knowledgeBaseService;
         this.conversationMapper = conversationMapper;
         this.chatMessageMapper = chatMessageMapper;
         this.messageCitationMapper = messageCitationMapper;
         this.answerFeedbackMapper = answerFeedbackMapper;
         this.actionRequestService = actionRequestService;
+        this.healthReportService = healthReportService;
     }
 
     @Transactional(readOnly = true)
@@ -93,10 +98,13 @@ public class ConversationHistoryService {
                 .collect(Collectors.toUnmodifiableSet());
         Map<UUID, ActionRequestResponse> actionsByMessage =
                 actionRequestService.findByAssistantMessageIds(messageIds);
+        Map<UUID, KnowledgeBaseHealthReportResponse> healthReportsByMessage =
+                healthReportService.findByAssistantMessageIds(messageIds);
 
         return messages.stream()
                 .map(message -> ConversationMessageResponse.from(
                         message,
+                        healthReportsByMessage.get(message.getId()),
                         actionsByMessage.get(message.getId()),
                         citationsByMessage.getOrDefault(message.getId(), List.of()),
                         helpfulMessageIds.contains(message.getId())))

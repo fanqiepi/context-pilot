@@ -1,6 +1,6 @@
 # REST API、SSE 与操作确认约定
 
-> 本文记录已完成的 V1/V2 接口和尚未实施的 V3 计划合同。已实现字段以 OpenAPI 为主要事实来源；V3 合同只有在获批实现后才进入 OpenAPI。
+> 本文记录已完成的 V1/V2 接口和已获准实施的 V3 合同。已实现字段以 OpenAPI 为主要事实来源；V3 合同按实施切片进入 OpenAPI，尚未完成的端点仍明确标记为待实现。
 
 ## 通用约定
 
@@ -33,9 +33,9 @@
 
 V2 只允许 `CREATE_KNOWLEDGE_BASE`，不提供客户端可枚举或动态注册任意工具的接口。
 
-## V3 计划资源（尚未实施）
+## V3 已批准资源（按切片实施）
 
-V3 详细合同见 [V3 知识库健康检查与维护助手详细设计](../architecture/v3-knowledge-base-maintenance-design.md)。计划新增：
+V3 详细合同见 [V3 知识库健康检查与维护助手详细设计](../architecture/v3-knowledge-base-maintenance-design.md)。以下资源已获准新增，但在相应实施切片完成前尚不可用：
 
 | 方法 | 路径 | 行为 |
 | --- | --- | --- |
@@ -50,7 +50,7 @@ SSE 计划新增 `health_report` 事件：
 message -> route -> delta -> health_report -> done(COMPLETED)
 ```
 
-`delta` 是与报告一致的确定性摘要；该路径不发送 `citation` 或 `usage`。历史消息计划增加可空 `healthReport`，按消息 ID 批量恢复已保存快照，不重新运行检查。
+`delta` 是与报告一致的确定性摘要；该路径不发送 `citation` 或 `usage`。历史消息响应已增加可空 `healthReport`，按助手消息 ID 批量恢复已保存快照，不重新运行检查；V1/V2 旧消息返回 `null`。
 
 动作确认资源沿用 V2 路径，但 `ActionRequest` 参数将由创建知识库专用对象演进为以 `actionType` 判别的强类型联合，固定允许：
 
@@ -59,6 +59,8 @@ message -> route -> delta -> health_report -> done(COMPLETED)
 - `REINDEX_DOCUMENT`
 
 两个维护动作只接受服务端保存的单个文档目标。操作 `SUCCEEDED` 表示任务已可靠接受，文档处理最终结果仍通过文档查询接口返回。
+
+截至 V3 切片 2，健康评估、不可变报告持久化及历史 `healthReport` 恢复已在后端完成。公开报告查询端点、聊天健康路由和 SSE `health_report` 尚不可用；它们与前端卡片由切片 3 接入。
 
 ## 知识库接口
 
