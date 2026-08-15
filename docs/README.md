@@ -3,6 +3,7 @@
 - [新会话项目背景](development/project-context.md)
 - [产品定位与大版本路线图](requirements/product-requirements.md)
 - [技术架构](architecture/technical-architecture.md)
+- [V3 知识库健康检查与维护助手详细设计](architecture/v3-knowledge-base-maintenance-design.md)
 - [ADR 0001：使用 PostgreSQL 和 pgvector](architecture/decisions/0001-use-pgvector.md)
 - [数据模型与 V2 操作结构](data/data-model.md)
 - [REST API、SSE 与操作确认约定](api/api-design.md)
