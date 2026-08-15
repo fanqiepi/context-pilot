@@ -1,0 +1,16 @@
+{
+  "configId": "v3-health-maintenance-v1",
+  "datasetVersion": "1.0.0",
+  "healthCapabilityVersion": "v2",
+  "embeddingProfileId": "offline_deterministic_1024_v1",
+  "deterministicRepetitions": 3,
+  "thresholds": {
+    "healthIntentAccuracy": 1.0,
+    "healthIntentFalsePositiveRate": 0.0,
+    "healthClassificationAccuracy": 1.0,
+    "completenessAccuracy": 1.0,
+    "repairEligibilityAccuracy": 1.0,
+    "lifecycleSafetyPassRate": 1.0,
+    "historyTraceIntegrityRate": 1.0
+  }
+}

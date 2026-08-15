@@ -183,5 +183,34 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>v3-evaluation</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/*EvaluationTests.java</include>
+                                <include>**/PostgresKnowledgeBaseHealthDataPortTests.java</include>
+                                <include>**/KnowledgeBaseHealthReportPersistenceTests.java</include>
+                                <include>**/HealthReportActionProposalPersistenceTests.java</include>
+                                <include>**/DocumentProcessingCoordinatorTests.java</include>
+                                <include>**/PendingDocumentRecoveryServiceTests.java</include>
+                                <include>**/DocumentProcessingIntegrationTests.java</include>
+                                <include>**/ChatApplicationServiceTests.java</include>
+                                <include>**/ChatStreamingServiceTests.java</include>
+                                <include>**/ConversationHistoryServiceTests.java</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <contextpilot.evals.root>${project.basedir}/../evals</contextpilot.evals.root>
+                                <contextpilot.evaluation.require-docker>true</contextpilot.evaluation.require-docker>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>
