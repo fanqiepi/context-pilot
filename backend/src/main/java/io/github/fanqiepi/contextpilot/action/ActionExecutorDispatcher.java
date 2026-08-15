@@ -6,9 +6,13 @@ import org.springframework.stereotype.Component;
 public class ActionExecutorDispatcher {
 
     private final CreateKnowledgeBaseActionExecutor createKnowledgeBaseExecutor;
+    private final RetryDocumentProcessingActionExecutor retryDocumentProcessingExecutor;
 
-    public ActionExecutorDispatcher(CreateKnowledgeBaseActionExecutor createKnowledgeBaseExecutor) {
+    public ActionExecutorDispatcher(
+            CreateKnowledgeBaseActionExecutor createKnowledgeBaseExecutor,
+            RetryDocumentProcessingActionExecutor retryDocumentProcessingExecutor) {
         this.createKnowledgeBaseExecutor = createKnowledgeBaseExecutor;
+        this.retryDocumentProcessingExecutor = retryDocumentProcessingExecutor;
     }
 
     public ActionExecutionResult execute(ActionType actionType, ActionParameters parameters) {
@@ -18,8 +22,10 @@ public class ActionExecutorDispatcher {
         return switch (actionType) {
             case CREATE_KNOWLEDGE_BASE -> createKnowledgeBaseExecutor.execute(
                     (CreateKnowledgeBaseActionParameters) parameters);
-            case RETRY_DOCUMENT_PROCESSING, REINDEX_DOCUMENT -> throw new IllegalStateException(
-                    "Action executor is not implemented in V3 Slice 4: " + actionType);
+            case RETRY_DOCUMENT_PROCESSING -> retryDocumentProcessingExecutor.execute(
+                    (RetryDocumentProcessingActionParameters) parameters);
+            case REINDEX_DOCUMENT -> throw new IllegalStateException(
+                    "Action executor is not implemented before V3 Slice 6: " + actionType);
         };
     }
 }

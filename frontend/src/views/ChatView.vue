@@ -9,6 +9,7 @@ import {
   listConversations,
   listKnowledgeBases,
   markMessageHelpful,
+  proposeHealthReportIssueAction,
   removeMessageHelpful,
   rejectActionRequest,
   streamChat,
@@ -24,6 +25,7 @@ import type {
   HealthCheckCompleteness,
   HealthRecommendedActionType,
   KnowledgeBase,
+  KnowledgeBaseHealthIssue,
   KnowledgeBaseHealthIssueType,
   KnowledgeBaseHealthStatus,
   StreamDoneEvent,
@@ -51,6 +53,7 @@ const loadingMessages = ref(false)
 const sending = ref(false)
 const feedbackSavingIds = reactive(new Set<string>())
 const actionSavingIds = reactive(new Set<string>())
+const healthProposalSavingIssueIds = reactive(new Set<string>())
 const messageScroller = ref<HTMLElement>()
 let streamController: AbortController | undefined
 let activeTextRenderer: StreamTextRenderer | undefined
@@ -401,6 +404,54 @@ async function rejectAction(message: UiMessage): Promise<void> {
   }
 }
 
+async function proposeRetryAction(
+  message: UiMessage,
+  issue: KnowledgeBaseHealthIssue,
+): Promise<void> {
+  const report = message.healthReport
+  if (
+    !report ||
+    !issue.actionEligible ||
+    issue.recommendedActionType !== 'RETRY_DOCUMENT_PROCESSING' ||
+    healthProposalSavingIssueIds.has(issue.id)
+  ) {
+    return
+  }
+  const conversationId = message.conversationId
+  healthProposalSavingIssueIds.add(issue.id)
+  try {
+    const proposal = await proposeHealthReportIssueAction(report.id, issue.id)
+    if (activeConversationId.value === conversationId) {
+      upsertMessage(proposal.userMessage)
+      upsertMessage({ ...proposal.assistantMessage, actionRequest: proposal.actionRequest })
+      await scrollToBottom()
+    }
+    await refreshConversations(false)
+    ElMessage.success(
+      proposal.reusedExistingProposal ? '已恢复现有重试提案' : '已生成文档重试提案',
+    )
+  } catch (error) {
+    ElMessage.error(errorMessage(error, '生成文档重试提案失败'))
+  } finally {
+    healthProposalSavingIssueIds.delete(issue.id)
+  }
+}
+
+function upsertMessage(message: ConversationMessage): void {
+  const index = messages.value.findIndex((item) => item.id === message.id)
+  if (index >= 0) {
+    messages.value[index] = message
+    return
+  }
+  messages.value.push(message)
+  messages.value.sort((left, right) => {
+    const timeDifference = new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime()
+    if (timeDifference !== 0) return timeDifference
+    if (left.role !== right.role) return left.role === 'USER' ? -1 : 1
+    return left.id.localeCompare(right.id)
+  })
+}
+
 function actionStatusLabel(status: ActionRequestStatus): string {
   return {
     PENDING_CONFIRMATION: '等待确认',
@@ -731,8 +782,26 @@ function formatScore(score: number | null): string {
                       </p>
                       <footer>
                         <span>建议：{{ recommendedActionLabel(issue.recommendedActionType) }}</span>
-                        <ElTag v-if="issue.actionEligible" type="success" size="small" effect="plain">
-                          可生成提案
+                        <ElButton
+                          v-if="
+                            issue.actionEligible &&
+                            issue.recommendedActionType === 'RETRY_DOCUMENT_PROCESSING'
+                          "
+                          type="primary"
+                          size="small"
+                          plain
+                          :loading="healthProposalSavingIssueIds.has(issue.id)"
+                          @click="proposeRetryAction(message, issue)"
+                        >
+                          生成重试提案
+                        </ElButton>
+                        <ElTag
+                          v-else-if="issue.actionEligible"
+                          type="info"
+                          size="small"
+                          effect="plain"
+                        >
+                          重建提案暂未开放
                         </ElTag>
                         <span v-else class="health-ineligible">
                           {{ issue.ineligibilitySummary || '当前不可生成提案' }}

@@ -8,6 +8,7 @@ import type {
   Citation,
   ConversationMessage,
   ConversationSummary,
+  HealthReportActionProposal,
   KnowledgeBase,
   KnowledgeBaseHealthReport,
   KnowledgeBaseInput,
@@ -113,6 +114,16 @@ export async function getKnowledgeBaseHealthReport(
 ): Promise<KnowledgeBaseHealthReport> {
   const response = await apiClient.get<KnowledgeBaseHealthReport>(
     `/knowledge-base-health-reports/${id}`,
+  )
+  return response.data
+}
+
+export async function proposeHealthReportIssueAction(
+  reportId: string,
+  issueId: string,
+): Promise<HealthReportActionProposal> {
+  const response = await apiClient.post<HealthReportActionProposal>(
+    `/knowledge-base-health-reports/${reportId}/issues/${issueId}/action-request`,
   )
   return response.data
 }

@@ -16,7 +16,10 @@ class ActionExecutorDispatcherTests {
 
     private final CreateKnowledgeBaseActionExecutor createExecutor =
             mock(CreateKnowledgeBaseActionExecutor.class);
-    private final ActionExecutorDispatcher dispatcher = new ActionExecutorDispatcher(createExecutor);
+    private final RetryDocumentProcessingActionExecutor retryExecutor =
+            mock(RetryDocumentProcessingActionExecutor.class);
+    private final ActionExecutorDispatcher dispatcher =
+            new ActionExecutorDispatcher(createExecutor, retryExecutor);
 
     @Test
     void dispatchesCreateKnowledgeBaseWithItsStrongParameterType() {
@@ -31,19 +34,20 @@ class ActionExecutorDispatcherTests {
     }
 
     @Test
-    void refusesMismatchedAndNotYetImplementedMaintenanceActions() {
+    void dispatchesRetryAndRefusesMismatchedParameters() {
         RetryDocumentProcessingActionParameters retry = new RetryDocumentProcessingActionParameters(
                 UUID.randomUUID(),
                 "failed.md",
                 DocumentStatus.FAILED,
                 UUID.randomUUID(),
                 UUID.randomUUID());
+        ActionExecutionResult expected = new ActionExecutionResult("重试任务已提交");
+        when(retryExecutor.execute(retry)).thenReturn(expected);
 
         assertThatThrownBy(() -> dispatcher.execute(ActionType.CREATE_KNOWLEDGE_BASE, retry))
                 .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> dispatcher.execute(ActionType.RETRY_DOCUMENT_PROCESSING, retry))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Slice 4");
+        assertThat(dispatcher.execute(ActionType.RETRY_DOCUMENT_PROCESSING, retry)).isSameAs(expected);
+        verify(retryExecutor).execute(retry);
         verifyNoInteractions(createExecutor);
     }
 }

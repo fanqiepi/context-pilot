@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import io.github.fanqiepi.contextpilot.chat.CapabilityId;
 import io.github.fanqiepi.contextpilot.common.ApiExceptionHandler;
+import io.github.fanqiepi.contextpilot.common.RequestIdFilter;
 import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
 import io.github.fanqiepi.contextpilot.document.EmbeddingIndexProfile;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,14 +27,17 @@ class KnowledgeBaseHealthReportControllerTests {
 
     @Mock
     private KnowledgeBaseHealthReportService reportService;
+    @Mock
+    private HealthReportActionProposalService actionProposalService;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(
-                        new KnowledgeBaseHealthReportController(reportService))
+                        new KnowledgeBaseHealthReportController(reportService, actionProposalService))
                 .setControllerAdvice(new ApiExceptionHandler())
+                .addFilters(new RequestIdFilter())
                 .build();
     }
 
@@ -96,5 +100,23 @@ class KnowledgeBaseHealthReportControllerTests {
         mockMvc.perform(get("/api/knowledge-base-health-reports/{id}", reportId))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("HEALTH_REPORT_NOT_FOUND"));
+    }
+
+    @Test
+    void createsActionProposalWithoutAcceptingClientParameters() throws Exception {
+        UUID reportId = UUID.randomUUID();
+        UUID issueId = UUID.randomUUID();
+        when(actionProposalService.propose(reportId, issueId, "health-action-trace"))
+                .thenReturn(new HealthReportActionProposalResponse(false, null, null, null));
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                        .post("/api/knowledge-base-health-reports/{reportId}/issues/{issueId}/action-request",
+                                reportId, issueId)
+                        .header("X-Request-Id", "health-action-trace"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.reusedExistingProposal").value(false))
+                .andExpect(jsonPath("$.userMessage").doesNotExist())
+                .andExpect(jsonPath("$.assistantMessage").doesNotExist())
+                .andExpect(jsonPath("$.actionRequest").doesNotExist());
     }
 }

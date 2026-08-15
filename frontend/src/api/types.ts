@@ -69,6 +69,7 @@ export type CapabilityMatchReason =
   | 'SIMPLE_INTERACTION_WHITELIST'
   | 'EXPLICIT_CREATE_KNOWLEDGE_BASE'
   | 'EXPLICIT_KNOWLEDGE_BASE_HEALTH'
+  | 'HEALTH_REPORT_ISSUE_SELECTED'
   | 'DEFAULT_KNOWLEDGE_QA'
 
 export type KnowledgeBaseHealthStatus =
@@ -225,6 +226,13 @@ export interface ConversationMessage {
   helpful: boolean
   createdAt: string
   updatedAt: string
+}
+
+export interface HealthReportActionProposal {
+  reusedExistingProposal: boolean
+  userMessage: ConversationMessage
+  assistantMessage: ConversationMessage
+  actionRequest: ActionRequest
 }
 
 export interface AnswerFeedback {

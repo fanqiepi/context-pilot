@@ -43,6 +43,10 @@ public interface ActionRequestMapper {
     @Select("SELECT " + SELECT_COLUMNS + " FROM action_request WHERE id = #{id} AND deleted = 0")
     ActionRequestEntity selectById(UUID id);
 
+    @Select("SELECT " + SELECT_COLUMNS
+            + " FROM action_request WHERE health_issue_id = #{healthIssueId} AND deleted = 0")
+    ActionRequestEntity selectByHealthIssueId(UUID healthIssueId);
+
     @Select({
             "<script>",
             "SELECT " + SELECT_COLUMNS,

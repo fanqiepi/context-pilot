@@ -312,7 +312,9 @@ class DatabaseMigrationTests {
                     WHERE schema_info.nspname = 'public'
                       AND table_info.relname = 'chat_message'
                       AND constraint_info.conname = 'chat_message_capability_match_reason_check'
-                    """)).contains("EXPLICIT_KNOWLEDGE_BASE_HEALTH");
+                    """))
+                    .contains("EXPLICIT_KNOWLEDGE_BASE_HEALTH")
+                    .contains("HEALTH_REPORT_ISSUE_SELECTED");
             assertThat(queryString(connection, """
                     SELECT format_type(attribute.atttypid, attribute.atttypmod)
                     FROM pg_attribute attribute

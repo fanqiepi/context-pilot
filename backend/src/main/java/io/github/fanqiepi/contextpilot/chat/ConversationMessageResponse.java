@@ -25,7 +25,7 @@ public record ConversationMessageResponse(
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt) {
 
-    static ConversationMessageResponse from(
+    public static ConversationMessageResponse from(
             ChatMessageEntity entity,
             KnowledgeBaseHealthReportResponse healthReport,
             ActionRequestResponse actionRequest,

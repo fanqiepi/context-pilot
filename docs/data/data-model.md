@@ -103,4 +103,6 @@ V3 切片 2 通过顺序迁移 V11 落地报告主表、异常明细表和表达
 
 V3 切片 3 通过 V12 扩展 `chat_message_capability_match_reason_check`，允许 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`。健康请求保存为 `KNOWLEDGE_QA/v2`；普通 RAG、V1/V2 历史消息和已有动作记录不做版本回填。
 
-V13 不改写 V2 `CREATE_KNOWLEDGE_BASE` 的 `action_type`、`parameters`、状态或消息关联，只为历史记录补充两个空目标列。迁移测试先在 V12 写入真实 V2 提案，再升级至 V13 验证原始 JSON 和状态保持不变。
+V3 切片 5 通过 V14 再次扩展该约束，允许 `HEALTH_REPORT_ISSUE_SELECTED`。从报告明细生成的确定性用户选择消息和助手提案消息保存为 `BUSINESS_ACTION/v2`，并与同一 `action_request` 的用户消息、助手消息、目标文档、健康明细和 trace ID 关联。生成过程锁定目标明细行，再查询 V13 活动唯一索引对应的现有动作，保证并发请求不会留下重复消息或提案。
+
+V13 和 V14 都不改写 V2 `CREATE_KNOWLEDGE_BASE` 的 `action_type`、`parameters`、状态或消息关联，只为历史记录补充两个空目标列并扩展新消息的允许匹配依据。迁移测试先在 V12 写入真实 V2 提案，再升级至最新版本验证原始 JSON 和状态保持不变。

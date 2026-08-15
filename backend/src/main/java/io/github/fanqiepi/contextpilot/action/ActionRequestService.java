@@ -73,6 +73,53 @@ public class ActionRequestService {
     }
 
     @Transactional
+    public ActionRequestResponse proposeRetryDocumentProcessing(
+            UUID conversationId,
+            UUID userMessageId,
+            UUID assistantMessageId,
+            String capabilityVersion,
+            String traceId,
+            RetryDocumentProcessingActionParameters parameters) {
+        OffsetDateTime now = now();
+        ActionRequestEntity entity = new ActionRequestEntity();
+        entity.setId(UUID.randomUUID());
+        entity.setConversationId(conversationId);
+        entity.setUserMessageId(userMessageId);
+        entity.setAssistantMessageId(assistantMessageId);
+        entity.setCapabilityId(CapabilityId.BUSINESS_ACTION);
+        entity.setCapabilityVersion(capabilityVersion);
+        entity.setActionType(ActionType.RETRY_DOCUMENT_PROCESSING);
+        entity.setParametersJson(parametersCodec.write(ActionType.RETRY_DOCUMENT_PROCESSING, parameters));
+        entity.setTargetDocumentId(parameters.documentId());
+        entity.setHealthIssueId(parameters.healthIssueId());
+        entity.setDisplaySummary("确认后将为文档“%s”提交单次重试处理任务，最终结果以文档状态为准。"
+                .formatted(parameters.originalFilenameSnapshot()));
+        entity.setStatus(ActionRequestStatus.PENDING_CONFIRMATION);
+        entity.setTraceId(traceId);
+        entity.setExpiresAt(now.plusMinutes(properties.getConfirmationTimeoutMinutes()));
+        entity.setCreatedAt(now);
+        entity.setUpdatedAt(now);
+        if (actionRequestMapper.insert(entity) != 1) {
+            throw new IllegalStateException("Retry document action proposal could not be created");
+        }
+        return response(entity);
+    }
+
+    @Transactional
+    public ActionRequestResponse findByHealthIssueId(UUID healthIssueId) {
+        ActionRequestEntity entity = actionRequestMapper.selectByHealthIssueId(healthIssueId);
+        if (entity == null) {
+            return null;
+        }
+        OffsetDateTime now = now();
+        if (isExpiredPending(entity, now) && actionRequestMapper.expire(entity.getId(), now) == 1) {
+            entity.setStatus(ActionRequestStatus.EXPIRED);
+            entity.setUpdatedAt(now);
+        }
+        return response(entity);
+    }
+
+    @Transactional
     public ActionRequestResponse get(UUID id) {
         OffsetDateTime now = now();
         expire(id, now);
