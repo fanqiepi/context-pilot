@@ -9,19 +9,19 @@
 
 - ContextPilot is a learning-oriented, controllable, and evaluable personal knowledge-work assistant built with Spring AI. Its user-facing product carrier is a single-user knowledge workspace; its engineering purpose is to explore modern agent capabilities through coherent, testable scenarios rather than by accumulating frameworks.
 - V1, the functional RAG baseline, is complete. It covers document ingestion, retrieval-augmented generation, citations, streaming responses, conversation history, call records, positive-only helpful feedback, fixed capability routing, and embedding-index governance.
-- The roadmap advances by major version. Only the current version is specified in implementation detail; the next version defines a scenario and boundary; later versions are directional candidates and are not implementation authorization.
-- V2 is the current authorized version. It adds the persisted, confirmable `CREATE_KNOWLEDGE_BASE` business action while preserving the modular monolith and existing RAG behavior.
-- V3 is only a planned outline for a knowledge-base maintenance assistant that can inspect health and, after confirmation, retry document processing or request reindexing. Do not implement V3 until V2 is complete and the V3 contracts are explicitly approved.
+- The roadmap advances by major version. A version under implementation is specified in detail; the next version defines a scenario and boundary; later versions are directional candidates and are not implementation authorization.
+- V2 is complete. It adds the persisted, confirmable `CREATE_KNOWLEDGE_BASE` business action while preserving the modular monolith and existing RAG behavior.
+- V3 is only a planned outline for a knowledge-base maintenance assistant that can inspect health and, after confirmation, retry document processing or request reindexing. No new major version is currently authorized for implementation; do not implement V3 until its contracts are explicitly approved and the repository governance documents are updated.
 - V4 and later may explore bounded planning, explicit memory, external-tool interoperability such as MCP, and multi-agent patterns, but none of these are currently authorized. Do not introduce agents, LangGraph or other workflow engines, MCP integration, microservices, message queues, multi-tenancy, plugin systems, dynamic tools, or model-generated SQL under the current scope.
 
-## Current authorized improvement scope
+## Completed V2 baseline and current scope
 
-- Treat current work as V2, not as unfinished MVP delivery and not as permission to implement later roadmap versions. Preserve the completed V1 baseline while adding one controlled action.
+- Treat V1 and V2 as completed baselines, not as unfinished MVP delivery and not as permission to implement later roadmap versions. Until another version is explicitly approved, preserve these baselines and limit changes to maintenance, verification, and approved documentation work.
 
 - Route each chat request to one of three explicit, versioned capabilities: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, or `BUSINESS_ACTION`.
 - Keep `SIMPLE_CHAT` narrow: identity, greeting, capability description, thanks, and farewell continue to use deterministic replies. Do not silently turn it into unrestricted open-domain model answering.
 - Preserve the current grounded RAG path for `KNOWLEDGE_QA`, including knowledge-base isolation, evidence validation, citations, refusal behavior, SSE, persistence, and trace IDs.
-- The first authorized business action is `CREATE_KNOWLEDGE_BASE`, exposed through a statically registered, strongly typed application action that delegates to the existing `KnowledgeBaseService`.
+- The only implemented business action is `CREATE_KNOWLEDGE_BASE`, exposed through a statically registered, strongly typed application action that delegates to the existing `KnowledgeBaseService`.
 - A business request must produce a validated, persisted action proposal first. The real action must not execute until the user explicitly confirms it through a separate request.
 - Persist an auditable action state machine such as `PENDING_CONFIRMATION -> EXECUTING -> SUCCEEDED/FAILED`, with `REJECTED` and `EXPIRED` terminal alternatives. Confirmation must be atomic and idempotent so repeated requests cannot execute the action twice.
 - Route matching should start with deterministic rules and default safely to `KNOWLEDGE_QA`; do not add an extra model classification call until measured ambiguity justifies it.
@@ -30,7 +30,7 @@
 ## Roadmap governance
 
 - Use `docs/requirements/product-requirements.md` as the single detailed roadmap. Avoid parallel phase systems such as P/N/I/A-D numbering for future work.
-- Describe V1 as a completed baseline, V2 in full detail, V3 as a bounded scenario outline, and V4+ only as goals and entry conditions.
+- Describe V1 and V2 as completed baselines, V3 as a bounded scenario outline, and V4+ only as goals and entry conditions.
 - A roadmap candidate is not authorization. Before starting a later major version, update this file and the relevant requirements, architecture, data, API, and evaluation documents with an explicitly approved scope.
 - Plan capabilities from user scenarios first. Frameworks such as LangGraph, MCP, workflow runtimes, or multi-agent libraries are implementation candidates, not roadmap goals by themselves.
 - Keep the three top-level routing classes stable for the current scope: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, and `BUSINESS_ACTION`. Future knowledge tasks or business actions should normally be modeled beneath these classes unless a later approved design demonstrates the need for another top-level route.
@@ -58,7 +58,7 @@
 - Architecture: frontend/backend separation with a modular monolith backend.
 - Streaming: SSE. Secrets and model credentials remain backend-only environment variables.
 - Current access model: single user with no login or role system.
-- V2 orchestration: explicit Java application services and persisted state transitions; no LangGraph dependency or external workflow runtime.
+- Completed V2 orchestration: explicit Java application services and persisted state transitions; no LangGraph dependency or external workflow runtime.
 
 ## Working agreements
 
