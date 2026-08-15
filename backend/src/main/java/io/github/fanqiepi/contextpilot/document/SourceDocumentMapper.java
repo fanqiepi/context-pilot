@@ -76,7 +76,16 @@ public interface SourceDocumentMapper extends BaseMapper<SourceDocumentEntity> {
                 embedding_profile_version = NULL, indexed_at = NULL,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = #{documentId} AND deleted = 0 AND status = 'SUCCEEDED'
-              AND embedding_profile_id IS DISTINCT FROM #{currentProfileId}
+              AND (
+                  embedding_profile_id IS DISTINCT FROM #{currentProfileId}
+                  OR NOT EXISTS (
+                      SELECT 1
+                      FROM vector_store
+                      WHERE metadata ->> 'document_id' = source_document.id::text
+                        AND metadata ->> 'knowledge_base_id' = source_document.knowledge_base_id::text
+                        AND metadata ->> 'embedding_profile_id' = #{currentProfileId}
+                  )
+              )
             """)
     int prepareReindex(
             @Param("documentId") UUID documentId,

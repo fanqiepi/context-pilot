@@ -18,8 +18,10 @@ class ActionExecutorDispatcherTests {
             mock(CreateKnowledgeBaseActionExecutor.class);
     private final RetryDocumentProcessingActionExecutor retryExecutor =
             mock(RetryDocumentProcessingActionExecutor.class);
+    private final ReindexDocumentActionExecutor reindexExecutor =
+            mock(ReindexDocumentActionExecutor.class);
     private final ActionExecutorDispatcher dispatcher =
-            new ActionExecutorDispatcher(createExecutor, retryExecutor);
+            new ActionExecutorDispatcher(createExecutor, retryExecutor, reindexExecutor);
 
     @Test
     void dispatchesCreateKnowledgeBaseWithItsStrongParameterType() {
@@ -49,5 +51,21 @@ class ActionExecutorDispatcherTests {
         assertThat(dispatcher.execute(ActionType.RETRY_DOCUMENT_PROCESSING, retry)).isSameAs(expected);
         verify(retryExecutor).execute(retry);
         verifyNoInteractions(createExecutor);
+    }
+
+    @Test
+    void dispatchesReindexWithItsStrongParameterType() {
+        ReindexDocumentActionParameters parameters = new ReindexDocumentActionParameters(
+                UUID.randomUUID(),
+                "outdated.md",
+                DocumentStatus.SUCCEEDED,
+                "profile-v0",
+                UUID.randomUUID(),
+                UUID.randomUUID());
+        ActionExecutionResult expected = new ActionExecutionResult("索引重建任务已提交");
+        when(reindexExecutor.execute(parameters)).thenReturn(expected);
+
+        assertThat(dispatcher.execute(ActionType.REINDEX_DOCUMENT, parameters)).isSameAs(expected);
+        verify(reindexExecutor).execute(parameters);
     }
 }

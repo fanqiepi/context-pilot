@@ -106,6 +106,39 @@ public class ActionRequestService {
     }
 
     @Transactional
+    public ActionRequestResponse proposeReindexDocument(
+            UUID conversationId,
+            UUID userMessageId,
+            UUID assistantMessageId,
+            String capabilityVersion,
+            String traceId,
+            ReindexDocumentActionParameters parameters) {
+        OffsetDateTime now = now();
+        ActionRequestEntity entity = new ActionRequestEntity();
+        entity.setId(UUID.randomUUID());
+        entity.setConversationId(conversationId);
+        entity.setUserMessageId(userMessageId);
+        entity.setAssistantMessageId(assistantMessageId);
+        entity.setCapabilityId(CapabilityId.BUSINESS_ACTION);
+        entity.setCapabilityVersion(capabilityVersion);
+        entity.setActionType(ActionType.REINDEX_DOCUMENT);
+        entity.setParametersJson(parametersCodec.write(ActionType.REINDEX_DOCUMENT, parameters));
+        entity.setTargetDocumentId(parameters.documentId());
+        entity.setHealthIssueId(parameters.healthIssueId());
+        entity.setDisplaySummary("确认后将为文档“%s”提交单次索引重建任务，最终结果以文档状态为准。"
+                .formatted(parameters.originalFilenameSnapshot()));
+        entity.setStatus(ActionRequestStatus.PENDING_CONFIRMATION);
+        entity.setTraceId(traceId);
+        entity.setExpiresAt(now.plusMinutes(properties.getConfirmationTimeoutMinutes()));
+        entity.setCreatedAt(now);
+        entity.setUpdatedAt(now);
+        if (actionRequestMapper.insert(entity) != 1) {
+            throw new IllegalStateException("Reindex document action proposal could not be created");
+        }
+        return response(entity);
+    }
+
+    @Transactional
     public ActionRequestResponse findByHealthIssueId(UUID healthIssueId) {
         ActionRequestEntity entity = actionRequestMapper.selectByHealthIssueId(healthIssueId);
         if (entity == null) {

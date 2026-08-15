@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import io.github.fanqiepi.contextpilot.document.DocumentIndexMetadataRepository;
 import io.github.fanqiepi.contextpilot.document.DocumentStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,6 +50,9 @@ class PostgresKnowledgeBaseHealthDataPortTests {
 
     @Autowired
     private KnowledgeBaseHealthDataPort dataPort;
+
+    @Autowired
+    private DocumentIndexMetadataRepository documentIndexMetadataRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -101,6 +105,22 @@ class PostgresKnowledgeBaseHealthDataPortTests {
 
         assertThat(facts.issueCount()).isEqualTo(3);
         assertThat(facts.issueCandidates()).hasSize(2);
+    }
+
+    @Test
+    void countsOnlyTheRequestedDocumentAndCurrentProfileVectors() {
+        UUID knowledgeBaseId = insertKnowledgeBase("Document vector count");
+        UUID documentId = insertDocument(
+                knowledgeBaseId, DocumentStatus.SUCCEEDED, 1, CURRENT_PROFILE, false);
+        UUID otherDocumentId = insertDocument(
+                knowledgeBaseId, DocumentStatus.SUCCEEDED, 1, CURRENT_PROFILE, false);
+        insertVector(knowledgeBaseId, documentId, CURRENT_PROFILE);
+        insertVector(knowledgeBaseId, documentId, CURRENT_PROFILE);
+        insertVector(knowledgeBaseId, documentId, "offline_deterministic_1024_v0");
+        insertVector(knowledgeBaseId, otherDocumentId, CURRENT_PROFILE);
+
+        assertThat(documentIndexMetadataRepository.countCurrentProfileVectors(
+                knowledgeBaseId, documentId, CURRENT_PROFILE)).isEqualTo(2);
     }
 
     private UUID insertKnowledgeBase(String name) {

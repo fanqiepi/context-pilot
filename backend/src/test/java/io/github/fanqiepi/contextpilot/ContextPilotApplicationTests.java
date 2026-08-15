@@ -6,6 +6,7 @@ import io.github.fanqiepi.contextpilot.chat.ConversationMapper;
 import io.github.fanqiepi.contextpilot.chat.MessageCitationMapper;
 import io.github.fanqiepi.contextpilot.chat.ModelCallMapper;
 import io.github.fanqiepi.contextpilot.document.DocumentService;
+import io.github.fanqiepi.contextpilot.document.DocumentIndexMetadataRepository;
 import io.github.fanqiepi.contextpilot.document.SourceDocumentMapper;
 import io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackMapper;
 import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthIssueMapper;
@@ -44,6 +45,9 @@ class ContextPilotApplicationTests {
 
     @MockitoBean
     private DocumentService documentService;
+
+    @MockitoBean
+    private DocumentIndexMetadataRepository documentIndexMetadataRepository;
 
     @MockitoBean
     private ConversationMapper conversationMapper;

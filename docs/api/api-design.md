@@ -40,7 +40,7 @@ V3 详细合同见 [V3 知识库健康检查与维护助手详细设计](../arch
 | 方法 | 路径 | 行为 |
 | --- | --- | --- |
 | `GET` | `/api/knowledge-base-health-reports/{id}` | 已实现；查询不可变健康报告、`dataAsOf`、完整性、来源和异常明细 |
-| `POST` | `/api/knowledge-base-health-reports/{reportId}/issues/{issueId}/action-request` | 已在切片 5 支持失败文档重试；从可信异常明细生成或恢复单文档提案，不接受请求体或客户端动作参数；索引重建分支待切片 6 |
+| `POST` | `/api/knowledge-base-health-reports/{reportId}/issues/{issueId}/action-request` | 已支持失败文档重试和索引重建；从可信异常明细生成或恢复单文档提案，不接受请求体或客户端动作参数 |
 
 明确健康检查请求通过 `/api/chat` 或 `/api/chat/stream` 发起。顶层能力仍为 `KNOWLEDGE_QA`，健康路径使用能力版本 `v2` 与匹配依据 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`；普通 RAG 和历史消息保持原版本。服务端使用专用只读 DataPort 生成确定性报告，不调用 ChatModel。
 
@@ -58,9 +58,9 @@ message -> route -> delta -> health_report -> done(COMPLETED)
 - `RETRY_DOCUMENT_PROCESSING`
 - `REINDEX_DOCUMENT`
 
-两个维护动作只接受服务端保存的单个文档目标。操作 `SUCCEEDED` 表示重试任务已提交，文档处理最终结果仍通过文档查询接口返回；事务提交后可靠派发和恢复语义将在切片 7 完成。
+两个维护动作只接受服务端保存的单个文档目标。操作 `SUCCEEDED` 表示重试或索引重建任务已提交，文档处理最终结果仍通过文档查询接口返回；事务提交后可靠派发和恢复语义将在切片 7 完成。
 
-截至 V3 切片 5，报告查询、同步聊天报告、确定性健康路由、SSE `health_report`、历史恢复和前端报告卡片均已可用；失败文档明细可生成 `RETRY_DOCUMENT_PROCESSING` 提案并通过现有确认接口提交单文档重试。响应包含 `reusedExistingProposal`、确定性 `userMessage`、携带操作卡片的 `assistantMessage` 和 `actionRequest`；重复请求返回相同记录。生成和确认均实时复核，索引重建按钮与执行器仍未开放。
+截至 V3 切片 6，报告查询、同步聊天报告、确定性健康路由、SSE `health_report`、历史恢复和前端报告卡片均已可用；失败文档明细可生成 `RETRY_DOCUMENT_PROCESSING` 提案，来源未知、profile 过期或当前 profile 实际向量缺失的成功文档可生成 `REINDEX_DOCUMENT` 提案。响应包含 `reusedExistingProposal`、确定性 `userMessage`、携带操作卡片的 `assistantMessage` 和 `actionRequest`；重复请求返回相同记录。生成和确认均实时复核文档状态、profile、实际向量及处理与 VectorStore 可用性。
 
 ## 知识库接口
 

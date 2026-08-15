@@ -96,7 +96,7 @@ V3 切片 2 已通过 V11 增加 `knowledge_base_health_report` 与 `knowledge_b
 
 V3 切片 3 已增加完整句健康意图策略和 V12 路由约束。健康请求使用 `KNOWLEDGE_QA/v2` 与 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`，复合请求仍回落普通 RAG；健康事实查询在独立 `REPEATABLE_READ` 只读事务中完成，报告保存和助手消息完成保持原子。同步聊天直接携带 `healthReport`，SSE 固定发送 `message -> route -> delta -> health_report -> done`，不产生模型调用、引用或 usage。公开 GET 资源和前端卡片读取同一不可变快照，刷新后由历史接口恢复。
 
-V3 切片 4 已把动作持久化与确认核心从创建知识库专用字段提取改为 sealed `ActionParameters`、按 `actionType` 的静态 JSONB 编解码和枚举 `switch` 分派。V13 为两个维护动作预留受限文档目标和健康明细关联，数据库按动作类型约束参数形状。切片 5 新增 `HealthReportActionProposalService` 与显式 `RetryDocumentProcessingActionExecutor`：报告明细通过数据库行锁串行生成提案，生成和确认分别读取实时文档状态、处理开关与次数上限，确认仍复用原子动作执行权。V14 仅扩展消息匹配依据。索引重建执行器留给切片 6；现有内存任务提交方式将在切片 7 演进为事务提交后派发与有限恢复扫描。
+V3 切片 4 已把动作持久化与确认核心从创建知识库专用字段提取改为 sealed `ActionParameters`、按 `actionType` 的静态 JSONB 编解码和枚举 `switch` 分派。V13 为两个维护动作预留受限文档目标和健康明细关联，数据库按动作类型约束参数形状。切片 5 新增失败文档重试提案与显式 `RetryDocumentProcessingActionExecutor`。切片 6 将同一可信报告明细入口扩展到 `REINDEX_DOCUMENT`，新增显式重建执行器和按知识库、文档、当前 profile 固定计数的索引元数据查询；来源未知、profile 过期或当前 profile 实际向量为零时允许重建。两个维护动作都在提案生成和确认时读取实时事实，并通过明细行锁、活动唯一索引和原子文档状态更新防止重复副作用。V14 仅扩展消息匹配依据；现有内存任务提交方式将在切片 7 演进为事务提交后派发与有限恢复扫描。
 
 V4 以后才可能研究有限规划、显式长期记忆、MCP 等外部工具互操作和多 Agent。只有固定编排无法满足经过评估的用户任务时才选择相关框架，并必须具备步骤预算、循环上限、人工确认、来源约束、恢复和评估数据。路线候选不构成当前实施授权。
 

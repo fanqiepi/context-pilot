@@ -404,7 +404,7 @@ async function rejectAction(message: UiMessage): Promise<void> {
   }
 }
 
-async function proposeRetryAction(
+async function proposeHealthAction(
   message: UiMessage,
   issue: KnowledgeBaseHealthIssue,
 ): Promise<void> {
@@ -412,11 +412,13 @@ async function proposeRetryAction(
   if (
     !report ||
     !issue.actionEligible ||
-    issue.recommendedActionType !== 'RETRY_DOCUMENT_PROCESSING' ||
+    !issue.recommendedActionType ||
     healthProposalSavingIssueIds.has(issue.id)
   ) {
     return
   }
+  const actionLabel =
+    issue.recommendedActionType === 'REINDEX_DOCUMENT' ? '索引重建' : '文档重试'
   const conversationId = message.conversationId
   healthProposalSavingIssueIds.add(issue.id)
   try {
@@ -428,10 +430,12 @@ async function proposeRetryAction(
     }
     await refreshConversations(false)
     ElMessage.success(
-      proposal.reusedExistingProposal ? '已恢复现有重试提案' : '已生成文档重试提案',
+      proposal.reusedExistingProposal
+        ? `已恢复现有${actionLabel}提案`
+        : `已生成${actionLabel}提案`,
     )
   } catch (error) {
-    ElMessage.error(errorMessage(error, '生成文档重试提案失败'))
+    ElMessage.error(errorMessage(error, `生成${actionLabel}提案失败`))
   } finally {
     healthProposalSavingIssueIds.delete(issue.id)
   }
@@ -785,24 +789,20 @@ function formatScore(score: number | null): string {
                         <ElButton
                           v-if="
                             issue.actionEligible &&
-                            issue.recommendedActionType === 'RETRY_DOCUMENT_PROCESSING'
+                            issue.recommendedActionType
                           "
                           type="primary"
                           size="small"
                           plain
                           :loading="healthProposalSavingIssueIds.has(issue.id)"
-                          @click="proposeRetryAction(message, issue)"
+                          @click="proposeHealthAction(message, issue)"
                         >
-                          生成重试提案
+                          {{
+                            issue.recommendedActionType === 'REINDEX_DOCUMENT'
+                              ? '生成重建提案'
+                              : '生成重试提案'
+                          }}
                         </ElButton>
-                        <ElTag
-                          v-else-if="issue.actionEligible"
-                          type="info"
-                          size="small"
-                          effect="plain"
-                        >
-                          重建提案暂未开放
-                        </ElTag>
                         <span v-else class="health-ineligible">
                           {{ issue.ineligibilitySummary || '当前不可生成提案' }}
                         </span>
