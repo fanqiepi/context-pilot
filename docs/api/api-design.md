@@ -1,6 +1,6 @@
 # REST API、SSE 与操作确认约定
 
-> 本文记录已完成的 V1 与 V2 接口。具体字段以 OpenAPI 为主要事实来源。
+> 本文记录已完成的 V1/V2 接口和尚未实施的 V3 计划合同。已实现字段以 OpenAPI 为主要事实来源；V3 合同只有在获批实现后才进入 OpenAPI。
 
 ## 通用约定
 
@@ -32,6 +32,33 @@
 - `/api/action-requests/{id}/reject`：拒绝仍在等待确认的操作。
 
 V2 只允许 `CREATE_KNOWLEDGE_BASE`，不提供客户端可枚举或动态注册任意工具的接口。
+
+## V3 计划资源（尚未实施）
+
+V3 详细合同见 [V3 知识库健康检查与维护助手详细设计](../architecture/v3-knowledge-base-maintenance-design.md)。计划新增：
+
+| 方法 | 路径 | 行为 |
+| --- | --- | --- |
+| `GET` | `/api/knowledge-base-health-reports/{id}` | 查询不可变健康报告、`dataAsOf`、完整性、来源和异常明细 |
+| `POST` | `/api/knowledge-base-health-reports/{reportId}/issues/{issueId}/action-request` | 从可信异常明细生成或恢复单文档修复提案，不接受客户端动作参数 |
+
+明确健康检查请求继续通过 `/api/chat` 或 `/api/chat/stream` 发起。顶层能力仍为 `KNOWLEDGE_QA`，匹配依据计划增加 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`；服务端使用专用只读 DataPort 生成确定性报告，不调用 ChatModel。
+
+SSE 计划新增 `health_report` 事件：
+
+```text
+message -> route -> delta -> health_report -> done(COMPLETED)
+```
+
+`delta` 是与报告一致的确定性摘要；该路径不发送 `citation` 或 `usage`。历史消息计划增加可空 `healthReport`，按消息 ID 批量恢复已保存快照，不重新运行检查。
+
+动作确认资源沿用 V2 路径，但 `ActionRequest` 参数将由创建知识库专用对象演进为以 `actionType` 判别的强类型联合，固定允许：
+
+- `CREATE_KNOWLEDGE_BASE`
+- `RETRY_DOCUMENT_PROCESSING`
+- `REINDEX_DOCUMENT`
+
+两个维护动作只接受服务端保存的单个文档目标。操作 `SUCCEEDED` 表示任务已可靠接受，文档处理最终结果仍通过文档查询接口返回。
 
 ## 知识库接口
 
