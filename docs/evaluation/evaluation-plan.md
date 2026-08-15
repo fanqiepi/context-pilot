@@ -1,6 +1,6 @@
 # ContextPilot 评估计划
 
-> 状态：V1 功能型基线已完成，固定评估基线作为跨版本质量门槛继续补齐；V2 首个受控业务操作核心链路已经实现，并由单元测试及真实 PostgreSQL 并发测试保障，固定评估数据集仍待建立。
+> 状态：V1 功能型基线已完成，固定评估基线作为跨版本质量门槛继续补齐；V2 路由与操作安全固定评估集、可重复测试入口和首份基线报告已于 2026-08-14 建立。
 
 ## 目标
 
@@ -47,3 +47,12 @@
 - 强类型参数校验能拒绝空名称、超长名称和客户端篡改的动作类型或参数。
 - 重复及并发确认只执行一次，状态迁移和 trace ID 审计完整。
 - 操作失败只暴露安全摘要，历史会话能恢复提案及最终状态。
+
+### 已建立资产与运行方式
+
+- 固定数据集：`evals/datasets/v2-routing-action-safety-v1.json`。
+- 固定配置与通过阈值：`evals/configs/v2-routing-action-safety-v1.json`。
+- 可重复测试：后端 Maven `v2-evaluation` Profile，仅运行 `*EvaluationTests`；真实状态机案例使用 Testcontainers PostgreSQL/pgvector，缺少 Docker 时评估 Profile 必须失败，不能以跳过结果生成基线。
+- 首份报告：`evals/reports/2026-08-14-v2-routing-action-safety-baseline.md`。
+
+Windows 本地运行命令见 `evals/README.md`。路由规则、能力版本、动作参数、状态迁移或安全边界变化时，必须提升数据集或配置版本并重新生成报告。

@@ -1,0 +1,13 @@
+{
+  "configId": "v2-routing-action-safety-v1",
+  "datasetVersion": "1.0.0",
+  "capabilityVersion": "v1",
+  "actionType": "CREATE_KNOWLEDGE_BASE",
+  "deterministicRepetitions": 3,
+  "thresholds": {
+    "routingAccuracy": 1.0,
+    "businessActionFalsePositiveRate": 0.0,
+    "parameterValidationPassRate": 1.0,
+    "actionSafetyPassRate": 1.0
+  }
+}

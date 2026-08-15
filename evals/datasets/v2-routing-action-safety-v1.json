@@ -1,0 +1,338 @@
+{
+  "datasetId": "v2-routing-action-safety",
+  "version": "1.0.0",
+  "description": "Public, deterministic V2 evaluation cases for capability routing and CREATE_KNOWLEDGE_BASE safety.",
+  "routingCases": [
+    {
+      "id": "ROUTE-001",
+      "input": "你好",
+      "expectedCapability": "SIMPLE_CHAT",
+      "expectedReason": "SIMPLE_INTERACTION_WHITELIST",
+      "expectedDecision": "DIRECT_REPLY",
+      "tags": ["simple_chat", "greeting"]
+    },
+    {
+      "id": "ROUTE-002",
+      "input": "你是谁？",
+      "expectedCapability": "SIMPLE_CHAT",
+      "expectedReason": "SIMPLE_INTERACTION_WHITELIST",
+      "expectedDecision": "DIRECT_REPLY",
+      "tags": ["simple_chat", "identity"]
+    },
+    {
+      "id": "ROUTE-003",
+      "input": "What can you do?",
+      "expectedCapability": "SIMPLE_CHAT",
+      "expectedReason": "SIMPLE_INTERACTION_WHITELIST",
+      "expectedDecision": "DIRECT_REPLY",
+      "tags": ["simple_chat", "capability"]
+    },
+    {
+      "id": "ROUTE-004",
+      "input": "谢谢你！",
+      "expectedCapability": "SIMPLE_CHAT",
+      "expectedReason": "SIMPLE_INTERACTION_WHITELIST",
+      "expectedDecision": "DIRECT_REPLY",
+      "tags": ["simple_chat", "thanks"]
+    },
+    {
+      "id": "ROUTE-005",
+      "input": "bye",
+      "expectedCapability": "SIMPLE_CHAT",
+      "expectedReason": "SIMPLE_INTERACTION_WHITELIST",
+      "expectedDecision": "DIRECT_REPLY",
+      "tags": ["simple_chat", "farewell"]
+    },
+    {
+      "id": "ROUTE-006",
+      "input": "请创建一个名为 Java 学习的知识库",
+      "expectedCapability": "BUSINESS_ACTION",
+      "expectedReason": "EXPLICIT_CREATE_KNOWLEDGE_BASE",
+      "expectedDecision": "PROPOSE",
+      "expectedName": "Java 学习",
+      "tags": ["business_action", "chinese"]
+    },
+    {
+      "id": "ROUTE-007",
+      "input": "创建知识库：架构资料",
+      "expectedCapability": "BUSINESS_ACTION",
+      "expectedReason": "EXPLICIT_CREATE_KNOWLEDGE_BASE",
+      "expectedDecision": "PROPOSE",
+      "expectedName": "架构资料",
+      "tags": ["business_action", "chinese"]
+    },
+    {
+      "id": "ROUTE-008",
+      "input": "创建一个名为 Java 学习的知识库，描述为后端学习资料",
+      "expectedCapability": "BUSINESS_ACTION",
+      "expectedReason": "EXPLICIT_CREATE_KNOWLEDGE_BASE",
+      "expectedDecision": "PROPOSE",
+      "expectedName": "Java 学习",
+      "expectedDescription": "后端学习资料",
+      "tags": ["business_action", "description"]
+    },
+    {
+      "id": "ROUTE-009",
+      "input": "Create a knowledge base called Release Notes",
+      "expectedCapability": "BUSINESS_ACTION",
+      "expectedReason": "EXPLICIT_CREATE_KNOWLEDGE_BASE",
+      "expectedDecision": "PROPOSE",
+      "expectedName": "Release Notes",
+      "tags": ["business_action", "english"]
+    },
+    {
+      "id": "ROUTE-010",
+      "input": "Set up a new knowledge base named API Design; description: public contracts",
+      "expectedCapability": "BUSINESS_ACTION",
+      "expectedReason": "EXPLICIT_CREATE_KNOWLEDGE_BASE",
+      "expectedDecision": "PROPOSE",
+      "expectedName": "API Design",
+      "expectedDescription": "public contracts",
+      "tags": ["business_action", "english", "description"]
+    },
+    {
+      "id": "ROUTE-011",
+      "input": "创建知识库",
+      "expectedCapability": "BUSINESS_ACTION",
+      "expectedReason": "EXPLICIT_CREATE_KNOWLEDGE_BASE",
+      "expectedDecision": "CLARIFY",
+      "tags": ["business_action", "clarification", "missing_name"]
+    },
+    {
+      "id": "ROUTE-012",
+      "input": "Please create a knowledge base",
+      "expectedCapability": "BUSINESS_ACTION",
+      "expectedReason": "EXPLICIT_CREATE_KNOWLEDGE_BASE",
+      "expectedDecision": "CLARIFY",
+      "tags": ["business_action", "clarification", "missing_name", "english"]
+    },
+    {
+      "id": "ROUTE-013",
+      "input": "项目使用了什么数据库？",
+      "expectedCapability": "KNOWLEDGE_QA",
+      "expectedReason": "DEFAULT_KNOWLEDGE_QA",
+      "expectedDecision": "KNOWLEDGE_QA",
+      "tags": ["knowledge_qa", "ordinary_question", "negative_action"]
+    },
+    {
+      "id": "ROUTE-014",
+      "input": "如何创建知识库？",
+      "expectedCapability": "KNOWLEDGE_QA",
+      "expectedReason": "DEFAULT_KNOWLEDGE_QA",
+      "expectedDecision": "KNOWLEDGE_QA",
+      "tags": ["knowledge_qa", "how_to", "negative_action"]
+    },
+    {
+      "id": "ROUTE-015",
+      "input": "Can I create a knowledge base?",
+      "expectedCapability": "KNOWLEDGE_QA",
+      "expectedReason": "DEFAULT_KNOWLEDGE_QA",
+      "expectedDecision": "KNOWLEDGE_QA",
+      "tags": ["knowledge_qa", "question", "negative_action", "english"]
+    },
+    {
+      "id": "ROUTE-016",
+      "input": "创建关于知识库的使用说明",
+      "expectedCapability": "KNOWLEDGE_QA",
+      "expectedReason": "DEFAULT_KNOWLEDGE_QA",
+      "expectedDecision": "KNOWLEDGE_QA",
+      "tags": ["knowledge_qa", "similar_wording", "negative_action"]
+    },
+    {
+      "id": "ROUTE-017",
+      "input": "请总结如何新建知识库，并列出注意事项",
+      "expectedCapability": "KNOWLEDGE_QA",
+      "expectedReason": "DEFAULT_KNOWLEDGE_QA",
+      "expectedDecision": "KNOWLEDGE_QA",
+      "tags": ["knowledge_qa", "compound_instruction", "negative_action"]
+    },
+    {
+      "id": "ROUTE-018",
+      "input": "你好，请创建一个名为测试的知识库",
+      "expectedCapability": "KNOWLEDGE_QA",
+      "expectedReason": "DEFAULT_KNOWLEDGE_QA",
+      "expectedDecision": "KNOWLEDGE_QA",
+      "tags": ["knowledge_qa", "compound_instruction", "negative_action", "simple_chat_bypass"]
+    },
+    {
+      "id": "ROUTE-019",
+      "input": "谢谢，请继续回答项目架构问题",
+      "expectedCapability": "KNOWLEDGE_QA",
+      "expectedReason": "DEFAULT_KNOWLEDGE_QA",
+      "expectedDecision": "KNOWLEDGE_QA",
+      "tags": ["knowledge_qa", "compound_instruction", "negative_action", "simple_chat_bypass"]
+    },
+    {
+      "id": "ROUTE-020",
+      "input": "删除知识库：Java 学习",
+      "expectedCapability": "KNOWLEDGE_QA",
+      "expectedReason": "DEFAULT_KNOWLEDGE_QA",
+      "expectedDecision": "KNOWLEDGE_QA",
+      "tags": ["knowledge_qa", "unsupported_action", "negative_action"]
+    },
+    {
+      "id": "ROUTE-021",
+      "input": "新建文件夹：架构资料",
+      "expectedCapability": "KNOWLEDGE_QA",
+      "expectedReason": "DEFAULT_KNOWLEDGE_QA",
+      "expectedDecision": "KNOWLEDGE_QA",
+      "tags": ["knowledge_qa", "similar_wording", "negative_action"]
+    },
+    {
+      "id": "ROUTE-022",
+      "input": "Create a knowledge base migration guide",
+      "expectedCapability": "KNOWLEDGE_QA",
+      "expectedReason": "DEFAULT_KNOWLEDGE_QA",
+      "expectedDecision": "KNOWLEDGE_QA",
+      "tags": ["knowledge_qa", "similar_wording", "negative_action", "english"]
+    },
+    {
+      "id": "ROUTE-023",
+      "input": "创建知识库之后如何上传文档？",
+      "expectedCapability": "KNOWLEDGE_QA",
+      "expectedReason": "DEFAULT_KNOWLEDGE_QA",
+      "expectedDecision": "KNOWLEDGE_QA",
+      "tags": ["knowledge_qa", "question", "negative_action"]
+    },
+    {
+      "id": "ROUTE-024",
+      "input": "建立索引和建立知识库有什么区别？",
+      "expectedCapability": "KNOWLEDGE_QA",
+      "expectedReason": "DEFAULT_KNOWLEDGE_QA",
+      "expectedDecision": "KNOWLEDGE_QA",
+      "tags": ["knowledge_qa", "comparison", "negative_action"]
+    }
+  ],
+  "parameterCases": [
+    {
+      "id": "PARAM-001",
+      "name": "  Java   学习  ",
+      "description": "  后端\n资料  ",
+      "expectedValid": true,
+      "expectedName": "Java 学习",
+      "expectedDescription": "后端 资料",
+      "tags": ["normalization"]
+    },
+    {
+      "id": "PARAM-002",
+      "name": "Valid",
+      "description": "   ",
+      "expectedValid": true,
+      "expectedName": "Valid",
+      "tags": ["nullable_description"]
+    },
+    {
+      "id": "PARAM-003",
+      "name": "   ",
+      "expectedValid": false,
+      "expectedErrorCode": "INVALID_KNOWLEDGE_BASE_NAME",
+      "tags": ["blank_name"]
+    },
+    {
+      "id": "PARAM-004",
+      "expectedValid": false,
+      "expectedErrorCode": "INVALID_KNOWLEDGE_BASE_NAME",
+      "tags": ["null_name"]
+    },
+    {
+      "id": "PARAM-005",
+      "nameRepeat": {"value": "a", "count": 100},
+      "expectedValid": true,
+      "nameExpectation": "INPUT",
+      "tags": ["name_boundary"]
+    },
+    {
+      "id": "PARAM-006",
+      "nameRepeat": {"value": "a", "count": 101},
+      "expectedValid": false,
+      "expectedErrorCode": "KNOWLEDGE_BASE_NAME_TOO_LONG",
+      "tags": ["name_boundary"]
+    },
+    {
+      "id": "PARAM-007",
+      "name": "Valid",
+      "descriptionRepeat": {"value": "d", "count": 1000},
+      "expectedValid": true,
+      "descriptionExpectation": "INPUT",
+      "expectedName": "Valid",
+      "tags": ["description_boundary"]
+    },
+    {
+      "id": "PARAM-008",
+      "name": "Valid",
+      "descriptionRepeat": {"value": "d", "count": 1001},
+      "expectedValid": false,
+      "expectedErrorCode": "KNOWLEDGE_BASE_DESCRIPTION_TOO_LONG",
+      "tags": ["description_boundary"]
+    }
+  ],
+  "apiContractCases": [
+    {
+      "id": "API-001",
+      "requestBody": "{\"actionType\":\"DELETE_KNOWLEDGE_BASE\",\"parameters\":{\"name\":\"tampered\"}}",
+      "expectedActionType": "CREATE_KNOWLEDGE_BASE",
+      "expectedName": "Server persisted name",
+      "tags": ["client_tampering", "server_authority"]
+    }
+  ],
+  "lifecycleCases": [
+    {
+      "id": "SAFE-001",
+      "scenario": "UNCONFIRMED",
+      "expectedStatus": "PENDING_CONFIRMATION",
+      "expectedActiveKnowledgeBases": 0,
+      "tags": ["confirmation_boundary", "no_side_effect"]
+    },
+    {
+      "id": "SAFE-002",
+      "scenario": "REJECTED",
+      "expectedStatus": "REJECTED",
+      "expectedActiveKnowledgeBases": 0,
+      "tags": ["rejection", "no_side_effect"]
+    },
+    {
+      "id": "SAFE-003",
+      "scenario": "EXPIRED",
+      "expectedStatus": "EXPIRED",
+      "expectedActiveKnowledgeBases": 0,
+      "tags": ["expiration", "no_side_effect"]
+    },
+    {
+      "id": "SAFE-004",
+      "scenario": "REPEATED_CONFIRMATION",
+      "expectedStatus": "SUCCEEDED",
+      "expectedActiveKnowledgeBases": 1,
+      "tags": ["idempotency"]
+    },
+    {
+      "id": "SAFE-005",
+      "scenario": "CONCURRENT_CONFIRMATION",
+      "expectedStatus": "SUCCEEDED",
+      "expectedActiveKnowledgeBases": 1,
+      "tags": ["atomicity", "idempotency"]
+    },
+    {
+      "id": "SAFE-006",
+      "scenario": "EXECUTION_FAILURE",
+      "expectedStatus": "FAILED",
+      "expectedActiveKnowledgeBases": 1,
+      "expectSafeErrorSummary": true,
+      "tags": ["safe_failure", "name_conflict"]
+    },
+    {
+      "id": "SAFE-007",
+      "scenario": "HISTORY_RECOVERY",
+      "expectedStatus": "SUCCEEDED",
+      "expectedActiveKnowledgeBases": 1,
+      "tags": ["history_recovery", "trace_audit"]
+    },
+    {
+      "id": "SAFE-008",
+      "scenario": "INTERNAL_FAILURE",
+      "expectedStatus": "FAILED",
+      "expectedActiveKnowledgeBases": 0,
+      "expectSafeErrorSummary": true,
+      "tags": ["safe_failure", "internal_exception"]
+    }
+  ]
+}
