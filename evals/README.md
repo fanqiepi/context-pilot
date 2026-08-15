@@ -19,3 +19,18 @@ concurrent confirmation behavior is evaluated against the production persistence
 
 When the dataset, routing rules, action validation, state transitions, or capability version
 changes, create a new dataset/config version and add a new dated report under `reports/`.
+
+## Run the V3 health-maintenance evaluation
+
+Prerequisites are the same as V2. From `backend/` on Windows:
+
+```powershell
+$env:JAVA_HOME = 'C:\path\to\jdk-21'
+.\mvnw.cmd -Pv3-evaluation test
+```
+
+The profile runs the V1/V2 evaluation regression, the deterministic V3 routing and health-rule
+datasets, and selected real PostgreSQL/pgvector lifecycle tests for immutable reports, trusted
+issue selection, confirmation safety, transaction-after-commit dispatch, and bounded recovery.
+Docker is mandatory: the profile fails instead of publishing a baseline when the real lifecycle
+environment is unavailable.

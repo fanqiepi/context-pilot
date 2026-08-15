@@ -9,17 +9,25 @@ import {
   listConversations,
   listKnowledgeBases,
   markMessageHelpful,
+  proposeHealthReportIssueAction,
   removeMessageHelpful,
   rejectActionRequest,
   streamChat,
 } from '@/api/contextPilot'
 import { errorMessage } from '@/api/client'
 import type {
+  ActionRequest,
   ActionRequestStatus,
+  ActionType,
   Citation,
   ConversationMessage,
   ConversationSummary,
+  HealthCheckCompleteness,
+  HealthRecommendedActionType,
   KnowledgeBase,
+  KnowledgeBaseHealthIssue,
+  KnowledgeBaseHealthIssueType,
+  KnowledgeBaseHealthStatus,
   StreamDoneEvent,
   StreamErrorEvent,
   StreamUsageEvent,
@@ -45,6 +53,7 @@ const loadingMessages = ref(false)
 const sending = ref(false)
 const feedbackSavingIds = reactive(new Set<string>())
 const actionSavingIds = reactive(new Set<string>())
+const healthProposalSavingIssueIds = reactive(new Set<string>())
 const messageScroller = ref<HTMLElement>()
 let streamController: AbortController | undefined
 let activeTextRenderer: StreamTextRenderer | undefined
@@ -62,6 +71,7 @@ const canSend = computed(
 )
 
 const suggestions = [
+  '检查这个知识库有没有异常',
   '概括这组资料的核心内容',
   '项目采用了哪些关键技术？',
   '列出资料中最值得关注的结论',
@@ -177,6 +187,7 @@ async function sendQuestion(): Promise<void> {
     capabilityId: null,
     capabilityVersion: null,
     capabilityMatchReason: null,
+    healthReport: null,
     actionRequest: null,
     citations: [],
     helpful: false,
@@ -194,6 +205,7 @@ async function sendQuestion(): Promise<void> {
     capabilityId: null,
     capabilityVersion: null,
     capabilityMatchReason: null,
+    healthReport: null,
     actionRequest: null,
     citations: [],
     helpful: false,
@@ -244,6 +256,9 @@ async function sendQuestion(): Promise<void> {
         onActionRequired(event) {
           const { actionRequestId, ...actionRequest } = event
           assistantMessage.actionRequest = { id: actionRequestId, ...actionRequest }
+        },
+        onHealthReport(event) {
+          assistantMessage.healthReport = event
         },
         onDelta(event) {
           textRenderer.enqueue(event.content)
@@ -357,8 +372,10 @@ async function confirmAction(message: UiMessage): Promise<void> {
     const updated = await confirmActionRequest(actionRequest.id)
     message.actionRequest = updated
     if (updated.status === 'SUCCEEDED') {
-      knowledgeBases.value = await listKnowledgeBases()
-      ElMessage.success(updated.resultSummary ?? '知识库已创建')
+      if (updated.actionType === 'CREATE_KNOWLEDGE_BASE') {
+        knowledgeBases.value = await listKnowledgeBases()
+      }
+      ElMessage.success(updated.resultSummary ?? '操作已完成')
     } else if (updated.status === 'FAILED') {
       ElMessage.error(updated.errorSummary ?? '操作执行失败')
     } else if (updated.status === 'EXPIRED') {
@@ -379,12 +396,64 @@ async function rejectAction(message: UiMessage): Promise<void> {
   actionSavingIds.add(actionRequest.id)
   try {
     message.actionRequest = await rejectActionRequest(actionRequest.id)
-    ElMessage.info('已取消操作，未创建知识库')
+    ElMessage.info('已取消操作，未执行任何变更')
   } catch (error) {
     ElMessage.error(errorMessage(error, '取消操作失败'))
   } finally {
     actionSavingIds.delete(actionRequest.id)
   }
+}
+
+async function proposeHealthAction(
+  message: UiMessage,
+  issue: KnowledgeBaseHealthIssue,
+): Promise<void> {
+  const report = message.healthReport
+  if (
+    !report ||
+    !issue.actionEligible ||
+    !issue.recommendedActionType ||
+    healthProposalSavingIssueIds.has(issue.id)
+  ) {
+    return
+  }
+  const actionLabel =
+    issue.recommendedActionType === 'REINDEX_DOCUMENT' ? '索引重建' : '文档重试'
+  const conversationId = message.conversationId
+  healthProposalSavingIssueIds.add(issue.id)
+  try {
+    const proposal = await proposeHealthReportIssueAction(report.id, issue.id)
+    if (activeConversationId.value === conversationId) {
+      upsertMessage(proposal.userMessage)
+      upsertMessage({ ...proposal.assistantMessage, actionRequest: proposal.actionRequest })
+      await scrollToBottom()
+    }
+    await refreshConversations(false)
+    ElMessage.success(
+      proposal.reusedExistingProposal
+        ? `已恢复现有${actionLabel}提案`
+        : `已生成${actionLabel}提案`,
+    )
+  } catch (error) {
+    ElMessage.error(errorMessage(error, `生成${actionLabel}提案失败`))
+  } finally {
+    healthProposalSavingIssueIds.delete(issue.id)
+  }
+}
+
+function upsertMessage(message: ConversationMessage): void {
+  const index = messages.value.findIndex((item) => item.id === message.id)
+  if (index >= 0) {
+    messages.value[index] = message
+    return
+  }
+  messages.value.push(message)
+  messages.value.sort((left, right) => {
+    const timeDifference = new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime()
+    if (timeDifference !== 0) return timeDifference
+    if (left.role !== right.role) return left.role === 'USER' ? -1 : 1
+    return left.id.localeCompare(right.id)
+  })
 }
 
 function actionStatusLabel(status: ActionRequestStatus): string {
@@ -406,6 +475,99 @@ function actionStatusType(
   if (status === 'PENDING_CONFIRMATION') return 'warning'
   if (status === 'EXECUTING') return 'primary'
   return 'info'
+}
+
+function actionTitle(actionType: ActionType): string {
+  return {
+    CREATE_KNOWLEDGE_BASE: '创建知识库',
+    RETRY_DOCUMENT_PROCESSING: '重试文档处理',
+    REINDEX_DOCUMENT: '重建文档索引',
+  }[actionType]
+}
+
+function actionConfirmLabel(actionType: ActionType): string {
+  return {
+    CREATE_KNOWLEDGE_BASE: '确认创建',
+    RETRY_DOCUMENT_PROCESSING: '确认重试',
+    REINDEX_DOCUMENT: '确认重建',
+  }[actionType]
+}
+
+function actionParameterRows(actionRequest: ActionRequest): Array<{ label: string; value: string }> {
+  switch (actionRequest.actionType) {
+    case 'CREATE_KNOWLEDGE_BASE':
+      return [
+        { label: '名称', value: actionRequest.parameters.name },
+        { label: '描述', value: actionRequest.parameters.description || '未填写' },
+      ]
+    case 'RETRY_DOCUMENT_PROCESSING':
+      return [
+        { label: '目标文档', value: actionRequest.parameters.originalFilenameSnapshot },
+        { label: '检查时状态', value: documentStatusLabel(actionRequest.parameters.observedDocumentStatus) },
+      ]
+    case 'REINDEX_DOCUMENT':
+      return [
+        { label: '目标文档', value: actionRequest.parameters.originalFilenameSnapshot },
+        { label: '检查时状态', value: documentStatusLabel(actionRequest.parameters.observedDocumentStatus) },
+        {
+          label: '检查时 Profile',
+          value: actionRequest.parameters.observedEmbeddingProfileId || '来源未知',
+        },
+      ]
+  }
+}
+
+function healthStatusLabel(status: KnowledgeBaseHealthStatus): string {
+  return {
+    EMPTY: '暂无文档',
+    HEALTHY: '健康',
+    IN_PROGRESS: '处理中',
+    ATTENTION_REQUIRED: '需要关注',
+    UNKNOWN: '状态未知',
+  }[status]
+}
+
+function healthStatusType(
+  status: KnowledgeBaseHealthStatus,
+): 'success' | 'warning' | 'danger' | 'info' | 'primary' {
+  if (status === 'HEALTHY') return 'success'
+  if (status === 'ATTENTION_REQUIRED') return 'danger'
+  if (status === 'IN_PROGRESS') return 'primary'
+  if (status === 'EMPTY') return 'info'
+  return 'warning'
+}
+
+function completenessLabel(completeness: HealthCheckCompleteness): string {
+  return {
+    COMPLETE: '检查完整',
+    PARTIAL: '部分检查',
+    TRUNCATED: '明细已截断',
+  }[completeness]
+}
+
+function healthIssueLabel(issueType: KnowledgeBaseHealthIssueType): string {
+  return {
+    DOCUMENT_PROCESSING_FAILED: '文档处理失败',
+    EMBEDDING_PROFILE_UNKNOWN: '索引来源未知',
+    EMBEDDING_PROFILE_OUTDATED: '索引版本已过期',
+    VECTOR_INDEX_MISSING: '当前索引缺失',
+  }[issueType]
+}
+
+function recommendedActionLabel(actionType: HealthRecommendedActionType | null): string {
+  if (actionType === 'RETRY_DOCUMENT_PROCESSING') return '重试文档处理'
+  if (actionType === 'REINDEX_DOCUMENT') return '重建文档索引'
+  return '暂无建议动作'
+}
+
+function documentStatusLabel(status: string): string {
+  return {
+    PENDING: '等待处理',
+    PROCESSING: '处理中',
+    SUCCEEDED: '处理成功',
+    FAILED: '处理失败',
+    DELETING: '删除中',
+  }[status] ?? status
 }
 
 async function scrollToBottom(): Promise<void> {
@@ -540,11 +702,127 @@ function formatScore(score: number | null): string {
                   {{ message.errorSummary }}
                 </div>
 
+                <section v-if="message.healthReport" class="health-card">
+                  <header>
+                    <div>
+                      <small>知识库健康报告</small>
+                      <strong>{{ healthStatusLabel(message.healthReport.healthStatus) }}</strong>
+                    </div>
+                    <ElTag
+                      :type="healthStatusType(message.healthReport.healthStatus)"
+                      effect="light"
+                      round
+                    >
+                      {{ completenessLabel(message.healthReport.completeness) }}
+                    </ElTag>
+                  </header>
+
+                  <div class="health-overview">
+                    <div>
+                      <span>数据时间</span>
+                      <strong>{{ formatDate(message.healthReport.dataAsOf) }}</strong>
+                    </div>
+                    <div>
+                      <span>当前索引</span>
+                      <strong>{{ message.healthReport.currentEmbeddingProfile.id }}</strong>
+                    </div>
+                    <div>
+                      <span>问题</span>
+                      <strong>{{ message.healthReport.issueCount }}</strong>
+                    </div>
+                  </div>
+
+                  <p
+                    v-if="message.healthReport.completenessReason"
+                    class="health-completeness-notice"
+                  >
+                    {{ message.healthReport.completenessReason }}
+                  </p>
+
+                  <div class="health-counts">
+                    <div><strong>{{ message.healthReport.documentCounts.total }}</strong><span>全部</span></div>
+                    <div><strong>{{ message.healthReport.documentCounts.pending }}</strong><span>等待</span></div>
+                    <div><strong>{{ message.healthReport.documentCounts.processing }}</strong><span>处理中</span></div>
+                    <div><strong>{{ message.healthReport.documentCounts.succeeded }}</strong><span>成功</span></div>
+                    <div><strong>{{ message.healthReport.documentCounts.failed }}</strong><span>失败</span></div>
+                    <div><strong>{{ message.healthReport.documentCounts.deleting }}</strong><span>删除中</span></div>
+                  </div>
+
+                  <div v-if="message.healthReport.issues.length" class="health-issue-list">
+                    <article v-for="issue in message.healthReport.issues" :key="issue.id">
+                      <header>
+                        <div>
+                          <strong>{{ issue.originalFilename }}</strong>
+                          <span>{{ healthIssueLabel(issue.issueType) }}</span>
+                        </div>
+                        <ElTag
+                          :type="issue.severity === 'ERROR' ? 'danger' : 'warning'"
+                          size="small"
+                          effect="plain"
+                        >
+                          {{ issue.severity === 'ERROR' ? '错误' : '警告' }}
+                        </ElTag>
+                      </header>
+                      <dl>
+                        <div>
+                          <dt>观察状态</dt>
+                          <dd>{{ documentStatusLabel(issue.observedDocumentStatus) }}</dd>
+                        </div>
+                        <div>
+                          <dt>处理次数</dt>
+                          <dd>{{ issue.observedProcessingAttempts }}</dd>
+                        </div>
+                        <div>
+                          <dt>索引 Profile</dt>
+                          <dd class="mono">{{ issue.observedEmbeddingProfileId || '未知' }}</dd>
+                        </div>
+                        <div>
+                          <dt>向量数量</dt>
+                          <dd>{{ issue.observedVectorCount ?? '未检查' }}</dd>
+                        </div>
+                      </dl>
+                      <p v-if="issue.observedErrorSummary" class="health-issue-error">
+                        {{ issue.observedErrorSummary }}
+                      </p>
+                      <footer>
+                        <span>建议：{{ recommendedActionLabel(issue.recommendedActionType) }}</span>
+                        <ElButton
+                          v-if="
+                            issue.actionEligible &&
+                            issue.recommendedActionType
+                          "
+                          type="primary"
+                          size="small"
+                          plain
+                          :loading="healthProposalSavingIssueIds.has(issue.id)"
+                          @click="proposeHealthAction(message, issue)"
+                        >
+                          {{
+                            issue.recommendedActionType === 'REINDEX_DOCUMENT'
+                              ? '生成重建提案'
+                              : '生成重试提案'
+                          }}
+                        </ElButton>
+                        <span v-else class="health-ineligible">
+                          {{ issue.ineligibilitySummary || '当前不可生成提案' }}
+                        </span>
+                      </footer>
+                    </article>
+                  </div>
+                  <p v-else class="health-empty-issues">未发现文档处理或索引异常。</p>
+
+                  <footer class="health-source">
+                    检查时 Profile：{{ message.healthReport.currentEmbeddingProfile.provider }} /
+                    {{ message.healthReport.currentEmbeddingProfile.model }} /
+                    {{ message.healthReport.currentEmbeddingProfile.dimensions }} 维 · 报告快照不会自动刷新
+                  </footer>
+                </section>
+
                 <section v-if="message.actionRequest" class="action-card">
                   <header>
                     <div>
                       <small>受控业务操作</small>
-                      <strong>创建知识库</strong>
+                      <strong>{{ actionTitle(message.actionRequest.actionType) }}</strong>
                     </div>
                     <ElTag
                       :type="actionStatusType(message.actionRequest.status)"
@@ -555,13 +833,12 @@ function formatScore(score: number | null): string {
                     </ElTag>
                   </header>
                   <dl>
-                    <div>
-                      <dt>名称</dt>
-                      <dd>{{ message.actionRequest.parameters.name }}</dd>
-                    </div>
-                    <div>
-                      <dt>描述</dt>
-                      <dd>{{ message.actionRequest.parameters.description || '未填写' }}</dd>
+                    <div
+                      v-for="row in actionParameterRows(message.actionRequest)"
+                      :key="row.label"
+                    >
+                      <dt>{{ row.label }}</dt>
+                      <dd>{{ row.value }}</dd>
                     </div>
                     <div>
                       <dt>确认期限</dt>
@@ -581,7 +858,7 @@ function formatScore(score: number | null): string {
                       :loading="actionSavingIds.has(message.actionRequest.id)"
                       @click="confirmAction(message)"
                     >
-                      确认创建
+                      {{ actionConfirmLabel(message.actionRequest.actionType) }}
                     </ElButton>
                     <ElButton
                       :disabled="actionSavingIds.has(message.actionRequest.id)"
@@ -999,6 +1276,188 @@ function formatScore(score: number | null): string {
   box-shadow: 0 10px 24px rgb(43 91 66 / 8%);
 }
 
+.health-card {
+  display: grid;
+  gap: 15px;
+  max-width: 760px;
+  margin-top: 14px;
+  padding: 18px;
+  border: 1px solid #c9d9cf;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #f8fbf8, #eef5f0);
+  box-shadow: 0 12px 28px rgb(43 91 66 / 9%);
+}
+
+.health-card > header,
+.health-issue-list article > header,
+.health-issue-list article > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.health-card > header > div,
+.health-issue-list article > header > div {
+  display: grid;
+  gap: 3px;
+}
+
+.health-card > header small {
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.health-card > header strong {
+  color: #26392d;
+  font-size: 16px;
+}
+
+.health-overview,
+.health-counts {
+  display: grid;
+  gap: 8px;
+}
+
+.health-overview {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.health-overview > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 11px 12px;
+  border-radius: 11px;
+  background: rgb(255 255 255 / 72%);
+}
+
+.health-overview span,
+.health-counts span {
+  color: #758178;
+  font-size: 10px;
+}
+
+.health-overview strong {
+  color: #35463b;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.health-completeness-notice,
+.health-empty-issues {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.health-completeness-notice {
+  color: #7a5724;
+  background: #fff3d6;
+}
+
+.health-counts {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.health-counts > div {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  padding: 9px 5px;
+  border: 1px solid #dce6de;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.health-counts strong {
+  color: #2d4d3a;
+  font-size: 15px;
+}
+
+.health-issue-list {
+  display: grid;
+  gap: 10px;
+}
+
+.health-issue-list article {
+  display: grid;
+  gap: 11px;
+  padding: 13px;
+  border: 1px solid #d9e2da;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.health-issue-list article > header strong {
+  color: #33443a;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.health-issue-list article > header span,
+.health-issue-list article > footer,
+.health-ineligible {
+  color: #748078;
+  font-size: 11px;
+}
+
+.health-issue-list dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 15px;
+  margin: 0;
+}
+
+.health-issue-list dl div {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.health-issue-list dt,
+.health-issue-list dd {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.health-issue-list dt {
+  color: #849087;
+}
+
+.health-issue-list dd {
+  color: #435047;
+  overflow-wrap: anywhere;
+}
+
+.health-issue-error {
+  margin: 0;
+  padding: 9px 10px;
+  border-radius: 9px;
+  color: #9e433c;
+  background: #fff1f0;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.health-empty-issues {
+  color: #246b45;
+  background: #e5f4e9;
+}
+
+.health-source {
+  padding-top: 2px;
+  color: #839087;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
 .action-card > header {
   display: flex;
   align-items: center;
@@ -1265,6 +1724,15 @@ function formatScore(score: number | null): string {
   .chat-header,
   .composer-shell {
     padding-inline: 14px;
+  }
+
+  .health-overview,
+  .health-issue-list dl {
+    grid-template-columns: 1fr;
+  }
+
+  .health-counts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 </style>

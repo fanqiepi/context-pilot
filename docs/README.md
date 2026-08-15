@@ -9,6 +9,7 @@
 - [REST API、SSE 与操作确认约定](api/api-design.md)
 - [ContextPilot 评估计划](evaluation/evaluation-plan.md)
 - [V2 版本验收报告](evaluation/v2-acceptance-report.md)
+- [V3 版本验收报告](evaluation/v3-acceptance-report.md)
 - [本地开发](development/local-development.md)
 
 接口实现后的字段细节以 OpenAPI 为主要事实来源，已实施的数据库结构以 Flyway 迁移脚本为事实来源。

@@ -20,6 +20,7 @@ import io.github.fanqiepi.contextpilot.common.InternalServiceException;
 import io.github.fanqiepi.contextpilot.common.PayloadTooLargeException;
 import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseService;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +37,7 @@ public class DocumentService {
     private final TransactionTemplate transactionTemplate;
     private final DocumentProcessingCoordinator processingCoordinator;
     private final DocumentVectorIndex documentVectorIndex;
+    private final DocumentIndexMetadataRepository documentIndexMetadataRepository;
     private final EmbeddingIndexProperties embeddingIndexProperties;
 
     public DocumentService(
@@ -46,6 +48,7 @@ public class DocumentService {
             TransactionTemplate transactionTemplate,
             DocumentProcessingCoordinator processingCoordinator,
             DocumentVectorIndex documentVectorIndex,
+            DocumentIndexMetadataRepository documentIndexMetadataRepository,
             EmbeddingIndexProperties embeddingIndexProperties) {
         this.sourceDocumentMapper = sourceDocumentMapper;
         this.knowledgeBaseService = knowledgeBaseService;
@@ -54,6 +57,7 @@ public class DocumentService {
         this.transactionTemplate = transactionTemplate;
         this.processingCoordinator = processingCoordinator;
         this.documentVectorIndex = documentVectorIndex;
+        this.documentIndexMetadataRepository = documentIndexMetadataRepository;
         this.embeddingIndexProperties = embeddingIndexProperties;
     }
 
@@ -107,7 +111,7 @@ public class DocumentService {
                     "Document metadata could not be saved",
                     exception);
         }
-        processingCoordinator.submit(documentId);
+        processingCoordinator.submitAfterCommit(documentId);
         return response(entity);
     }
 
@@ -147,29 +151,13 @@ public class DocumentService {
             throw retryNotAllowed(documentId, entity);
         }
         SourceDocumentEntity entity = requireEntity(documentId);
-        processingCoordinator.submit(documentId);
+        processingCoordinator.submitAfterCommit(documentId);
         return response(entity);
     }
 
     public DocumentResponse reindex(UUID documentId) {
-        SourceDocumentEntity current = requireEntity(documentId);
-        if (current.getStatus() != DocumentStatus.SUCCEEDED) {
-            throw reindexNotAllowed(documentId, current);
-        }
+        requireReindexableDocument(documentId);
         EmbeddingIndexProfile currentProfile = embeddingIndexProperties.currentProfile();
-        if (currentProfile.id().equals(current.getEmbeddingProfileId())) {
-            throw reindexNotRequired(documentId);
-        }
-        if (!processingCoordinator.isEnabled()) {
-            throw new ConflictException(
-                    "DOCUMENT_PROCESSING_DISABLED",
-                    "Document processing is not enabled");
-        }
-        if (!documentVectorIndex.isAvailable()) {
-            throw new ConflictException(
-                    "VECTOR_STORE_UNAVAILABLE",
-                    "Document index cannot be rebuilt while vector storage is disabled");
-        }
         if (sourceDocumentMapper.prepareReindex(documentId, currentProfile.id()) == 0) {
             SourceDocumentEntity latest = requireEntity(documentId);
             if (latest.getStatus() == DocumentStatus.SUCCEEDED
@@ -179,8 +167,12 @@ public class DocumentService {
             throw reindexNotAllowed(documentId, latest);
         }
         SourceDocumentEntity pending = requireEntity(documentId);
-        processingCoordinator.submit(documentId);
+        processingCoordinator.submitAfterCommit(documentId);
         return response(pending);
+    }
+
+    public DocumentResponse validateReindex(UUID documentId) {
+        return response(requireReindexableDocument(documentId));
     }
 
     public void delete(UUID documentId) {
@@ -217,6 +209,44 @@ public class DocumentService {
 
     private DocumentResponse response(SourceDocumentEntity entity) {
         return DocumentResponse.from(entity, embeddingIndexProperties.currentProfile());
+    }
+
+    private SourceDocumentEntity requireReindexableDocument(UUID documentId) {
+        SourceDocumentEntity current = requireEntity(documentId);
+        if (current.getStatus() != DocumentStatus.SUCCEEDED) {
+            throw reindexNotAllowed(documentId, current);
+        }
+        if (!documentVectorIndex.isAvailable()) {
+            throw vectorStoreUnavailable();
+        }
+        EmbeddingIndexProfile currentProfile = embeddingIndexProperties.currentProfile();
+        if (currentProfile.id().equals(current.getEmbeddingProfileId())
+                && currentProfileVectorCount(current, currentProfile) > 0) {
+            throw reindexNotRequired(documentId);
+        }
+        if (!processingCoordinator.isEnabled()) {
+            throw new ConflictException(
+                    "DOCUMENT_PROCESSING_DISABLED",
+                    "Document processing is not enabled");
+        }
+        return current;
+    }
+
+    private long currentProfileVectorCount(
+            SourceDocumentEntity document,
+            EmbeddingIndexProfile currentProfile) {
+        try {
+            return documentIndexMetadataRepository.countCurrentProfileVectors(
+                    document.getKnowledgeBaseId(), document.getId(), currentProfile.id());
+        } catch (DataAccessException exception) {
+            throw vectorStoreUnavailable();
+        }
+    }
+
+    private ConflictException vectorStoreUnavailable() {
+        return new ConflictException(
+                "VECTOR_STORE_UNAVAILABLE",
+                "Document index cannot be rebuilt while vector storage is unavailable");
     }
 
     private String validateFilename(String originalFilename) {

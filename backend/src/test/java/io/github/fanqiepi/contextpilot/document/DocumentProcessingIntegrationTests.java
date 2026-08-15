@@ -17,6 +17,7 @@ import io.github.fanqiepi.contextpilot.retrieval.RetrievalService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.task.TaskRejectedException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
@@ -67,6 +68,12 @@ class DocumentProcessingIntegrationTests {
 
     @Autowired
     private DocumentProcessingService processingService;
+
+    @Autowired
+    private PendingDocumentRecoveryService pendingDocumentRecoveryService;
+
+    @Autowired
+    private DocumentProcessingProperties processingProperties;
 
     @Autowired
     private RetrievalService retrievalService;
@@ -158,6 +165,35 @@ class DocumentProcessingIntegrationTests {
         DocumentResponse failedAgain = awaitStatus(uploaded.id(), DocumentStatus.FAILED);
         assertThat(failedAgain.errorSummary()).isNotBlank();
         assertThat(vectorCount(uploaded.id())).isZero();
+    }
+
+    @Test
+    void keepsRejectedWorkPendingAndRecoversItFromPersistedState() {
+        KnowledgeBaseResponse knowledgeBase = knowledgeBaseService.create(
+                new KnowledgeBaseCreateRequest("Processing recovery", null));
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "recovery-notes.txt",
+                "text/plain",
+                "Persisted pending work can be dispatched again."
+                        .getBytes(StandardCharsets.UTF_8));
+        DocumentResponse uploaded = documentService.upload(knowledgeBase.id(), file);
+        awaitStatus(uploaded.id(), DocumentStatus.SUCCEEDED);
+        jdbcTemplate.update(
+                "UPDATE source_document SET status = 'PENDING', updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                uploaded.id());
+        DocumentProcessingCoordinator rejectingCoordinator = new DocumentProcessingCoordinator(
+                processingProperties,
+                task -> {
+                    throw new TaskRejectedException("queue full");
+                },
+                processingService);
+
+        assertThat(rejectingCoordinator.submit(uploaded.id())).isFalse();
+        assertThat(documentService.get(uploaded.id()).status()).isEqualTo(DocumentStatus.PENDING);
+        assertThat(pendingDocumentRecoveryService.recoverPendingDocuments()).isPositive();
+
+        assertThat(awaitStatus(uploaded.id(), DocumentStatus.SUCCEEDED).errorSummary()).isNull();
     }
 
     private DocumentResponse awaitStatus(UUID documentId, DocumentStatus expected) {

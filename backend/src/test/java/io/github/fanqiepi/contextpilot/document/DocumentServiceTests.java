@@ -18,6 +18,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.unit.DataSize;
@@ -54,6 +55,9 @@ class DocumentServiceTests {
     @Mock
     private DocumentVectorIndex documentVectorIndex;
 
+    @Mock
+    private DocumentIndexMetadataRepository documentIndexMetadataRepository;
+
     private StorageProperties storageProperties;
     private EmbeddingIndexProperties embeddingIndexProperties;
 
@@ -72,6 +76,7 @@ class DocumentServiceTests {
                 transactionTemplate,
                 processingCoordinator,
                 documentVectorIndex,
+                documentIndexMetadataRepository,
                 embeddingIndexProperties);
     }
 
@@ -96,7 +101,7 @@ class DocumentServiceTests {
         assertThat(entity.getStatus()).isEqualTo(DocumentStatus.PENDING);
         assertThat(entity.getStorageKey()).startsWith("knowledge-bases/" + knowledgeBaseId + "/documents/");
         assertThat(response.status()).isEqualTo(DocumentStatus.PENDING);
-        verify(processingCoordinator).submit(entity.getId());
+        verify(processingCoordinator).submitAfterCommit(entity.getId());
     }
 
     @Test
@@ -228,7 +233,7 @@ class DocumentServiceTests {
         DocumentResponse response = documentService.retry(documentId);
 
         assertThat(response.status()).isEqualTo(DocumentStatus.PENDING);
-        verify(processingCoordinator).submit(documentId);
+        verify(processingCoordinator).submitAfterCommit(documentId);
     }
 
     @Test
@@ -272,7 +277,7 @@ class DocumentServiceTests {
         verify(sourceDocumentMapper).prepareReindex(
                 documentId,
                 embeddingIndexProperties.currentProfile().id());
-        verify(processingCoordinator).submit(documentId);
+        verify(processingCoordinator).submitAfterCommit(documentId);
     }
 
     @Test
@@ -296,6 +301,10 @@ class DocumentServiceTests {
         UUID documentId = UUID.randomUUID();
         SourceDocumentEntity succeeded = document(documentId, DocumentStatus.SUCCEEDED);
         succeeded.setEmbeddingProfileId(embeddingIndexProperties.currentProfile().id());
+        when(documentVectorIndex.isAvailable()).thenReturn(true);
+        when(documentIndexMetadataRepository.countCurrentProfileVectors(
+                succeeded.getKnowledgeBaseId(), documentId, embeddingIndexProperties.currentProfile().id()))
+                .thenReturn(1L);
         when(sourceDocumentMapper.selectById(documentId)).thenReturn(succeeded);
 
         assertThatThrownBy(() -> documentService.reindex(documentId))
@@ -303,6 +312,51 @@ class DocumentServiceTests {
                         io.github.fanqiepi.contextpilot.common.ConflictException.class,
                         exception -> assertThat(exception.getCode())
                                 .isEqualTo("DOCUMENT_REINDEX_NOT_REQUIRED"));
+
+        verify(sourceDocumentMapper, never()).prepareReindex(
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any());
+        verifyNoInteractions(processingCoordinator);
+    }
+
+    @Test
+    void submitsCurrentProfileDocumentWhenItsVectorsAreMissing() {
+        UUID documentId = UUID.randomUUID();
+        SourceDocumentEntity succeeded = document(documentId, DocumentStatus.SUCCEEDED);
+        succeeded.setEmbeddingProfileId(embeddingIndexProperties.currentProfile().id());
+        SourceDocumentEntity pending = document(documentId, DocumentStatus.PENDING);
+        when(documentVectorIndex.isAvailable()).thenReturn(true);
+        when(documentIndexMetadataRepository.countCurrentProfileVectors(
+                succeeded.getKnowledgeBaseId(), documentId, embeddingIndexProperties.currentProfile().id()))
+                .thenReturn(0L);
+        when(processingCoordinator.isEnabled()).thenReturn(true);
+        when(sourceDocumentMapper.selectById(documentId)).thenReturn(succeeded, pending);
+        when(sourceDocumentMapper.prepareReindex(
+                documentId, embeddingIndexProperties.currentProfile().id())).thenReturn(1);
+
+        DocumentResponse response = documentService.reindex(documentId);
+
+        assertThat(response.status()).isEqualTo(DocumentStatus.PENDING);
+        verify(processingCoordinator).submitAfterCommit(documentId);
+    }
+
+    @Test
+    void reportsVectorStoreUnavailableWhenCurrentProfileVectorsCannotBeInspected() {
+        UUID documentId = UUID.randomUUID();
+        SourceDocumentEntity succeeded = document(documentId, DocumentStatus.SUCCEEDED);
+        succeeded.setEmbeddingProfileId(embeddingIndexProperties.currentProfile().id());
+        when(documentVectorIndex.isAvailable()).thenReturn(true);
+        when(sourceDocumentMapper.selectById(documentId)).thenReturn(succeeded);
+        when(documentIndexMetadataRepository.countCurrentProfileVectors(
+                succeeded.getKnowledgeBaseId(), documentId, embeddingIndexProperties.currentProfile().id()))
+                .thenThrow(new DataAccessResourceFailureException("database detail"));
+
+        assertThatThrownBy(() -> documentService.reindex(documentId))
+                .isInstanceOfSatisfying(
+                        io.github.fanqiepi.contextpilot.common.ConflictException.class,
+                        exception -> assertThat(exception.getCode())
+                                .isEqualTo("VECTOR_STORE_UNAVAILABLE"))
+                .hasMessageNotContaining("database detail");
 
         verify(sourceDocumentMapper, never()).prepareReindex(
                 org.mockito.ArgumentMatchers.any(),

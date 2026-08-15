@@ -45,7 +45,8 @@ class ActionRequestControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
                 .andExpect(jsonPath("$.actionType").value("CREATE_KNOWLEDGE_BASE"))
-                .andExpect(jsonPath("$.parameters.name").value("Java 学习"));
+                .andExpect(jsonPath("$.parameters.name").value("Java 学习"))
+                .andExpect(jsonPath("$.parameters.actionType").doesNotExist());
 
         mockMvc.perform(post("/api/action-requests/{id}/confirm", id))
                 .andExpect(status().isOk())

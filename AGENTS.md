@@ -11,13 +11,13 @@
 - V1, the functional RAG baseline, is complete. It covers document ingestion, retrieval-augmented generation, citations, streaming responses, conversation history, call records, positive-only helpful feedback, fixed capability routing, and embedding-index governance.
 - The roadmap advances by major version. A version under implementation is specified in detail; the next version defines a scenario and boundary; later versions are directional candidates and are not implementation authorization.
 - V2 is complete. It adds the persisted, confirmable `CREATE_KNOWLEDGE_BASE` business action while preserving the modular monolith and existing RAG behavior.
-- V3 has a detailed design draft at `docs/architecture/v3-knowledge-base-maintenance-design.md` for a knowledge-base maintenance assistant that can inspect health and, after confirmation, retry document processing or request reindexing. No new major version is currently authorized for implementation; do not implement V3 until that design and its contracts are explicitly approved for implementation and the repository governance documents are updated.
+- V3 is complete. Its approved detailed design and completion record are at `docs/architecture/v3-knowledge-base-maintenance-design.md` and `docs/evaluation/v3-acceptance-report.md`; preserve the V1/V2/V3 baselines in subsequent maintenance.
 - V4 and later may explore bounded planning, explicit memory, external-tool interoperability such as MCP, and multi-agent patterns, but none of these are currently authorized. Do not introduce agents, LangGraph or other workflow engines, MCP integration, microservices, message queues, multi-tenancy, plugin systems, dynamic tools, or model-generated SQL under the current scope.
 
-## Completed V2 baseline and current scope
+## Completed V1-V3 baselines and current scope
 
-- Treat V1 and V2 as completed baselines, not as unfinished MVP delivery and not as permission to implement later roadmap versions. Until another version is explicitly approved, preserve these baselines and limit changes to maintenance, verification, and approved documentation work.
-- V3 design work may refine the committed detailed-design draft and related requirements, architecture, data, API, and evaluation documents. Design approval does not authorize production code, Flyway migrations, or frontend implementation.
+- Treat V1, V2, and V3 as completed baselines, not as unfinished MVP delivery. Maintenance must preserve their documented behavior and acceptance evidence.
+- V3 was completed through the ordered, independently verifiable slices in the approved design. V4 and later remain unapproved until their scope and entry conditions are explicitly reviewed and committed.
 
 - Route each chat request to one of three explicit, versioned capabilities: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, or `BUSINESS_ACTION`.
 - Keep `SIMPLE_CHAT` narrow: identity, greeting, capability description, thanks, and farewell continue to use deterministic replies. Do not silently turn it into unrestricted open-domain model answering.
@@ -31,7 +31,7 @@
 ## Roadmap governance
 
 - Use `docs/requirements/product-requirements.md` as the single detailed roadmap. Avoid parallel phase systems such as P/N/I/A-D numbering for future work.
-- Describe V1 and V2 as completed baselines, V3 as a bounded detailed-design candidate that is not yet authorized for implementation, and V4+ only as goals and entry conditions.
+- Describe V1, V2, and V3 as completed baselines, and V4+ only as goals and entry conditions.
 - A roadmap candidate is not authorization. Before starting a later major version, update this file and the relevant requirements, architecture, data, API, and evaluation documents with an explicitly approved scope.
 - Plan capabilities from user scenarios first. Frameworks such as LangGraph, MCP, workflow runtimes, or multi-agent libraries are implementation candidates, not roadmap goals by themselves.
 - Keep the three top-level routing classes stable for the current scope: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, and `BUSINESS_ACTION`. Future knowledge tasks or business actions should normally be modeled beneath these classes unless a later approved design demonstrates the need for another top-level route.

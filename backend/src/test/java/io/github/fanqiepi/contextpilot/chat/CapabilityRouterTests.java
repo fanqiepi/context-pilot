@@ -8,7 +8,8 @@ class CapabilityRouterTests {
 
     private final CapabilityRouter router = new CapabilityRouter(
             new SimpleChatReplyPolicy(),
-            new CreateKnowledgeBaseIntentPolicy());
+            new CreateKnowledgeBaseIntentPolicy(),
+            new KnowledgeBaseHealthIntentPolicy());
 
     @Test
     void routesWhitelistedSimpleInteractionFirst() {
@@ -29,6 +30,25 @@ class CapabilityRouterTests {
                 .isEqualTo(CapabilityId.BUSINESS_ACTION);
         assertThat(router.route("新建知识库：架构资料", "trace-short").matchReason())
                 .isEqualTo(CapabilityMatchReason.EXPLICIT_CREATE_KNOWLEDGE_BASE);
+    }
+
+    @Test
+    void routesOnlyExplicitWholeSentenceHealthRequests() {
+        CapabilityRoute route = router.route(" 检查这个知识库有没有异常。 ", "trace-health");
+
+        assertThat(route.capabilityId()).isEqualTo(CapabilityId.KNOWLEDGE_QA);
+        assertThat(route.capabilityVersion()).isEqualTo("v2");
+        assertThat(route.matchReason())
+                .isEqualTo(CapabilityMatchReason.EXPLICIT_KNOWLEDGE_BASE_HEALTH);
+        assertThat(router.route("检查当前知识库的健康状态", "trace-health-2").matchReason())
+                .isEqualTo(CapabilityMatchReason.EXPLICIT_KNOWLEDGE_BASE_HEALTH);
+        assertThat(router.route("Check the health of this knowledge base", "trace-health-en").matchReason())
+                .isEqualTo(CapabilityMatchReason.EXPLICIT_KNOWLEDGE_BASE_HEALTH);
+
+        assertThat(router.route("检查这个知识库有没有异常，并概括核心内容", "trace-compound").matchReason())
+                .isEqualTo(CapabilityMatchReason.DEFAULT_KNOWLEDGE_QA);
+        assertThat(router.route("修复这个知识库的所有异常", "trace-repair").matchReason())
+                .isEqualTo(CapabilityMatchReason.DEFAULT_KNOWLEDGE_QA);
     }
 
     @Test

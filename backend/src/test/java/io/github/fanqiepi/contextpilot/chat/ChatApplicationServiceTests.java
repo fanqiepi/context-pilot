@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import io.github.fanqiepi.contextpilot.common.InternalServiceException;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportResponse;
 import io.github.fanqiepi.contextpilot.model.ChatModelGateway;
 import io.github.fanqiepi.contextpilot.model.ChatModelResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -141,6 +144,29 @@ class ChatApplicationServiceTests {
     }
 
     @Test
+    void returnsPersistedHealthReportWithoutModelOrAdditionalMessageWrite() {
+        ChatRequest request = new ChatRequest(null, UUID.randomUUID(), "检查这个知识库有没有异常");
+        PendingChatExchange exchange = exchange();
+        KnowledgeBaseHealthReportResponse report = mock(KnowledgeBaseHealthReportResponse.class);
+        when(report.summary()).thenReturn("知识库健康，未发现异常。");
+        PreparedChat prepared = PreparedChat.health(healthRoute("trace-health"), exchange, report);
+        when(preparationService.prepare(request, "trace-health"))
+                .thenReturn(prepared);
+
+        ChatAnswerResponse response = service.answer(request, "trace-health");
+
+        assertThat(response.answer()).isEqualTo("知识库健康，未发现异常。");
+        assertThat(response.healthReport()).isSameAs(report);
+        assertThat(response.capabilityVersion()).isEqualTo("v2");
+        assertThat(response.capabilityMatchReason())
+                .isEqualTo(CapabilityMatchReason.EXPLICIT_KNOWLEDGE_BASE_HEALTH);
+        assertThat(response.citations()).isEmpty();
+        assertThat(response.model()).isNull();
+        assertThat(response.usage()).isNull();
+        verifyNoInteractions(persistenceService, chatModelGateway);
+    }
+
+    @Test
     void recordsModelFailureBeforeReturningSafeError() {
         UUID knowledgeBaseId = UUID.randomUUID();
         PendingChatExchange exchange = exchange();
@@ -191,6 +217,14 @@ class ChatApplicationServiceTests {
         return CapabilityRoute.matched(
                 CapabilityId.SIMPLE_CHAT,
                 CapabilityMatchReason.SIMPLE_INTERACTION_WHITELIST,
+                traceId);
+    }
+
+    private CapabilityRoute healthRoute(String traceId) {
+        return CapabilityRoute.matched(
+                CapabilityId.KNOWLEDGE_QA,
+                "v2",
+                CapabilityMatchReason.EXPLICIT_KNOWLEDGE_BASE_HEALTH,
                 traceId);
     }
 }

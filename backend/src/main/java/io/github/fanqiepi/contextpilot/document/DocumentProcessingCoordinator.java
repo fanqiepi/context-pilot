@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Component
 public class DocumentProcessingCoordinator {
@@ -35,15 +37,33 @@ public class DocumentProcessingCoordinator {
         return processingAttempts < properties.getMaxAttempts();
     }
 
-    public void submit(UUID documentId) {
+    public void submitAfterCommit(UUID documentId) {
         if (!isEnabled()) {
             return;
         }
+        if (!TransactionSynchronizationManager.isActualTransactionActive()
+                || !TransactionSynchronizationManager.isSynchronizationActive()) {
+            submit(documentId);
+            return;
+        }
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                submit(documentId);
+            }
+        });
+    }
+
+    public boolean submit(UUID documentId) {
+        if (!isEnabled()) {
+            return false;
+        }
         try {
             taskExecutor.execute(() -> processingService.process(documentId));
+            return true;
         } catch (TaskRejectedException exception) {
             LOGGER.warn("Document processing queue rejected documentId={}", documentId);
-            processingService.markSubmissionFailed(documentId);
+            return false;
         }
     }
 }

@@ -8,12 +8,15 @@ import type {
   Citation,
   ConversationMessage,
   ConversationSummary,
+  HealthReportActionProposal,
   KnowledgeBase,
+  KnowledgeBaseHealthReport,
   KnowledgeBaseInput,
   SourceDocument,
   StreamDeltaEvent,
   StreamDoneEvent,
   StreamErrorEvent,
+  StreamHealthReportEvent,
   StreamActionRequiredEvent,
   StreamMessageEvent,
   StreamRouteEvent,
@@ -106,6 +109,25 @@ export async function getActionRequest(id: string): Promise<ActionRequest> {
   return response.data
 }
 
+export async function getKnowledgeBaseHealthReport(
+  id: string,
+): Promise<KnowledgeBaseHealthReport> {
+  const response = await apiClient.get<KnowledgeBaseHealthReport>(
+    `/knowledge-base-health-reports/${id}`,
+  )
+  return response.data
+}
+
+export async function proposeHealthReportIssueAction(
+  reportId: string,
+  issueId: string,
+): Promise<HealthReportActionProposal> {
+  const response = await apiClient.post<HealthReportActionProposal>(
+    `/knowledge-base-health-reports/${reportId}/issues/${issueId}/action-request`,
+  )
+  return response.data
+}
+
 export async function confirmActionRequest(id: string): Promise<ActionRequest> {
   const response = await apiClient.post<ActionRequest>(`/action-requests/${id}/confirm`)
   return response.data
@@ -120,6 +142,7 @@ export interface ChatStreamHandlers {
   onMessage: (event: StreamMessageEvent) => void
   onRoute?: (event: StreamRouteEvent) => void
   onActionRequired: (event: StreamActionRequiredEvent) => void
+  onHealthReport: (event: StreamHealthReportEvent) => void
   onDelta: (event: StreamDeltaEvent) => void
   onCitation: (event: Citation) => void
   onUsage: (event: StreamUsageEvent) => void
@@ -161,6 +184,9 @@ export async function streamChat(
           break
         case 'action_required':
           handlers.onActionRequired(payload as StreamActionRequiredEvent)
+          break
+        case 'health_report':
+          handlers.onHealthReport(payload as StreamHealthReportEvent)
           break
         case 'delta':
           handlers.onDelta(payload as StreamDeltaEvent)

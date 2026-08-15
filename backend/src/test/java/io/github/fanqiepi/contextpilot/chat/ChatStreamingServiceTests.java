@@ -9,6 +9,7 @@ import io.github.fanqiepi.contextpilot.action.ActionRequestStatus;
 import io.github.fanqiepi.contextpilot.action.ActionType;
 import io.github.fanqiepi.contextpilot.action.CreateKnowledgeBaseActionParameters;
 import io.github.fanqiepi.contextpilot.common.InternalServiceException;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportResponse;
 import io.github.fanqiepi.contextpilot.model.ChatModelChunk;
 import io.github.fanqiepi.contextpilot.model.ChatModelGateway;
 import io.github.fanqiepi.contextpilot.model.ChatModelResult;
@@ -27,6 +28,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -145,6 +147,33 @@ class ChatStreamingServiceTests {
         verify(persistenceService).completeWithoutModel(
                 exchange.assistantMessageId(), SimpleChatReplyPolicy.IDENTITY_REPLY);
         verifyNoInteractions(chatModelGateway);
+    }
+
+    @Test
+    void emitsPersistedHealthReportInStableOrderWithoutModelCall() {
+        ChatRequest request = request();
+        PendingChatExchange exchange = exchange();
+        KnowledgeBaseHealthReportResponse report = mock(KnowledgeBaseHealthReportResponse.class);
+        when(report.summary()).thenReturn("知识库健康，未发现异常。");
+        PreparedChat prepared = PreparedChat.health(healthRoute("trace-health"), exchange, report);
+        when(preparationService.prepare(request, "trace-health"))
+                .thenReturn(prepared);
+
+        List<ServerSentEvent<ChatStreamPayload>> events = service
+                .stream(request, "trace-health")
+                .collectList()
+                .block(Duration.ofSeconds(5));
+
+        assertThat(events).isNotNull();
+        assertThat(events.stream().map(ServerSentEvent::event).toList())
+                .containsExactly("message", "route", "delta", "health_report", "done");
+        ChatStreamPayload.Route route = (ChatStreamPayload.Route) events.get(1).data();
+        assertThat(route.capabilityVersion()).isEqualTo("v2");
+        assertThat(route.capabilityMatchReason())
+                .isEqualTo(CapabilityMatchReason.EXPLICIT_KNOWLEDGE_BASE_HEALTH);
+        assertThat(events.get(3).data()).isSameAs(report);
+        assertThat(((ChatStreamPayload.Done) events.getLast().data()).status()).isEqualTo("COMPLETED");
+        verifyNoInteractions(persistenceService, chatModelGateway);
     }
 
     @Test
@@ -311,6 +340,14 @@ class ChatStreamingServiceTests {
         return CapabilityRoute.matched(
                 CapabilityId.SIMPLE_CHAT,
                 CapabilityMatchReason.SIMPLE_INTERACTION_WHITELIST,
+                traceId);
+    }
+
+    private CapabilityRoute healthRoute(String traceId) {
+        return CapabilityRoute.matched(
+                CapabilityId.KNOWLEDGE_QA,
+                "v2",
+                CapabilityMatchReason.EXPLICIT_KNOWLEDGE_BASE_HEALTH,
                 traceId);
     }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportResponse;
 
 public record ChatAnswerResponse(
         UUID conversationId,
@@ -18,5 +19,6 @@ public record ChatAnswerResponse(
         CapabilityId capabilityId,
         String capabilityVersion,
         CapabilityMatchReason capabilityMatchReason,
+        KnowledgeBaseHealthReportResponse healthReport,
         ActionRequestResponse actionRequest) {
 }

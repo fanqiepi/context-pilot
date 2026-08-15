@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
 import io.github.fanqiepi.contextpilot.action.ActionRequestStatus;
+import io.github.fanqiepi.contextpilot.action.ActionParameters;
 import io.github.fanqiepi.contextpilot.action.ActionType;
-import io.github.fanqiepi.contextpilot.action.CreateKnowledgeBaseActionParameters;
 
 public interface ChatStreamPayload {
 
@@ -38,7 +38,7 @@ public interface ChatStreamPayload {
             CapabilityId capabilityId,
             String capabilityVersion,
             ActionType actionType,
-            CreateKnowledgeBaseActionParameters parameters,
+            ActionParameters parameters,
             String displaySummary,
             ActionRequestStatus status,
             String resultSummary,

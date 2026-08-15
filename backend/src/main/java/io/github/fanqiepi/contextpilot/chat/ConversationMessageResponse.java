@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportResponse;
 
 public record ConversationMessageResponse(
         UUID id,
@@ -17,14 +18,16 @@ public record ConversationMessageResponse(
         CapabilityId capabilityId,
         String capabilityVersion,
         CapabilityMatchReason capabilityMatchReason,
+        KnowledgeBaseHealthReportResponse healthReport,
         ActionRequestResponse actionRequest,
         List<ChatCitationResponse> citations,
         boolean helpful,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt) {
 
-    static ConversationMessageResponse from(
+    public static ConversationMessageResponse from(
             ChatMessageEntity entity,
+            KnowledgeBaseHealthReportResponse healthReport,
             ActionRequestResponse actionRequest,
             List<ChatCitationResponse> citations,
             boolean helpful) {
@@ -39,6 +42,7 @@ public record ConversationMessageResponse(
                 entity.getCapabilityId(),
                 entity.getCapabilityVersion(),
                 entity.getCapabilityMatchReason(),
+                healthReport,
                 actionRequest,
                 List.copyOf(citations),
                 helpful,

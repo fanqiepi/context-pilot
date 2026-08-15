@@ -1,6 +1,6 @@
 # ContextPilot 数据模型
 
-> 本文定义已完成的 V1/V2 逻辑模型和尚未实施的 V3 设计模型；已经实施的物理结构仍以 Flyway 迁移为事实来源。V3 表结构不得在设计获批实现前创建。
+> 本文定义已完成的 V1/V2 逻辑模型和已获准实施的 V3 设计模型；已经实施的物理结构仍以 Flyway 迁移为事实来源。V3 物理结构按批准的实施切片通过后续 Flyway 迁移逐步落地。
 
 ## 核心实体
 
@@ -15,8 +15,8 @@
 | `model_call` | 模型、耗时、Token、状态和脱敏错误 | 关联消息或文档任务 |
 | `answer_feedback` | “有用”正向反馈 | 每条助手消息最多一条当前反馈 |
 | `action_request` | 保存需人工确认的业务操作提案、状态和安全结果摘要 | 关联会话、用户消息和提案助手消息 |
-| `knowledge_base_health_report`（V3 设计） | 保存不可变的知识库健康检查快照 | 关联知识库、会话和检查消息 |
-| `knowledge_base_health_issue`（V3 设计） | 保存报告中的文档异常、观察事实和修复建议 | 关联健康报告和目标文档 |
+| `knowledge_base_health_report`（V3 / V11） | 保存不可变的知识库健康检查快照 | 关联知识库、会话和检查消息 |
+| `knowledge_base_health_issue`（V3 / V11） | 保存报告中的文档异常、观察事实和修复建议 | 关联健康报告和目标文档 |
 
 ## 数据约定
 
@@ -86,15 +86,27 @@
 
 客户端不能提交或覆盖持久化后的 `action_type`、`parameters`、消息关系或 trace ID。模型输出只作为候选输入，必须在保存提案前转换为明确 DTO 并通过领域校验。
 
-## V3 计划数据结构（尚未实施）
+## V3 数据结构（按切片实施）
 
-V3 详细字段与约束见 [V3 知识库健康检查与维护助手详细设计](../architecture/v3-knowledge-base-maintenance-design.md)。计划新增：
+V3 详细字段与约束见 [V3 知识库健康检查与维护助手详细设计](../architecture/v3-knowledge-base-maintenance-design.md)。V11 已新增：
 
 - `knowledge_base_health_report`：保存知识库、会话、触发消息、能力版本、`health_status`、完整性、`data_as_of`、当前 Embedding profile 快照、各文档状态计数、问题计数、确定性摘要和 trace ID。一条活动助手消息最多关联一份报告；报告创建后不刷新或覆盖。
 - `knowledge_base_health_issue`：保存报告时观察到的文档 ID、文件名快照、问题类型、严重程度、文档状态、处理次数、安全错误摘要、Embedding profile、向量计数、来源更新时间、建议动作和不可执行原因。同一报告、文档和问题类型最多一条活动明细。
 
 报告及明细属于审计型业务记录，使用 `deleted` 逻辑删除。`source_document` 继续作为当前事实来源；报告只表达历史时间点结论。历史读取不得重新计算旧报告，生成提案和确认执行时必须重新校验实时文档状态。
 
-V3 还计划通过后续 Flyway 迁移扩展 `action_request`：允许 `RETRY_DOCUMENT_PROCESSING` 和 `REINDEX_DOCUMENT`，增加受限删除外键 `target_document_id` 与可空 `health_issue_id`，并按动作类型约束 JSONB 参数。应用参数使用 sealed 强类型联合和显式静态分派，不把 `action_request` 演进为任意工具载体。
+V3 切片 4 已通过 V13 扩展 `action_request`：固定允许 `CREATE_KNOWLEDGE_BASE`、`RETRY_DOCUMENT_PROCESSING` 和 `REINDEX_DOCUMENT`，增加受限删除外键 `target_document_id` 与可空 `health_issue_id`，并按动作类型约束 JSONB 参数。创建知识库动作的两个目标字段必须为空；维护动作必须具有一致的文档目标和健康明细，单个活动健康明细最多关联一个提案。应用参数使用 sealed 强类型联合和显式静态分派，不把 `action_request` 演进为任意工具载体。
 
-为受控检查实际向量存在性，计划给 `vector_store.metadata` 中的知识库、文档和 Embedding profile 字段增加表达式索引。该索引只优化专用只读 DataPort，不改变 `PgVectorStore` 的写入和检索边界。
+为受控检查实际向量存在性，V11 已给 `vector_store.metadata` 中的知识库、文档和 Embedding profile 字段增加 `vector_store_health_metadata_idx` 表达式索引。该索引只优化专用只读 DataPort，不改变 `PgVectorStore` 的写入和检索边界。
+
+V3 切片 2 通过顺序迁移 V11 落地报告主表、异常明细表和表达式索引，未修改 V1-V10。报告与明细只在创建时写入；历史查询按助手消息批量读取保存快照，不从当前 `source_document` 重新计算。
+
+V3 切片 3 通过 V12 扩展 `chat_message_capability_match_reason_check`，允许 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`。健康请求保存为 `KNOWLEDGE_QA/v2`；普通 RAG、V1/V2 历史消息和已有动作记录不做版本回填。
+
+V3 切片 5 通过 V14 再次扩展该约束，允许 `HEALTH_REPORT_ISSUE_SELECTED`。从报告明细生成的确定性用户选择消息和助手提案消息保存为 `BUSINESS_ACTION/v2`，并与同一 `action_request` 的用户消息、助手消息、目标文档、健康明细和 trace ID 关联。生成过程锁定目标明细行，再查询 V13 活动唯一索引对应的现有动作，保证并发请求不会留下重复消息或提案。
+
+V3 切片 6 不新增迁移，复用 V13 已预留的 `REINDEX_DOCUMENT` 参数形状和目标约束。实时重建资格通过 `source_document` 与按知识库、文档、当前 profile 限定的 `vector_store.metadata` 计数共同判断；`prepareReindex` 的条件更新同时允许来源未知、profile 不同和当前 profile 实际向量不存在，并原子迁移到 `PENDING`，避免校验与状态更新之间产生错误重建或重复提交。
+
+V3 切片 7 不新增迁移。上传、重试和索引重建在业务状态写入成功后统一注册事务提交后派发；队列拒绝不再执行 `PENDING -> FAILED`，应用启动和低频固定间隔按 `updated_at, id` 稳定顺序读取有限数量的活动 `PENDING` 文档并重新派发。工作线程继续使用带状态条件的 `claimForProcessing` 取得处理权，因此恢复扫描和直接派发并发时仍只会有一个处理器进入 `PROCESSING`。
+
+V13 和 V14 都不改写 V2 `CREATE_KNOWLEDGE_BASE` 的 `action_type`、`parameters`、状态或消息关联，只为历史记录补充两个空目标列并扩展新消息的允许匹配依据。迁移测试先在 V12 写入真实 V2 提案，再升级至最新版本验证原始 JSON 和状态保持不变。

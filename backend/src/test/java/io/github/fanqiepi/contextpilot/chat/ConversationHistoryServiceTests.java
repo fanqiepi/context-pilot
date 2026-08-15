@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
@@ -13,6 +14,8 @@ import io.github.fanqiepi.contextpilot.action.ActionRequestService;
 import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
 import io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackEntity;
 import io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackMapper;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportResponse;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportService;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseService;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -53,6 +57,8 @@ class ConversationHistoryServiceTests {
     private AnswerFeedbackMapper answerFeedbackMapper;
     @Mock
     private ActionRequestService actionRequestService;
+    @Mock
+    private KnowledgeBaseHealthReportService healthReportService;
 
     private ConversationHistoryService service;
 
@@ -64,7 +70,8 @@ class ConversationHistoryServiceTests {
                 chatMessageMapper,
                 messageCitationMapper,
                 answerFeedbackMapper,
-                actionRequestService);
+                actionRequestService,
+                healthReportService);
     }
 
     @Test
@@ -135,6 +142,9 @@ class ConversationHistoryServiceTests {
                     .containsValue(assistantMessageId);
             return List.of(feedback(assistantMessageId));
         });
+        KnowledgeBaseHealthReportResponse healthReport = mock(KnowledgeBaseHealthReportResponse.class);
+        when(healthReportService.findByAssistantMessageIds(any()))
+                .thenReturn(Map.of(assistantMessageId, healthReport));
 
         List<ConversationMessageResponse> result = service.messages(conversationId);
 
@@ -142,6 +152,7 @@ class ConversationHistoryServiceTests {
         assertThat(result.getFirst().role()).isEqualTo(ChatMessageRole.USER);
         assertThat(result.getFirst().citations()).isEmpty();
         assertThat(result.getFirst().helpful()).isFalse();
+        assertThat(result.getFirst().healthReport()).isNull();
         assertThat(result.getLast().content()).isEqualTo("Answer [1].");
         assertThat(result.getLast().traceId()).isEqualTo("trace-answer");
         assertThat(result.getLast().capabilityId()).isEqualTo(CapabilityId.KNOWLEDGE_QA);
@@ -153,6 +164,7 @@ class ConversationHistoryServiceTests {
                 .containsExactly(1, 2);
         assertThat(result.getLast().citations().getFirst().originalFilename()).isEqualTo("first.txt");
         assertThat(result.getLast().helpful()).isTrue();
+        assertThat(result.getLast().healthReport()).isSameAs(healthReport);
     }
 
     @Test
@@ -166,6 +178,7 @@ class ConversationHistoryServiceTests {
 
         verify(messageCitationMapper, never()).selectList(any());
         verify(answerFeedbackMapper, never()).selectList(any());
+        verify(healthReportService, never()).findByAssistantMessageIds(any());
     }
 
     @Test
@@ -180,6 +193,7 @@ class ConversationHistoryServiceTests {
         verify(chatMessageMapper, never()).selectList(any());
         verify(messageCitationMapper, never()).selectList(any());
         verify(answerFeedbackMapper, never()).selectList(any());
+        verify(healthReportService, never()).findByAssistantMessageIds(any());
     }
 
     private ConversationEntity conversation(

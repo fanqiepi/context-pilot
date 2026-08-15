@@ -3,5 +3,7 @@ package io.github.fanqiepi.contextpilot.chat;
 public enum CapabilityMatchReason {
     SIMPLE_INTERACTION_WHITELIST,
     EXPLICIT_CREATE_KNOWLEDGE_BASE,
+    EXPLICIT_KNOWLEDGE_BASE_HEALTH,
+    HEALTH_REPORT_ISSUE_SELECTED,
     DEFAULT_KNOWLEDGE_QA
 }

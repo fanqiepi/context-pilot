@@ -43,6 +43,8 @@ spring:
 contextpilot:
   action-request:
     confirmation-timeout-minutes: ${ACTION_CONFIRMATION_TIMEOUT_MINUTES:30}
+  health:
+    issue-limit: ${HEALTH_ISSUE_LIMIT:100}
   embedding:
     index:
       profile-id: ${EMBEDDING_PROFILE_ID:dashscope_qwen3_7_1024_v1}
@@ -64,6 +66,8 @@ contextpilot:
       max-pool-size: ${DOCUMENT_PROCESSING_MAX_POOL_SIZE:2}
       queue-capacity: ${DOCUMENT_PROCESSING_QUEUE_CAPACITY:50}
       max-attempts: ${DOCUMENT_PROCESSING_MAX_ATTEMPTS:3}
+      recovery-batch-size: ${DOCUMENT_PROCESSING_RECOVERY_BATCH_SIZE:50}
+      recovery-interval-millis: ${DOCUMENT_PROCESSING_RECOVERY_INTERVAL_MILLIS:60000}
   chat:
     retrieval-top-k: ${CHAT_RETRIEVAL_TOP_K:5}
     min-similarity: ${CHAT_MIN_SIMILARITY:0.5}

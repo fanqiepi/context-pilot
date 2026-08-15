@@ -66,6 +66,7 @@ class ChatControllerTests {
                 CapabilityId.KNOWLEDGE_QA,
                 "v1",
                 CapabilityMatchReason.DEFAULT_KNOWLEDGE_QA,
+                null,
                 null));
 
         mockMvc.perform(post("/api/chat")

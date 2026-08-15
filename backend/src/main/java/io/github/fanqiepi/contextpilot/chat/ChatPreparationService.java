@@ -7,6 +7,10 @@ import java.util.Optional;
 import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
 import io.github.fanqiepi.contextpilot.action.ActionRequestService;
 import io.github.fanqiepi.contextpilot.action.CreateKnowledgeBaseActionParameters;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthAssessment;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportResponse;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportService;
+import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthService;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalResultResponse;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalSearchRequest;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalService;
@@ -30,6 +34,8 @@ public class ChatPreparationService {
     private final CapabilityRouter capabilityRouter;
     private final CreateKnowledgeBaseIntentPolicy createKnowledgeBaseIntentPolicy;
     private final ActionRequestService actionRequestService;
+    private final KnowledgeBaseHealthService healthService;
+    private final KnowledgeBaseHealthReportService healthReportService;
 
     public ChatPreparationService(
             RetrievalService retrievalService,
@@ -39,7 +45,9 @@ public class ChatPreparationService {
             SimpleChatReplyPolicy simpleReplyPolicy,
             CapabilityRouter capabilityRouter,
             CreateKnowledgeBaseIntentPolicy createKnowledgeBaseIntentPolicy,
-            ActionRequestService actionRequestService) {
+            ActionRequestService actionRequestService,
+            KnowledgeBaseHealthService healthService,
+            KnowledgeBaseHealthReportService healthReportService) {
         this.retrievalService = retrievalService;
         this.persistenceService = persistenceService;
         this.promptComposer = promptComposer;
@@ -48,6 +56,8 @@ public class ChatPreparationService {
         this.capabilityRouter = capabilityRouter;
         this.createKnowledgeBaseIntentPolicy = createKnowledgeBaseIntentPolicy;
         this.actionRequestService = actionRequestService;
+        this.healthService = healthService;
+        this.healthReportService = healthReportService;
     }
 
     @Transactional
@@ -79,6 +89,9 @@ public class ChatPreparationService {
             ChatRequest request,
             String question,
             CapabilityRoute route) {
+        if (route.matchReason() == CapabilityMatchReason.EXPLICIT_KNOWLEDGE_BASE_HEALTH) {
+            return prepareKnowledgeBaseHealth(request, question, route);
+        }
         List<RetrievalResultResponse> results = retrievalService.search(
                 request.knowledgeBaseId(),
                 new RetrievalSearchRequest(question, properties.getRetrievalTopK()));
@@ -93,6 +106,21 @@ public class ChatPreparationService {
                 exchange,
                 promptComposer.compose(question, evidence),
                 citations(evidence));
+    }
+
+    private PreparedChat prepareKnowledgeBaseHealth(
+            ChatRequest request,
+            String question,
+            CapabilityRoute route) {
+        PendingChatExchange exchange = persistenceService.begin(
+                request.conversationId(), request.knowledgeBaseId(), question, route);
+        KnowledgeBaseHealthAssessment assessment = healthService.inspect(request.knowledgeBaseId());
+        KnowledgeBaseHealthReportResponse report = healthReportService.create(
+                exchange.conversationId(),
+                exchange.userMessageId(),
+                exchange.assistantMessageId(),
+                assessment);
+        return PreparedChat.health(route, exchange, report);
     }
 
     private PreparedChat prepareBusinessAction(

@@ -71,6 +71,14 @@ public class ChatStreamingService {
                             prepared.actionRequest())),
                     event("done", new ChatStreamPayload.Done("AWAITING_CONFIRMATION", traceId)));
         }
+        if (prepared.healthReportReady()) {
+            return Flux.just(
+                    message,
+                    route,
+                    event("delta", new ChatStreamPayload.Delta(prepared.directAnswer())),
+                    event("health_report", prepared.healthReport()),
+                    event("done", new ChatStreamPayload.Done("COMPLETED", traceId)));
+        }
         if (prepared.hasDirectAnswer()) {
             persistenceService.completeWithoutModel(
                     exchange.assistantMessageId(), prepared.directAnswer());

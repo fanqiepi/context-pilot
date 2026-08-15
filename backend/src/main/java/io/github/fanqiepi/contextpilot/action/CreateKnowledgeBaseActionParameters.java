@@ -2,7 +2,7 @@ package io.github.fanqiepi.contextpilot.action;
 
 import io.github.fanqiepi.contextpilot.common.BadRequestException;
 
-public record CreateKnowledgeBaseActionParameters(String name, String description) {
+public record CreateKnowledgeBaseActionParameters(String name, String description) implements ActionParameters {
 
     public CreateKnowledgeBaseActionParameters {
         name = normalize(name);
@@ -22,6 +22,11 @@ public record CreateKnowledgeBaseActionParameters(String name, String descriptio
                     "KNOWLEDGE_BASE_DESCRIPTION_TOO_LONG",
                     "Knowledge base description must not exceed 1000 characters");
         }
+    }
+
+    @Override
+    public ActionType actionType() {
+        return ActionType.CREATE_KNOWLEDGE_BASE;
     }
 
     private static String normalize(String value) {

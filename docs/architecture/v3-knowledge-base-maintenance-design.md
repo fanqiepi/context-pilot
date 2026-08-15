@@ -1,6 +1,6 @@
 # V3 知识库健康检查与维护助手详细设计
 
-> 状态：详细设计草案，2026-08-15 形成；尚未授权实现。
+> 状态：详细设计已批准，2026-08-15 获准实施；当前按第 18 节切片推进。
 >
 > 适用范围：`GET_KNOWLEDGE_BASE_HEALTH`、`RETRY_DOCUMENT_PROCESSING`、`REINDEX_DOCUMENT`。
 >
@@ -338,7 +338,7 @@ ineligibilitySummary
 
 ### 9.1 去除创建知识库专用硬编码
 
-当前 `ActionRequestResponse.parameters`、SSE `ActionRequired.parameters`、Mapper 字段提取和执行服务都绑定 `CreateKnowledgeBaseActionParameters`。V3 必须把动作核心重构为静态强类型协议：
+切片 4 实施前，`ActionRequestResponse.parameters`、SSE `ActionRequired.parameters`、Mapper 字段提取和执行服务都绑定 `CreateKnowledgeBaseActionParameters`。V3 将动作核心重构为静态强类型协议：
 
 ```text
 ActionParameters（sealed interface）
@@ -574,7 +574,7 @@ V3 评估 Profile 必须使用真实 PostgreSQL/pgvector 容器验证报告、�
 
 ## 18. 实施切片
 
-只有本设计及相关治理文档通过明确评审并授权实现后，才按以下顺序开发：
+本设计及相关治理文档已于 2026-08-15 明确评审并授权实现，按以下顺序开发：
 
 1. **健康只读核心**：DataPort、健康规则、结构化 DTO 和真实 PostgreSQL 测试。
 2. **报告持久化**：报告主表、异常明细表、消息关联和历史恢复。
@@ -586,6 +586,22 @@ V3 评估 Profile 必须使用真实 PostgreSQL/pgvector 容器验证报告、�
 8. **评估与验收**：V1/V2 回归、V3 固定评估、真实页面检查和版本报告。
 
 每个切片都必须保持可构建、可测试，不提前加入下一切片的通用抽象。
+
+### 18.1 当前实施进度
+
+- 2026-08-15 完成切片 1“健康只读核心”：新增 `health` 业务边界、参数化 PostgreSQL DataPort、固定健康状态与四类问题规则、结构化评估结果、明细上限配置，以及规则单元测试和真实 PostgreSQL/pgvector 隔离测试。
+- 切片 1 只返回应用内部健康评估，不创建报告表、不写聊天消息、不新增 HTTP/SSE 合同，也不改变现有文档重试或重建入口。
+- 2026-08-15 完成切片 2“报告持久化”：新增 V11 报告主表、异常明细表与向量元数据表达式索引；报告服务校验知识库、会话、用户消息、待完成助手消息及 trace 的可信关联，在同一事务保存不可变快照并完成助手消息；历史服务按消息和报告批量恢复快照，不重新执行健康检查。
+- 切片 2 已通过真实 PostgreSQL/pgvector 迁移及持久化测试，覆盖来源快照不可变、稳定排序、重复创建冲突、跨知识库拒绝和历史回显；公开报告端点、健康聊天路由和 SSE 事件已在切片 3 补齐。
+- 2026-08-15 完成切片 3“聊天与前端卡片”：新增完整句健康意图白名单、`KNOWLEDGE_QA/v2` 与 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`，V12 扩展消息路由约束；同步聊天、报告 GET、固定顺序 SSE `health_report` 和历史刷新恢复读取同一不可变报告，且不调用 ChatModel。
+- 前端卡片展示总体状态、`dataAsOf`、完整性、当前 profile、文档计数、异常依据、建议动作和不可执行原因；切片 5 已开放失败文档的重试提案按钮，切片 6 已开放来源未知、profile 过期和实际向量缺失明细的索引重建提案按钮。后端聚焦测试、真实 PostgreSQL HTTP/SSE 链路、前端类型检查和生产构建已通过。
+- 2026-08-15 完成切片 4“动作核心重构”：新增 sealed `ActionParameters` 及三个固定参数 record，Mapper 以 `action_type` 静态编解码 JSONB，确认服务通过枚举 `switch` 显式分派；V13 增加两个维护动作、文档目标、健康明细外键、按动作类型的参数形状约束和活动明细唯一索引。前端 `ActionRequest` 同步演进为判别联合。
+- 切片 4 完成时尚未开放维护提案入口；V12 既有创建知识库提案迁移到 V13 后 JSON、状态及空目标字段保持兼容。
+- 2026-08-15 完成切片 5“失败文档重试提案”：新增无请求体的报告明细提案端点和 `HealthReportActionProposalService`，以明细行锁与 V13 唯一索引保证并发请求只创建一组确定性消息和一个提案；消息使用 `BUSINESS_ACTION/v2` 与 V14 `HEALTH_REPORT_ISSUE_SELECTED`。客户端仅提交报告与明细 ID，服务端校验报告、会话、知识库、文档及动作资格，并从不可变快照构造强类型参数。
+- `RetryDocumentProcessingActionExecutor` 在确认取得执行权后复用单文档重试原语，再次校验 `FAILED`、处理开关和次数上限；陈旧、删除、关闭或超限目标进入动作 `FAILED` 且不修改文档，重复及并发确认最多提交一次。
+- 2026-08-15 完成切片 6“索引重建提案”：同一无请求体端点按可信明细静态选择 `REINDEX_DOCUMENT`，提案参数保存报告观察到的 profile；`ReindexDocumentActionExecutor` 复用单文档重建原语，生成和确认均校验 `SUCCEEDED`、当前 profile、实际向量及处理与 VectorStore 可用性。来源未知、profile 过期和当前 profile 向量为零均可重建；向量在报告后恢复、状态变化或依赖不可用时安全拒绝且不修改文档。前端开放重建按钮，重复请求恢复同一操作卡片。
+- 2026-08-15 完成切片 7“可靠派发”：上传、重试和索引重建统一注册事务提交后派发；执行器队列拒绝只记录受限日志并保留 `PENDING`。新增启动与低频固定间隔的有界恢复扫描，按稳定顺序重新派发活动 `PENDING` 文档，并继续依靠 `claimForProcessing` 原子抢占消解重复派发。该切片不新增数据库迁移。
+- 2026-08-15 完成切片 8“评估与验收”：建立固定数据集、离线 Maven Profile 与脱敏基线报告，完成 V1/V2 回归、V3 专项评估、全量回归、前端构建、真实接口验收和页面目检。八个切片及第 19 节完成标准全部满足，V3 正式完成。
 
 ## 19. V3 完成标准
 
@@ -602,7 +618,7 @@ V3 评估 Profile 必须使用真实 PostgreSQL/pgvector 容器验证报告、�
 
 ## 20. 授权边界
 
-本文只形成 V3 详细设计，不自动授权生产代码、迁移或前端实现。设计评审需要明确确认以下默认决策后，才能把 V3 状态改为“获准实施”：
+2026-08-15 的实施授权明确确认以下默认决策；后续实现不得静默扩大这些边界：
 
 - 首版只支持单文档动作，不支持批量修复；
 - 健康报告使用主表加明细表并保持不可变；
@@ -611,4 +627,4 @@ V3 评估 Profile 必须使用真实 PostgreSQL/pgvector 容器验证报告、�
 - 动作核心采用 sealed 强类型参数和静态分派，不建设通用工具网关；
 - `PENDING` 文档使用提交后派发和有界恢复扫描保证任务接受语义。
 
-获得实现授权时，必须同步更新 `AGENTS.md`、产品需求、技术架构、数据模型、API 设计和评估计划中的版本状态。
+本次授权已同步更新 `AGENTS.md`、产品需求、技术架构、数据模型、API 设计和评估计划中的版本状态。V4 及任何超出上述默认决策的扩展仍需单独批准。
