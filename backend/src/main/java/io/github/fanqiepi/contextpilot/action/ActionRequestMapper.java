@@ -16,8 +16,8 @@ public interface ActionRequestMapper {
     String SELECT_COLUMNS = """
             id, conversation_id, user_message_id, assistant_message_id,
             capability_id, capability_version, action_type,
-            parameters ->> 'name' AS name,
-            parameters ->> 'description' AS description,
+            parameters::text AS parameters_json,
+            target_document_id, health_issue_id,
             display_summary, status, result_summary, error_summary, trace_id,
             expires_at, confirmed_at, executed_at, created_at, updated_at, deleted
             """;
@@ -26,15 +26,14 @@ public interface ActionRequestMapper {
             INSERT INTO action_request (
                 id, conversation_id, user_message_id, assistant_message_id,
                 capability_id, capability_version, action_type, parameters,
+                target_document_id, health_issue_id,
                 display_summary, status, trace_id, expires_at,
                 created_at, updated_at, deleted
             ) VALUES (
                 #{id}, #{conversationId}, #{userMessageId}, #{assistantMessageId},
                 #{capabilityId}, #{capabilityVersion}, #{actionType},
-                jsonb_strip_nulls(jsonb_build_object(
-                    'name', CAST(#{name} AS text),
-                    'description', CAST(#{description} AS text)
-                )),
+                CAST(#{parametersJson} AS jsonb),
+                #{targetDocumentId}, #{healthIssueId},
                 #{displaySummary}, #{status}, #{traceId}, #{expiresAt},
                 #{createdAt}, #{updatedAt}, #{deleted}
             )

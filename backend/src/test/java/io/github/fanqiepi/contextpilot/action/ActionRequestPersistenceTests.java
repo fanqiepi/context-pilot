@@ -129,6 +129,35 @@ class ActionRequestPersistenceTests {
         assertThat(knowledgeBaseService.get(existing.id()).name()).isEqualTo(name);
     }
 
+    @Test
+    void preservesV2ParametersWhileUsingTheGeneralizedActionSchema() {
+        String name = "Compatible action " + UUID.randomUUID();
+
+        ActionRequestResponse proposal = proposal(name);
+        ActionRequestResponse restored = actionRequestService.get(proposal.id());
+
+        assertThat(restored.actionType()).isEqualTo(ActionType.CREATE_KNOWLEDGE_BASE);
+        assertThat(restored.parameters())
+                .isInstanceOfSatisfying(CreateKnowledgeBaseActionParameters.class, parameters -> {
+                    assertThat(parameters.name()).isEqualTo(name);
+                    assertThat(parameters.description()).isNull();
+                });
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT parameters::text FROM action_request WHERE id = ?",
+                String.class,
+                proposal.id()))
+                .contains("\"name\": \"" + name + "\"")
+                .doesNotContain("description", "actionType");
+        assertThat(jdbcTemplate.queryForObject(
+                """
+                SELECT target_document_id IS NULL AND health_issue_id IS NULL
+                FROM action_request
+                WHERE id = ?
+                """,
+                Boolean.class,
+                proposal.id())).isTrue();
+    }
+
     private ActionRequestResponse confirmAfterSignal(
             UUID id,
             CountDownLatch ready,

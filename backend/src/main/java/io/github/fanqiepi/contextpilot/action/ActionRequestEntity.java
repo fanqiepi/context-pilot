@@ -14,8 +14,9 @@ public class ActionRequestEntity {
     private CapabilityId capabilityId;
     private String capabilityVersion;
     private ActionType actionType;
-    private String name;
-    private String description;
+    private String parametersJson;
+    private UUID targetDocumentId;
+    private UUID healthIssueId;
     private String displaySummary;
     private ActionRequestStatus status;
     private String resultSummary;
@@ -42,10 +43,12 @@ public class ActionRequestEntity {
     public void setCapabilityVersion(String capabilityVersion) { this.capabilityVersion = capabilityVersion; }
     public ActionType getActionType() { return actionType; }
     public void setActionType(ActionType actionType) { this.actionType = actionType; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getParametersJson() { return parametersJson; }
+    public void setParametersJson(String parametersJson) { this.parametersJson = parametersJson; }
+    public UUID getTargetDocumentId() { return targetDocumentId; }
+    public void setTargetDocumentId(UUID targetDocumentId) { this.targetDocumentId = targetDocumentId; }
+    public UUID getHealthIssueId() { return healthIssueId; }
+    public void setHealthIssueId(UUID healthIssueId) { this.healthIssueId = healthIssueId; }
     public String getDisplaySummary() { return displaySummary; }
     public void setDisplaySummary(String displaySummary) { this.displaySummary = displaySummary; }
     public ActionRequestStatus getStatus() { return status; }

@@ -95,10 +95,12 @@ V3 详细字段与约束见 [V3 知识库健康检查与维护助手详细设计
 
 报告及明细属于审计型业务记录，使用 `deleted` 逻辑删除。`source_document` 继续作为当前事实来源；报告只表达历史时间点结论。历史读取不得重新计算旧报告，生成提案和确认执行时必须重新校验实时文档状态。
 
-V3 还计划通过后续 Flyway 迁移扩展 `action_request`：允许 `RETRY_DOCUMENT_PROCESSING` 和 `REINDEX_DOCUMENT`，增加受限删除外键 `target_document_id` 与可空 `health_issue_id`，并按动作类型约束 JSONB 参数。应用参数使用 sealed 强类型联合和显式静态分派，不把 `action_request` 演进为任意工具载体。
+V3 切片 4 已通过 V13 扩展 `action_request`：固定允许 `CREATE_KNOWLEDGE_BASE`、`RETRY_DOCUMENT_PROCESSING` 和 `REINDEX_DOCUMENT`，增加受限删除外键 `target_document_id` 与可空 `health_issue_id`，并按动作类型约束 JSONB 参数。创建知识库动作的两个目标字段必须为空；维护动作必须具有一致的文档目标和健康明细，单个活动健康明细最多关联一个提案。应用参数使用 sealed 强类型联合和显式静态分派，不把 `action_request` 演进为任意工具载体。
 
 为受控检查实际向量存在性，V11 已给 `vector_store.metadata` 中的知识库、文档和 Embedding profile 字段增加 `vector_store_health_metadata_idx` 表达式索引。该索引只优化专用只读 DataPort，不改变 `PgVectorStore` 的写入和检索边界。
 
 V3 切片 2 通过顺序迁移 V11 落地报告主表、异常明细表和表达式索引，未修改 V1-V10。报告与明细只在创建时写入；历史查询按助手消息批量读取保存快照，不从当前 `source_document` 重新计算。
 
 V3 切片 3 通过 V12 扩展 `chat_message_capability_match_reason_check`，允许 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`。健康请求保存为 `KNOWLEDGE_QA/v2`；普通 RAG、V1/V2 历史消息和已有动作记录不做版本回填。
+
+V13 不改写 V2 `CREATE_KNOWLEDGE_BASE` 的 `action_type`、`parameters`、状态或消息关联，只为历史记录补充两个空目标列。迁移测试先在 V12 写入真实 V2 提案，再升级至 V13 验证原始 JSON 和状态保持不变。

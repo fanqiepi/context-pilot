@@ -148,7 +148,10 @@ export interface KnowledgeBaseHealthReport {
   createdAt: string
 }
 
-export type ActionType = 'CREATE_KNOWLEDGE_BASE'
+export type ActionType =
+  | 'CREATE_KNOWLEDGE_BASE'
+  | 'RETRY_DOCUMENT_PROCESSING'
+  | 'REINDEX_DOCUMENT'
 export type ActionRequestStatus =
   | 'PENDING_CONFIRMATION'
   | 'EXECUTING'
@@ -162,15 +165,32 @@ export interface CreateKnowledgeBaseActionParameters {
   description: string | null
 }
 
-export interface ActionRequest {
+export interface RetryDocumentProcessingActionParameters {
+  documentId: string
+  originalFilenameSnapshot: string
+  observedDocumentStatus: 'FAILED'
+  healthReportId: string
+  healthIssueId: string
+}
+
+export interface ReindexDocumentActionParameters {
+  documentId: string
+  originalFilenameSnapshot: string
+  observedDocumentStatus: 'SUCCEEDED'
+  observedEmbeddingProfileId: string | null
+  healthReportId: string
+  healthIssueId: string
+}
+
+interface ActionRequestBase<TActionType extends ActionType, TParameters> {
   id: string
   conversationId: string
   userMessageId: string
   assistantMessageId: string
   capabilityId: 'BUSINESS_ACTION'
   capabilityVersion: string
-  actionType: ActionType
-  parameters: CreateKnowledgeBaseActionParameters
+  actionType: TActionType
+  parameters: TParameters
   displaySummary: string
   status: ActionRequestStatus
   resultSummary: string | null
@@ -182,6 +202,11 @@ export interface ActionRequest {
   createdAt: string
   updatedAt: string
 }
+
+export type ActionRequest =
+  | ActionRequestBase<'CREATE_KNOWLEDGE_BASE', CreateKnowledgeBaseActionParameters>
+  | ActionRequestBase<'RETRY_DOCUMENT_PROCESSING', RetryDocumentProcessingActionParameters>
+  | ActionRequestBase<'REINDEX_DOCUMENT', ReindexDocumentActionParameters>
 
 export interface ConversationMessage {
   id: string
@@ -241,9 +266,11 @@ export interface StreamRouteEvent {
 
 export type StreamHealthReportEvent = KnowledgeBaseHealthReport
 
-export type StreamActionRequiredEvent = Omit<ActionRequest, 'id'> & {
-  actionRequestId: string
-}
+export type StreamActionRequiredEvent = ActionRequest extends infer TActionRequest
+  ? TActionRequest extends ActionRequest
+    ? Omit<TActionRequest, 'id'> & { actionRequestId: string }
+    : never
+  : never
 
 export interface StreamUsageEvent {
   model: string

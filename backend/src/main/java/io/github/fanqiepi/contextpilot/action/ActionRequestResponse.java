@@ -13,7 +13,7 @@ public record ActionRequestResponse(
         CapabilityId capabilityId,
         String capabilityVersion,
         ActionType actionType,
-        CreateKnowledgeBaseActionParameters parameters,
+        ActionParameters parameters,
         String displaySummary,
         ActionRequestStatus status,
         String resultSummary,
@@ -25,7 +25,7 @@ public record ActionRequestResponse(
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt) {
 
-    static ActionRequestResponse from(ActionRequestEntity entity) {
+    static ActionRequestResponse from(ActionRequestEntity entity, ActionParametersCodec parametersCodec) {
         return new ActionRequestResponse(
                 entity.getId(),
                 entity.getConversationId(),
@@ -34,7 +34,7 @@ public record ActionRequestResponse(
                 entity.getCapabilityId(),
                 entity.getCapabilityVersion(),
                 entity.getActionType(),
-                new CreateKnowledgeBaseActionParameters(entity.getName(), entity.getDescription()),
+                parametersCodec.read(entity.getActionType(), entity.getParametersJson()),
                 entity.getDisplaySummary(),
                 entity.getStatus(),
                 entity.getResultSummary(),

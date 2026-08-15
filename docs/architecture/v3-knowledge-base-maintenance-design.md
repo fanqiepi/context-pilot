@@ -338,7 +338,7 @@ ineligibilitySummary
 
 ### 9.1 去除创建知识库专用硬编码
 
-当前 `ActionRequestResponse.parameters`、SSE `ActionRequired.parameters`、Mapper 字段提取和执行服务都绑定 `CreateKnowledgeBaseActionParameters`。V3 必须把动作核心重构为静态强类型协议：
+切片 4 实施前，`ActionRequestResponse.parameters`、SSE `ActionRequired.parameters`、Mapper 字段提取和执行服务都绑定 `CreateKnowledgeBaseActionParameters`。V3 将动作核心重构为静态强类型协议：
 
 ```text
 ActionParameters（sealed interface）
@@ -595,7 +595,9 @@ V3 评估 Profile 必须使用真实 PostgreSQL/pgvector 容器验证报告、�
 - 切片 2 已通过真实 PostgreSQL/pgvector 迁移及持久化测试，覆盖来源快照不可变、稳定排序、重复创建冲突、跨知识库拒绝和历史回显；公开报告端点、健康聊天路由和 SSE 事件已在切片 3 补齐。
 - 2026-08-15 完成切片 3“聊天与前端卡片”：新增完整句健康意图白名单、`KNOWLEDGE_QA/v2` 与 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`，V12 扩展消息路由约束；同步聊天、报告 GET、固定顺序 SSE `health_report` 和历史刷新恢复读取同一不可变报告，且不调用 ChatModel。
 - 前端卡片展示总体状态、`dataAsOf`、完整性、当前 profile、文档计数、异常依据、建议动作和不可执行原因；维护动作按钮留给切片 5/6，不提前调用未实现端点。后端聚焦测试、真实 PostgreSQL HTTP/SSE 链路、前端类型检查和生产构建已通过。
-- 切片 4 至切片 8 尚未实施，下一步是动作核心强类型参数联合、静态执行分派和 V2 创建动作兼容重构。
+- 2026-08-15 完成切片 4“动作核心重构”：新增 sealed `ActionParameters` 及三个固定参数 record，Mapper 以 `action_type` 静态编解码 JSONB，确认服务通过枚举 `switch` 显式分派；V13 增加两个维护动作、文档目标、健康明细外键、按动作类型的参数形状约束和活动明细唯一索引。前端 `ActionRequest` 同步演进为判别联合。
+- 切片 4 不开放维护提案入口，也不执行文档副作用；`RETRY_DOCUMENT_PROCESSING` 与 `REINDEX_DOCUMENT` 分支在对应切片完成前明确拒绝。V12 既有创建知识库提案迁移到 V13 后 JSON、状态及空目标字段保持兼容。
+- 切片 5 至切片 8 尚未实施，下一步是失败文档重试提案、实时双重校验和单文档确认。
 
 ## 19. V3 完成标准
 

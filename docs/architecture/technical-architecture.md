@@ -96,6 +96,8 @@ V3 切片 2 已通过 V11 增加 `knowledge_base_health_report` 与 `knowledge_b
 
 V3 切片 3 已增加完整句健康意图策略和 V12 路由约束。健康请求使用 `KNOWLEDGE_QA/v2` 与 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`，复合请求仍回落普通 RAG；健康事实查询在独立 `REPEATABLE_READ` 只读事务中完成，报告保存和助手消息完成保持原子。同步聊天直接携带 `healthReport`，SSE 固定发送 `message -> route -> delta -> health_report -> done`，不产生模型调用、引用或 usage。公开 GET 资源和前端卡片读取同一不可变快照，刷新后由历史接口恢复。
 
+V3 切片 4 已把动作持久化与确认核心从创建知识库专用字段提取改为 sealed `ActionParameters`、按 `actionType` 的静态 JSONB 编解码和枚举 `switch` 分派。V13 为两个维护动作预留受限文档目标和健康明细关联，数据库按动作类型约束参数形状；现阶段只有 `CREATE_KNOWLEDGE_BASE` 具有执行器，维护动作必须等切片 5/6 的实时复核和专用执行器完成后才能生成或执行。
+
 V4 以后才可能研究有限规划、显式长期记忆、MCP 等外部工具互操作和多 Agent。只有固定编排无法满足经过评估的用户任务时才选择相关框架，并必须具备步骤预算、循环上限、人工确认、来源约束、恢复和评估数据。路线候选不构成当前实施授权。
 
 ## 基础设施职责

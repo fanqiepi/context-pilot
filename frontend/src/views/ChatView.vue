@@ -15,7 +15,9 @@ import {
 } from '@/api/contextPilot'
 import { errorMessage } from '@/api/client'
 import type {
+  ActionRequest,
   ActionRequestStatus,
+  ActionType,
   Citation,
   ConversationMessage,
   ConversationSummary,
@@ -367,8 +369,10 @@ async function confirmAction(message: UiMessage): Promise<void> {
     const updated = await confirmActionRequest(actionRequest.id)
     message.actionRequest = updated
     if (updated.status === 'SUCCEEDED') {
-      knowledgeBases.value = await listKnowledgeBases()
-      ElMessage.success(updated.resultSummary ?? '知识库已创建')
+      if (updated.actionType === 'CREATE_KNOWLEDGE_BASE') {
+        knowledgeBases.value = await listKnowledgeBases()
+      }
+      ElMessage.success(updated.resultSummary ?? '操作已完成')
     } else if (updated.status === 'FAILED') {
       ElMessage.error(updated.errorSummary ?? '操作执行失败')
     } else if (updated.status === 'EXPIRED') {
@@ -389,7 +393,7 @@ async function rejectAction(message: UiMessage): Promise<void> {
   actionSavingIds.add(actionRequest.id)
   try {
     message.actionRequest = await rejectActionRequest(actionRequest.id)
-    ElMessage.info('已取消操作，未创建知识库')
+    ElMessage.info('已取消操作，未执行任何变更')
   } catch (error) {
     ElMessage.error(errorMessage(error, '取消操作失败'))
   } finally {
@@ -416,6 +420,46 @@ function actionStatusType(
   if (status === 'PENDING_CONFIRMATION') return 'warning'
   if (status === 'EXECUTING') return 'primary'
   return 'info'
+}
+
+function actionTitle(actionType: ActionType): string {
+  return {
+    CREATE_KNOWLEDGE_BASE: '创建知识库',
+    RETRY_DOCUMENT_PROCESSING: '重试文档处理',
+    REINDEX_DOCUMENT: '重建文档索引',
+  }[actionType]
+}
+
+function actionConfirmLabel(actionType: ActionType): string {
+  return {
+    CREATE_KNOWLEDGE_BASE: '确认创建',
+    RETRY_DOCUMENT_PROCESSING: '确认重试',
+    REINDEX_DOCUMENT: '确认重建',
+  }[actionType]
+}
+
+function actionParameterRows(actionRequest: ActionRequest): Array<{ label: string; value: string }> {
+  switch (actionRequest.actionType) {
+    case 'CREATE_KNOWLEDGE_BASE':
+      return [
+        { label: '名称', value: actionRequest.parameters.name },
+        { label: '描述', value: actionRequest.parameters.description || '未填写' },
+      ]
+    case 'RETRY_DOCUMENT_PROCESSING':
+      return [
+        { label: '目标文档', value: actionRequest.parameters.originalFilenameSnapshot },
+        { label: '检查时状态', value: documentStatusLabel(actionRequest.parameters.observedDocumentStatus) },
+      ]
+    case 'REINDEX_DOCUMENT':
+      return [
+        { label: '目标文档', value: actionRequest.parameters.originalFilenameSnapshot },
+        { label: '检查时状态', value: documentStatusLabel(actionRequest.parameters.observedDocumentStatus) },
+        {
+          label: '检查时 Profile',
+          value: actionRequest.parameters.observedEmbeddingProfileId || '来源未知',
+        },
+      ]
+  }
 }
 
 function healthStatusLabel(status: KnowledgeBaseHealthStatus): string {
@@ -709,7 +753,7 @@ function formatScore(score: number | null): string {
                   <header>
                     <div>
                       <small>受控业务操作</small>
-                      <strong>创建知识库</strong>
+                      <strong>{{ actionTitle(message.actionRequest.actionType) }}</strong>
                     </div>
                     <ElTag
                       :type="actionStatusType(message.actionRequest.status)"
@@ -720,13 +764,12 @@ function formatScore(score: number | null): string {
                     </ElTag>
                   </header>
                   <dl>
-                    <div>
-                      <dt>名称</dt>
-                      <dd>{{ message.actionRequest.parameters.name }}</dd>
-                    </div>
-                    <div>
-                      <dt>描述</dt>
-                      <dd>{{ message.actionRequest.parameters.description || '未填写' }}</dd>
+                    <div
+                      v-for="row in actionParameterRows(message.actionRequest)"
+                      :key="row.label"
+                    >
+                      <dt>{{ row.label }}</dt>
+                      <dd>{{ row.value }}</dd>
                     </div>
                     <div>
                       <dt>确认期限</dt>
@@ -746,7 +789,7 @@ function formatScore(score: number | null): string {
                       :loading="actionSavingIds.has(message.actionRequest.id)"
                       @click="confirmAction(message)"
                     >
-                      确认创建
+                      {{ actionConfirmLabel(message.actionRequest.actionType) }}
                     </ElButton>
                     <ElButton
                       :disabled="actionSavingIds.has(message.actionRequest.id)"

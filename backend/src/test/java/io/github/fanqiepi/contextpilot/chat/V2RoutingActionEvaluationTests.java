@@ -6,6 +6,8 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import io.github.fanqiepi.contextpilot.action.ActionRequestController;
+import io.github.fanqiepi.contextpilot.action.ActionExecutorDispatcher;
+import io.github.fanqiepi.contextpilot.action.ActionParametersCodec;
 import io.github.fanqiepi.contextpilot.action.ActionRequestEntity;
 import io.github.fanqiepi.contextpilot.action.ActionRequestMapper;
 import io.github.fanqiepi.contextpilot.action.ActionRequestProperties;
@@ -13,7 +15,6 @@ import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
 import io.github.fanqiepi.contextpilot.action.ActionRequestService;
 import io.github.fanqiepi.contextpilot.action.ActionRequestStatus;
 import io.github.fanqiepi.contextpilot.action.ActionType;
-import io.github.fanqiepi.contextpilot.action.CreateKnowledgeBaseActionExecutor;
 import io.github.fanqiepi.contextpilot.action.CreateKnowledgeBaseActionParameters;
 import io.github.fanqiepi.contextpilot.common.ApiExceptionHandler;
 import io.github.fanqiepi.contextpilot.common.BadRequestException;
@@ -27,6 +28,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import tools.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -175,17 +177,20 @@ class V2RoutingActionEvaluationTests {
     void returnsSafeSummaryForUnexpectedExecutionFailure(
             V2EvaluationDataset.LifecycleCase testCase) {
         ActionRequestMapper mapper = mock(ActionRequestMapper.class);
-        CreateKnowledgeBaseActionExecutor executor = mock(CreateKnowledgeBaseActionExecutor.class);
+        ActionParametersCodec parametersCodec = new ActionParametersCodec(new ObjectMapper());
+        ActionExecutorDispatcher executorDispatcher = mock(ActionExecutorDispatcher.class);
         ActionRequestProperties properties = new ActionRequestProperties();
-        ActionRequestService service = new ActionRequestService(mapper, properties, executor);
-        ActionRequestEntity entity = pendingEntity();
+        ActionRequestService service = new ActionRequestService(
+                mapper, properties, parametersCodec, executorDispatcher);
+        ActionRequestEntity entity = pendingEntity(parametersCodec);
         when(mapper.expire(eq(entity.getId()), any(OffsetDateTime.class))).thenReturn(0);
         when(mapper.selectById(entity.getId())).thenReturn(entity);
         when(mapper.claimExecution(eq(entity.getId()), any(OffsetDateTime.class))).thenAnswer(invocation -> {
             entity.setStatus(ActionRequestStatus.EXECUTING);
             return 1;
         });
-        when(executor.execute(any(CreateKnowledgeBaseActionParameters.class)))
+        when(executorDispatcher.execute(
+                eq(ActionType.CREATE_KNOWLEDGE_BASE), any(CreateKnowledgeBaseActionParameters.class)))
                 .thenThrow(new RuntimeException("simulated internal execution failure"));
         doAnswer(invocation -> {
             entity.setStatus(ActionRequestStatus.FAILED);
@@ -306,7 +311,7 @@ class V2RoutingActionEvaluationTests {
                 .toList();
     }
 
-    private ActionRequestEntity pendingEntity() {
+    private ActionRequestEntity pendingEntity(ActionParametersCodec parametersCodec) {
         OffsetDateTime now = OffsetDateTime.parse("2026-08-14T08:00:00Z");
         ActionRequestEntity entity = new ActionRequestEntity();
         entity.setId(UUID.randomUUID());
@@ -316,7 +321,9 @@ class V2RoutingActionEvaluationTests {
         entity.setCapabilityId(CapabilityId.BUSINESS_ACTION);
         entity.setCapabilityVersion(CONFIG.capabilityVersion());
         entity.setActionType(ActionType.CREATE_KNOWLEDGE_BASE);
-        entity.setName("Internal failure evaluation");
+        entity.setParametersJson(parametersCodec.write(
+                ActionType.CREATE_KNOWLEDGE_BASE,
+                new CreateKnowledgeBaseActionParameters("Internal failure evaluation", null)));
         entity.setDisplaySummary("确认后将创建知识库“Internal failure evaluation”。");
         entity.setStatus(ActionRequestStatus.PENDING_CONFIRMATION);
         entity.setTraceId("eval-internal-failure");

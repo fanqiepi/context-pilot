@@ -52,7 +52,7 @@ message -> route -> delta -> health_report -> done(COMPLETED)
 
 `delta` 是与报告一致的确定性摘要；该路径不发送 `citation` 或 `usage`。历史消息响应已增加可空 `healthReport`，按助手消息 ID 批量恢复已保存快照，不重新运行检查；V1/V2 旧消息返回 `null`。
 
-动作确认资源沿用 V2 路径，但 `ActionRequest` 参数将由创建知识库专用对象演进为以 `actionType` 判别的强类型联合，固定允许：
+动作确认资源沿用 V2 路径。自 V3 切片 4 起，`ActionRequest` 参数已由创建知识库专用对象演进为以 `actionType` 判别的强类型联合，固定允许：
 
 - `CREATE_KNOWLEDGE_BASE`
 - `RETRY_DOCUMENT_PROCESSING`
@@ -60,7 +60,7 @@ message -> route -> delta -> health_report -> done(COMPLETED)
 
 两个维护动作只接受服务端保存的单个文档目标。操作 `SUCCEEDED` 表示任务已可靠接受，文档处理最终结果仍通过文档查询接口返回。
 
-截至 V3 切片 3，报告查询端点、同步聊天报告、确定性健康路由、SSE `health_report`、历史 `healthReport` 恢复和前端报告卡片均已可用。前端展示总体状态、检查时间、完整性、当前 profile、文档计数和稳定排序异常；当前只展示建议与可执行性，不提前提供维护动作按钮。
+截至 V3 切片 4，报告查询端点、同步聊天报告、确定性健康路由、SSE `health_report`、历史 `healthReport` 恢复和前端报告卡片均已可用；动作响应、SSE `action_required` 和前端操作卡片已支持判别联合。维护动作提案端点与按钮仍未开放，两个维护动作也不会在专用执行器完成前产生副作用。
 
 ## 知识库接口
 

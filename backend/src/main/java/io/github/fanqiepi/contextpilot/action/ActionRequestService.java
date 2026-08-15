@@ -12,7 +12,6 @@ import io.github.fanqiepi.contextpilot.chat.CapabilityId;
 import io.github.fanqiepi.contextpilot.common.BadRequestException;
 import io.github.fanqiepi.contextpilot.common.ConflictException;
 import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
-import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,19 +21,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class ActionRequestService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ActionRequestService.class);
-    private static final String INTERNAL_FAILURE_SUMMARY = "创建知识库失败，请稍后重试";
+    private static final String INTERNAL_FAILURE_SUMMARY = "操作执行失败，请稍后重试";
+    private static final String CREATE_KNOWLEDGE_BASE_FAILURE_SUMMARY = "创建知识库失败，请稍后重试";
 
     private final ActionRequestMapper actionRequestMapper;
     private final ActionRequestProperties properties;
-    private final CreateKnowledgeBaseActionExecutor executor;
+    private final ActionParametersCodec parametersCodec;
+    private final ActionExecutorDispatcher executorDispatcher;
 
     public ActionRequestService(
             ActionRequestMapper actionRequestMapper,
             ActionRequestProperties properties,
-            CreateKnowledgeBaseActionExecutor executor) {
+            ActionParametersCodec parametersCodec,
+            ActionExecutorDispatcher executorDispatcher) {
         this.actionRequestMapper = actionRequestMapper;
         this.properties = properties;
-        this.executor = executor;
+        this.parametersCodec = parametersCodec;
+        this.executorDispatcher = executorDispatcher;
     }
 
     @Transactional
@@ -58,8 +61,7 @@ public class ActionRequestService {
         entity.setCapabilityId(capabilityId);
         entity.setCapabilityVersion(capabilityVersion);
         entity.setActionType(ActionType.CREATE_KNOWLEDGE_BASE);
-        entity.setName(parameters.name());
-        entity.setDescription(parameters.description());
+        entity.setParametersJson(parametersCodec.write(ActionType.CREATE_KNOWLEDGE_BASE, parameters));
         entity.setDisplaySummary(displaySummary(parameters));
         entity.setStatus(ActionRequestStatus.PENDING_CONFIRMATION);
         entity.setTraceId(traceId);
@@ -67,14 +69,14 @@ public class ActionRequestService {
         entity.setCreatedAt(now);
         entity.setUpdatedAt(now);
         actionRequestMapper.insert(entity);
-        return ActionRequestResponse.from(entity);
+        return response(entity);
     }
 
     @Transactional
     public ActionRequestResponse get(UUID id) {
         OffsetDateTime now = now();
         expire(id, now);
-        return ActionRequestResponse.from(requireEntity(id));
+        return response(requireEntity(id));
     }
 
     @Transactional
@@ -97,7 +99,7 @@ public class ActionRequestService {
         }).toList();
         return currentEntities.stream().collect(Collectors.toMap(
                 ActionRequestEntity::getAssistantMessageId,
-                ActionRequestResponse::from,
+                this::response,
                 (left, right) -> left,
                 LinkedHashMap::new));
     }
@@ -108,31 +110,30 @@ public class ActionRequestService {
         expire(id, now);
         ActionRequestEntity current = requireEntity(id);
         if (current.getStatus() != ActionRequestStatus.PENDING_CONFIRMATION) {
-            return ActionRequestResponse.from(current);
+            return response(current);
         }
         if (actionRequestMapper.claimExecution(id, now) == 0) {
-            return ActionRequestResponse.from(requireEntity(id));
+            return response(requireEntity(id));
         }
 
-        CreateKnowledgeBaseActionParameters parameters =
-                new CreateKnowledgeBaseActionParameters(current.getName(), current.getDescription());
-        KnowledgeBaseResponse created;
+        ActionParameters parameters = parametersCodec.read(
+                current.getActionType(), current.getParametersJson());
+        ActionExecutionResult result;
         try {
-            created = executor.execute(parameters);
+            result = executorDispatcher.execute(current.getActionType(), parameters);
         } catch (BadRequestException | ConflictException exception) {
             completeFailure(id, exception.getMessage());
-            return ActionRequestResponse.from(requireEntity(id));
+            return response(requireEntity(id));
         } catch (RuntimeException exception) {
             LOGGER.error("Action execution failed, actionRequestId={}, traceId={}",
                     id, current.getTraceId(), exception);
-            completeFailure(id, INTERNAL_FAILURE_SUMMARY);
-            return ActionRequestResponse.from(requireEntity(id));
+            completeFailure(id, internalFailureSummary(current.getActionType()));
+            return response(requireEntity(id));
         }
-        String resultSummary = "知识库“%s”已创建（ID：%s）".formatted(created.name(), created.id());
-        if (actionRequestMapper.completeSuccess(id, resultSummary, now()) != 1) {
+        if (actionRequestMapper.completeSuccess(id, safeSummary(result.resultSummary()), now()) != 1) {
             throw new IllegalStateException("Claimed action request could not be completed");
         }
-        return ActionRequestResponse.from(requireEntity(id));
+        return response(requireEntity(id));
     }
 
     @Transactional
@@ -141,7 +142,7 @@ public class ActionRequestService {
         expire(id, now);
         ActionRequestEntity current = requireEntity(id);
         if (current.getStatus() == ActionRequestStatus.REJECTED) {
-            return ActionRequestResponse.from(current);
+            return response(current);
         }
         if (current.getStatus() != ActionRequestStatus.PENDING_CONFIRMATION) {
             throw new ConflictException(
@@ -153,7 +154,7 @@ public class ActionRequestService {
                     "ACTION_REQUEST_STATUS_CONFLICT",
                     "Action request status changed before it could be rejected");
         }
-        return ActionRequestResponse.from(requireEntity(id));
+        return response(requireEntity(id));
     }
 
     private void completeFailure(UUID id, String summary) {
@@ -176,6 +177,10 @@ public class ActionRequestService {
         return entity;
     }
 
+    private ActionRequestResponse response(ActionRequestEntity entity) {
+        return ActionRequestResponse.from(entity, parametersCodec);
+    }
+
     private boolean isExpiredPending(ActionRequestEntity entity, OffsetDateTime now) {
         return entity.getStatus() == ActionRequestStatus.PENDING_CONFIRMATION
                 && !entity.getExpiresAt().isAfter(now);
@@ -195,6 +200,14 @@ public class ActionRequestService {
             return INTERNAL_FAILURE_SUMMARY;
         }
         return normalized.length() <= 1000 ? normalized : normalized.substring(0, 1000);
+    }
+
+    private String internalFailureSummary(ActionType actionType) {
+        return switch (actionType) {
+            case CREATE_KNOWLEDGE_BASE -> CREATE_KNOWLEDGE_BASE_FAILURE_SUMMARY;
+            case RETRY_DOCUMENT_PROCESSING -> "提交文档重试任务失败，请稍后重试";
+            case REINDEX_DOCUMENT -> "提交索引重建任务失败，请稍后重试";
+        };
     }
 
     private OffsetDateTime now() {
