@@ -156,7 +156,7 @@ class HealthReportActionProposalPersistenceTests {
                 .isEqualTo(DocumentStatus.PENDING);
         assertThat(actionRequestService.confirm(created.actionRequest().id()).status())
                 .isEqualTo(ActionRequestStatus.SUCCEEDED);
-        verify(processingCoordinator, times(1)).submit(context.documentId());
+        verify(processingCoordinator, times(1)).submitAfterCommit(context.documentId());
     }
 
     @Test
@@ -187,7 +187,7 @@ class HealthReportActionProposalPersistenceTests {
         assertThat(failed.errorSummary()).contains("状态已变化").doesNotContain("SQLException", "UPDATE");
         assertThat(sourceDocumentMapper.selectById(staleBeforeConfirmation.documentId()).getStatus())
                 .isEqualTo(DocumentStatus.PROCESSING);
-        verify(processingCoordinator, never()).submit(staleBeforeConfirmation.documentId());
+        verify(processingCoordinator, never()).submitAfterCommit(staleBeforeConfirmation.documentId());
     }
 
     @Test
@@ -258,7 +258,7 @@ class HealthReportActionProposalPersistenceTests {
         }
         assertThat(actionRequestService.get(firstProposal.actionRequest().id()).status())
                 .isEqualTo(ActionRequestStatus.SUCCEEDED);
-        verify(processingCoordinator, times(1)).submit(context.documentId());
+        verify(processingCoordinator, times(1)).submitAfterCommit(context.documentId());
     }
 
     @Test
@@ -274,7 +274,7 @@ class HealthReportActionProposalPersistenceTests {
         assertThat(failed.errorSummary()).contains("未启用").doesNotContain("Exception", "DocumentService");
         assertThat(sourceDocumentMapper.selectById(context.documentId()).getStatus())
                 .isEqualTo(DocumentStatus.FAILED);
-        verify(processingCoordinator, never()).submit(context.documentId());
+        verify(processingCoordinator, never()).submitAfterCommit(context.documentId());
     }
 
     @Test
@@ -287,9 +287,9 @@ class HealthReportActionProposalPersistenceTests {
         assertReindexProposalAndConfirmation(outdated, KnowledgeBaseHealthIssueType.EMBEDDING_PROFILE_OUTDATED);
         assertReindexProposalAndConfirmation(missing, KnowledgeBaseHealthIssueType.VECTOR_INDEX_MISSING);
 
-        verify(processingCoordinator, times(1)).submit(unknown.documentId());
-        verify(processingCoordinator, times(1)).submit(outdated.documentId());
-        verify(processingCoordinator, times(1)).submit(missing.documentId());
+        verify(processingCoordinator, times(1)).submitAfterCommit(unknown.documentId());
+        verify(processingCoordinator, times(1)).submitAfterCommit(outdated.documentId());
+        verify(processingCoordinator, times(1)).submitAfterCommit(missing.documentId());
     }
 
     @Test
@@ -321,7 +321,7 @@ class HealthReportActionProposalPersistenceTests {
         assertThat(failed.errorSummary()).contains("无需提交").doesNotContain("SELECT", "SQLException");
         assertThat(sourceDocumentMapper.selectById(restoredBeforeConfirmation.documentId()).getStatus())
                 .isEqualTo(DocumentStatus.SUCCEEDED);
-        verify(processingCoordinator, never()).submit(restoredBeforeConfirmation.documentId());
+        verify(processingCoordinator, never()).submitAfterCommit(restoredBeforeConfirmation.documentId());
     }
 
     @Test
@@ -352,7 +352,7 @@ class HealthReportActionProposalPersistenceTests {
         assertThat(failed.errorSummary()).contains("向量存储当前不可用");
         assertThat(sourceDocumentMapper.selectById(unavailableBeforeConfirmation.documentId()).getStatus())
                 .isEqualTo(DocumentStatus.SUCCEEDED);
-        verify(processingCoordinator, never()).submit(unavailableBeforeConfirmation.documentId());
+        verify(processingCoordinator, never()).submitAfterCommit(unavailableBeforeConfirmation.documentId());
     }
 
     @Test
@@ -383,7 +383,7 @@ class HealthReportActionProposalPersistenceTests {
         assertThat(failed.errorSummary()).contains("文档处理当前未启用");
         assertThat(sourceDocumentMapper.selectById(disabledBeforeConfirmation.documentId()).getStatus())
                 .isEqualTo(DocumentStatus.SUCCEEDED);
-        verify(processingCoordinator, never()).submit(disabledBeforeConfirmation.documentId());
+        verify(processingCoordinator, never()).submitAfterCommit(disabledBeforeConfirmation.documentId());
     }
 
     private HealthContext healthContext(int processingAttempts) {

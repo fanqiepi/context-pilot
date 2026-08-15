@@ -68,10 +68,6 @@ public class DocumentProcessingService {
         }
     }
 
-    public void markSubmissionFailed(UUID documentId) {
-        sourceDocumentMapper.markSubmissionFailed(documentId, "Document processing queue is full");
-    }
-
     private void cleanupAfterFailure(UUID documentId, Exception original) {
         try {
             documentVectorIndex.deleteByDocumentId(documentId);

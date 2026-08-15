@@ -107,4 +107,6 @@ V3 切片 5 通过 V14 再次扩展该约束，允许 `HEALTH_REPORT_ISSUE_SELEC
 
 V3 切片 6 不新增迁移，复用 V13 已预留的 `REINDEX_DOCUMENT` 参数形状和目标约束。实时重建资格通过 `source_document` 与按知识库、文档、当前 profile 限定的 `vector_store.metadata` 计数共同判断；`prepareReindex` 的条件更新同时允许来源未知、profile 不同和当前 profile 实际向量不存在，并原子迁移到 `PENDING`，避免校验与状态更新之间产生错误重建或重复提交。
 
+V3 切片 7 不新增迁移。上传、重试和索引重建在业务状态写入成功后统一注册事务提交后派发；队列拒绝不再执行 `PENDING -> FAILED`，应用启动和低频固定间隔按 `updated_at, id` 稳定顺序读取有限数量的活动 `PENDING` 文档并重新派发。工作线程继续使用带状态条件的 `claimForProcessing` 取得处理权，因此恢复扫描和直接派发并发时仍只会有一个处理器进入 `PROCESSING`。
+
 V13 和 V14 都不改写 V2 `CREATE_KNOWLEDGE_BASE` 的 `action_type`、`parameters`、状态或消息关联，只为历史记录补充两个空目标列并扩展新消息的允许匹配依据。迁移测试先在 V12 写入真实 V2 提案，再升级至最新版本验证原始 JSON 和状态保持不变。

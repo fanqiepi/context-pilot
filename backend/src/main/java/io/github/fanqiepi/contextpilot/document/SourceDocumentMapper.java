@@ -1,10 +1,12 @@
 package io.github.fanqiepi.contextpilot.document;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 @Mapper
@@ -50,19 +52,6 @@ public interface SourceDocumentMapper extends BaseMapper<SourceDocumentEntity> {
 
     @Update("""
             UPDATE source_document
-            SET status = 'FAILED', error_summary = #{errorSummary},
-                embedding_profile_id = NULL, embedding_provider = NULL,
-                embedding_model = NULL, embedding_dimensions = NULL,
-                embedding_profile_version = NULL, indexed_at = NULL,
-                updated_at = CURRENT_TIMESTAMP
-            WHERE id = #{documentId} AND deleted = 0 AND status = 'PENDING'
-            """)
-    int markSubmissionFailed(
-            @Param("documentId") UUID documentId,
-            @Param("errorSummary") String errorSummary);
-
-    @Update("""
-            UPDATE source_document
             SET status = 'PENDING', error_summary = NULL, updated_at = CURRENT_TIMESTAMP
             WHERE id = #{documentId} AND deleted = 0 AND status = 'FAILED'
             """)
@@ -97,4 +86,13 @@ public interface SourceDocumentMapper extends BaseMapper<SourceDocumentEntity> {
             WHERE id = #{documentId} AND deleted = 0
             """)
     int markDeleting(@Param("documentId") UUID documentId);
+
+    @Select("""
+            SELECT id
+            FROM source_document
+            WHERE deleted = 0 AND status = 'PENDING'
+            ORDER BY updated_at, id
+            LIMIT #{limit}
+            """)
+    List<UUID> selectPendingIds(@Param("limit") int limit);
 }

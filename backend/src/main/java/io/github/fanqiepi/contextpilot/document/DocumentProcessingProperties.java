@@ -12,6 +12,8 @@ public class DocumentProcessingProperties {
     private int maxPoolSize = 2;
     private int queueCapacity = 50;
     private int maxAttempts = 3;
+    private int recoveryBatchSize = 50;
+    private long recoveryIntervalMillis = 60_000;
 
     public boolean isEnabled() {
         return enabled;
@@ -53,6 +55,22 @@ public class DocumentProcessingProperties {
         this.maxAttempts = maxAttempts;
     }
 
+    public int getRecoveryBatchSize() {
+        return recoveryBatchSize;
+    }
+
+    public void setRecoveryBatchSize(int recoveryBatchSize) {
+        this.recoveryBatchSize = recoveryBatchSize;
+    }
+
+    public long getRecoveryIntervalMillis() {
+        return recoveryIntervalMillis;
+    }
+
+    public void setRecoveryIntervalMillis(long recoveryIntervalMillis) {
+        this.recoveryIntervalMillis = recoveryIntervalMillis;
+    }
+
     void validate() {
         if (corePoolSize <= 0) {
             throw new IllegalStateException("Document processing core pool size must be positive");
@@ -65,6 +83,12 @@ public class DocumentProcessingProperties {
         }
         if (maxAttempts <= 0) {
             throw new IllegalStateException("Document processing max attempts must be positive");
+        }
+        if (recoveryBatchSize <= 0 || recoveryBatchSize > 500) {
+            throw new IllegalStateException("Document processing recovery batch size must be between 1 and 500");
+        }
+        if (recoveryIntervalMillis < 1_000) {
+            throw new IllegalStateException("Document processing recovery interval must be at least 1000 milliseconds");
         }
     }
 }

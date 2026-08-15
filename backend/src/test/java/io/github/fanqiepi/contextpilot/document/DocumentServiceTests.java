@@ -101,7 +101,7 @@ class DocumentServiceTests {
         assertThat(entity.getStatus()).isEqualTo(DocumentStatus.PENDING);
         assertThat(entity.getStorageKey()).startsWith("knowledge-bases/" + knowledgeBaseId + "/documents/");
         assertThat(response.status()).isEqualTo(DocumentStatus.PENDING);
-        verify(processingCoordinator).submit(entity.getId());
+        verify(processingCoordinator).submitAfterCommit(entity.getId());
     }
 
     @Test
@@ -233,7 +233,7 @@ class DocumentServiceTests {
         DocumentResponse response = documentService.retry(documentId);
 
         assertThat(response.status()).isEqualTo(DocumentStatus.PENDING);
-        verify(processingCoordinator).submit(documentId);
+        verify(processingCoordinator).submitAfterCommit(documentId);
     }
 
     @Test
@@ -277,7 +277,7 @@ class DocumentServiceTests {
         verify(sourceDocumentMapper).prepareReindex(
                 documentId,
                 embeddingIndexProperties.currentProfile().id());
-        verify(processingCoordinator).submit(documentId);
+        verify(processingCoordinator).submitAfterCommit(documentId);
     }
 
     @Test
@@ -337,7 +337,7 @@ class DocumentServiceTests {
         DocumentResponse response = documentService.reindex(documentId);
 
         assertThat(response.status()).isEqualTo(DocumentStatus.PENDING);
-        verify(processingCoordinator).submit(documentId);
+        verify(processingCoordinator).submitAfterCommit(documentId);
     }
 
     @Test

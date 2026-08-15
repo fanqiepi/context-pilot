@@ -600,7 +600,8 @@ V3 评估 Profile 必须使用真实 PostgreSQL/pgvector 容器验证报告、�
 - 2026-08-15 完成切片 5“失败文档重试提案”：新增无请求体的报告明细提案端点和 `HealthReportActionProposalService`，以明细行锁与 V13 唯一索引保证并发请求只创建一组确定性消息和一个提案；消息使用 `BUSINESS_ACTION/v2` 与 V14 `HEALTH_REPORT_ISSUE_SELECTED`。客户端仅提交报告与明细 ID，服务端校验报告、会话、知识库、文档及动作资格，并从不可变快照构造强类型参数。
 - `RetryDocumentProcessingActionExecutor` 在确认取得执行权后复用单文档重试原语，再次校验 `FAILED`、处理开关和次数上限；陈旧、删除、关闭或超限目标进入动作 `FAILED` 且不修改文档，重复及并发确认最多提交一次。
 - 2026-08-15 完成切片 6“索引重建提案”：同一无请求体端点按可信明细静态选择 `REINDEX_DOCUMENT`，提案参数保存报告观察到的 profile；`ReindexDocumentActionExecutor` 复用单文档重建原语，生成和确认均校验 `SUCCEEDED`、当前 profile、实际向量及处理与 VectorStore 可用性。来源未知、profile 过期和当前 profile 向量为零均可重建；向量在报告后恢复、状态变化或依赖不可用时安全拒绝且不修改文档。前端开放重建按钮，重复请求恢复同一操作卡片。
-- 切片 7 至切片 8 尚未实施，下一步是事务提交后派发、队列拒绝保留 `PENDING` 和有限恢复扫描。
+- 2026-08-15 完成切片 7“可靠派发”：上传、重试和索引重建统一注册事务提交后派发；执行器队列拒绝只记录受限日志并保留 `PENDING`。新增启动与低频固定间隔的有界恢复扫描，按稳定顺序重新派发活动 `PENDING` 文档，并继续依靠 `claimForProcessing` 原子抢占消解重复派发。该切片不新增数据库迁移。
+- 切片 8 尚未实施，下一步是固定评估集、离线 Profile、前端视觉验收和版本验收报告。
 
 ## 19. V3 完成标准
 

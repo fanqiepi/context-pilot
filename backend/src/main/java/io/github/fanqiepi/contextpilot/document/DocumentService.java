@@ -111,7 +111,7 @@ public class DocumentService {
                     "Document metadata could not be saved",
                     exception);
         }
-        processingCoordinator.submit(documentId);
+        processingCoordinator.submitAfterCommit(documentId);
         return response(entity);
     }
 
@@ -151,7 +151,7 @@ public class DocumentService {
             throw retryNotAllowed(documentId, entity);
         }
         SourceDocumentEntity entity = requireEntity(documentId);
-        processingCoordinator.submit(documentId);
+        processingCoordinator.submitAfterCommit(documentId);
         return response(entity);
     }
 
@@ -167,7 +167,7 @@ public class DocumentService {
             throw reindexNotAllowed(documentId, latest);
         }
         SourceDocumentEntity pending = requireEntity(documentId);
-        processingCoordinator.submit(documentId);
+        processingCoordinator.submitAfterCommit(documentId);
         return response(pending);
     }
 
