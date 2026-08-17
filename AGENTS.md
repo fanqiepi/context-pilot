@@ -12,12 +12,12 @@
 - The roadmap advances by major version. A version under implementation is specified in detail; the next version defines a scenario and boundary; later versions are directional candidates and are not implementation authorization.
 - V2 is complete. It adds the persisted, confirmable `CREATE_KNOWLEDGE_BASE` business action while preserving the modular monolith and existing RAG behavior.
 - V3 is complete. Its approved detailed design and completion record are at `docs/architecture/v3-knowledge-base-maintenance-design.md` and `docs/evaluation/v3-acceptance-report.md`; preserve the V1/V2/V3 baselines in subsequent maintenance.
-- V4's first-phase contract is confirmed but implementation is not authorized. It is limited to explicit `DOCUMENT_COMPARISON` requests over 2-5 eligible documents, bounded Plan-and-Execute, read-only per-document retrieval, 90-second execution, persisted/cancellable runs, and grounded citations; natural-language research routing is forbidden. The design artifact is `docs/architecture/v4-knowledge-research-design.md`; do not introduce production agents, LangGraph or other workflow engines, MCP integration, microservices, message queues, multi-tenancy, plugin systems, dynamic tools, or model-generated SQL under the current scope.
+- V4's first-phase contract is confirmed, and Slice 1 for the evaluation corpus and fixed baselines is authorized. This authorization covers only public or synthetic evaluation assets, the current single-turn RAG baseline, an evaluation-only bounded Plan-and-Execute candidate harness, and its report. Production research runtime, Flyway migrations, formal API/SSE, and frontend entry remain unapproved. The design artifact is `docs/architecture/v4-knowledge-research-design.md`; do not introduce production agents, LangGraph or other workflow engines, MCP integration, microservices, message queues, multi-tenancy, plugin systems, dynamic tools, or model-generated SQL under the current scope.
 
 ## Completed V1-V3 baselines and current scope
 
 - Treat V1, V2, and V3 as completed baselines, not as unfinished MVP delivery. Maintenance must preserve their documented behavior and acceptance evidence.
-- V3 was completed through the ordered, independently verifiable slices in the approved design. V4 production implementation remains unapproved until its evaluation evidence and entry conditions are explicitly reviewed and committed; implementation details must not change the confirmed first-phase contract or expand its scope.
+- V3 was completed through the ordered, independently verifiable slices in the approved design. V4 Slice 1 evaluation work is approved and must produce reviewable evidence before Slice 2 or any production implementation is authorized; implementation details must not change the confirmed first-phase contract or expand its scope.
 
 - Route each chat request to one of three explicit, versioned capabilities: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, or `BUSINESS_ACTION`.
 - Keep `SIMPLE_CHAT` narrow: identity, greeting, capability description, thanks, and farewell continue to use deterministic replies. Do not silently turn it into unrestricted open-domain model answering.
@@ -31,7 +31,7 @@
 ## Roadmap governance
 
 - Use `docs/requirements/product-requirements.md` as the single detailed roadmap. Avoid parallel phase systems such as P/N/I/A-D numbering for future work.
-- Describe V1, V2, and V3 as completed baselines, V4 as a detailed design awaiting implementation authorization, and V5+ only as goals and entry conditions.
+- Describe V1, V2, and V3 as completed baselines, V4 as a detailed design with evaluation Slice 1 authorized and production implementation awaiting later slice authorization, and V5+ only as goals and entry conditions.
 - A roadmap candidate is not authorization. Before starting a later major version, update this file and the relevant requirements, architecture, data, API, and evaluation documents with an explicitly approved scope.
 - Plan capabilities from user scenarios first. Frameworks such as LangGraph, MCP, workflow runtimes, or multi-agent libraries are implementation candidates, not roadmap goals by themselves.
 - Keep the three top-level routing classes stable for the current scope: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, and `BUSINESS_ACTION`. Future knowledge tasks or business actions should normally be modeled beneath these classes unless a later approved design demonstrates the need for another top-level route.

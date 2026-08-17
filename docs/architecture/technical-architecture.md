@@ -1,6 +1,6 @@
 # ContextPilot 技术架构
 
-> 状态：V1、V2 与 V3 均已完成；V4 受限 Plan-and-Execute 第一阶段合同已确认，但尚未授权改变生产架构
+> 状态：V1、V2 与 V3 均已完成；V4 受限 Plan-and-Execute 第一阶段合同已确认，Slice 1 评估工作已授权，但尚未授权改变生产架构
 
 ## 架构形式
 
@@ -78,13 +78,13 @@ V3 通过专用只读 DataPort 生成不可变健康报告，使用 `dataAsOf`�
 
 ## V4 受限 Plan-and-Execute 设计边界
 
-V4 的详细设计见 [V4 知识研究助手详细设计](v4-knowledge-research-design.md)。第一阶段合同已确认但尚未授权实施：只处理前端显式提交的 `DOCUMENT_COMPARISON`，选择 2 至 5 份合格文档，普通聊天文本不自动触发。现有 `KNOWLEDGE_QA` 单轮 RAG 保持不变；研究路径采用应用级 Plan-and-Execute：Planner 产生最多 4 个强类型顺序步骤，确定性校验器冻结范围与预算，有界执行器按文档调用受控检索，证据账本保留真实来源，Synthesizer 最后生成并校验引用。
+V4 的详细设计见 [V4 知识研究助手详细设计](v4-knowledge-research-design.md)。第一阶段合同已确认，当前只授权 Slice 1 评估工作：使用显式 `DOCUMENT_COMPARISON`、2 至 5 份合格文档和固定问题集，对照现有单轮 RAG 与评估专用的受限 Plan-and-Execute 候选方案。生产研究路径的目标架构仍是 Planner 产生最多 4 个强类型顺序步骤，确定性校验器冻结范围与预算，有界执行器按文档调用受控检索，证据账本保留真实来源，Synthesizer 最后生成并校验引用，但该生产架构尚未获准实现。
 
 该方案不是 ReAct 或自主 Agent 循环。首版不重规划，步骤只允许 `RETRIEVE`，不允许业务副作用、任意 SQL、Shell、文件、HTTP、MCP 或跨知识库访问，也不引入 LangGraph、通用 Tool Gateway、工作流引擎或多 Agent。模型的隐藏思维过程不保存；可审计对象是任务目标、结构化计划、步骤状态、检索范围、证据、预算和安全错误摘要。
 
 候选模块包括 `ResearchApplicationService`、`ResearchPlanner`、`ResearchPlanValidator`、`ResearchExecutor`、`ResearchEvidenceLedger` 和 `ResearchSynthesizer`，仍采用模块化单体中的显式 Java 服务。运行状态与回答结果分离，90 秒内进入 `SUCCEEDED/PARTIAL/FAILED/CANCELLED`；取消使用条件更新，断线不取消，应用重启将遗留活动运行安全标记失败。数据库状态是事实来源，SSE 只负责进度；普通 RAG、V2/V3 动作与健康报告链路保持不变。
 
-以上合同已完成评审，但不是实现授权。固定评估仍必须证明多步检索相对单轮 RAG 有实际质量收益，并完成治理文档授权切换。V5 的显式长期记忆、V6 的外部工具互操作和更远期多 Agent 仍为方向性候选。
+以上合同已完成评审。Slice 1 可以在评估资产和测试范围内建立候选原型并产生基线，不得新增生产模块、迁移、接口或页面。固定评估证明多步检索相对单轮 RAG 有实际质量收益后，才逐片讨论和授权后续生产实现。V5 的显式长期记忆、V6 的外部工具互操作和更远期多 Agent 仍为方向性候选。
 
 ## 基础设施职责
 
