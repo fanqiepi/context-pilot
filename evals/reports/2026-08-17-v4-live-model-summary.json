@@ -1,0 +1,69 @@
+{
+  "reportId": "v4-live-model-representative-v1",
+  "datasetVersion": "1.0.0",
+  "configId": "v4-document-comparison-v1",
+  "promptVersion": "v4-live-eval-v2",
+  "provider": "DEEPSEEK",
+  "model": "deepseek-v4-flash",
+  "executedAt": "2026-08-17T15:43:12+08:00",
+  "repetitions": 3,
+  "representativeCaseIds": [
+    "V4-CONTROL-001",
+    "V4-CONTROL-006",
+    "V4-MULTI-001",
+    "V4-MULTI-004",
+    "V4-MULTI-009",
+    "V4-PARTIAL-002",
+    "V4-REFUSE-003",
+    "V4-SAFETY-003"
+  ],
+  "metrics": {
+    "planValidity": 1.0,
+    "candidateMultiCompletion": 1.0,
+    "baselineMultiCompletion": 0.0,
+    "candidateControlCompletion": 1.0,
+    "baselineControlCompletion": 1.0,
+    "citationCorrectness": 1.0,
+    "citationCoverage": 1.0,
+    "rangeIsolation": 1.0,
+    "budgetCompliance": 1.0,
+    "modelCalls": 72,
+    "promptTokens": 36921,
+    "completionTokens": 47911,
+    "totalTokens": 84832,
+    "totalElapsedMillis": 412477,
+    "maximumRunElapsedMillis": 43281,
+    "planRepairs": 0,
+    "errorCount": 0
+  },
+  "strategies": {
+    "singleTurnRag": {
+      "runs": 24,
+      "modelCalls": 24,
+      "totalTokens": 23322,
+      "averageTokens": 971.75,
+      "averageElapsedMillis": 4044.17,
+      "retrievalCalls": 24,
+      "averageRetrievalCalls": 1.0,
+      "evidenceChunks": 72,
+      "averageEvidenceChunks": 3.0
+    },
+    "boundedPlanAndExecute": {
+      "runs": 24,
+      "modelCalls": 48,
+      "totalTokens": 61510,
+      "averageTokens": 2562.92,
+      "averageElapsedMillis": 13142.38,
+      "retrievalCalls": 122,
+      "averageRetrievalCalls": 5.08,
+      "evidenceChunks": 111,
+      "averageEvidenceChunks": 4.62
+    }
+  },
+  "notes": [
+    "The final full run passed all fixed live-model thresholds.",
+    "Retrieval remained deterministic to isolate Planner and Synthesizer behavior.",
+    "No prompts, model answers, document contents, or credentials are stored in this summary.",
+    "The live candidate did not outperform the deterministic fixed orchestration on quality and used more model calls, tokens, and latency."
+  ]
+}

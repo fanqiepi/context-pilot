@@ -1,4 +1,5 @@
 .env
+/backend/config/application-local-secrets.yml
 data/uploads/*
 !data/uploads/.gitkeep
 data/test-documents/

@@ -4,7 +4,7 @@
 - [产品定位与大版本路线图](requirements/product-requirements.md)
 - [技术架构](architecture/technical-architecture.md)
 - [V3 知识库健康检查与维护助手详细设计](architecture/v3-knowledge-base-maintenance-design.md)
-- [V4 知识研究助手详细设计（Slice 1 评估已授权）](architecture/v4-knowledge-research-design.md)
+- [V4 知识研究助手详细设计（Slice 1 评估已完成）](architecture/v4-knowledge-research-design.md)
 - [ADR 0001：使用 PostgreSQL 和 pgvector](architecture/decisions/0001-use-pgvector.md)
 - [数据模型](data/data-model.md)
 - [REST API、SSE 与操作确认约定](api/api-design.md)
