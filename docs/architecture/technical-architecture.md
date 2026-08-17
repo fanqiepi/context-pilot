@@ -1,6 +1,6 @@
 # ContextPilot 技术架构
 
-> 状态：V1 知识库问答基线与 V2 可控行动助手均已完成；V3 详细设计已于 2026-08-15 获准实施，是当前架构演进范围
+> 状态：V1、V2 与 V3 均已完成；V4 受限 Plan-and-Execute 第一阶段合同已确认，但尚未授权改变生产架构
 
 ## 架构形式
 
@@ -68,37 +68,23 @@ HTTP request ID 作为 V1 trace ID 的起点，后续贯穿 SSE、消息和 `mod
 
 ## V2 已完成编排
 
-`ChatApplicationService` 仍是聊天总入口，并在进入现有 RAG 流程前调用轻量 `CapabilityRouter`。路由器只返回应用定义的能力 ID、版本和匹配依据，不返回可执行类名、SQL、URL 或任意工具描述。
+`ChatApplicationService` 通过确定性 `CapabilityRouter` 在 `SIMPLE_CHAT`、`BUSINESS_ACTION` 和 `KNOWLEDGE_QA` 之间选择；默认不增加模型分类调用。`CREATE_KNOWLEDGE_BASE` 使用强类型持久化提案和独立确认请求，原子取得执行权后才调用 `KnowledgeBaseService`，重复确认不产生第二次副作用。操作状态、失败摘要和前端卡片均以数据库记录为准。完整行为见 [V2 版本验收报告](../evaluation/v2-acceptance-report.md)。
 
-第一版路由顺序固定：
+## V3 已完成架构与后续边界
 
-1. `SimpleChatReplyPolicy` 命中时选择 `SIMPLE_CHAT`。
-2. 明确匹配创建知识库意图时选择 `BUSINESS_ACTION`。
-3. 其余请求选择 `KNOWLEDGE_QA`，继续执行知识库隔离检索和证据校验。
+V3 通过专用只读 DataPort 生成不可变健康报告，使用 `dataAsOf`、完整性和来源说明恢复历史结论。可信报告明细可以生成单文档重试或索引重建提案；生成与确认都会复核实时事实，动作使用 sealed 强类型参数和静态分派。文档任务在事务提交后派发，并由有界扫描恢复遗留 `PENDING` 任务。
 
-路由默认不增加独立模型调用。只有后续评估数据证明确定性规则无法满足真实表达时，才允许设计结构化分类器；分类结果仍只是候选能力，不能作为业务操作确认。
+完整架构、迁移和切片见 [V3 详细设计](v3-knowledge-base-maintenance-design.md)，完成证据见 [V3 版本验收报告](../evaluation/v3-acceptance-report.md)。已完成范围不包含批量动作、自动动作链或通用 Agent/工具平台。
 
-业务操作采用“两次请求”协议。聊天流只创建并返回 `PENDING_CONFIRMATION` 提案；真正执行由独立确认接口触发，因此 SSE 连接不需要为人工决定长期保持。确认服务通过带期望状态的原子更新把提案从 `PENDING_CONFIRMATION` 转为 `EXECUTING`，只有更新成功的请求可以调用动作。重复确认返回已有状态或结果，不能再次产生副作用。创建知识库动作与状态更新都在同一个 PostgreSQL 本地事务中完成；文档维护动作也在确认事务内同时写入 `PENDING` 和操作成功摘要，任务仅在事务提交后派发，避免后台线程读取未提交状态。
+## V4 受限 Plan-and-Execute 设计边界
 
-首个 `CREATE_KNOWLEDGE_BASE` 动作使用强类型名称和可选描述，复用 `KnowledgeBaseService` 的规范化、唯一约束和错误语义。模型文本、检索文档和客户端提交的动作类型都不能绕过静态注册和服务端校验。提案参数只保存规范化后的必要字段，结果和错误只保存安全摘要。
+V4 的详细设计见 [V4 知识研究助手详细设计](v4-knowledge-research-design.md)。第一阶段合同已确认但尚未授权实施：只处理前端显式提交的 `DOCUMENT_COMPARISON`，选择 2 至 5 份合格文档，普通聊天文本不自动触发。现有 `KNOWLEDGE_QA` 单轮 RAG 保持不变；研究路径采用应用级 Plan-and-Execute：Planner 产生最多 4 个强类型顺序步骤，确定性校验器冻结范围与预算，有界执行器按文档调用受控检索，证据账本保留真实来源，Synthesizer 最后生成并校验引用。
 
-前端在聊天消息下展示可恢复的操作卡片。卡片必须在确认前清楚展示操作类型、参数和影响；确认、拒绝、执行中、成功、失败及过期状态均以后端记录为准。
+该方案不是 ReAct 或自主 Agent 循环。首版不重规划，步骤只允许 `RETRIEVE`，不允许业务副作用、任意 SQL、Shell、文件、HTTP、MCP 或跨知识库访问，也不引入 LangGraph、通用 Tool Gateway、工作流引擎或多 Agent。模型的隐藏思维过程不保存；可审计对象是任务目标、结构化计划、步骤状态、检索范围、证据、预算和安全错误摘要。
 
-## V3 已批准架构与后续边界
+候选模块包括 `ResearchApplicationService`、`ResearchPlanner`、`ResearchPlanValidator`、`ResearchExecutor`、`ResearchEvidenceLedger` 和 `ResearchSynthesizer`，仍采用模块化单体中的显式 Java 服务。运行状态与回答结果分离，90 秒内进入 `SUCCEEDED/PARTIAL/FAILED/CANCELLED`；取消使用条件更新，断线不取消，应用重启将遗留活动运行安全标记失败。数据库状态是事实来源，SSE 只负责进度；普通 RAG、V2/V3 动作与健康报告链路保持不变。
 
-V3 当前场景是“知识库健康检查与维护助手”。批准的详细设计见 [V3 知识库健康检查与维护助手详细设计](v3-knowledge-base-maintenance-design.md)：通过专用只读 DataPort 生成并持久化不可变健康报告与异常明细，使用 `dataAsOf`、完整性和来源说明恢复历史结论；用户选择单个异常后复用提案、人工确认、幂等和审计协议提交文档重试或索引重建任务。动作核心演进为 sealed 强类型参数与静态分派，不继续绑定创建知识库专用参数，也不抽取通用工具执行网关。
-
-该设计已于 2026-08-15 获得实施授权。实现必须遵循设计中的八个切片顺序，并保持单文档动作、不可变报告和后台任务可靠接受等边界；当前授权不包含 V4 或通用 Agent/工具平台能力。
-
-V3 切片 1 已实现 `health` 内部边界：`KnowledgeBaseHealthService` 读取当前 Embedding profile 和处理配置，专用 PostgreSQL DataPort 在只读事务中按知识库查询完整状态计数、已知问题和当前 profile 向量数，确定性规则再生成状态、完整性、稳定建议和受限明细。向量存在性查询失败时通过事务保存点回退到业务表已知事实并标记 `PARTIAL`。
-
-V3 切片 2 已通过 V11 增加 `knowledge_base_health_report` 与 `knowledge_base_health_issue`，保存能力版本、时间点、完整性、profile、计数、来源观察值和建议动作快照；报告服务在同一事务内校验知识库、会话、用户消息、待完成助手消息和 trace 关系，写入报告后完成助手消息。会话历史按助手消息与报告 ID 分两次批量读取报告和明细，不读取当前文档重新计算旧结论。
-
-V3 切片 3 已增加完整句健康意图策略和 V12 路由约束。健康请求使用 `KNOWLEDGE_QA/v2` 与 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`，复合请求仍回落普通 RAG；健康事实查询在独立 `REPEATABLE_READ` 只读事务中完成，报告保存和助手消息完成保持原子。同步聊天直接携带 `healthReport`，SSE 固定发送 `message -> route -> delta -> health_report -> done`，不产生模型调用、引用或 usage。公开 GET 资源和前端卡片读取同一不可变快照，刷新后由历史接口恢复。
-
-V3 切片 4 已把动作持久化与确认核心从创建知识库专用字段提取改为 sealed `ActionParameters`、按 `actionType` 的静态 JSONB 编解码和枚举 `switch` 分派。V13 为两个维护动作预留受限文档目标和健康明细关联，数据库按动作类型约束参数形状。切片 5 新增失败文档重试提案与显式 `RetryDocumentProcessingActionExecutor`。切片 6 将同一可信报告明细入口扩展到 `REINDEX_DOCUMENT`，新增显式重建执行器和按知识库、文档、当前 profile 固定计数的索引元数据查询；来源未知、profile 过期或当前 profile 实际向量为零时允许重建。两个维护动作都在提案生成和确认时读取实时事实，并通过明细行锁、活动唯一索引和原子文档状态更新防止重复副作用。V14 仅扩展消息匹配依据。切片 7 已把上传、重试和重建统一为事务提交后派发；队列拒绝保留 `PENDING`，应用启动和低频有界扫描重新派发遗留任务，重复派发仍由原子 `claimForProcessing` 消解。
-
-V4 以后才可能研究有限规划、显式长期记忆、MCP 等外部工具互操作和多 Agent。只有固定编排无法满足经过评估的用户任务时才选择相关框架，并必须具备步骤预算、循环上限、人工确认、来源约束、恢复和评估数据。路线候选不构成当前实施授权。
+以上合同已完成评审，但不是实现授权。固定评估仍必须证明多步检索相对单轮 RAG 有实际质量收益，并完成治理文档授权切换。V5 的显式长期记忆、V6 的外部工具互操作和更远期多 Agent 仍为方向性候选。
 
 ## 基础设施职责
 

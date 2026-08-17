@@ -1,6 +1,6 @@
 # REST API、SSE 与操作确认约定
 
-> 本文记录已完成的 V1/V2 接口和已获准实施的 V3 合同。已实现字段以 OpenAPI 为主要事实来源；V3 合同按实施切片进入 OpenAPI，尚未完成的端点仍明确标记为待实现。
+> 本文记录已完成的 V1/V2/V3 接口和尚未授权实施的 V4 候选合同。已实现字段以 OpenAPI 为主要事实来源；V4 内容只用于设计评审，不应进入 OpenAPI 或客户端类型。
 
 ## 通用约定
 
@@ -33,16 +33,16 @@
 
 V2 只允许 `CREATE_KNOWLEDGE_BASE`，不提供客户端可枚举或动态注册任意工具的接口。
 
-## V3 资源（按切片实施）
+## V3 已实现资源
 
-V3 详细合同见 [V3 知识库健康检查与维护助手详细设计](../architecture/v3-knowledge-base-maintenance-design.md)。资源状态如下：
+V3 详细合同见 [V3 知识库健康检查与维护助手详细设计](../architecture/v3-knowledge-base-maintenance-design.md)：
 
 | 方法 | 路径 | 行为 |
 | --- | --- | --- |
-| `GET` | `/api/knowledge-base-health-reports/{id}` | 已实现；查询不可变健康报告、`dataAsOf`、完整性、来源和异常明细 |
-| `POST` | `/api/knowledge-base-health-reports/{reportId}/issues/{issueId}/action-request` | 已支持失败文档重试和索引重建；从可信异常明细生成或恢复单文档提案，不接受请求体或客户端动作参数 |
+| `GET` | `/api/knowledge-base-health-reports/{id}` | 查询不可变健康报告、`dataAsOf`、完整性、来源和异常明细 |
+| `POST` | `/api/knowledge-base-health-reports/{reportId}/issues/{issueId}/action-request` | 从可信明细生成或恢复单文档重试/重建提案，不接受请求体或客户端动作参数 |
 
-明确健康检查请求通过 `/api/chat` 或 `/api/chat/stream` 发起。顶层能力仍为 `KNOWLEDGE_QA`，健康路径使用能力版本 `v2` 与匹配依据 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`；普通 RAG 和历史消息保持原版本。服务端使用专用只读 DataPort 生成确定性报告，不调用 ChatModel。
+健康检查通过 `/api/chat` 或 `/api/chat/stream` 发起，使用 `KNOWLEDGE_QA/v2` 和确定性只读 DataPort，不调用 ChatModel。SSE 顺序为：
 
 SSE 已新增 `health_report` 事件：
 
@@ -50,17 +50,58 @@ SSE 已新增 `health_report` 事件：
 message -> route -> delta -> health_report -> done(COMPLETED)
 ```
 
-`delta` 是与报告一致的确定性摘要；该路径不发送 `citation` 或 `usage`。历史消息响应已增加可空 `healthReport`，按助手消息 ID 批量恢复已保存快照，不重新运行检查；V1/V2 旧消息返回 `null`。
+该路径不发送 `citation` 或 `usage`；历史通过可空 `healthReport` 恢复保存快照。维护动作沿用 V2 确认资源，强类型动作固定为 `CREATE_KNOWLEDGE_BASE`、`RETRY_DOCUMENT_PROCESSING` 和 `REINDEX_DOCUMENT`。维护动作只接受服务端保存的单文档目标，生成和确认均复核实时资格；`SUCCEEDED` 表示任务已可靠提交，最终处理结果仍由文档状态表达。
 
-动作确认资源沿用 V2 路径。自 V3 切片 4 起，`ActionRequest` 参数已由创建知识库专用对象演进为以 `actionType` 判别的强类型联合，固定允许：
+## V4 已确认候选研究合同（未授权实现）
 
-- `CREATE_KNOWLEDGE_BASE`
-- `RETRY_DOCUMENT_PROCESSING`
-- `REINDEX_DOCUMENT`
+V4 详细方案见 [V4 知识研究助手详细设计](../architecture/v4-knowledge-research-design.md)。SSE 是第一阶段用户入口，同步接口只用于集成测试；两者使用同一强类型 `research` 对象：
 
-两个维护动作只接受服务端保存的单个文档目标。操作 `SUCCEEDED` 表示重试或索引重建任务已提交，文档处理最终结果仍通过文档查询接口返回。文档先在确认事务内进入 `PENDING`，任务仅在事务提交后派发；执行器队列拒绝不会把文档改为失败，启动与低频有界恢复扫描会重新派发遗留任务。
+```json
+{
+  "knowledgeBaseId": "uuid",
+  "conversationId": "uuid-or-null",
+  "question": "比较这些文档在部署方式和限制上的差异",
+  "research": {
+    "clientRequestId": "client-generated-uuid",
+    "taskType": "DOCUMENT_COMPARISON",
+    "documentIds": ["uuid-a", "uuid-b"]
+  }
+}
+```
 
-截至 V3 切片 6，报告查询、同步聊天报告、确定性健康路由、SSE `health_report`、历史恢复和前端报告卡片均已可用；失败文档明细可生成 `RETRY_DOCUMENT_PROCESSING` 提案，来源未知、profile 过期或当前 profile 实际向量缺失的成功文档可生成 `REINDEX_DOCUMENT` 提案。响应包含 `reusedExistingProposal`、确定性 `userMessage`、携带操作卡片的 `assistantMessage` 和 `actionRequest`；重复请求返回相同记录。生成和确认均实时复核文档状态、profile、实际向量及处理与 VectorStore 可用性。
+缺少 `research` 时继续执行 V1-V3 现有行为，服务端不得根据 `question` 自动进入研究编排。`clientRequestId` 由前端生成并用于幂等恢复；`taskType` 只允许 `DOCUMENT_COMPARISON`；`documentIds` 必须包含 2 至 5 个不重复、未删除、`SUCCEEDED` 且索引兼容的同知识库文档。任一文档失效时整体返回 `409`，不静默排除。客户端不能提交计划、预算、证据或工具名。
+
+候选辅助资源：
+
+| 方法 | 路径 | 行为 |
+| --- | --- | --- |
+| `GET` | `/api/research-runs/{id}` | 查询执行/回答状态、冻结文档、计划步骤、预算/usage、错误摘要和最终消息关联 |
+| `POST` | `/api/research-runs/{id}/cancel` | 原子取消活动运行；已取消重复请求幂等成功，其他终态返回 `409` |
+
+聊天请求原子创建用户消息、待完成助手消息和研究运行，不增加第二个创建入口。相同 `clientRequestId` 与相同规范化请求返回已有运行；相同 ID 携带不同请求返回 `409 RESEARCH_REQUEST_ID_CONFLICT`。访问运行时必须通过会话与知识库可信关系验证范围。第一阶段固定错误语义为：
+
+- `400 RESEARCH_REQUEST_INVALID`：问题、任务类型、文档数量或重复 ID 不合法；
+- `404 RESEARCH_DOCUMENT_NOT_FOUND` / `RESEARCH_RUN_NOT_FOUND`：可信范围内资源不存在；
+- `409 RESEARCH_DOCUMENT_NOT_ELIGIBLE`：任一文档状态或索引不满足启动资格；
+- `409 RESEARCH_RUN_NOT_CANCELLABLE`：运行已进入非取消终态；
+- `RESEARCH_PLAN_INVALID`、`RESEARCH_TIMEOUT`、`RESEARCH_DEPENDENCY_UNAVAILABLE` 和 `RESEARCH_RUN_INTERRUPTED`：作为运行失败码持久化，并通过同步响应或 SSE 安全摘要返回。
+
+SSE 顺序固定为：
+
+```text
+message
+-> route
+-> research_plan
+-> research_step*
+-> delta*
+-> citation*
+-> usage?
+-> done(COMPLETED|PARTIAL|REFUSED|FAILED|CANCELLED)
+```
+
+`research_plan` 只包含可读计划摘要和预算，不暴露 Planner 原始输出或隐藏思维；`research_step` 包含稳定步骤 ID、顺序、状态、目标、命中/裁剪数量和安全失败摘要；`delta` 只承载最终综合回答；`citation` 只能来自已保存证据账本。所有事件携带运行内单调 `sequence`。
+
+数据库状态是事实来源。SSE 断开不会取消运行，任务继续执行；取消必须调用独立接口。历史消息只返回可空 `researchRun` 摘要，完整步骤通过运行接口查询；活动运行刷新后由前端轮询恢复，第一阶段不提供 SSE 续传。V1-V3 旧消息返回 `null`。
 
 ## 知识库接口
 
@@ -137,7 +178,7 @@ TXT、Markdown 和文本型 PDF 分别通过 Spring AI 对应 reader 解析；PD
 
 连接断开不等于模型调用必然取消；服务端必须记录最终状态。任何 SSE 事件都不能携带 API Key、完整提示词或未截断的内部异常。
 
-`message` 数据包含 `conversationId`、`userMessageId`、`assistantMessageId` 和 `traceId`；`delta` 数据包含本次增量文本；`citation` 与非流式接口使用相同的结构化引用；`usage` 包含模型、Token 和耗时；`done` 包含 `COMPLETED` 或 `REFUSED` 状态及 `traceId`。模型流失败时在已发送的事件之后追加一个安全的 `error` 事件并结束，不再发送引用、usage 或 done。客户端在模型完成前断开时，待处理的助手消息和模型调用记录为失败，并保存脱敏的取消摘要。
+`message` 数据包含 `conversationId`、`userMessageId`、`assistantMessageId` 和 `traceId`；`delta` 数据包含本次增量文本；`citation` 与非流式接口使用相同的结构化引用；`usage` 包含模型、Token 和耗时；`done` 包含 `COMPLETED` 或 `REFUSED` 状态及 `traceId`。V1-V3 普通模型流失败时追加安全 `error` 后结束，客户端提前断开会把待处理消息和模型调用标记失败。V4 持久化研究运行采用前述独立规则：SSE 断开不取消运行，由取消接口和运行状态负责后续收敛。
 
 固定白名单内的身份介绍、问候、能力说明、感谢和告别不调用模型，事件顺序为 `message -> delta -> done(COMPLETED)`，不发送 `citation` 或 `usage`。其他无可靠知识库证据的问题仍使用 `done(REFUSED)`。
 
