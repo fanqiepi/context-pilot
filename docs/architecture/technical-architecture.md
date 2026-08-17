@@ -1,12 +1,12 @@
 # ContextPilot 技术架构
 
-> 状态：V1、V2 与 V3 均已完成；V4 受限 Plan-and-Execute 第一阶段合同已确认，Slice 1 评估工作已完成，但尚未授权改变生产架构
+> 状态：V1、V2 与 V3 均已完成；V4 第一阶段已选择固定维度/逐文档确定性编排并整体授权 Slices 2-7，生产实现已落地，正在完成最终验收。
 
 ## 架构形式
 
 系统采用 Vue 前端与 Spring Boot 后端分离的模块化单体。后端使用 Java 21、Spring Boot 4.1.x 和 Spring AI 2.0.x；V2 继续使用显式 Java 应用服务和持久化状态迁移，不拆分微服务，不引入消息队列、Agent、LangGraph、MCP 或其他工作流运行时。更远版本是否采用这些技术，必须由已经确认的用户场景和评估数据决定。
 
-前端使用 Vue 3、TypeScript、Vue Router 和 Element Plus。`/library` 承载知识库、文档上传与处理状态管理，`/chat` 承载知识库选择、会话历史、流式问答和单向“有用”反馈。普通 HTTP 请求统一通过 Axios 访问 `/api`，SSE 使用 `@microsoft/fetch-event-source` 解析具名事件；聊天页对突发到达的 `delta` 使用短缓冲渐进渲染，并在缓冲区清空后再展示引用和完成状态。开发服务器将 `/api` 和 `/actuator` 代理到后端。模型密钥不进入浏览器，回答和引用按纯文本渲染，不信任模型输出或文档内容中的 HTML。
+前端使用 Vue 3、TypeScript、Vue Router 和 Element Plus。`/library` 承载知识库、文档上传与处理状态管理，`/chat` 承载知识库选择、会话历史、流式问答和单向“有用”反馈。普通 HTTP 请求统一通过 Axios 访问 `/api`，SSE 使用 `@microsoft/fetch-event-source` 解析具名事件；聊天页对突发到达的 `delta` 使用短缓冲渐进渲染，并在缓冲区清空后再展示引用和完成状态。开发服务器将 `/api` 和 `/actuator` 代理到后端。模型密钥不进入浏览器；助手回答使用 `marked` 解析 Markdown，并在 `v-html` 展示前通过 `DOMPurify` 清洗，禁止脚本、样式、表单、嵌入内容和远程媒体标签。用户消息继续按纯文本展示，模型输出和文档内容中的原始 HTML 均不受信任。
 
 ## 后端能力边界
 
@@ -76,15 +76,15 @@ V3 通过专用只读 DataPort 生成不可变健康报告，使用 `dataAsOf`�
 
 完整架构、迁移和切片见 [V3 详细设计](v3-knowledge-base-maintenance-design.md)，完成证据见 [V3 版本验收报告](../evaluation/v3-acceptance-report.md)。已完成范围不包含批量动作、自动动作链或通用 Agent/工具平台。
 
-## V4 受限 Plan-and-Execute 设计边界
+## V4 固定编排研究运行时
 
-V4 的详细设计见 [V4 知识研究助手详细设计](v4-knowledge-research-design.md)。第一阶段合同已确认，Slice 1 已使用显式 `DOCUMENT_COMPARISON`、2 至 5 份文档和固定问题集，对照现有单轮 RAG 与测试侧受限候选编排。离线结果证明范围化多步检索能改善固定合成任务的完整覆盖，但未证明模型 Planner 优于固定编排。生产研究路径的候选架构仍是 Planner 产生最多 4 个强类型顺序步骤，确定性校验器冻结范围与预算，有界执行器按文档调用受控检索，证据账本保留真实来源，Synthesizer 最后生成并校验引用，但该生产架构尚未获准实现。
+V4 的详细设计见 [V4 知识研究助手详细设计](v4-knowledge-research-design.md)。Slice 1 证明范围化多步检索能改善固定合成任务的完整覆盖，但未证明模型 Planner 优于固定编排，因此生产路径采用版本化固定维度生成最多 4 个强类型顺序步骤，确定性校验器冻结范围与预算，有界执行器按文档调用受控检索，证据账本保留真实来源，Synthesizer 最后生成并校验引用。该路径只由显式 `DOCUMENT_COMPARISON`、2 至 5 份文档触发。
 
 该方案不是 ReAct 或自主 Agent 循环。首版不重规划，步骤只允许 `RETRIEVE`，不允许业务副作用、任意 SQL、Shell、文件、HTTP、MCP 或跨知识库访问，也不引入 LangGraph、通用 Tool Gateway、工作流引擎或多 Agent。模型的隐藏思维过程不保存；可审计对象是任务目标、结构化计划、步骤状态、检索范围、证据、预算和安全错误摘要。
 
-候选模块包括 `ResearchApplicationService`、`ResearchPlanner`、`ResearchPlanValidator`、`ResearchExecutor`、`ResearchEvidenceLedger` 和 `ResearchSynthesizer`，仍采用模块化单体中的显式 Java 服务。运行状态与回答结果分离，90 秒内进入 `SUCCEEDED/PARTIAL/FAILED/CANCELLED`；取消使用条件更新，断线不取消，应用重启将遗留活动运行安全标记失败。数据库状态是事实来源，SSE 只负责进度；普通 RAG、V2/V3 动作与健康报告链路保持不变。
+生产模块包括 `DeterministicResearchPlanner`、`ResearchPlanValidator`、`ResearchStartService`、`ResearchExecutorService`、`ResearchQueryService`、`ResearchRunCommandService` 和 SSE 适配服务，仍采用模块化单体中的显式 Java 服务。运行状态与回答结果分离，90 秒内进入 `SUCCEEDED/PARTIAL/FAILED/CANCELLED`；取消使用条件更新，断线不取消，应用重启将遗留活动运行安全标记失败。数据库状态是事实来源，SSE 只负责进度；普通 RAG、V2/V3 动作与健康报告链路保持不变。
 
-以上合同已完成评审，Slice 1 也已在评估资产和测试范围内建立候选原型与基线，未新增生产模块、迁移、接口或页面。后续必须结合固定编排与模型规划的取舍另行讨论和授权生产切片。V5 的显式长期记忆、V6 的外部工具互操作和更远期多 Agent 仍为方向性候选。
+以上合同与整体授权已同步到生产模块、Flyway V15、正式 API/SSE 和前端入口；切片是独立验证检查点而非重复授权门。研究综合使用独立的 3000 Token 输出上限和 1800 字符正文上限；`PARTIAL` 卡片按稳定 `errorCode` 展示准确原因，受控缺证据句式不被误判为无引用内容。模型规划仍未获准进入生产，V5 的显式长期记忆、V6 的外部工具互操作和更远期多 Agent 仍为方向性候选。
 
 ## 基础设施职责
 

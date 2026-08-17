@@ -1,6 +1,6 @@
 # ContextPilot 数据模型
 
-> 本文定义已完成的 V1/V2/V3 逻辑模型，以及尚未授权迁移的 V4 候选模型；已经实施的物理结构仍以 Flyway 迁移为事实来源。V4 Slice 1 仅完成评估资产，不得被解释为已授权或已存在数据库结构。
+> 本文定义 V1-V3 已完成模型和 V4 第一阶段已授权、已由 Flyway V15 落地的研究模型；已经实施的物理结构仍以 Flyway 迁移为事实来源。
 
 ## 核心实体
 
@@ -81,19 +81,19 @@ V3 详细字段与约束见 [V3 知识库健康检查与维护助手详细设计
 
 报告与明细是不可变审计快照，使用逻辑删除；`source_document` 仍是当前事实来源，历史读取不重新计算，维护提案生成和确认都会复核实时状态。V11 同时增加健康向量元数据索引；V12/V14 扩展消息匹配依据；V13 将 `action_request` 扩展为固定允许 `CREATE_KNOWLEDGE_BASE`、`RETRY_DOCUMENT_PROCESSING` 和 `REINDEX_DOCUMENT`，并用目标文档、健康明细和按动作类型的 JSONB 约束保持强关联。V11-V14 保持 V2 历史提案兼容，完整迁移行为以 Flyway 脚本和 V3 设计为准。
 
-## V4 已确认候选数据结构（未授权迁移）
+## V4 已实施研究数据结构
 
 V4 详细设计见 [V4 知识研究助手详细设计](../architecture/v4-knowledge-research-design.md)。第一阶段合同确认四张审计型业务表：
 
-| 候选实体 | 主要职责 | 关键关系 |
+| 实体 | 主要职责 | 关键关系 |
 | --- | --- | --- |
 | `research_run` | 保存幂等请求、固定任务类型、计划版本、2-5 个冻结文档、执行/回答状态、预算、trace 和重试来源 | 关联知识库、会话、用户消息和助手消息 |
 | `research_step` | 保存服务端步骤 ID/顺序、目标、查询、受限文档数组、状态和执行摘要 | 属于一个研究运行 |
 | `research_evidence` | 保存 vector ID 快照、真实文档/chunk、页码、相似度、摘录和 Embedding profile | 属于一个研究运行，不外键关联可重建向量 |
 | `research_step_evidence` | 保存步骤与证据的多对多关系、步骤内排名和相似度 | 关联研究步骤与研究证据 |
 
-四张表使用 UUID、带时区时间和逻辑删除。`research_run` 不重复保存原始问题或 Planner 原始 JSON；冻结文档与步骤文档范围使用受限 JSONB 数组，计划从规范化步骤恢复。第一阶段 `task_type` 只允许 `DOCUMENT_COMPARISON`，执行状态为 `PLANNING/EXECUTING/SYNTHESIZING/SUCCEEDED/PARTIAL/FAILED/CANCELLED`，回答状态为 `ANSWERED/REFUSED` 或空；状态只通过条件更新单向迁移。
+四张表使用 UUID、带时区时间和逻辑删除。`research_run` 不重复保存原始问题，也不存在模型 Planner 原始 JSON；冻结文档与步骤文档范围使用受限 JSONB 数组，计划从规范化步骤恢复。第一阶段 `task_type` 只允许 `DOCUMENT_COMPARISON`，执行状态为 `PLANNING/EXECUTING/SYNTHESIZING/SUCCEEDED/PARTIAL/FAILED/CANCELLED`，回答状态为 `ANSWERED/REFUSED` 或空；状态只通过条件更新单向迁移。
 
-`message_citation` 候选增加可空 `research_evidence_id`，V4 引用必须关联当前运行的真实证据，V1-V3 历史行保持空且不回填。`chat_message` 候选增加 `CANCELLED`，只用于取消的研究助手消息；部分完成与拒答仍保存为已完成消息。应用启动把遗留活动运行标记为 `FAILED/RESEARCH_RUN_INTERRUPTED`，不自动恢复；重新执行创建新运行并通过 `retry_of_run_id` 关联旧记录。
+Flyway V15 为 `message_citation` 增加可空 `research_evidence_id`，V4 引用必须关联当前运行的真实证据，V1-V3 历史行保持空且不回填。`chat_message` 增加 `CANCELLED`，只用于取消的研究助手消息；部分完成与拒答仍保存为已完成消息。应用启动把遗留活动运行标记为 `FAILED/RESEARCH_RUN_INTERRUPTED`，不自动恢复；重新执行创建新运行并通过 `retry_of_run_id` 关联旧记录。
 
-合同已确认，但当前不分配 Flyway 版本号，也不创建表、索引或历史回填规则。列长度、索引名和检查约束在获准实施后的数据切片中机械细化，不得改变上述语义。
+Flyway `V15__create_document_comparison_research.sql` 已创建四表、唯一索引、外键、状态与预算检查约束，并以不回填方式兼容 V1-V3 历史数据。

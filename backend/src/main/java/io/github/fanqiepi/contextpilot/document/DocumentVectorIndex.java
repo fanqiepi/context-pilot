@@ -60,13 +60,21 @@ public class DocumentVectorIndex {
     }
 
     public List<Document> search(UUID knowledgeBaseId, String query, int topK) {
+        return search(knowledgeBaseId, null, query, topK);
+    }
+
+    public List<Document> search(UUID knowledgeBaseId, UUID documentId, String query, int topK) {
         EmbeddingIndexProfile profile = embeddingIndexProperties.currentProfile();
+        String filter = KNOWLEDGE_BASE_ID + " == '" + knowledgeBaseId + "' && "
+                + EMBEDDING_PROFILE_ID + " == '" + profile.id() + "'";
+        if (documentId != null) {
+            filter += " && " + DOCUMENT_ID + " == '" + documentId + "'";
+        }
         SearchRequest request = SearchRequest.builder()
                 .query(query)
                 .topK(topK)
                 .similarityThresholdAll()
-                .filterExpression(KNOWLEDGE_BASE_ID + " == '" + knowledgeBaseId + "' && "
-                        + EMBEDDING_PROFILE_ID + " == '" + profile.id() + "'")
+                .filterExpression(filter)
                 .build();
         return requireVectorStore().similaritySearch(request);
     }

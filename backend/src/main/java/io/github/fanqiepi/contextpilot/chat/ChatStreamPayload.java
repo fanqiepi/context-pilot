@@ -7,6 +7,8 @@ import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
 import io.github.fanqiepi.contextpilot.action.ActionRequestStatus;
 import io.github.fanqiepi.contextpilot.action.ActionParameters;
 import io.github.fanqiepi.contextpilot.action.ActionType;
+import io.github.fanqiepi.contextpilot.research.ResearchRunResponse;
+import io.github.fanqiepi.contextpilot.research.ResearchStepResponse;
 
 public interface ChatStreamPayload {
 
@@ -81,7 +83,16 @@ public interface ChatStreamPayload {
             long latencyMs) implements ChatStreamPayload {
     }
 
-    record Done(String status, String traceId) implements ChatStreamPayload {
+    record ResearchPlan(long sequence, ResearchRunResponse run) implements ChatStreamPayload {
+    }
+
+    record ResearchStep(long sequence, UUID runId, ResearchStepResponse step) implements ChatStreamPayload {
+    }
+
+    record Done(String status, String traceId, UUID runId, Long sequence) implements ChatStreamPayload {
+        public Done(String status, String traceId) {
+            this(status, traceId, null, null);
+        }
     }
 
     record Error(String code, String message, String traceId) implements ChatStreamPayload {

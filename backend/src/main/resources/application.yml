@@ -41,6 +41,8 @@ spring:
         dimensions: 1024
 
 contextpilot:
+  research:
+    enabled: ${RESEARCH_ENABLED:true}
   action-request:
     confirmation-timeout-minutes: ${ACTION_CONFIRMATION_TIMEOUT_MINUTES:30}
   health:

@@ -9,6 +9,7 @@ import org.springframework.ai.chat.metadata.ChatResponseMetadata;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,9 +39,25 @@ public class ChatModelGateway {
     }
 
     public ChatModelResult generate(String systemText, String userText) {
+        return generate(prompt(systemText, userText));
+    }
+
+    public ChatModelResult generate(String systemText, String userText, int maxOutputTokens) {
+        if (maxOutputTokens <= 0) {
+            throw new IllegalArgumentException("maxOutputTokens must be positive");
+        }
+        ChatOptions options = ChatOptions.builder()
+                .model(configuredModel)
+                .maxTokens(maxOutputTokens)
+                .build();
+        return generate(new Prompt(
+                List.of(new SystemMessage(systemText), new UserMessage(userText)), options));
+    }
+
+    private ChatModelResult generate(Prompt prompt) {
         ChatModel chatModel = requireChatModel();
         try {
-            ChatResponse response = chatModel.call(prompt(systemText, userText));
+            ChatResponse response = chatModel.call(prompt);
             if (response == null || response.getResult() == null
                     || response.getResult().getOutput() == null
                     || response.getResult().getOutput().getText() == null

@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         "spring.ai.model.chat=none",
         "spring.ai.model.embedding=none",
         "spring.flyway.enabled=false",
+        "contextpilot.research.enabled=false",
         "spring.autoconfigure.exclude="
                 + "org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration,"
                 + "org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration"

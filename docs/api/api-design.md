@@ -1,6 +1,6 @@
 # REST API、SSE 与操作确认约定
 
-> 本文记录已完成的 V1/V2/V3 接口和尚未授权实现的 V4 候选合同。已实现字段以 OpenAPI 为主要事实来源；V4 Slice 1 仅完成评估资产，候选接口仍不应进入 OpenAPI 或客户端类型。
+> 本文记录已完成的 V1/V2/V3 接口和已整体授权、正在验收的 V4 第一阶段正式合同。已实现字段以 OpenAPI 为主要事实来源；V4 使用固定维度/逐文档确定性编排，正式接口、SSE 与客户端类型已进入生产代码。
 
 ## 通用约定
 
@@ -52,7 +52,7 @@ message -> route -> delta -> health_report -> done(COMPLETED)
 
 该路径不发送 `citation` 或 `usage`；历史通过可空 `healthReport` 恢复保存快照。维护动作沿用 V2 确认资源，强类型动作固定为 `CREATE_KNOWLEDGE_BASE`、`RETRY_DOCUMENT_PROCESSING` 和 `REINDEX_DOCUMENT`。维护动作只接受服务端保存的单文档目标，生成和确认均复核实时资格；`SUCCEEDED` 表示任务已可靠提交，最终处理结果仍由文档状态表达。
 
-## V4 已确认候选研究合同（未授权实现）
+## V4 正式研究合同
 
 V4 详细方案见 [V4 知识研究助手详细设计](../architecture/v4-knowledge-research-design.md)。SSE 是第一阶段用户入口，同步接口只用于集成测试；两者使用同一强类型 `research` 对象：
 
@@ -71,7 +71,7 @@ V4 详细方案见 [V4 知识研究助手详细设计](../architecture/v4-knowle
 
 缺少 `research` 时继续执行 V1-V3 现有行为，服务端不得根据 `question` 自动进入研究编排。`clientRequestId` 由前端生成并用于幂等恢复；`taskType` 只允许 `DOCUMENT_COMPARISON`；`documentIds` 必须包含 2 至 5 个不重复、未删除、`SUCCEEDED` 且索引兼容的同知识库文档。任一文档失效时整体返回 `409`，不静默排除。客户端不能提交计划、预算、证据或工具名。
 
-候选辅助资源：
+正式辅助资源：
 
 | 方法 | 路径 | 行为 |
 | --- | --- | --- |
@@ -85,6 +85,7 @@ V4 详细方案见 [V4 知识研究助手详细设计](../architecture/v4-knowle
 - `409 RESEARCH_DOCUMENT_NOT_ELIGIBLE`：任一文档状态或索引不满足启动资格；
 - `409 RESEARCH_RUN_NOT_CANCELLABLE`：运行已进入非取消终态；
 - `RESEARCH_PLAN_INVALID`、`RESEARCH_TIMEOUT`、`RESEARCH_DEPENDENCY_UNAVAILABLE` 和 `RESEARCH_RUN_INTERRUPTED`：作为运行失败码持久化，并通过同步响应或 SSE 安全摘要返回。
+- `RESEARCH_PARTIAL_RETRIEVAL`、`RESEARCH_EVIDENCE_BUDGET_REACHED`、`RESEARCH_ANSWER_BUDGET_REACHED` 和 `RESEARCH_UNSUPPORTED_CONTENT_REMOVED`：作为部分完成原因持久化；运行查询与历史摘要返回 `errorCode/errorSummary`，前端据此展示对应原因，不使用笼统的降级说明。
 
 SSE 顺序固定为：
 
@@ -99,7 +100,7 @@ message
 -> done(COMPLETED|PARTIAL|REFUSED|FAILED|CANCELLED)
 ```
 
-`research_plan` 只包含可读计划摘要和预算，不暴露 Planner 原始输出或隐藏思维；`research_step` 包含稳定步骤 ID、顺序、状态、目标、命中/裁剪数量和安全失败摘要；`delta` 只承载最终综合回答；`citation` 只能来自已保存证据账本。所有事件携带运行内单调 `sequence`。
+`research_plan` 只包含固定编排产生的可读计划摘要和预算，不存在模型 Planner 原始输出或隐藏思维；`research_step` 包含稳定步骤 ID、顺序、状态、目标、命中/裁剪数量和安全失败摘要；`delta` 只承载最终综合回答；`citation` 只能来自已保存证据账本。所有事件通过 SSE `id` 携带运行内单调 `sequence`，研究计划、步骤和结束载荷同时包含对应序号。
 
 数据库状态是事实来源。SSE 断开不会取消运行，任务继续执行；取消必须调用独立接口。历史消息只返回可空 `researchRun` 摘要，完整步骤通过运行接口查询；活动运行刷新后由前端轮询恢复，第一阶段不提供 SSE 续传。V1-V3 旧消息返回 `null`。
 
