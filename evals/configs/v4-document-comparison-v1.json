@@ -1,0 +1,49 @@
+{
+  "configId": "v4-document-comparison-v1",
+  "datasetVersion": "1.0.0",
+  "planVersion": "v1",
+  "deterministicRepetitions": 3,
+  "representativeCaseIds": ["V4-CONTROL-001", "V4-CONTROL-006", "V4-MULTI-001", "V4-MULTI-004", "V4-MULTI-009", "V4-PARTIAL-002", "V4-REFUSE-003", "V4-SAFETY-003"],
+  "dimensions": [
+    {"id":"deployment","aliases":["部署方式","部署"]},
+    {"id":"limits","aliases":["限制条件","限制","配额"]},
+    {"id":"security","aliases":["安全机制","安全"]},
+    {"id":"observability","aliases":["可观测性","监控"]},
+    {"id":"recovery","aliases":["恢复机制","恢复","容灾"]},
+    {"id":"cost","aliases":["成本模型","成本","计费"]},
+    {"id":"compliance","aliases":["合规认证","合规"]},
+    {"id":"offline_mode","aliases":["离线模式","离线运行"]},
+    {"id":"data_residency","aliases":["数据驻留","地域存储"]},
+    {"id":"airgap","aliases":["物理隔离","隔离网部署"]}
+  ],
+  "budgets": {
+    "minimumDocuments": 2,
+    "maximumDocuments": 5,
+    "singleTurnTopK": 5,
+    "maximumPlanSteps": 4,
+    "maximumRetrievalCalls": 20,
+    "perDocumentTopK": 3,
+    "maximumRawHits": 60,
+    "maximumEvidenceChunks": 24,
+    "maximumEvidenceCharacters": 24000,
+    "maximumExcerptCharacters": 1000,
+    "maximumStepEvidenceCharacters": 8000,
+    "maximumModelCalls": 3,
+    "hardTimeoutMillis": 90000
+  },
+  "thresholds": {
+    "explicitEntryAccuracy": 1.0,
+    "selectedDocumentCoverage": 1.0,
+    "planSchemaValidity": 0.95,
+    "multiStepTaskCompletion": 0.85,
+    "multiStepImprovementPoints": 15.0,
+    "comparisonDimensionCoverage": 0.85,
+    "citationCorrectness": 0.95,
+    "citationCoverage": 0.90,
+    "answerFaithfulness": 0.90,
+    "missingAndRefusalCorrectness": 0.90,
+    "maximumControlQualityDropPoints": 5.0,
+    "rangeIsolation": 1.0,
+    "budgetCompliance": 1.0
+  }
+}

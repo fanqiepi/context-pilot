@@ -1,6 +1,6 @@
 # ContextPilot 数据模型
 
-> 本文定义已完成的 V1/V2 逻辑模型和已获准实施的 V3 设计模型；已经实施的物理结构仍以 Flyway 迁移为事实来源。V3 物理结构按批准的实施切片通过后续 Flyway 迁移逐步落地。
+> 本文定义已完成的 V1/V2/V3 逻辑模型，以及尚未授权迁移的 V4 候选模型；已经实施的物理结构仍以 Flyway 迁移为事实来源。V4 Slice 1 仅完成评估资产，不得被解释为已授权或已存在数据库结构。
 
 ## 核心实体
 
@@ -68,45 +68,32 @@
 
 ## V2 已实现操作结构
 
-`V10__create_action_request.sql` 创建 `action_request`，包含：
+`V10__create_action_request.sql` 创建 `action_request`，关联会话、用户消息和唯一提案助手消息，保存静态动作类型、强类型校验后的 JSONB 参数、展示/结果/错误摘要、trace、过期与执行时间及逻辑删除标记。状态固定为 `PENDING_CONFIRMATION`、`EXECUTING`、`SUCCEEDED`、`FAILED`、`REJECTED` 或 `EXPIRED`。
 
-- `id`：应用生成 UUID。
-- `conversation_id`、`user_message_id`、`assistant_message_id`：通过受限删除外键关联提案产生时的聊天上下文。
-- `capability_id`、`capability_version`：当前固定为业务操作能力及其版本。
-- `action_type`：静态白名单动作；首个且当前唯一允许值为 `CREATE_KNOWLEDGE_BASE`。
-- `parameters`：JSONB，只保存服务端完成强类型解析、规范化和校验后的必要参数。
-- `display_summary`：确认卡片使用的安全影响摘要，不包含密钥或原始模型请求。
-- `status`：`PENDING_CONFIRMATION`、`EXECUTING`、`SUCCEEDED`、`FAILED`、`REJECTED` 或 `EXPIRED`。
-- `result_summary`、`error_summary`：成功结果或脱敏失败摘要；不得保存堆栈、SQL、密钥或完整模型请求。
-- `trace_id`、`expires_at`、`confirmed_at`、`executed_at`、`created_at`、`updated_at` 和 `deleted`。
+只有原子取得 `PENDING_CONFIRMATION -> EXECUTING` 的请求可以执行动作；重复或并发确认只读取已有状态。客户端和模型都不能覆盖已保存的动作类型、参数、消息关系或 trace ID。完整物理字段和约束以 V10 及后续迁移为准。
 
-`assistant_message_id` 应具有唯一约束，使一条提案消息最多关联一条业务操作。新产生的聊天消息还计划记录可空的 `capability_id` 和 `capability_version`；历史行保持为空，读取时不得错误推断。
+## V3 已实现数据结构
 
-操作执行使用带期望状态的原子更新：只有成功把 `PENDING_CONFIRMATION` 改为 `EXECUTING` 的请求可以调用业务服务。重复或并发确认读取现有状态，不再次执行。首个 `CREATE_KNOWLEDGE_BASE` 操作的状态迁移、知识库写入和成功结果写入使用同一个本地数据库事务；可预期业务失败在事务内转为 `FAILED` 和脱敏摘要。终态不能回退，普通删除继续使用逻辑删除。
-
-客户端不能提交或覆盖持久化后的 `action_type`、`parameters`、消息关系或 trace ID。模型输出只作为候选输入，必须在保存提案前转换为明确 DTO 并通过领域校验。
-
-## V3 数据结构（按切片实施）
-
-V3 详细字段与约束见 [V3 知识库健康检查与维护助手详细设计](../architecture/v3-knowledge-base-maintenance-design.md)。V11 已新增：
+V3 详细字段与约束见 [V3 知识库健康检查与维护助手详细设计](../architecture/v3-knowledge-base-maintenance-design.md)。V11 新增：
 
 - `knowledge_base_health_report`：保存知识库、会话、触发消息、能力版本、`health_status`、完整性、`data_as_of`、当前 Embedding profile 快照、各文档状态计数、问题计数、确定性摘要和 trace ID。一条活动助手消息最多关联一份报告；报告创建后不刷新或覆盖。
 - `knowledge_base_health_issue`：保存报告时观察到的文档 ID、文件名快照、问题类型、严重程度、文档状态、处理次数、安全错误摘要、Embedding profile、向量计数、来源更新时间、建议动作和不可执行原因。同一报告、文档和问题类型最多一条活动明细。
 
-报告及明细属于审计型业务记录，使用 `deleted` 逻辑删除。`source_document` 继续作为当前事实来源；报告只表达历史时间点结论。历史读取不得重新计算旧报告，生成提案和确认执行时必须重新校验实时文档状态。
+报告与明细是不可变审计快照，使用逻辑删除；`source_document` 仍是当前事实来源，历史读取不重新计算，维护提案生成和确认都会复核实时状态。V11 同时增加健康向量元数据索引；V12/V14 扩展消息匹配依据；V13 将 `action_request` 扩展为固定允许 `CREATE_KNOWLEDGE_BASE`、`RETRY_DOCUMENT_PROCESSING` 和 `REINDEX_DOCUMENT`，并用目标文档、健康明细和按动作类型的 JSONB 约束保持强关联。V11-V14 保持 V2 历史提案兼容，完整迁移行为以 Flyway 脚本和 V3 设计为准。
 
-V3 切片 4 已通过 V13 扩展 `action_request`：固定允许 `CREATE_KNOWLEDGE_BASE`、`RETRY_DOCUMENT_PROCESSING` 和 `REINDEX_DOCUMENT`，增加受限删除外键 `target_document_id` 与可空 `health_issue_id`，并按动作类型约束 JSONB 参数。创建知识库动作的两个目标字段必须为空；维护动作必须具有一致的文档目标和健康明细，单个活动健康明细最多关联一个提案。应用参数使用 sealed 强类型联合和显式静态分派，不把 `action_request` 演进为任意工具载体。
+## V4 已确认候选数据结构（未授权迁移）
 
-为受控检查实际向量存在性，V11 已给 `vector_store.metadata` 中的知识库、文档和 Embedding profile 字段增加 `vector_store_health_metadata_idx` 表达式索引。该索引只优化专用只读 DataPort，不改变 `PgVectorStore` 的写入和检索边界。
+V4 详细设计见 [V4 知识研究助手详细设计](../architecture/v4-knowledge-research-design.md)。第一阶段合同确认四张审计型业务表：
 
-V3 切片 2 通过顺序迁移 V11 落地报告主表、异常明细表和表达式索引，未修改 V1-V10。报告与明细只在创建时写入；历史查询按助手消息批量读取保存快照，不从当前 `source_document` 重新计算。
+| 候选实体 | 主要职责 | 关键关系 |
+| --- | --- | --- |
+| `research_run` | 保存幂等请求、固定任务类型、计划版本、2-5 个冻结文档、执行/回答状态、预算、trace 和重试来源 | 关联知识库、会话、用户消息和助手消息 |
+| `research_step` | 保存服务端步骤 ID/顺序、目标、查询、受限文档数组、状态和执行摘要 | 属于一个研究运行 |
+| `research_evidence` | 保存 vector ID 快照、真实文档/chunk、页码、相似度、摘录和 Embedding profile | 属于一个研究运行，不外键关联可重建向量 |
+| `research_step_evidence` | 保存步骤与证据的多对多关系、步骤内排名和相似度 | 关联研究步骤与研究证据 |
 
-V3 切片 3 通过 V12 扩展 `chat_message_capability_match_reason_check`，允许 `EXPLICIT_KNOWLEDGE_BASE_HEALTH`。健康请求保存为 `KNOWLEDGE_QA/v2`；普通 RAG、V1/V2 历史消息和已有动作记录不做版本回填。
+四张表使用 UUID、带时区时间和逻辑删除。`research_run` 不重复保存原始问题或 Planner 原始 JSON；冻结文档与步骤文档范围使用受限 JSONB 数组，计划从规范化步骤恢复。第一阶段 `task_type` 只允许 `DOCUMENT_COMPARISON`，执行状态为 `PLANNING/EXECUTING/SYNTHESIZING/SUCCEEDED/PARTIAL/FAILED/CANCELLED`，回答状态为 `ANSWERED/REFUSED` 或空；状态只通过条件更新单向迁移。
 
-V3 切片 5 通过 V14 再次扩展该约束，允许 `HEALTH_REPORT_ISSUE_SELECTED`。从报告明细生成的确定性用户选择消息和助手提案消息保存为 `BUSINESS_ACTION/v2`，并与同一 `action_request` 的用户消息、助手消息、目标文档、健康明细和 trace ID 关联。生成过程锁定目标明细行，再查询 V13 活动唯一索引对应的现有动作，保证并发请求不会留下重复消息或提案。
+`message_citation` 候选增加可空 `research_evidence_id`，V4 引用必须关联当前运行的真实证据，V1-V3 历史行保持空且不回填。`chat_message` 候选增加 `CANCELLED`，只用于取消的研究助手消息；部分完成与拒答仍保存为已完成消息。应用启动把遗留活动运行标记为 `FAILED/RESEARCH_RUN_INTERRUPTED`，不自动恢复；重新执行创建新运行并通过 `retry_of_run_id` 关联旧记录。
 
-V3 切片 6 不新增迁移，复用 V13 已预留的 `REINDEX_DOCUMENT` 参数形状和目标约束。实时重建资格通过 `source_document` 与按知识库、文档、当前 profile 限定的 `vector_store.metadata` 计数共同判断；`prepareReindex` 的条件更新同时允许来源未知、profile 不同和当前 profile 实际向量不存在，并原子迁移到 `PENDING`，避免校验与状态更新之间产生错误重建或重复提交。
-
-V3 切片 7 不新增迁移。上传、重试和索引重建在业务状态写入成功后统一注册事务提交后派发；队列拒绝不再执行 `PENDING -> FAILED`，应用启动和低频固定间隔按 `updated_at, id` 稳定顺序读取有限数量的活动 `PENDING` 文档并重新派发。工作线程继续使用带状态条件的 `claimForProcessing` 取得处理权，因此恢复扫描和直接派发并发时仍只会有一个处理器进入 `PROCESSING`。
-
-V13 和 V14 都不改写 V2 `CREATE_KNOWLEDGE_BASE` 的 `action_type`、`parameters`、状态或消息关联，只为历史记录补充两个空目标列并扩展新消息的允许匹配依据。迁移测试先在 V12 写入真实 V2 提案，再升级至最新版本验证原始 JSON 和状态保持不变。
+合同已确认，但当前不分配 Flyway 版本号，也不创建表、索引或历史回填规则。列长度、索引名和检查约束在获准实施后的数据切片中机械细化，不得改变上述语义。

@@ -12,17 +12,17 @@
 - The roadmap advances by major version. A version under implementation is specified in detail; the next version defines a scenario and boundary; later versions are directional candidates and are not implementation authorization.
 - V2 is complete. It adds the persisted, confirmable `CREATE_KNOWLEDGE_BASE` business action while preserving the modular monolith and existing RAG behavior.
 - V3 is complete. Its approved detailed design and completion record are at `docs/architecture/v3-knowledge-base-maintenance-design.md` and `docs/evaluation/v3-acceptance-report.md`; preserve the V1/V2/V3 baselines in subsequent maintenance.
-- V4 and later may explore bounded planning, explicit memory, external-tool interoperability such as MCP, and multi-agent patterns, but none of these are currently authorized. Do not introduce agents, LangGraph or other workflow engines, MCP integration, microservices, message queues, multi-tenancy, plugin systems, dynamic tools, or model-generated SQL under the current scope.
+- V4's first-phase contract is confirmed, and Slice 1 for the evaluation corpus and fixed baselines is complete. Its versioned assets and evidence report demonstrate a need for scoped multi-step retrieval on the synthetic corpus but do not prove that a model Planner is better than fixed orchestration. Slice 2 and all production research runtime, Flyway migrations, formal API/SSE, and frontend entry remain unapproved. The design artifact is `docs/architecture/v4-knowledge-research-design.md`; do not introduce production agents, LangGraph or other workflow engines, MCP integration, microservices, message queues, multi-tenancy, plugin systems, dynamic tools, or model-generated SQL under the current scope.
 
 ## Completed V1-V3 baselines and current scope
 
 - Treat V1, V2, and V3 as completed baselines, not as unfinished MVP delivery. Maintenance must preserve their documented behavior and acceptance evidence.
-- V3 was completed through the ordered, independently verifiable slices in the approved design. V4 and later remain unapproved until their scope and entry conditions are explicitly reviewed and committed.
+- V3 was completed through the ordered, independently verifiable slices in the approved design. V4 Slice 1 is complete with reviewable offline evidence; no Slice 2 or production implementation is authorized, and any next slice requires a separate scope discussion and governance update without changing the confirmed first-phase contract.
 
 - Route each chat request to one of three explicit, versioned capabilities: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, or `BUSINESS_ACTION`.
 - Keep `SIMPLE_CHAT` narrow: identity, greeting, capability description, thanks, and farewell continue to use deterministic replies. Do not silently turn it into unrestricted open-domain model answering.
 - Preserve the current grounded RAG path for `KNOWLEDGE_QA`, including knowledge-base isolation, evidence validation, citations, refusal behavior, SSE, persistence, and trace IDs.
-- The only implemented business action is `CREATE_KNOWLEDGE_BASE`, exposed through a statically registered, strongly typed application action that delegates to the existing `KnowledgeBaseService`.
+- Implemented business actions are the statically dispatched, strongly typed `CREATE_KNOWLEDGE_BASE`, `RETRY_DOCUMENT_PROCESSING`, and `REINDEX_DOCUMENT`; preserve their existing service boundaries and V2/V3 confirmation semantics.
 - A business request must produce a validated, persisted action proposal first. The real action must not execute until the user explicitly confirms it through a separate request.
 - Persist an auditable action state machine such as `PENDING_CONFIRMATION -> EXECUTING -> SUCCEEDED/FAILED`, with `REJECTED` and `EXPIRED` terminal alternatives. Confirmation must be atomic and idempotent so repeated requests cannot execute the action twice.
 - Route matching should start with deterministic rules and default safely to `KNOWLEDGE_QA`; do not add an extra model classification call until measured ambiguity justifies it.
@@ -31,7 +31,7 @@
 ## Roadmap governance
 
 - Use `docs/requirements/product-requirements.md` as the single detailed roadmap. Avoid parallel phase systems such as P/N/I/A-D numbering for future work.
-- Describe V1, V2, and V3 as completed baselines, and V4+ only as goals and entry conditions.
+- Describe V1, V2, and V3 as completed baselines, V4 as a detailed design with evaluation Slice 1 completed and production implementation awaiting separate later-slice authorization, and V5+ only as goals and entry conditions.
 - A roadmap candidate is not authorization. Before starting a later major version, update this file and the relevant requirements, architecture, data, API, and evaluation documents with an explicitly approved scope.
 - Plan capabilities from user scenarios first. Frameworks such as LangGraph, MCP, workflow runtimes, or multi-agent libraries are implementation candidates, not roadmap goals by themselves.
 - Keep the three top-level routing classes stable for the current scope: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, and `BUSINESS_ACTION`. Future knowledge tasks or business actions should normally be modeled beneath these classes unless a later approved design demonstrates the need for another top-level route.

@@ -34,3 +34,43 @@ datasets, and selected real PostgreSQL/pgvector lifecycle tests for immutable re
 issue selection, confirmation safety, transaction-after-commit dispatch, and bounded recovery.
 Docker is mandatory: the profile fails instead of publishing a baseline when the real lifecycle
 environment is unavailable.
+
+## Run the V4 Slice 1 document-comparison evaluation
+
+V4 Slice 1 is intentionally isolated from production runtime code. From `backend/` on Windows:
+
+```powershell
+$env:JAVA_HOME = 'C:\path\to\jdk-21'
+.\mvnw.cmd -Pv4-evaluation test
+```
+
+The profile loads the public synthetic corpus, 32 semantic cases, 12 deferred lifecycle case
+definitions, and the fixed V4 budget. It compares the current global single-turn Top-K shape with
+an evaluation-only bounded plan/execution/evidence-ledger prototype. The prototype performs no
+network or external model calls and is not reachable from production controllers, services, SSE,
+or the frontend.
+
+The eight representative cases are repeated three times to verify deterministic prototype
+stability. This does not substitute for live model, PostgreSQL/pgvector, persistence, SSE, restart,
+or page evaluation; those results must be recorded separately when their corresponding slice is
+implemented and authorized.
+
+### Run the V4 live chat-model comparison
+
+Create the ignored `backend/config/application-local-secrets.yml` from its tracked example, fill
+the DeepSeek key, and run from `backend/`:
+
+```powershell
+$env:JAVA_HOME = 'C:\path\to\jdk-21'
+.\mvnw.cmd -Pv4-live-model-evaluation test
+```
+
+The live profile runs the same eight representative cases three times for both strategies. It uses
+DeepSeek for Planner and Synthesizer calls, while keeping retrieval deterministic so model behavior
+is isolated from embedding variance. It disables Flyway, embedding, and VectorStore auto-
+configuration; therefore it does not call DashScope or validate real pgvector retrieval.
+
+The sanitized per-run metrics are written to `backend/target/v4-live-model-results.json`. They
+contain case IDs, pass/fail metrics, token counts, latency, and safe error codes, but no prompts,
+model answers, document contents, or credentials. The fixed versioned summary is stored under
+`evals/reports/`.
