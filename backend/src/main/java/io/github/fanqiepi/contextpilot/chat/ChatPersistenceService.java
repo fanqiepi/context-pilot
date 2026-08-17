@@ -8,6 +8,7 @@ import java.util.UUID;
 import io.github.fanqiepi.contextpilot.common.BadRequestException;
 import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
 import io.github.fanqiepi.contextpilot.model.ChatModelResult;
+import io.github.fanqiepi.contextpilot.research.ResearchCitation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +55,23 @@ public class ChatPersistenceService {
         conversationMapper.updateById(conversation);
         return new PendingChatExchange(
                 conversation.getId(), userMessage.getId(), assistantMessage.getId());
+    }
+
+    @Transactional
+    public PendingChatExchange beginResearch(
+            UUID requestedConversationId,
+            UUID knowledgeBaseId,
+            String question,
+            String traceId) {
+        return begin(
+                requestedConversationId,
+                knowledgeBaseId,
+                question,
+                CapabilityRoute.matched(
+                        CapabilityId.KNOWLEDGE_QA,
+                        "v4",
+                        CapabilityMatchReason.EXPLICIT_DOCUMENT_COMPARISON,
+                        traceId));
     }
 
     @Transactional(readOnly = true)
@@ -125,6 +143,91 @@ public class ChatPersistenceService {
         call.setLatencyMs(latencyMs);
         call.setUpdatedAt(now);
         modelCallMapper.updateById(call);
+    }
+
+    @Transactional
+    public void completeResearchSuccess(
+            UUID assistantMessageId,
+            UUID modelCallId,
+            String answer,
+            List<ResearchCitation> citations,
+            ChatModelResult result,
+            long latencyMs) {
+        OffsetDateTime now = now();
+        completeMessage(assistantMessageId, answer, ChatMessageStatus.COMPLETED, null);
+        persistResearchCitations(assistantMessageId, citations, now);
+        ModelCallEntity call = requireModelCall(modelCallId);
+        call.setModel(result.model());
+        call.setStatus(ModelCallStatus.SUCCEEDED);
+        call.setPromptTokens(result.promptTokens());
+        call.setCompletionTokens(result.completionTokens());
+        call.setTotalTokens(result.totalTokens());
+        call.setLatencyMs(latencyMs);
+        call.setUpdatedAt(now);
+        modelCallMapper.updateById(call);
+    }
+
+    @Transactional
+    public void completeResearchWithoutModel(
+            UUID assistantMessageId,
+            String answer,
+            List<ResearchCitation> citations) {
+        OffsetDateTime now = now();
+        completeMessage(assistantMessageId, answer, ChatMessageStatus.COMPLETED, null);
+        persistResearchCitations(assistantMessageId, citations, now);
+    }
+
+    @Transactional
+    public void completeResearchAfterModelTimeout(
+            UUID assistantMessageId,
+            UUID modelCallId,
+            String answer,
+            List<ResearchCitation> citations,
+            long latencyMs) {
+        OffsetDateTime now = now();
+        completeMessage(assistantMessageId, answer, ChatMessageStatus.COMPLETED, null);
+        persistResearchCitations(assistantMessageId, citations, now);
+        ModelCallEntity call = requireModelCall(modelCallId);
+        call.setStatus(ModelCallStatus.FAILED);
+        call.setLatencyMs(latencyMs);
+        call.setErrorSummary("Research synthesis exceeded the hard timeout");
+        call.setUpdatedAt(now);
+        modelCallMapper.updateById(call);
+    }
+
+    private void persistResearchCitations(
+            UUID assistantMessageId,
+            List<ResearchCitation> citations,
+            OffsetDateTime now) {
+        int rank = 1;
+        for (ResearchCitation researchCitation : citations) {
+            ChatCitationResponse citation = researchCitation.citation();
+            MessageCitationEntity entity = new MessageCitationEntity();
+            entity.setId(UUID.randomUUID());
+            entity.setMessageId(assistantMessageId);
+            entity.setResearchEvidenceId(researchCitation.researchEvidenceId());
+            entity.setDocumentId(citation.documentId());
+            entity.setChunkId(citation.chunkId());
+            entity.setOriginalFilename(citation.originalFilename());
+            entity.setChunkIndex(citation.chunkIndex());
+            entity.setPageNumber(citation.pageNumber());
+            entity.setRankIndex(rank++);
+            entity.setScore(citation.score());
+            entity.setExcerpt(citation.excerpt());
+            entity.setCreatedAt(now);
+            entity.setUpdatedAt(now);
+            citationMapper.insert(entity);
+        }
+    }
+
+    @Transactional
+    public void failResearchMessage(UUID assistantMessageId, String summary) {
+        completeMessage(assistantMessageId, "", ChatMessageStatus.FAILED, summary);
+    }
+
+    @Transactional
+    public void cancelResearchMessage(UUID assistantMessageId) {
+        completeMessage(assistantMessageId, "", ChatMessageStatus.CANCELLED, "Research run was cancelled");
     }
 
     @Transactional

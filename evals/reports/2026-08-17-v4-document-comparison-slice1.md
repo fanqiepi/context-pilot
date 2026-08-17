@@ -6,7 +6,9 @@
 >
 > 配置：`v4-document-comparison-v1`
 >
-> 结论：Slice 1 离线与 DeepSeek 代表性基线通过；证明范围化多步检索在固定合成任务上有必要，但模型 Planner 未优于固定编排且成本更高，本报告不构成 Slice 2 授权
+> 结论：Slice 1 离线与 DeepSeek 代表性基线通过；证明范围化多步检索在固定合成任务上有必要，但模型 Planner 未优于固定编排且成本更高。本报告在出具时不单独构成 Slice 2 授权；同日后续治理决策已整体授权 Slices 2-7。
+
+> 后续治理（2026-08-17）：基于本报告，项目选择版本化固定维度/逐文档确定性编排作为首个生产基线，并在后续决策中整体授权 V4 第一阶段 Slices 2-7。本注记不改变 Slice 1 当时的实验数据与结论。
 
 ## 评估对象与运行方式
 
@@ -119,4 +121,4 @@ $env:JAVA_HOME = 'F:\jdk21weizhi\microsoft-jdk-21.0.3-windows-x64\jdk-21.0.3+9'
 
 确定性维度 Planner 与 DeepSeek Planner 都达到当前固定案例的全部质量阈值，而真实模型候选增加了 Planner 调用、Token 与延迟。因此现有证据仍不能证明模型生成计划比更简单的固定编排更好，反而支持在进入生产切片前优先评审固定维度/逐文档编排。后续若要保留模型 Planner，必须增加固定编排无法覆盖的真实歧义案例并重新证明收益；不得仅凭本报告引入通用 Agent runtime、LangGraph、MCP、多 Agent 或动态工具。
 
-本报告只完成 Slice 1 证据交付。Slice 2、生产 `src/main`、Flyway、正式 API/SSE 和前端仍未获授权。
+本报告只完成 Slice 1 证据交付，不把后续实现计入本报告的通过结论。基于该证据形成的同日后续治理决策，已选择固定维度/逐文档确定性编排，并整体授权 Slices 2-7、生产 `src/main`、Flyway、正式 API/SSE、前端与最终验收。

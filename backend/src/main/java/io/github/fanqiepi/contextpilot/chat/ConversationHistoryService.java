@@ -18,6 +18,10 @@ import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportService;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import io.github.fanqiepi.contextpilot.research.ResearchQueryService;
+import io.github.fanqiepi.contextpilot.research.ResearchRunSummaryResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 
 @Service
 public class ConversationHistoryService {
@@ -34,6 +38,7 @@ public class ConversationHistoryService {
     private final AnswerFeedbackMapper answerFeedbackMapper;
     private final ActionRequestService actionRequestService;
     private final KnowledgeBaseHealthReportService healthReportService;
+    private final ResearchQueryService researchQueryService;
 
     public ConversationHistoryService(
             KnowledgeBaseService knowledgeBaseService,
@@ -50,6 +55,27 @@ public class ConversationHistoryService {
         this.answerFeedbackMapper = answerFeedbackMapper;
         this.actionRequestService = actionRequestService;
         this.healthReportService = healthReportService;
+        this.researchQueryService = null;
+    }
+
+    @Autowired
+    public ConversationHistoryService(
+            KnowledgeBaseService knowledgeBaseService,
+            ConversationMapper conversationMapper,
+            ChatMessageMapper chatMessageMapper,
+            MessageCitationMapper messageCitationMapper,
+            AnswerFeedbackMapper answerFeedbackMapper,
+            ActionRequestService actionRequestService,
+            KnowledgeBaseHealthReportService healthReportService,
+            ObjectProvider<ResearchQueryService> researchQueryService) {
+        this.knowledgeBaseService = knowledgeBaseService;
+        this.conversationMapper = conversationMapper;
+        this.chatMessageMapper = chatMessageMapper;
+        this.messageCitationMapper = messageCitationMapper;
+        this.answerFeedbackMapper = answerFeedbackMapper;
+        this.actionRequestService = actionRequestService;
+        this.healthReportService = healthReportService;
+        this.researchQueryService = researchQueryService.getIfAvailable();
     }
 
     @Transactional(readOnly = true)
@@ -100,12 +126,15 @@ public class ConversationHistoryService {
                 actionRequestService.findByAssistantMessageIds(messageIds);
         Map<UUID, KnowledgeBaseHealthReportResponse> healthReportsByMessage =
                 healthReportService.findByAssistantMessageIds(messageIds);
+        Map<UUID, ResearchRunSummaryResponse> researchRunsByMessage = researchQueryService == null
+                ? Map.of() : researchQueryService.summariesByAssistantMessageIds(messageIds);
 
         return messages.stream()
                 .map(message -> ConversationMessageResponse.from(
                         message,
                         healthReportsByMessage.get(message.getId()),
                         actionsByMessage.get(message.getId()),
+                        researchRunsByMessage.get(message.getId()),
                         citationsByMessage.getOrDefault(message.getId(), List.of()),
                         helpfulMessageIds.contains(message.getId())))
                 .toList();

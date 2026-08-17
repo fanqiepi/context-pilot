@@ -58,6 +58,31 @@ public class RetrievalService {
         }
     }
 
+    public java.util.List<RetrievalResultResponse> searchDocument(
+            UUID knowledgeBaseId,
+            UUID documentId,
+            String query,
+            int topK) {
+        if (!documentVectorIndex.isAvailable()) {
+            throw unavailable();
+        }
+        try {
+            return documentVectorIndex.search(knowledgeBaseId, documentId, query.strip(), topK)
+                    .stream()
+                    .map(this::toResponse)
+                    .filter(result -> result.documentId().equals(documentId))
+                    .toList();
+        } catch (RuntimeException exception) {
+            if (exception instanceof InternalServiceException internal) {
+                throw internal;
+            }
+            throw new InternalServiceException(
+                    "RESEARCH_DOCUMENT_RETRIEVAL_FAILED",
+                    "Document-scoped retrieval failed",
+                    exception);
+        }
+    }
+
     private RetrievalResultResponse toResponse(Document document) {
         Map<String, Object> metadata = document.getMetadata();
         return new RetrievalResultResponse(

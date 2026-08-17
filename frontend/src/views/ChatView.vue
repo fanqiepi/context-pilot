@@ -8,6 +8,9 @@ import {
   listConversationMessages,
   listConversations,
   listKnowledgeBases,
+  listDocuments,
+  getResearchRun,
+  cancelResearchRun,
   markMessageHelpful,
   proposeHealthReportIssueAction,
   removeMessageHelpful,
@@ -28,6 +31,8 @@ import type {
   KnowledgeBaseHealthIssue,
   KnowledgeBaseHealthIssueType,
   KnowledgeBaseHealthStatus,
+  SourceDocument,
+  ResearchRun,
   StreamDoneEvent,
   StreamErrorEvent,
   StreamUsageEvent,
@@ -36,9 +41,11 @@ import {
   createStreamTextRenderer,
   type StreamTextRenderer,
 } from '@/utils/streamTextRenderer'
+import { renderMarkdown } from '@/utils/markdown'
 
 interface UiMessage extends ConversationMessage {
   usage?: StreamUsageEvent
+  researchDetails?: ResearchRun
 }
 
 const route = useRoute()
@@ -51,12 +58,17 @@ const draft = ref('')
 const loadingWorkspace = ref(false)
 const loadingMessages = ref(false)
 const sending = ref(false)
+const researchMode = ref(false)
+const documents = ref<SourceDocument[]>([])
+const selectedResearchDocumentIds = ref<string[]>([])
+const activeResearchRunId = ref('')
 const feedbackSavingIds = reactive(new Set<string>())
 const actionSavingIds = reactive(new Set<string>())
 const healthProposalSavingIssueIds = reactive(new Set<string>())
 const messageScroller = ref<HTMLElement>()
 let streamController: AbortController | undefined
 let activeTextRenderer: StreamTextRenderer | undefined
+const researchPollTimers = new Map<string, number>()
 
 const activeKnowledgeBase = computed(
   () => knowledgeBases.value.find((item) => item.id === activeKnowledgeBaseId.value) ?? null,
@@ -66,8 +78,20 @@ const activeConversation = computed(
   () => conversations.value.find((item) => item.id === activeConversationId.value) ?? null,
 )
 
-const canSend = computed(
-  () => Boolean(activeKnowledgeBaseId.value && draft.value.trim() && !sending.value),
+const canSend = computed(() =>
+  Boolean(
+    activeKnowledgeBaseId.value &&
+      draft.value.trim() &&
+      !sending.value &&
+      (!researchMode.value || selectedResearchDocumentIds.value.length >= 2),
+  ),
+)
+
+const eligibleResearchDocuments = computed(() =>
+  documents.value.filter(
+    (document) =>
+      document.status === 'SUCCEEDED' && document.embeddingIndexCompatibility === 'CURRENT',
+  ),
 )
 
 const suggestions = [
@@ -84,6 +108,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   streamController?.abort()
   activeTextRenderer?.cancel()
+  clearResearchPolling()
 })
 
 async function initialize(): Promise<void> {
@@ -97,6 +122,7 @@ async function initialize(): Promise<void> {
       knowledgeBases.value.find((item) => item.id === queryValue)?.id ??
       knowledgeBases.value[0]?.id ??
       ''
+    await refreshDocuments()
     await refreshConversations(true)
   } catch (error) {
     ElMessage.error(errorMessage(error, '问答工作台加载失败'))
@@ -113,7 +139,19 @@ async function selectKnowledgeBase(id: string): Promise<void> {
   activeKnowledgeBaseId.value = id
   activeConversationId.value = ''
   messages.value = []
+  selectedResearchDocumentIds.value = []
+  await refreshDocuments()
   await refreshConversations(true)
+}
+
+async function refreshDocuments(): Promise<void> {
+  documents.value = activeKnowledgeBaseId.value
+    ? await listDocuments(activeKnowledgeBaseId.value)
+    : []
+  const eligible = new Set(eligibleResearchDocuments.value.map((document) => document.id))
+  selectedResearchDocumentIds.value = selectedResearchDocumentIds.value.filter((id) =>
+    eligible.has(id),
+  )
 }
 
 async function refreshConversations(openLatest = false): Promise<void> {
@@ -143,9 +181,18 @@ async function openConversation(conversationId: string): Promise<void> {
     return
   }
   activeConversationId.value = conversationId
+  clearResearchPolling()
   loadingMessages.value = true
   try {
     messages.value = await listConversationMessages(conversationId)
+    await Promise.all(
+      messages.value
+        .filter((message) => message.researchRun)
+        .map(async (message) => {
+          message.researchDetails = await getResearchRun(message.researchRun!.id)
+          scheduleResearchPolling(message)
+        }),
+    )
     await scrollToBottom()
   } catch (error) {
     ElMessage.error(errorMessage(error, '历史消息加载失败'))
@@ -160,6 +207,7 @@ function startNewConversation(): void {
     return
   }
   activeConversationId.value = ''
+  clearResearchPolling()
   messages.value = []
   draft.value = ''
 }
@@ -189,6 +237,7 @@ async function sendQuestion(): Promise<void> {
     capabilityMatchReason: null,
     healthReport: null,
     actionRequest: null,
+    researchRun: null,
     citations: [],
     helpful: false,
     createdAt: now,
@@ -207,6 +256,7 @@ async function sendQuestion(): Promise<void> {
     capabilityMatchReason: null,
     healthReport: null,
     actionRequest: null,
+    researchRun: null,
     citations: [],
     helpful: false,
     createdAt: now,
@@ -236,6 +286,15 @@ async function sendQuestion(): Promise<void> {
         ...(activeConversationId.value
           ? { conversationId: activeConversationId.value }
           : {}),
+        ...(researchMode.value
+          ? {
+              research: {
+                clientRequestId: crypto.randomUUID(),
+                taskType: 'DOCUMENT_COMPARISON' as const,
+                documentIds: [...selectedResearchDocumentIds.value],
+              },
+            }
+          : {}),
       },
       {
         onMessage(event) {
@@ -260,6 +319,26 @@ async function sendQuestion(): Promise<void> {
         onHealthReport(event) {
           assistantMessage.healthReport = event
         },
+        onResearchPlan(event) {
+          activeResearchRunId.value = event.run.id
+          assistantMessage.researchDetails = event.run
+          assistantMessage.researchRun = {
+            id: event.run.id,
+            taskType: event.run.taskType,
+            executionStatus: event.run.executionStatus,
+            answerStatus: event.run.answerStatus,
+            totalSteps: event.run.steps.length,
+            completedSteps: 0,
+            errorCode: event.run.errorCode,
+            errorSummary: event.run.errorSummary,
+          }
+        },
+        onResearchStep(event) {
+          const run = assistantMessage.researchDetails
+          if (!run) return
+          const index = run.steps.findIndex((step) => step.id === event.step.id)
+          if (index >= 0) run.steps[index] = event.step
+        },
         onDelta(event) {
           textRenderer.enqueue(event.content)
         },
@@ -271,6 +350,9 @@ async function sendQuestion(): Promise<void> {
         },
         onDone(event) {
           doneEvent = event
+          if (assistantMessage.researchDetails) {
+            void refreshResearchMessage(assistantMessage)
+          }
         },
         onError(event) {
           streamErrorEvent = event
@@ -295,7 +377,7 @@ async function sendQuestion(): Promise<void> {
       assistantMessage.traceId = streamErrorEvent.traceId
       assistantMessage.updatedAt = new Date().toISOString()
     } else if (doneEvent) {
-      assistantMessage.status = 'COMPLETED'
+      assistantMessage.status = doneEvent.status === 'CANCELLED' ? 'CANCELLED' : 'COMPLETED'
       assistantMessage.traceId = doneEvent.traceId
       assistantMessage.updatedAt = new Date().toISOString()
     } else {
@@ -318,6 +400,10 @@ async function sendQuestion(): Promise<void> {
     }
   } finally {
     sending.value = false
+    activeResearchRunId.value = ''
+    if (assistantMessage.researchDetails) {
+      scheduleResearchPolling(assistantMessage)
+    }
     streamController = undefined
     if (activeTextRenderer === textRenderer) {
       activeTextRenderer = undefined
@@ -327,7 +413,87 @@ async function sendQuestion(): Promise<void> {
   }
 }
 
-function stopGeneration(): void {
+function isResearchTerminal(run: ResearchRun): boolean {
+  return ['SUCCEEDED', 'PARTIAL', 'FAILED', 'CANCELLED'].includes(run.executionStatus)
+}
+
+const researchPartialReasons: Record<string, string> = {
+  RESEARCH_TIMEOUT: '比较在执行时限内未能完成，仅保留超时前取得的结果。',
+  RESEARCH_PARTIAL_RETRIEVAL: '部分所选文档检索失败，结果仅基于成功取得的证据。',
+  RESEARCH_EVIDENCE_BUDGET_REACHED: '候选证据超过本次保留上限，结果仅基于裁剪后证据。',
+  RESEARCH_ANSWER_BUDGET_REACHED: '综合回答超过长度上限，仅保留长度预算内的结果。',
+  RESEARCH_UNSUPPORTED_CONTENT_REMOVED: '缺少有效引用的综合内容已被移除。',
+  RESEARCH_PARTIAL: '本次比较仅部分完成。',
+}
+
+function researchPartialReason(run: ResearchRun): string | null {
+  if (run.executionStatus !== 'PARTIAL') return null
+  if (run.errorCode && researchPartialReasons[run.errorCode]) {
+    return researchPartialReasons[run.errorCode]
+  }
+  return run.errorSummary ?? '本次比较仅部分完成。'
+}
+
+function applyResearchRun(message: UiMessage, run: ResearchRun): void {
+  message.researchDetails = run
+  message.researchRun = {
+    id: run.id,
+    taskType: run.taskType,
+    executionStatus: run.executionStatus,
+    answerStatus: run.answerStatus,
+    totalSteps: run.steps.length,
+    completedSteps: run.steps.filter((step) =>
+      ['SUCCEEDED', 'PARTIAL', 'FAILED', 'CANCELLED'].includes(step.status),
+    ).length,
+    errorCode: run.errorCode,
+    errorSummary: run.errorSummary,
+  }
+  if (isResearchTerminal(run)) {
+    message.status = run.executionStatus === 'CANCELLED'
+      ? 'CANCELLED'
+      : run.executionStatus === 'FAILED'
+        ? 'FAILED'
+        : 'COMPLETED'
+    message.errorSummary = run.executionStatus === 'FAILED' ? run.errorSummary : null
+  }
+}
+
+async function refreshResearchMessage(message: UiMessage): Promise<void> {
+  const runId = message.researchDetails?.id ?? message.researchRun?.id
+  if (!runId) return
+  try {
+    const run = await getResearchRun(runId)
+    if (!messages.value.some((candidate) => candidate === message)) return
+    applyResearchRun(message, run)
+    if (!isResearchTerminal(run)) scheduleResearchPolling(message)
+  } catch {
+    if (messages.value.some((candidate) => candidate === message)) scheduleResearchPolling(message)
+  }
+}
+
+function scheduleResearchPolling(message: UiMessage): void {
+  const run = message.researchDetails
+  if (!run || isResearchTerminal(run) || researchPollTimers.has(run.id)) return
+  const timer = window.setTimeout(() => {
+    researchPollTimers.delete(run.id)
+    void refreshResearchMessage(message)
+  }, 1500)
+  researchPollTimers.set(run.id, timer)
+}
+
+function clearResearchPolling(): void {
+  researchPollTimers.forEach((timer) => window.clearTimeout(timer))
+  researchPollTimers.clear()
+}
+
+async function stopGeneration(): Promise<void> {
+  if (activeResearchRunId.value) {
+    try {
+      await cancelResearchRun(activeResearchRunId.value)
+    } catch (error) {
+      ElMessage.error(errorMessage(error, '取消多文档比对失败'))
+    }
+  }
   if (streamController) {
     activeTextRenderer?.cancel()
     streamController.abort()
@@ -694,13 +860,58 @@ function formatScore(score: number | null): string {
                   </ElTag>
                 </div>
 
-                <div v-if="message.content" class="message-content">{{ message.content }}</div>
+                <div
+                  v-if="message.content && message.role === 'ASSISTANT'"
+                  class="message-content markdown-content"
+                  v-html="renderMarkdown(message.content)"
+                ></div>
+                <div v-else-if="message.content" class="message-content">
+                  {{ message.content }}
+                </div>
                 <div v-else-if="message.status === 'PENDING'" class="typing-indicator">
                   <i></i><i></i><i></i>
                 </div>
                 <div v-if="message.errorSummary" class="message-error">
                   {{ message.errorSummary }}
                 </div>
+
+                <section v-if="message.researchDetails" class="research-card">
+                  <header>
+                    <div>
+                      <small>多文档比对</small>
+                      <strong>固定维度 · 逐文档检索</strong>
+                    </div>
+                    <ElTag effect="light" round>
+                      {{ message.researchDetails.executionStatus }}
+                    </ElTag>
+                  </header>
+                  <div
+                    v-if="researchPartialReason(message.researchDetails)"
+                    class="research-partial-reason"
+                  >
+                    <strong>部分完成原因</strong>
+                    <span>{{ researchPartialReason(message.researchDetails) }}</span>
+                    <code v-if="message.researchDetails.errorCode">
+                      {{ message.researchDetails.errorCode }}
+                    </code>
+                  </div>
+                  <div class="research-step-list">
+                    <article
+                      v-for="step in message.researchDetails.steps"
+                      :key="step.id"
+                      class="research-step"
+                    >
+                      <span>{{ step.ordinal }}</span>
+                      <div>
+                        <strong>{{ step.goal }}</strong>
+                        <small>
+                          {{ step.status }} · 命中 {{ step.hitCount }} · 保留
+                          {{ step.retainedEvidenceCount }}
+                        </small>
+                      </div>
+                    </article>
+                  </div>
+                </section>
 
                 <section v-if="message.healthReport" class="health-card">
                   <header>
@@ -919,6 +1130,33 @@ function formatScore(score: number | null): string {
         </div>
 
         <footer class="composer-shell">
+          <div class="research-controls">
+            <div class="research-mode-toggle">
+              <span>多文档比对</span>
+              <ElSwitch v-model="researchMode" :disabled="sending" />
+            </div>
+            <ElSelect
+              v-if="researchMode"
+              v-model="selectedResearchDocumentIds"
+              multiple
+              collapse-tags
+              collapse-tags-tooltip
+              :max-collapse-tags="3"
+              placeholder="选择 2–5 份已完成索引的文档"
+              :disabled="sending"
+            >
+              <ElOption
+                v-for="document in eligibleResearchDocuments"
+                :key="document.id"
+                :label="document.originalFilename"
+                :value="document.id"
+                :disabled="
+                  selectedResearchDocumentIds.length >= 5 &&
+                  !selectedResearchDocumentIds.includes(document.id)
+                "
+              />
+            </ElSelect>
+          </div>
           <div class="composer">
             <ElInput
               v-model="draft"
@@ -926,7 +1164,9 @@ function formatScore(score: number | null): string {
               resize="none"
               :autosize="{ minRows: 2, maxRows: 6 }"
               maxlength="2000"
-              placeholder="基于当前知识库提问…"
+              :placeholder="
+                researchMode ? '填写需要比较的问题…' : '基于当前知识库提问…'
+              "
               :disabled="!activeKnowledgeBase || sending"
               @keydown.enter.exact.prevent="sendQuestion"
             />
@@ -1252,6 +1492,117 @@ function formatScore(score: number | null): string {
   line-height: 1.85;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
+}
+
+.markdown-content {
+  white-space: normal;
+}
+
+.markdown-content :deep(> :first-child) {
+  margin-top: 0;
+}
+
+.markdown-content :deep(> :last-child) {
+  margin-bottom: 0;
+}
+
+.markdown-content :deep(h1),
+.markdown-content :deep(h2),
+.markdown-content :deep(h3),
+.markdown-content :deep(h4),
+.markdown-content :deep(h5),
+.markdown-content :deep(h6) {
+  margin: 1.25em 0 0.55em;
+  color: #1f2d25;
+  line-height: 1.45;
+}
+
+.markdown-content :deep(h1) {
+  font-size: 1.35em;
+}
+
+.markdown-content :deep(h2) {
+  font-size: 1.22em;
+}
+
+.markdown-content :deep(h3) {
+  font-size: 1.1em;
+}
+
+.markdown-content :deep(h4),
+.markdown-content :deep(h5),
+.markdown-content :deep(h6) {
+  font-size: 1em;
+}
+
+.markdown-content :deep(p),
+.markdown-content :deep(ul),
+.markdown-content :deep(ol),
+.markdown-content :deep(blockquote),
+.markdown-content :deep(pre),
+.markdown-content :deep(table) {
+  margin: 0.65em 0;
+}
+
+.markdown-content :deep(ul),
+.markdown-content :deep(ol) {
+  padding-left: 1.6em;
+}
+
+.markdown-content :deep(li + li) {
+  margin-top: 0.3em;
+}
+
+.markdown-content :deep(blockquote) {
+  padding: 0.2em 0 0.2em 0.9em;
+  border-left: 3px solid #a9c8b8;
+  color: #5b6b62;
+}
+
+.markdown-content :deep(code) {
+  padding: 0.12em 0.35em;
+  border-radius: 5px;
+  background: #edf3ef;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.markdown-content :deep(pre) {
+  overflow-x: auto;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #1f2923;
+  color: #edf5f0;
+}
+
+.markdown-content :deep(pre code) {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+}
+
+.markdown-content :deep(a) {
+  color: #167455;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.markdown-content :deep(table) {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.markdown-content :deep(th),
+.markdown-content :deep(td) {
+  padding: 7px 10px;
+  border: 1px solid #d9e3dd;
+  text-align: left;
+}
+
+.markdown-content :deep(th) {
+  background: #f2f6f3;
 }
 
 .message-error {
@@ -1642,10 +1993,106 @@ function formatScore(score: number | null): string {
   overflow-wrap: anywhere;
 }
 
+.research-card {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #d8e5dc;
+  border-radius: 14px;
+  background: #f7fbf8;
+}
+
+.research-card > header,
+.research-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.research-card > header div,
+.research-step div {
+  display: grid;
+  gap: 3px;
+}
+
+.research-card small,
+.research-step small {
+  color: #728078;
+}
+
+.research-step-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.research-partial-reason {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid #efd9a8;
+  border-radius: 10px;
+  background: #fff9e9;
+  color: #735a1e;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.research-partial-reason code {
+  width: fit-content;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgb(115 90 30 / 8%);
+  color: #806720;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
+.research-step {
+  justify-content: flex-start;
+  padding: 9px 10px;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.research-step > span {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e2f0e7;
+  color: #176b4d;
+  font-weight: 700;
+}
+
 .composer-shell {
   padding: 14px 20px 12px;
   border-top: 1px solid #e4e9e1;
   background: rgb(252 253 249 / 92%);
+}
+
+.research-controls {
+  display: grid;
+  grid-template-columns: auto minmax(240px, 560px);
+  align-items: center;
+  gap: 12px;
+  width: min(900px, 100%);
+  margin: 0 auto 10px;
+}
+
+.research-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4d5d54;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.research-controls > .el-select {
+  width: 100%;
 }
 
 .composer {
@@ -1724,6 +2171,15 @@ function formatScore(score: number | null): string {
   .chat-header,
   .composer-shell {
     padding-inline: 14px;
+  }
+
+  .research-controls {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .research-mode-toggle {
+    justify-content: space-between;
   }
 
   .health-overview,

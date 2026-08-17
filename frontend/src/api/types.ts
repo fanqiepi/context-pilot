@@ -63,14 +63,95 @@ export interface ConversationSummary {
 }
 
 export type ChatMessageRole = 'USER' | 'ASSISTANT'
-export type ChatMessageStatus = 'PENDING' | 'COMPLETED' | 'FAILED'
+export type ChatMessageStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
 export type CapabilityId = 'SIMPLE_CHAT' | 'KNOWLEDGE_QA' | 'BUSINESS_ACTION'
 export type CapabilityMatchReason =
   | 'SIMPLE_INTERACTION_WHITELIST'
   | 'EXPLICIT_CREATE_KNOWLEDGE_BASE'
   | 'EXPLICIT_KNOWLEDGE_BASE_HEALTH'
   | 'HEALTH_REPORT_ISSUE_SELECTED'
+  | 'EXPLICIT_DOCUMENT_COMPARISON'
   | 'DEFAULT_KNOWLEDGE_QA'
+
+export type ResearchTaskType = 'DOCUMENT_COMPARISON'
+export type ResearchExecutionStatus =
+  | 'PLANNING'
+  | 'EXECUTING'
+  | 'SYNTHESIZING'
+  | 'SUCCEEDED'
+  | 'PARTIAL'
+  | 'FAILED'
+  | 'CANCELLED'
+export type ResearchAnswerStatus = 'ANSWERED' | 'REFUSED'
+export type ResearchStepStatus =
+  | 'PENDING'
+  | 'RUNNING'
+  | 'SUCCEEDED'
+  | 'PARTIAL'
+  | 'FAILED'
+  | 'CANCELLED'
+
+export interface ResearchStep {
+  id: string
+  ordinal: number
+  goal: string
+  query: string
+  documentIds: string[]
+  status: ResearchStepStatus
+  hitCount: number
+  retainedEvidenceCount: number
+  latencyMs: number | null
+  errorSummary: string | null
+}
+
+export interface ResearchRunSummary {
+  id: string
+  taskType: ResearchTaskType
+  executionStatus: ResearchExecutionStatus
+  answerStatus: ResearchAnswerStatus | null
+  totalSteps: number
+  completedSteps: number
+  errorCode: string | null
+  errorSummary: string | null
+}
+
+export interface ResearchRun extends ResearchRunSummary {
+  knowledgeBaseId: string
+  conversationId: string
+  userMessageId: string
+  assistantMessageId: string
+  clientRequestId: string
+  planVersion: string
+  documentIds: string[]
+  steps: ResearchStep[]
+  budget: {
+    maximumPlanSteps: number
+    maximumRetrievalCalls: number
+    perDocumentTopK: number
+    maximumRawHits: number
+    maximumEvidenceChunks: number
+    maximumEvidenceCharacters: number
+    maximumExcerptCharacters: number
+    maximumStepEvidenceCharacters: number
+    hardTimeoutMillis: number
+  }
+  usage: {
+    retrievalCalls: number
+    rawHits: number
+    evidenceChunks: number
+    evidenceCharacters: number
+    promptTokens: number | null
+    completionTokens: number | null
+    totalTokens: number | null
+  }
+  traceId: string
+  retryOfRunId: string | null
+  startedAt: string | null
+  cancelledAt: string | null
+  completedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
 
 export type KnowledgeBaseHealthStatus =
   | 'EMPTY'
@@ -222,6 +303,7 @@ export interface ConversationMessage {
   capabilityMatchReason: CapabilityMatchReason | null
   healthReport: KnowledgeBaseHealthReport | null
   actionRequest: ActionRequest | null
+  researchRun: ResearchRunSummary | null
   citations: Citation[]
   helpful: boolean
   createdAt: string
@@ -249,6 +331,12 @@ export interface ChatRequest {
   knowledgeBaseId: string
   question: string
   conversationId?: string
+  research?: {
+    clientRequestId: string
+    taskType: 'DOCUMENT_COMPARISON'
+    documentIds: string[]
+    retryOfRunId?: string
+  }
 }
 
 export interface StreamMessageEvent {
@@ -289,8 +377,27 @@ export interface StreamUsageEvent {
 }
 
 export interface StreamDoneEvent {
-  status: 'COMPLETED' | 'REFUSED' | 'AWAITING_CONFIRMATION'
+  status:
+    | 'COMPLETED'
+    | 'PARTIAL'
+    | 'REFUSED'
+    | 'FAILED'
+    | 'CANCELLED'
+    | 'AWAITING_CONFIRMATION'
   traceId: string
+  runId?: string
+  sequence?: number
+}
+
+export interface StreamResearchPlanEvent {
+  sequence: number
+  run: ResearchRun
+}
+
+export interface StreamResearchStepEvent {
+  sequence: number
+  runId: string
+  step: ResearchStep
 }
 
 export interface StreamErrorEvent {

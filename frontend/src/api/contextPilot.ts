@@ -21,6 +21,9 @@ import type {
   StreamMessageEvent,
   StreamRouteEvent,
   StreamUsageEvent,
+  ResearchRun,
+  StreamResearchPlanEvent,
+  StreamResearchStepEvent,
 } from './types'
 
 export async function listKnowledgeBases(): Promise<KnowledgeBase[]> {
@@ -138,11 +141,23 @@ export async function rejectActionRequest(id: string): Promise<ActionRequest> {
   return response.data
 }
 
+export async function getResearchRun(id: string): Promise<ResearchRun> {
+  const response = await apiClient.get<ResearchRun>(`/research-runs/${id}`)
+  return response.data
+}
+
+export async function cancelResearchRun(id: string): Promise<ResearchRun> {
+  const response = await apiClient.post<ResearchRun>(`/research-runs/${id}/cancel`)
+  return response.data
+}
+
 export interface ChatStreamHandlers {
   onMessage: (event: StreamMessageEvent) => void
   onRoute?: (event: StreamRouteEvent) => void
   onActionRequired: (event: StreamActionRequiredEvent) => void
   onHealthReport: (event: StreamHealthReportEvent) => void
+  onResearchPlan?: (event: StreamResearchPlanEvent) => void
+  onResearchStep?: (event: StreamResearchStepEvent) => void
   onDelta: (event: StreamDeltaEvent) => void
   onCitation: (event: Citation) => void
   onUsage: (event: StreamUsageEvent) => void
@@ -187,6 +202,12 @@ export async function streamChat(
           break
         case 'health_report':
           handlers.onHealthReport(payload as StreamHealthReportEvent)
+          break
+        case 'research_plan':
+          handlers.onResearchPlan?.(payload as StreamResearchPlanEvent)
+          break
+        case 'research_step':
+          handlers.onResearchStep?.(payload as StreamResearchStepEvent)
           break
         case 'delta':
           handlers.onDelta(payload as StreamDeltaEvent)

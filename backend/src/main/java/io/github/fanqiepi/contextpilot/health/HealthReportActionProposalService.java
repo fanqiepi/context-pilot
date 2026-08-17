@@ -362,7 +362,7 @@ public class HealthReportActionProposalService {
             ChatMessageEntity message,
             ActionRequestResponse actionRequest) {
         return ConversationMessageResponse.from(
-                message, null, actionRequest, List.of(), false);
+                message, null, actionRequest, null, List.of(), false);
     }
 
     private BadRequestException contextMismatch() {

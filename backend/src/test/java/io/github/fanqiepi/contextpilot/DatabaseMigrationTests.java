@@ -67,7 +67,8 @@ class DatabaseMigrationTests {
                     """.formatted(v2ActionRequestId))).isTrue();
             for (String tableName : new String[] {
                     "conversation", "chat_message", "message_citation", "model_call", "answer_feedback",
-                    "action_request", "knowledge_base_health_report", "knowledge_base_health_issue"
+                    "action_request", "knowledge_base_health_report", "knowledge_base_health_issue",
+                    "research_run", "research_step", "research_evidence", "research_step_evidence"
             }) {
                 assertThat(queryBoolean(connection, """
                         SELECT EXISTS (
@@ -88,6 +89,27 @@ class DatabaseMigrationTests {
                           AND constraint_type = 'FOREIGN KEY'
                     )
                     """)).isTrue();
+            assertThat(queryString(connection, """
+                    SELECT data_type
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public'
+                      AND table_name = 'research_run'
+                      AND column_name = 'selected_document_ids'
+                    """)).isEqualTo("jsonb");
+            assertThat(queryString(connection, """
+                    SELECT data_type
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public'
+                      AND table_name = 'research_step'
+                      AND column_name = 'document_ids'
+                    """)).isEqualTo("jsonb");
+            assertThat(queryString(connection, """
+                    SELECT data_type
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public'
+                      AND table_name = 'message_citation'
+                      AND column_name = 'research_evidence_id'
+                    """)).isEqualTo("uuid");
             assertThat(queryString(connection, """
                     SELECT data_type
                     FROM information_schema.columns

@@ -74,3 +74,11 @@ The sanitized per-run metrics are written to `backend/target/v4-live-model-resul
 contain case IDs, pass/fail metrics, token counts, latency, and safe error codes, but no prompts,
 model answers, document contents, or credentials. The fixed versioned summary is stored under
 `evals/reports/`.
+
+## Verify the V4 production implementation
+
+The Slice 1 prototype remains evaluation-only. The authorized production baseline uses the
+versioned deterministic planner in `src/main`, Flyway V15, persisted research runs, formal API/SSE,
+and the Vue research UI. Run the full backend suite, the `v4-evaluation` profile, and the frontend
+production build; the current evidence and remaining external-provider gate are recorded in
+`docs/evaluation/v4-implementation-acceptance-report.md`.

@@ -15,6 +15,7 @@ public class MessageCitationEntity {
     private UUID id;
     private UUID messageId;
     private UUID documentId;
+    private UUID researchEvidenceId;
     private String chunkId;
     private String originalFilename;
     private Integer chunkIndex;
@@ -33,6 +34,8 @@ public class MessageCitationEntity {
     public void setMessageId(UUID messageId) { this.messageId = messageId; }
     public UUID getDocumentId() { return documentId; }
     public void setDocumentId(UUID documentId) { this.documentId = documentId; }
+    public UUID getResearchEvidenceId() { return researchEvidenceId; }
+    public void setResearchEvidenceId(UUID researchEvidenceId) { this.researchEvidenceId = researchEvidenceId; }
     public String getChunkId() { return chunkId; }
     public void setChunkId(String chunkId) { this.chunkId = chunkId; }
     public String getOriginalFilename() { return originalFilename; }
