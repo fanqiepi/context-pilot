@@ -29,6 +29,8 @@ import io.github.fanqiepi.contextpilot.common.InternalServiceException;
 import io.github.fanqiepi.contextpilot.document.EmbeddingIndexProperties;
 import io.github.fanqiepi.contextpilot.model.ChatModelGateway;
 import io.github.fanqiepi.contextpilot.model.ChatModelResult;
+import io.github.fanqiepi.contextpilot.observability.AiCallContext;
+import io.github.fanqiepi.contextpilot.observability.AiCallLogger;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalResultResponse;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalService;
 import org.springframework.stereotype.Service;
@@ -136,6 +138,9 @@ public class ResearchExecutorService {
         }
         long startNanos = System.nanoTime();
         UUID modelCallId = null;
+        AiCallContext modelCallContext = null;
+        long modelCallStartNanos = 0;
+        boolean modelCallLogged = false;
         try {
             List<ResearchStepEntity> steps = stepMapper.selectByRunId(runId);
             List<UUID> selectedDocumentIds = jsonCodec.readDocumentIds(run.getSelectedDocumentIdsJson());
@@ -259,19 +264,31 @@ public class ResearchExecutorService {
             modelCallId = chatPersistenceService.beginModelCall(
                     run.getAssistantMessageId(), chatModelGateway.provider(),
                     chatModelGateway.configuredModel(), PROMPT_VERSION, run.getTraceId());
+            String synthesisUserPrompt = synthesisPrompt(
+                    question(run), steps, selectedDocumentNames, ledger.evidence());
+            modelCallContext = new AiCallContext(
+                    "RESEARCH_SYNTHESIS", chatModelGateway.provider(), chatModelGateway.configuredModel(),
+                    run.getTraceId(), modelCallId, "researchRun", runId, PROMPT_VERSION,
+                    SYSTEM_PROMPT.length() + synthesisUserPrompt.length(), ledger.evidence().size(),
+                    ResearchBudget.SYNTHESIS_MAX_OUTPUT_TOKENS);
+            modelCallStartNanos = System.nanoTime();
+            AiCallLogger.started(modelCallContext);
             ChatModelResult modelResult;
             try {
                 modelResult = callWithinDeadline(
                         runId, startNanos,
                         () -> chatModelGateway.generate(
                                 SYSTEM_PROMPT,
-                                synthesisPrompt(question(run), steps, selectedDocumentNames, ledger.evidence()),
+                                synthesisUserPrompt,
                                 ResearchBudget.SYNTHESIS_MAX_OUTPUT_TOKENS));
             } catch (ResearchDeadlineException exception) {
+                long modelLatencyMs = elapsedMillis(modelCallStartNanos);
+                AiCallLogger.failed(modelCallContext, modelLatencyMs, exception);
+                modelCallLogged = true;
                 String answer = timeoutAnswer(ledger.evidence());
                 chatPersistenceService.completeResearchAfterModelTimeout(
                         run.getAssistantMessageId(), modelCallId, answer, researchCitations,
-                        elapsedMillis(startNanos));
+                        modelLatencyMs);
                 runMapper.complete(
                         runId, ResearchExecutionStatus.PARTIAL, ResearchAnswerStatus.ANSWERED,
                         null, null, null, "RESEARCH_TIMEOUT",
@@ -281,6 +298,11 @@ public class ResearchExecutorService {
                         researchCitations.stream().map(ResearchCitation::citation).toList(),
                         null, elapsedMillis(startNanos));
             }
+            long modelLatencyMs = elapsedMillis(modelCallStartNanos);
+            AiCallLogger.succeeded(
+                    modelCallContext, modelLatencyMs, modelResult.promptTokens(),
+                    modelResult.completionTokens(), modelResult.totalTokens(), null);
+            modelCallLogged = true;
             requireNotCancelled(runId);
             GroundedAnswer grounded = groundAnswer(
                     modelResult.content(), ledger.evidence().size(), selectedDocumentNames);
@@ -304,7 +326,7 @@ public class ResearchExecutorService {
             }
             chatPersistenceService.completeResearchSuccess(
                     run.getAssistantMessageId(), modelCallId, answer, answerCitations,
-                    modelResult, elapsedMillis(startNanos));
+                    modelResult, modelLatencyMs);
             runMapper.complete(
                     runId, terminalStatus, answerStatus,
                     modelResult.promptTokens(), modelResult.completionTokens(), modelResult.totalTokens(),
@@ -317,6 +339,11 @@ public class ResearchExecutorService {
             stepMapper.cancelRemaining(runId, now());
             return persistedResult(requireRun(runId));
         } catch (RuntimeException exception) {
+            long failureLatencyMs = modelCallStartNanos == 0
+                    ? elapsedMillis(startNanos) : elapsedMillis(modelCallStartNanos);
+            if (modelCallContext != null && !modelCallLogged) {
+                AiCallLogger.failed(modelCallContext, failureLatencyMs, exception);
+            }
             String code = exception instanceof InternalServiceException internal
                     ? internal.getCode() : "RESEARCH_DEPENDENCY_UNAVAILABLE";
             String summary = safeSummary(exception.getMessage());
@@ -325,7 +352,7 @@ public class ResearchExecutorService {
                 chatPersistenceService.failResearchMessage(run.getAssistantMessageId(), summary);
             } else {
                 chatPersistenceService.completeFailure(
-                        run.getAssistantMessageId(), modelCallId, elapsedMillis(startNanos), summary);
+                        run.getAssistantMessageId(), modelCallId, failureLatencyMs, summary);
             }
             return persistedResult(requireRun(runId));
         }

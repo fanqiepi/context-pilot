@@ -14,6 +14,7 @@ ContextPilot 是一个基于 Spring AI 的学习型、可控、可评估的个�
 - V2 已完成 `CREATE_KNOWLEDGE_BASE` 的强类型提案、独立确认/拒绝、原子幂等执行、审计和可恢复操作卡片，并通过专项评估与页面验收。
 - V3 已完成不可变健康报告、失败文档重试、异常索引重建、强类型动作分派和后台任务可靠派发，并通过固定评估、全量回归、真实接口和页面验收。
 - 2026-08-17 V4 Slice 1 已完成 7 份合成文档、32 个语义案例、12 个生命周期定义、单轮 Top-K 对照、测试侧候选编排原型和 DeepSeek 代表性对照。结果证明范围化多步检索的必要性，但未证明模型 Planner 优于固定编排。项目因此选择版本化固定维度与逐文档确定性编排作为首个生产基线并整体授权 Slices 2-7；生产代码、Flyway V15、正式 API/SSE、前端和本地工程验收已落地。完整证据见 `evals/reports/2026-08-17-v4-document-comparison-slice1.md` 与 `docs/evaluation/v4-implementation-acceptance-report.md`；DeepSeek/DashScope 生产端到端发布门本轮未重新执行。
+- 2026-08-21 已为普通聊天、SSE 聊天、V4 研究综合、文档 Embedding 入库和检索 Embedding 补充安全的结构化调用日志。日志使用可用的 `traceId`、每次调用的 `callId` 和业务资源 ID 关联调用，记录耗时、Token、结果数及脱敏失败原因，不记录完整 Prompt、文档正文、模型回答或密钥；排查方法见 `docs/development/local-development.md`。
 - 日常开发和集成分支为 `develop`，不得直接提交到 `main`。
 
 ## 大版本路线

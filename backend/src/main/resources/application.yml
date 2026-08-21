@@ -83,6 +83,10 @@ contextpilot:
 server:
   port: ${SERVER_PORT:18080}
 
+logging:
+  level:
+    io.github.fanqiepi.contextpilot.observability.AiCallLogger: ${AI_CALL_LOG_LEVEL:INFO}
+
 management:
   endpoints:
     web:

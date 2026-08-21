@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,7 +26,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class ChatApplicationServiceTests {
 
     @Mock
@@ -45,7 +47,7 @@ class ChatApplicationServiceTests {
     }
 
     @Test
-    void answersFromReliableEvidenceAndPersistsCitation() {
+    void answersFromReliableEvidenceAndPersistsCitation(CapturedOutput output) {
         UUID knowledgeBaseId = UUID.randomUUID();
         PendingChatExchange exchange = exchange();
         UUID documentId = UUID.randomUUID();
@@ -96,6 +98,12 @@ class ChatApplicationServiceTests {
                 eq(response.citations()),
                 eq(modelResult),
                 any(Long.class));
+        assertThat(output)
+                .contains("ai.call.started operation=CHAT_COMPLETION provider=DEEPSEEK")
+                .contains("traceId=trace-1 callId=" + modelCallId)
+                .contains("ai.call.succeeded operation=CHAT_COMPLETION")
+                .doesNotContain("Where are vectors stored?")
+                .doesNotContain(modelResult.content());
     }
 
     @Test
@@ -167,7 +175,7 @@ class ChatApplicationServiceTests {
     }
 
     @Test
-    void recordsModelFailureBeforeReturningSafeError() {
+    void recordsModelFailureBeforeReturningSafeError(CapturedOutput output) {
         UUID knowledgeBaseId = UUID.randomUUID();
         PendingChatExchange exchange = exchange();
         ChatRequest request = new ChatRequest(null, knowledgeBaseId, "Question");
@@ -200,6 +208,10 @@ class ChatApplicationServiceTests {
                 eq(modelCallId),
                 any(Long.class),
                 eq("Chat model call failed"));
+        assertThat(output)
+                .contains("ai.call.failed operation=CHAT_COMPLETION provider=DEEPSEEK")
+                .contains("traceId=trace-3 callId=" + modelCallId)
+                .contains("errorType=java.lang.RuntimeException errorMessage=provider failure");
     }
 
     private PendingChatExchange exchange() {
