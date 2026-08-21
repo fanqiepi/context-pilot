@@ -270,7 +270,7 @@ public class ResearchExecutorService {
                     "RESEARCH_SYNTHESIS", chatModelGateway.provider(), chatModelGateway.configuredModel(),
                     run.getTraceId(), modelCallId, "researchRun", runId, PROMPT_VERSION,
                     SYSTEM_PROMPT.length() + synthesisUserPrompt.length(), ledger.evidence().size(),
-                    ResearchBudget.SYNTHESIS_MAX_OUTPUT_TOKENS);
+                    null);
             modelCallStartNanos = System.nanoTime();
             AiCallLogger.started(modelCallContext);
             ChatModelResult modelResult;
@@ -279,8 +279,7 @@ public class ResearchExecutorService {
                         runId, startNanos,
                         () -> chatModelGateway.generate(
                                 SYSTEM_PROMPT,
-                                synthesisUserPrompt,
-                                ResearchBudget.SYNTHESIS_MAX_OUTPUT_TOKENS));
+                                synthesisUserPrompt));
             } catch (ResearchDeadlineException exception) {
                 long modelLatencyMs = elapsedMillis(modelCallStartNanos);
                 AiCallLogger.failed(modelCallContext, modelLatencyMs, exception);

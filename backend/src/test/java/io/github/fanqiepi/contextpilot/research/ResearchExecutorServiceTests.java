@@ -95,7 +95,7 @@ class ResearchExecutorServiceTests {
                 .thenReturn(UUID.randomUUID());
         when(chatModelGateway.provider()).thenReturn("DEEPSEEK");
         when(chatModelGateway.configuredModel()).thenReturn("deepseek-v4-flash");
-        when(chatModelGateway.generate(anyString(), anyString(), eq(ResearchBudget.SYNTHESIS_MAX_OUTPUT_TOKENS)))
+        when(chatModelGateway.generate(anyString(), anyString()))
                 .thenReturn(new ChatModelResult("比较结论 [1]", "deepseek-v4-flash", 10, 5, 15));
         ResearchRunResponse completed = response(runId, ResearchExecutionStatus.SUCCEEDED);
         when(queryService.get(runId)).thenReturn(completed);
@@ -111,8 +111,7 @@ class ResearchExecutorServiceTests {
         verify(chatPersistenceService).completeResearchSuccess(
                 eq(run.getAssistantMessageId()), any(), eq("比较结论 [1]"), any(), any(), anyLong());
         verify(chatModelGateway).generate(
-                org.mockito.ArgumentMatchers.contains("1800"), anyString(),
-                eq(ResearchBudget.SYNTHESIS_MAX_OUTPUT_TOKENS));
+                org.mockito.ArgumentMatchers.contains("1800"), anyString());
     }
 
     @Test
@@ -146,7 +145,7 @@ class ResearchExecutorServiceTests {
                 .thenReturn(UUID.randomUUID());
         when(chatModelGateway.provider()).thenReturn("DEEPSEEK");
         when(chatModelGateway.configuredModel()).thenReturn("deepseek-v4-flash");
-        when(chatModelGateway.generate(anyString(), anyString(), eq(ResearchBudget.SYNTHESIS_MAX_OUTPUT_TOKENS)))
+        when(chatModelGateway.generate(anyString(), anyString()))
                 .thenReturn(new ChatModelResult("可信结论 [1]\n这行没有引用", "deepseek-v4-flash", 10, 5, 15));
         when(queryService.get(runId)).thenReturn(response(runId, ResearchExecutionStatus.PARTIAL));
 
@@ -232,8 +231,7 @@ class ResearchExecutorServiceTests {
                 .thenReturn(UUID.randomUUID());
         when(chatModelGateway.provider()).thenReturn("DEEPSEEK");
         when(chatModelGateway.configuredModel()).thenReturn("deepseek-v4-flash");
-        when(chatModelGateway.generate(
-                anyString(), anyString(), eq(ResearchBudget.SYNTHESIS_MAX_OUTPUT_TOKENS)))
+        when(chatModelGateway.generate(anyString(), anyString()))
                 .thenReturn(new ChatModelResult(
                         "## 安全性\n`first.md`：本次检索未找到相关内容。\n`second.md` 提供安全说明 [1]",
                         "deepseek-v4-flash", 10, 5, 15));
@@ -282,8 +280,7 @@ class ResearchExecutorServiceTests {
                 .thenReturn(UUID.randomUUID());
         when(chatModelGateway.provider()).thenReturn("DEEPSEEK");
         when(chatModelGateway.configuredModel()).thenReturn("deepseek-v4-flash");
-        when(chatModelGateway.generate(
-                anyString(), anyString(), eq(ResearchBudget.SYNTHESIS_MAX_OUTPUT_TOKENS)))
+        when(chatModelGateway.generate(anyString(), anyString()))
                 .thenReturn(new ChatModelResult(
                         "## 安全性\n可信结论 [1]\n没有引用的推断",
                         "deepseek-v4-flash", 10, 5, 15));
