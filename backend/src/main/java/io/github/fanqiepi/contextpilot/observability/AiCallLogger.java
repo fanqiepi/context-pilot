@@ -22,6 +22,17 @@ public final class AiCallLogger {
     }
 
     public static void started(AiCallContext context) {
+        if (isRetrieval(context)) {
+            LOGGER.debug(
+                    "ai.call.started operation={} provider={} model={} traceId={} callId={} "
+                            + "resourceType={} resourceId={} promptVersion={} inputCharacters={} "
+                            + "itemCount={} maxOutputTokens={}",
+                    value(context.operation()), value(context.provider()), value(context.model()),
+                    value(context.traceId()), value(context.callId()), value(context.resourceType()),
+                    value(context.resourceId()), value(context.promptVersion()), value(context.inputCharacters()),
+                    value(context.itemCount()), value(context.maxOutputTokens()));
+            return;
+        }
         LOGGER.info(
                 "ai.call.started operation={} provider={} model={} traceId={} callId={} "
                         + "resourceType={} resourceId={} promptVersion={} inputCharacters={} "
@@ -39,6 +50,17 @@ public final class AiCallLogger {
             Integer completionTokens,
             Integer totalTokens,
             Integer resultCount) {
+        if (isRetrieval(context)) {
+            LOGGER.debug(
+                    "ai.call.succeeded operation={} provider={} model={} traceId={} callId={} "
+                            + "resourceType={} resourceId={} latencyMs={} promptTokens={} "
+                            + "completionTokens={} totalTokens={} resultCount={}",
+                    value(context.operation()), value(context.provider()), value(context.model()),
+                    value(context.traceId()), value(context.callId()), value(context.resourceType()),
+                    value(context.resourceId()), latencyMs, value(promptTokens), value(completionTokens),
+                    value(totalTokens), value(resultCount));
+            return;
+        }
         LOGGER.info(
                 "ai.call.succeeded operation={} provider={} model={} traceId={} callId={} "
                         + "resourceType={} resourceId={} latencyMs={} promptTokens={} "
@@ -61,12 +83,25 @@ public final class AiCallLogger {
     }
 
     public static void cancelled(AiCallContext context, long latencyMs) {
+        if (isRetrieval(context)) {
+            LOGGER.debug(
+                    "ai.call.cancelled operation={} provider={} model={} traceId={} callId={} "
+                            + "resourceType={} resourceId={} latencyMs={}",
+                    value(context.operation()), value(context.provider()), value(context.model()),
+                    value(context.traceId()), value(context.callId()), value(context.resourceType()),
+                    value(context.resourceId()), latencyMs);
+            return;
+        }
         LOGGER.info(
                 "ai.call.cancelled operation={} provider={} model={} traceId={} callId={} "
                         + "resourceType={} resourceId={} latencyMs={}",
                 value(context.operation()), value(context.provider()), value(context.model()),
                 value(context.traceId()), value(context.callId()), value(context.resourceType()),
                 value(context.resourceId()), latencyMs);
+    }
+
+    private static boolean isRetrieval(AiCallContext context) {
+        return "EMBEDDING_RETRIEVAL".equals(context.operation());
     }
 
     private static Throwable rootCause(Throwable exception) {

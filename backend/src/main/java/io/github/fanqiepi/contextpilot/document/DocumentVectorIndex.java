@@ -75,6 +75,10 @@ public class DocumentVectorIndex {
         return search(knowledgeBaseId, null, query, topK, null);
     }
 
+    public List<Document> search(UUID knowledgeBaseId, String query, int topK, String traceId) {
+        return search(knowledgeBaseId, null, query, topK, traceId);
+    }
+
     public List<Document> search(UUID knowledgeBaseId, UUID documentId, String query, int topK) {
         return search(knowledgeBaseId, documentId, query, topK, null);
     }

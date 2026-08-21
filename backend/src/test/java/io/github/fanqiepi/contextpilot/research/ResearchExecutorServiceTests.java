@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.github.fanqiepi.contextpilot.chat.ChatMessageEntity;
 import io.github.fanqiepi.contextpilot.chat.ChatMessageMapper;
@@ -20,7 +22,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.core.task.support.TaskExecutorAdapter;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -35,7 +40,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class ResearchExecutorServiceTests {
     @Mock private ResearchRunMapper runMapper;
     @Mock private ResearchStepMapper stepMapper;
@@ -62,7 +67,7 @@ class ResearchExecutorServiceTests {
     }
 
     @Test
-    void executesEveryStepPerDocumentAndPersistsBoundedEvidenceBeforeSynthesis() {
+    void retrievesDocumentsInBoundedParallelAndPersistsThemInFixedOrder(CapturedOutput output) {
         UUID runId = UUID.randomUUID();
         UUID firstDocument = UUID.randomUUID();
         UUID secondDocument = UUID.randomUUID();
@@ -80,13 +85,27 @@ class ResearchExecutorServiceTests {
                 .thenReturn(1);
         when(evidenceMapper.insert(any())).thenReturn(1);
         when(stepEvidenceMapper.insert(any())).thenReturn(1);
-        when(retrievalService.searchDocument(any(), any(), anyString(), eq(3)))
+        AtomicInteger active = new AtomicInteger();
+        AtomicInteger maximumActive = new AtomicInteger();
+        CyclicBarrier stepBarrier = new CyclicBarrier(2);
+        when(retrievalService.searchDocument(any(), any(), anyString(), eq(3), anyString()))
                 .thenAnswer(invocation -> {
                     UUID documentId = invocation.getArgument(1);
                     String query = invocation.getArgument(2);
-                    return List.of(new RetrievalResultResponse(
-                            UUID.randomUUID().toString(), documentId, documentId + ".md", 0,
-                            null, query + " evidence", 0.9));
+                    int concurrent = active.incrementAndGet();
+                    maximumActive.accumulateAndGet(concurrent, Math::max);
+                    try {
+                        stepBarrier.await(1, java.util.concurrent.TimeUnit.SECONDS);
+                        if (documentId.equals(firstDocument)) {
+                            Thread.sleep(30);
+                        }
+                        return List.of(new RetrievalResultResponse(
+                                UUID.nameUUIDFromBytes((query + documentId).getBytes()).toString(),
+                                documentId, documentId + ".md", 0,
+                                null, query + " evidence", 0.9));
+                    } finally {
+                        active.decrementAndGet();
+                    }
                 });
         ChatMessageEntity question = new ChatMessageEntity();
         question.setContent("比较部署和安全");
@@ -100,18 +119,50 @@ class ResearchExecutorServiceTests {
         ResearchRunResponse completed = response(runId, ResearchExecutionStatus.SUCCEEDED);
         when(queryService.get(runId)).thenReturn(completed);
 
-        ResearchExecutionResult result = service.execute(runId);
+        ExecutorService ioExecutor = Executors.newFixedThreadPool(2);
+        ResearchExecutorService parallelService = new ResearchExecutorService(
+                runMapper, stepMapper, evidenceMapper, stepEvidenceMapper, jsonCodec, queryService,
+                researchDocumentMapper, retrievalService, new EmbeddingIndexProperties(), chatModelGateway,
+                chatPersistenceService, chatMessageMapper, messageCitationMapper,
+                new TaskExecutorAdapter(ioExecutor));
+        ResearchExecutionResult result;
+        try {
+            result = parallelService.execute(runId);
+        } finally {
+            ioExecutor.shutdownNow();
+        }
 
         assertThat(result.answer()).isEqualTo("比较结论 [1]");
         assertThat(result.citations()).hasSize(4);
-        verify(retrievalService, times(4)).searchDocument(any(), any(), anyString(), eq(3));
+        assertThat(maximumActive.get()).isEqualTo(2);
+        verify(retrievalService, times(4)).searchDocument(any(), any(), anyString(), eq(3), anyString());
         verify(evidenceMapper, times(4)).insert(any());
+        ArgumentCaptor<ResearchEvidenceEntity> evidence = ArgumentCaptor.forClass(ResearchEvidenceEntity.class);
+        verify(evidenceMapper, times(4)).insert(evidence.capture());
+        assertThat(evidence.getAllValues())
+                .extracting(ResearchEvidenceEntity::getDocumentId)
+                .containsExactly(firstDocument, secondDocument, firstDocument, secondDocument);
         verify(stepMapper, times(2)).complete(any(), eq(ResearchStepStatus.SUCCEEDED),
                 eq(2), eq(2), anyLong(), isNull(), any());
         verify(chatPersistenceService).completeResearchSuccess(
                 eq(run.getAssistantMessageId()), any(), eq("比较结论 [1]"), any(), any(), anyLong());
         verify(chatModelGateway).generate(
                 org.mockito.ArgumentMatchers.contains("1800"), anyString());
+        assertThat(output)
+                .contains("research.step.retrieval.completed traceId=trace runId=" + runId + " step=1")
+                .contains("status=SUCCEEDED")
+                .contains("documentCount=2 attemptedDocuments=2 successfulDocuments=2")
+                .contains("rawHits=2 durationMs=")
+                .contains("research.run.completed traceId=trace runId=" + runId + " status=SUCCEEDED")
+                .contains("stepCount=2 documentCount=2 retrievalCalls=4")
+                .contains("evidenceCharacters=72 truncated=false")
+                .contains("totalDurationMs=")
+                .doesNotContain("research.retrieval.started");
+        assertThat(output.toString()).containsSubsequence(
+                "research.step.started traceId=trace runId=" + runId + " step=1",
+                "research.step.retrieval.completed traceId=trace runId=" + runId + " step=1",
+                "research.step.started traceId=trace runId=" + runId + " step=2",
+                "research.step.retrieval.completed traceId=trace runId=" + runId + " step=2");
     }
 
     @Test
@@ -131,7 +182,7 @@ class ResearchExecutorServiceTests {
                 .thenReturn(1);
         when(evidenceMapper.insert(any())).thenReturn(1);
         when(stepEvidenceMapper.insert(any())).thenReturn(1);
-        when(retrievalService.searchDocument(any(), any(), anyString(), eq(3)))
+        when(retrievalService.searchDocument(any(), any(), anyString(), eq(3), anyString()))
                 .thenThrow(new InternalServiceException(
                         "RESEARCH_DOCUMENT_RETRIEVAL_FAILED", "one document failed",
                         new IllegalStateException("test")))
@@ -173,7 +224,7 @@ class ResearchExecutorServiceTests {
         when(runMapper.updateCurrentStep(eq(runId), eq(1), any())).thenReturn(1);
         when(runMapper.beginSynthesis(eq(runId), eq(1), eq(0), eq(0), eq(0), any())).thenReturn(1);
         when(runMapper.fail(eq(runId), eq("RESEARCH_TIMEOUT"), anyString(), any())).thenReturn(1);
-        when(retrievalService.searchDocument(any(), any(), anyString(), eq(3)))
+        when(retrievalService.searchDocument(any(), any(), anyString(), eq(3), anyString()))
                 .thenAnswer(invocation -> {
                     Thread.sleep(1000);
                     return List.of();
@@ -219,7 +270,7 @@ class ResearchExecutorServiceTests {
                 .thenReturn(1);
         when(evidenceMapper.insert(any())).thenReturn(1);
         when(stepEvidenceMapper.insert(any())).thenReturn(1);
-        when(retrievalService.searchDocument(any(), any(), anyString(), eq(3)))
+        when(retrievalService.searchDocument(any(), any(), anyString(), eq(3), anyString()))
                 .thenReturn(List.of())
                 .thenReturn(List.of(new RetrievalResultResponse(
                         UUID.randomUUID().toString(), secondDocument, "second.md", 0,
@@ -266,7 +317,7 @@ class ResearchExecutorServiceTests {
                 .thenReturn(1);
         when(evidenceMapper.insert(any())).thenReturn(1);
         when(stepEvidenceMapper.insert(any())).thenReturn(1);
-        when(retrievalService.searchDocument(any(), any(), anyString(), eq(3)))
+        when(retrievalService.searchDocument(any(), any(), anyString(), eq(3), anyString()))
                 .thenAnswer(invocation -> {
                     UUID documentId = invocation.getArgument(1);
                     return List.of(new RetrievalResultResponse(
@@ -296,6 +347,40 @@ class ResearchExecutorServiceTests {
                 eq(ResearchAnswerStatus.ANSWERED), eq(10), eq(5), eq(15),
                 eq("RESEARCH_UNSUPPORTED_CONTENT_REMOVED"),
                 eq("综合结果中缺少有效引用的内容已被移除，以下仅展示通过引用校验的部分。"), any());
+    }
+
+    @Test
+    void neverSubmitsMoreThanTwentyRetrievalCallsEvenForAnInvalidPersistedPlan() {
+        UUID runId = UUID.randomUUID();
+        List<UUID> documents = List.of(
+                UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(),
+                UUID.randomUUID(), UUID.randomUUID());
+        ResearchRunEntity run = run(runId, documents);
+        List<ResearchStepEntity> steps = java.util.stream.IntStream.rangeClosed(1, 5)
+                .mapToObj(ordinal -> step(runId, ordinal, "dimension-" + ordinal, documents))
+                .toList();
+        when(runMapper.selectById(runId)).thenReturn(run);
+        when(runMapper.claimExecution(eq(runId), any())).thenReturn(1);
+        when(stepMapper.selectByRunId(runId)).thenReturn(steps);
+        when(stepMapper.markRunning(any(), any())).thenReturn(1);
+        when(runMapper.updateCurrentStep(eq(runId), anyInt(), any())).thenReturn(1);
+        when(retrievalService.searchDocument(any(), any(), anyString(), eq(3), anyString()))
+                .thenReturn(List.of());
+        when(runMapper.beginSynthesis(eq(runId), eq(20), eq(0), eq(0), eq(0), any()))
+                .thenReturn(1);
+        when(runMapper.complete(eq(runId), eq(ResearchExecutionStatus.SUCCEEDED),
+                eq(ResearchAnswerStatus.REFUSED), isNull(), isNull(), isNull(), isNull(), isNull(), any()))
+                .thenReturn(1);
+        when(queryService.get(runId)).thenReturn(response(runId, ResearchExecutionStatus.SUCCEEDED));
+
+        ResearchExecutionResult result = service.execute(runId);
+
+        assertThat(result.answer()).isEqualTo("所选文档中没有找到足够证据回答这个比较问题。");
+        verify(retrievalService, times(20))
+                .searchDocument(any(), any(), anyString(), eq(3), anyString());
+        verify(runMapper).beginSynthesis(eq(runId), eq(20), eq(0), eq(0), eq(0), any());
+        verify(stepMapper).complete(eq(steps.getLast().getId()), eq(ResearchStepStatus.PARTIAL),
+                eq(0), eq(0), anyLong(), anyString(), any());
     }
 
     private ResearchRunEntity run(UUID runId, List<UUID> documentIds) {

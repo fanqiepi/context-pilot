@@ -80,10 +80,8 @@ class DocumentVectorIndexTests {
                 .contains("embedding_profile_id")
                 .contains(currentProfile.id());
         assertThat(output)
-                .contains("ai.call.started operation=EMBEDDING_RETRIEVAL")
-                .contains("resourceType=knowledgeBase resourceId=" + knowledgeBaseId)
-                .contains("inputCharacters=5 itemCount=5")
-                .contains("ai.call.succeeded operation=EMBEDDING_RETRIEVAL")
+                .doesNotContain("ai.call.started operation=EMBEDDING_RETRIEVAL")
+                .doesNotContain("ai.call.succeeded operation=EMBEDDING_RETRIEVAL")
                 .doesNotContain("query");
     }
 

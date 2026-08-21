@@ -43,6 +43,7 @@ spring:
 contextpilot:
   research:
     enabled: ${RESEARCH_ENABLED:true}
+    retrieval-parallelism: ${RESEARCH_RETRIEVAL_PARALLELISM:4}
   action-request:
     confirmation-timeout-minutes: ${ACTION_CONFIRMATION_TIMEOUT_MINUTES:30}
   health:
@@ -86,6 +87,7 @@ server:
 logging:
   level:
     io.github.fanqiepi.contextpilot.observability.AiCallLogger: ${AI_CALL_LOG_LEVEL:INFO}
+    io.github.fanqiepi.contextpilot.research.ResearchExecutorService: ${RESEARCH_LOG_LEVEL:INFO}
 
 management:
   endpoints:

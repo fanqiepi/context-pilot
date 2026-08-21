@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -85,7 +86,7 @@ class ChatPreparationServiceTests {
                 "Reliable evidence",
                 0.9);
         ChatPrompt prompt = new ChatPrompt("system", "user", "v1");
-        when(retrievalService.search(eq(knowledgeBaseId), any())).thenReturn(List.of(evidence));
+        when(retrievalService.search(eq(knowledgeBaseId), any(), anyString())).thenReturn(List.of(evidence));
         when(persistenceService.begin(
                 eq(conversationId), eq(knowledgeBaseId), eq("Question?"), any(CapabilityRoute.class)))
                 .thenReturn(exchange);
@@ -117,7 +118,7 @@ class ChatPreparationServiceTests {
                 null,
                 "Weak evidence",
                 0.2);
-        when(retrievalService.search(eq(knowledgeBaseId), any())).thenReturn(List.of(weakEvidence));
+        when(retrievalService.search(eq(knowledgeBaseId), any(), anyString())).thenReturn(List.of(weakEvidence));
         when(persistenceService.begin(eq(null), eq(knowledgeBaseId), eq("Unknown"), any(CapabilityRoute.class)))
                 .thenReturn(exchange);
 
