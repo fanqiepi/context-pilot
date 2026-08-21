@@ -15,13 +15,15 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class DocumentVectorIndexTests {
 
     @Mock
@@ -42,7 +44,7 @@ class DocumentVectorIndexTests {
     }
 
     @Test
-    void writesEmbeddingProfileIntoEveryVectorChunk() {
+    void writesEmbeddingProfileIntoEveryVectorChunk(CapturedOutput output) {
         SourceDocumentEntity source = sourceDocument();
         DocumentChunk chunk = new DocumentChunk(0, "knowledge content", Map.of("page_number", 1));
 
@@ -55,10 +57,17 @@ class DocumentVectorIndexTests {
         assertThat(metadata.get("embedding_profile_id")).isEqualTo(currentProfile.id());
         assertThat(metadata.get("embedding_model")).isEqualTo(currentProfile.model());
         assertThat(metadata.get("embedding_dimensions")).isEqualTo(currentProfile.dimensions());
+        assertThat(output)
+                .contains("ai.call.started operation=EMBEDDING_INDEX")
+                .contains("provider=" + currentProfile.provider())
+                .contains("model=" + currentProfile.model())
+                .contains("resourceType=sourceDocument resourceId=" + source.getId())
+                .contains("ai.call.succeeded operation=EMBEDDING_INDEX")
+                .doesNotContain("knowledge content");
     }
 
     @Test
-    void isolatesSearchByKnowledgeBaseAndEmbeddingProfile() {
+    void isolatesSearchByKnowledgeBaseAndEmbeddingProfile(CapturedOutput output) {
         UUID knowledgeBaseId = UUID.randomUUID();
         when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(List.of());
 
@@ -70,6 +79,10 @@ class DocumentVectorIndexTests {
                 .contains(knowledgeBaseId.toString())
                 .contains("embedding_profile_id")
                 .contains(currentProfile.id());
+        assertThat(output)
+                .doesNotContain("ai.call.started operation=EMBEDDING_RETRIEVAL")
+                .doesNotContain("ai.call.succeeded operation=EMBEDDING_RETRIEVAL")
+                .doesNotContain("query");
     }
 
     private SourceDocumentEntity sourceDocument() {

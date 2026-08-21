@@ -94,7 +94,8 @@ public class ChatPreparationService {
         }
         List<RetrievalResultResponse> results = retrievalService.search(
                 request.knowledgeBaseId(),
-                new RetrievalSearchRequest(question, properties.getRetrievalTopK()));
+                new RetrievalSearchRequest(question, properties.getRetrievalTopK()),
+                route.traceId());
         List<RetrievalResultResponse> evidence = selectEvidence(results);
         PendingChatExchange exchange = persistenceService.begin(
                 request.conversationId(), request.knowledgeBaseId(), question, route);

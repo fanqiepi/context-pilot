@@ -30,6 +30,13 @@ public class RetrievalService {
     public java.util.List<RetrievalResultResponse> search(
             UUID knowledgeBaseId,
             RetrievalSearchRequest request) {
+        return search(knowledgeBaseId, request, null);
+    }
+
+    public java.util.List<RetrievalResultResponse> search(
+            UUID knowledgeBaseId,
+            RetrievalSearchRequest request,
+            String traceId) {
         knowledgeBaseService.get(knowledgeBaseId);
         if (!documentVectorIndex.isAvailable()) {
             throw unavailable();
@@ -43,7 +50,8 @@ public class RetrievalService {
             return documentVectorIndex.search(
                             knowledgeBaseId,
                             request.query().strip(),
-                            request.effectiveTopK())
+                            request.effectiveTopK(),
+                            traceId)
                     .stream()
                     .map(this::toResponse)
                     .toList();
@@ -63,11 +71,20 @@ public class RetrievalService {
             UUID documentId,
             String query,
             int topK) {
+        return searchDocument(knowledgeBaseId, documentId, query, topK, null);
+    }
+
+    public java.util.List<RetrievalResultResponse> searchDocument(
+            UUID knowledgeBaseId,
+            UUID documentId,
+            String query,
+            int topK,
+            String traceId) {
         if (!documentVectorIndex.isAvailable()) {
             throw unavailable();
         }
         try {
-            return documentVectorIndex.search(knowledgeBaseId, documentId, query.strip(), topK)
+            return documentVectorIndex.search(knowledgeBaseId, documentId, query.strip(), topK, traceId)
                     .stream()
                     .map(this::toResponse)
                     .filter(result -> result.documentId().equals(documentId))

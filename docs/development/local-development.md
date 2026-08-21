@@ -77,4 +77,24 @@ npm run dev
 
 真实模型集成默认关闭。后续启用真实服务时，才需要在后端进程中设置 `DEEPSEEK_API_KEY`、`DASHSCOPE_API_KEY` 和对应 Spring AI 模型配置。
 
+## AI 调用日志
+
+后端默认以 `INFO` 级别记录安全的结构化 AI 调用生命周期，统一使用 `ai.call.started`、`ai.call.succeeded`、`ai.call.failed` 和 `ai.call.cancelled` 事件。覆盖普通聊天、SSE 聊天、V4 研究综合和文档 Embedding 入库；单次检索查询 Embedding 生命周期降为 `DEBUG`，避免多文档研究在 `INFO` 产生逐调用噪声。日志字段包括：
+
+- `operation`、`provider`、`model`；
+- 可用时的 `traceId`、每次都有的 `callId`、关联资源类型和资源 ID，其中聊天与研究的 `callId` 对应 `model_call.id`；
+- Prompt 版本、输入字符数、文档或证据数量和最大输出 Token，不记录实际输入内容；
+- 成功调用的耗时、Token 用量或结果数量；
+- 失败调用的根异常类型、单行错误摘要和服务端异常堆栈。
+
+可以使用前端 SSE 错误中的 `traceId` 查询后端日志和 `model_call.trace_id`，再使用 `callId` 对齐单次模型调用。日志不得输出 API Key、完整 Prompt、完整文档正文或完整模型回答；排查 HTTP 客户端问题时也不要在共享环境中直接开启可能打印请求正文或认证头的全局 `DEBUG`/`TRACE` 日志。
+
+V4 研究在 `INFO` 使用成对的 `research.step.started`、`research.step.retrieval.completed` 和最终 `research.run.completed` 记录步骤及运行汇总。步骤检索汇总在该步骤全部文档检索结束后立即输出，包含 `traceId`、`runId`、步骤序号、文档数、命中数和步骤耗时；证据账本需要跨步骤统一去重与裁剪，因此最终证据字符数、截断状态和总耗时只在运行汇总中输出。逐文档的 `research.retrieval.*` 明细位于 `DEBUG`，并包含文档 ID，但不记录查询正文或证据正文。步骤之间仍按计划顺序执行；同一步骤内默认最多并行检索 4 份文档，可通过 `RESEARCH_RETRIEVAL_PARALLELISM` 配置为 1 至 5。结果始终按冻结文档列表顺序汇总，执行器在提交前再次强制最多 20 次检索调用。
+
+AI 调用日志级别可通过 `AI_CALL_LOG_LEVEL` 调整，例如临时关闭成功调用日志时设置为 `WARN`；研究步骤日志可通过 `RESEARCH_LOG_LEVEL` 调整，需要查看逐文档检索明细时设置为 `DEBUG`。失败的 AI 调用使用 `ERROR`，仍会保留。示例：
+
+```text
+ai.call.failed operation=CHAT_STREAM provider=DEEPSEEK model=deepseek-v4-flash traceId=... callId=... resourceType=assistantMessage resourceId=... latencyMs=... errorType=... errorMessage=...
+```
+
 后端默认监听 `18080`，Knife4j 接口文档位于 `http://localhost:18080/doc.html`，原始 OpenAPI JSON 位于 `http://localhost:18080/v3/api-docs`。如需使用其他端口，可设置 `SERVER_PORT`；修改后还应同步调整前端开发代理目标。

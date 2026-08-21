@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import io.github.fanqiepi.contextpilot.document.processing.DocumentChunk;
+import io.github.fanqiepi.contextpilot.observability.AiCallContext;
+import io.github.fanqiepi.contextpilot.observability.AiCallLogger;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -40,9 +42,19 @@ public class DocumentVectorIndex {
         VectorStore vectorStore = requireVectorStore();
         String filter = documentFilter(source.getId());
         vectorStore.delete(filter);
+        EmbeddingIndexProfile profile = embeddingIndexProperties.currentProfile();
+        AiCallContext callContext = new AiCallContext(
+                "EMBEDDING_INDEX", profile.provider(), profile.model(), null, UUID.randomUUID(),
+                "sourceDocument", source.getId(), profile.version(), null,
+                chunks == null ? null : chunks.size(), null);
+        long startNanos = System.nanoTime();
+        AiCallLogger.started(callContext);
         try {
             vectorStore.add(toDocuments(source, chunks));
+            AiCallLogger.succeeded(
+                    callContext, elapsedMillis(startNanos), null, null, null, chunks.size());
         } catch (RuntimeException exception) {
+            AiCallLogger.failed(callContext, elapsedMillis(startNanos), exception);
             try {
                 vectorStore.delete(filter);
             } catch (RuntimeException cleanupFailure) {
@@ -60,10 +72,23 @@ public class DocumentVectorIndex {
     }
 
     public List<Document> search(UUID knowledgeBaseId, String query, int topK) {
-        return search(knowledgeBaseId, null, query, topK);
+        return search(knowledgeBaseId, null, query, topK, null);
+    }
+
+    public List<Document> search(UUID knowledgeBaseId, String query, int topK, String traceId) {
+        return search(knowledgeBaseId, null, query, topK, traceId);
     }
 
     public List<Document> search(UUID knowledgeBaseId, UUID documentId, String query, int topK) {
+        return search(knowledgeBaseId, documentId, query, topK, null);
+    }
+
+    public List<Document> search(
+            UUID knowledgeBaseId,
+            UUID documentId,
+            String query,
+            int topK,
+            String traceId) {
         EmbeddingIndexProfile profile = embeddingIndexProperties.currentProfile();
         String filter = KNOWLEDGE_BASE_ID + " == '" + knowledgeBaseId + "' && "
                 + EMBEDDING_PROFILE_ID + " == '" + profile.id() + "'";
@@ -76,7 +101,26 @@ public class DocumentVectorIndex {
                 .similarityThresholdAll()
                 .filterExpression(filter)
                 .build();
-        return requireVectorStore().similaritySearch(request);
+        AiCallContext callContext = new AiCallContext(
+                "EMBEDDING_RETRIEVAL", profile.provider(), profile.model(), traceId, UUID.randomUUID(),
+                documentId == null ? "knowledgeBase" : "sourceDocument",
+                documentId == null ? knowledgeBaseId : documentId,
+                profile.version(), query.length(), topK, null);
+        long startNanos = System.nanoTime();
+        AiCallLogger.started(callContext);
+        try {
+            List<Document> results = requireVectorStore().similaritySearch(request);
+            AiCallLogger.succeeded(
+                    callContext, elapsedMillis(startNanos), null, null, null, results.size());
+            return results;
+        } catch (RuntimeException exception) {
+            AiCallLogger.failed(callContext, elapsedMillis(startNanos), exception);
+            throw exception;
+        }
+    }
+
+    private long elapsedMillis(long startNanos) {
+        return java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
     }
 
     private List<Document> toDocuments(SourceDocumentEntity source, List<DocumentChunk> chunks) {

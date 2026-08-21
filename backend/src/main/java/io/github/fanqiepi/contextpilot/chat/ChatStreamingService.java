@@ -12,6 +12,8 @@ import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
 import io.github.fanqiepi.contextpilot.model.ChatModelChunk;
 import io.github.fanqiepi.contextpilot.model.ChatModelGateway;
 import io.github.fanqiepi.contextpilot.model.ChatModelResult;
+import io.github.fanqiepi.contextpilot.observability.AiCallContext;
+import io.github.fanqiepi.contextpilot.observability.AiCallLogger;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -107,8 +109,13 @@ public class ChatStreamingService {
                 chatModelGateway.configuredModel(),
                 prompt.version(),
                 traceId);
+        AiCallContext callContext = new AiCallContext(
+                "CHAT_STREAM", chatModelGateway.provider(), chatModelGateway.configuredModel(),
+                traceId, modelCallId, "assistantMessage", exchange.assistantMessageId(), prompt.version(),
+                prompt.systemText().length() + prompt.userText().length(), null, null);
         StreamLifecycle lifecycle = new StreamLifecycle(
                 exchange.assistantMessageId(), modelCallId, prepared.citations());
+        AiCallLogger.started(callContext);
 
         Flux<ServerSentEvent<ChatStreamPayload>> deltas = chatModelGateway
                 .stream(prompt.systemText(), prompt.userText())
@@ -121,6 +128,9 @@ public class ChatStreamingService {
             ChatModelResult result = lifecycle.result();
             long latencyMs = lifecycle.elapsedMillis();
             lifecycle.complete(result, latencyMs);
+            AiCallLogger.succeeded(
+                    callContext, latencyMs, result.promptTokens(), result.completionTokens(),
+                    result.totalTokens(), null);
             List<ServerSentEvent<ChatStreamPayload>> events = new ArrayList<>();
             for (ChatCitationResponse citation : prepared.citations()) {
                 events.add(event("citation", citation));
@@ -137,11 +147,13 @@ public class ChatStreamingService {
 
         return Flux.concat(Flux.just(message, route), deltas, tail)
                 .onErrorResume(exception -> {
+                    AiCallLogger.failed(callContext, lifecycle.elapsedMillis(), exception);
                     lifecycle.failSafely(FAILED_SUMMARY, exception);
                     return Flux.just(errorEvent(exception, traceId));
                 })
                 .doFinally(signal -> {
                     if (signal == SignalType.CANCEL) {
+                        AiCallLogger.cancelled(callContext, lifecycle.elapsedMillis());
                         lifecycle.failSafely(CANCELLED_SUMMARY, null);
                     }
                 });

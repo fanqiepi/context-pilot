@@ -12,10 +12,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,17 +31,22 @@ import io.github.fanqiepi.contextpilot.common.InternalServiceException;
 import io.github.fanqiepi.contextpilot.document.EmbeddingIndexProperties;
 import io.github.fanqiepi.contextpilot.model.ChatModelGateway;
 import io.github.fanqiepi.contextpilot.model.ChatModelResult;
+import io.github.fanqiepi.contextpilot.observability.AiCallContext;
+import io.github.fanqiepi.contextpilot.observability.AiCallLogger;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalResultResponse;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalService;
-import org.springframework.stereotype.Service;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.stereotype.Service;
 
 @Service
 @ConditionalOnProperty(prefix = "contextpilot.research", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class ResearchExecutorService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResearchExecutorService.class);
     private static final String REFUSAL = "所选文档中没有找到足够证据回答这个比较问题。";
     private static final String PROMPT_VERSION = "document-comparison-synthesis-v2";
     private static final Pattern CITATION_PATTERN = Pattern.compile("\\[(\\d+)]");
@@ -136,17 +143,25 @@ public class ResearchExecutorService {
         }
         long startNanos = System.nanoTime();
         UUID modelCallId = null;
+        AiCallContext modelCallContext = null;
+        long modelCallStartNanos = 0;
+        boolean modelCallLogged = false;
+        RunLogState logState = new RunLogState(run.getTraceId(), runId);
         try {
             List<ResearchStepEntity> steps = stepMapper.selectByRunId(runId);
             List<UUID> selectedDocumentIds = jsonCodec.readDocumentIds(run.getSelectedDocumentIdsJson());
+            logState.stepCount = steps.size();
+            logState.documentCount = selectedDocumentIds.size();
             Set<String> selectedDocumentNames = selectedDocumentNames(selectedDocumentIds);
             List<HitGroup> groups = new ArrayList<>();
             Map<UUID, StepProgress> progress = new LinkedHashMap<>();
             int retrievalCalls = 0;
+            int retrievalReservations = 0;
             int successfulRetrievals = 0;
             int rawHits = 0;
             int retrievalFailures = 0;
             boolean timedOut = false;
+            boolean retrievalBudgetExhausted = false;
             for (ResearchStepEntity step : steps) {
                 requireNotCancelled(runId);
                 if (isTimedOut(startNanos)) {
@@ -156,52 +171,55 @@ public class ResearchExecutorService {
                 runMapper.updateCurrentStep(runId, step.getOrdinal(), now());
                 stepMapper.markRunning(step.getId(), now());
                 long stepStart = System.nanoTime();
-                int stepHits = 0;
                 StepProgress stepProgress = new StepProgress();
                 progress.put(step.getId(), stepProgress);
-                for (UUID documentId : jsonCodec.readDocumentIds(step.getDocumentIdsJson())) {
-                    requireNotCancelled(runId);
-                    if (isTimedOut(startNanos)) {
-                        timedOut = true;
-                        stepProgress.errors.add("Research hard timeout exceeded");
-                        break;
-                    }
-                    retrievalCalls++;
-                    stepProgress.attempted++;
-                    try {
-                        List<RetrievalResultResponse> hits = callWithinDeadline(
-                                runId, startNanos,
-                                () -> retrievalService.searchDocument(
-                                        run.getKnowledgeBaseId(), documentId, step.getQuery(),
-                                        ResearchBudget.V1.perDocumentTopK()));
-                        successfulRetrievals++;
-                        rawHits += hits.size();
-                        stepHits += hits.size();
-                        groups.add(new HitGroup(step, documentId, hits));
-                    } catch (ResearchDeadlineException exception) {
-                        timedOut = true;
-                        stepProgress.errors.add("Research hard timeout exceeded");
-                        break;
-                    } catch (InternalServiceException exception) {
-                        if ("VECTOR_STORE_UNAVAILABLE".equals(exception.getCode())) {
-                            throw exception;
-                        }
-                        retrievalFailures++;
-                        stepProgress.errors.add("Document " + documentId + ": "
-                                + safeSummary(exception.getMessage()));
-                    }
+                List<UUID> documentIds = jsonCodec.readDocumentIds(step.getDocumentIdsJson());
+                LOGGER.info(
+                        "research.step.started traceId={} runId={} step={} stepId={} documentCount={}",
+                        logValue(run.getTraceId()), runId, step.getOrdinal(), step.getId(), documentIds.size());
+                int remainingCalls = ResearchBudget.V1.maximumRetrievalCalls() - retrievalReservations;
+                StepRetrievalBatch batch = retrieveStep(
+                        run, step, documentIds, remainingCalls, startNanos, logState);
+                retrievalReservations += batch.reserved();
+                retrievalCalls += batch.attempted();
+                successfulRetrievals += batch.successful();
+                rawHits += batch.rawHits();
+                retrievalFailures += batch.failures();
+                stepProgress.attempted = batch.attempted();
+                stepProgress.successful = batch.successful();
+                stepProgress.failures = batch.failures();
+                stepProgress.errors.addAll(batch.errors());
+                groups.addAll(batch.groups());
+                if (batch.budgetExhausted()) {
+                    retrievalBudgetExhausted = true;
+                    stepProgress.errors.add("Research retrieval call budget exhausted");
                 }
-                step.setHitCount(stepHits);
+                if (batch.timedOut()) {
+                    timedOut = true;
+                    stepProgress.errors.add("Research hard timeout exceeded");
+                }
+                step.setHitCount(batch.rawHits());
                 step.setLatencyMs(elapsedMillis(stepStart));
+                boolean retrievalPartial = stepProgress.attempted < documentIds.size()
+                        || !stepProgress.errors.isEmpty();
+                LOGGER.info(
+                        "research.step.retrieval.completed traceId={} runId={} step={} stepId={} status={} "
+                                + "documentCount={} attemptedDocuments={} successfulDocuments={} failedDocuments={} "
+                                + "rawHits={} durationMs={}",
+                        logValue(run.getTraceId()), runId, step.getOrdinal(), step.getId(),
+                        retrievalPartial ? ResearchStepStatus.PARTIAL : ResearchStepStatus.SUCCEEDED,
+                        documentIds.size(), stepProgress.attempted, stepProgress.successful,
+                        stepProgress.failures, step.getHitCount(), step.getLatencyMs());
                 if (timedOut) {
                     break;
                 }
+                requireNotCancelled(runId);
             }
 
             Ledger ledger = selectEvidence(groups);
+            logState.evidenceCharacters = ledger.totalCharacters();
+            logState.truncated = ledger.truncated();
             persistLedger(run, ledger);
-            Map<UUID, Integer> retainedByStep = new HashMap<>();
-            ledger.links().forEach(link -> retainedByStep.merge(link.stepId(), 1, Integer::sum));
             for (ResearchStepEntity step : steps) {
                 StepProgress stepProgress = progress.get(step.getId());
                 if (stepProgress == null) {
@@ -211,7 +229,7 @@ public class ResearchExecutorService {
                 boolean stepPartial = stepProgress.attempted < expected || !stepProgress.errors.isEmpty();
                 stepMapper.complete(
                         step.getId(), stepPartial ? ResearchStepStatus.PARTIAL : ResearchStepStatus.SUCCEEDED,
-                        step.getHitCount(), retainedByStep.getOrDefault(step.getId(), 0),
+                        step.getHitCount(), retainedEvidenceCount(step, ledger),
                         step.getLatencyMs(), stepPartial ? safeSummary(String.join("; ", stepProgress.errors)) : null,
                         now());
             }
@@ -221,7 +239,9 @@ public class ResearchExecutorService {
             if (runMapper.beginSynthesis(
                     runId, retrievalCalls, rawHits, ledger.evidence().size(),
                     ledger.totalCharacters(), now()) == 0) {
-                return persistedResult(requireRun(runId));
+                ResearchRunEntity latest = requireRun(runId);
+                logState.status = latest.getExecutionStatus().name();
+                return persistedResult(latest);
             }
 
             if (ledger.evidence().isEmpty()) {
@@ -232,12 +252,14 @@ public class ResearchExecutorService {
                             : "Every document-scoped retrieval failed";
                     runMapper.fail(runId, code, summary, now());
                     chatPersistenceService.failResearchMessage(run.getAssistantMessageId(), summary);
+                    logState.status = ResearchExecutionStatus.FAILED.name();
                     return persistedResult(requireRun(runId));
                 }
                 chatPersistenceService.completeWithoutModel(run.getAssistantMessageId(), REFUSAL);
                 runMapper.complete(
                         runId, ResearchExecutionStatus.SUCCEEDED, ResearchAnswerStatus.REFUSED,
                         null, null, null, null, null, now());
+                logState.status = ResearchExecutionStatus.SUCCEEDED.name();
                 return new ResearchExecutionResult(queryService.get(runId), REFUSAL, List.of(), null,
                         elapsedMillis(startNanos));
             }
@@ -251,6 +273,7 @@ public class ResearchExecutorService {
                         runId, ResearchExecutionStatus.PARTIAL, ResearchAnswerStatus.ANSWERED,
                         null, null, null, "RESEARCH_TIMEOUT",
                         "Research timed out after collecting evidence", now());
+                logState.status = ResearchExecutionStatus.PARTIAL.name();
                 return new ResearchExecutionResult(
                         queryService.get(runId), answer,
                         researchCitations.stream().map(ResearchCitation::citation).toList(),
@@ -259,35 +282,53 @@ public class ResearchExecutorService {
             modelCallId = chatPersistenceService.beginModelCall(
                     run.getAssistantMessageId(), chatModelGateway.provider(),
                     chatModelGateway.configuredModel(), PROMPT_VERSION, run.getTraceId());
+            String synthesisUserPrompt = synthesisPrompt(
+                    question(run), steps, selectedDocumentNames, ledger.evidence());
+            modelCallContext = new AiCallContext(
+                    "RESEARCH_SYNTHESIS", chatModelGateway.provider(), chatModelGateway.configuredModel(),
+                    run.getTraceId(), modelCallId, "researchRun", runId, PROMPT_VERSION,
+                    SYSTEM_PROMPT.length() + synthesisUserPrompt.length(), ledger.evidence().size(),
+                    null);
+            modelCallStartNanos = System.nanoTime();
+            AiCallLogger.started(modelCallContext);
             ChatModelResult modelResult;
             try {
                 modelResult = callWithinDeadline(
                         runId, startNanos,
                         () -> chatModelGateway.generate(
                                 SYSTEM_PROMPT,
-                                synthesisPrompt(question(run), steps, selectedDocumentNames, ledger.evidence()),
-                                ResearchBudget.SYNTHESIS_MAX_OUTPUT_TOKENS));
+                                synthesisUserPrompt));
             } catch (ResearchDeadlineException exception) {
+                long modelLatencyMs = elapsedMillis(modelCallStartNanos);
+                AiCallLogger.failed(modelCallContext, modelLatencyMs, exception);
+                modelCallLogged = true;
                 String answer = timeoutAnswer(ledger.evidence());
                 chatPersistenceService.completeResearchAfterModelTimeout(
                         run.getAssistantMessageId(), modelCallId, answer, researchCitations,
-                        elapsedMillis(startNanos));
+                        modelLatencyMs);
                 runMapper.complete(
                         runId, ResearchExecutionStatus.PARTIAL, ResearchAnswerStatus.ANSWERED,
                         null, null, null, "RESEARCH_TIMEOUT",
                         "Research synthesis exceeded the hard timeout", now());
+                logState.status = ResearchExecutionStatus.PARTIAL.name();
                 return new ResearchExecutionResult(
                         queryService.get(runId), answer,
                         researchCitations.stream().map(ResearchCitation::citation).toList(),
                         null, elapsedMillis(startNanos));
             }
+            long modelLatencyMs = elapsedMillis(modelCallStartNanos);
+            AiCallLogger.succeeded(
+                    modelCallContext, modelLatencyMs, modelResult.promptTokens(),
+                    modelResult.completionTokens(), modelResult.totalTokens(), null);
+            modelCallLogged = true;
             requireNotCancelled(runId);
             GroundedAnswer grounded = groundAnswer(
                     modelResult.content(), ledger.evidence().size(), selectedDocumentNames);
             boolean completedAfterTimeout = isTimedOut(startNanos);
-            boolean partial = retrievalFailures > 0 || ledger.truncated()
+            boolean partial = retrievalFailures > 0 || retrievalBudgetExhausted || ledger.truncated()
                     || grounded.removedUnsupportedContent() || grounded.answerTruncated()
                     || completedAfterTimeout;
+            logState.truncated |= grounded.answerTruncated();
             String answer = grounded.hasSupportedContent() ? grounded.content() : REFUSAL;
             List<ResearchCitation> answerCitations = grounded.hasSupportedContent()
                     ? researchCitations : List.of();
@@ -296,7 +337,8 @@ public class ResearchExecutorService {
             ResearchAnswerStatus answerStatus = grounded.hasSupportedContent()
                     ? ResearchAnswerStatus.ANSWERED : ResearchAnswerStatus.REFUSED;
             String completionCode = terminalStatus == ResearchExecutionStatus.PARTIAL
-                    ? partialCode(completedAfterTimeout, retrievalFailures, ledger.truncated(), grounded)
+                    ? partialCode(completedAfterTimeout, retrievalFailures, retrievalBudgetExhausted,
+                            ledger.truncated(), grounded)
                     : null;
             String completionSummary = partialSummary(completionCode);
             if (completionSummary != null && grounded.hasSupportedContent()) {
@@ -304,31 +346,232 @@ public class ResearchExecutorService {
             }
             chatPersistenceService.completeResearchSuccess(
                     run.getAssistantMessageId(), modelCallId, answer, answerCitations,
-                    modelResult, elapsedMillis(startNanos));
+                    modelResult, modelLatencyMs);
             runMapper.complete(
                     runId, terminalStatus, answerStatus,
                     modelResult.promptTokens(), modelResult.completionTokens(), modelResult.totalTokens(),
                     completionCode, completionSummary, now());
+            logState.status = terminalStatus.name();
             return new ResearchExecutionResult(
                     queryService.get(runId), answer,
                     answerCitations.stream().map(ResearchCitation::citation).toList(),
                     modelResult.model(), elapsedMillis(startNanos));
         } catch (ResearchCancelledException exception) {
             stepMapper.cancelRemaining(runId, now());
+            logState.status = ResearchExecutionStatus.CANCELLED.name();
             return persistedResult(requireRun(runId));
         } catch (RuntimeException exception) {
+            long failureLatencyMs = modelCallStartNanos == 0
+                    ? elapsedMillis(startNanos) : elapsedMillis(modelCallStartNanos);
+            if (modelCallContext != null && !modelCallLogged) {
+                AiCallLogger.failed(modelCallContext, failureLatencyMs, exception);
+            }
             String code = exception instanceof InternalServiceException internal
                     ? internal.getCode() : "RESEARCH_DEPENDENCY_UNAVAILABLE";
             String summary = safeSummary(exception.getMessage());
             runMapper.fail(runId, code, summary, now());
+            logState.status = ResearchExecutionStatus.FAILED.name();
             if (modelCallId == null) {
                 chatPersistenceService.failResearchMessage(run.getAssistantMessageId(), summary);
             } else {
                 chatPersistenceService.completeFailure(
-                        run.getAssistantMessageId(), modelCallId, elapsedMillis(startNanos), summary);
+                        run.getAssistantMessageId(), modelCallId, failureLatencyMs, summary);
             }
             return persistedResult(requireRun(runId));
+        } finally {
+            LOGGER.info(
+                    "research.run.completed traceId={} runId={} status={} stepCount={} documentCount={} "
+                            + "retrievalCalls={} evidenceCharacters={} truncated={} totalDurationMs={}",
+                    logValue(logState.traceId), logState.runId, logState.status, logState.stepCount,
+                    logState.documentCount, logState.retrievalCalls.get(), logState.evidenceCharacters,
+                    logState.truncated, elapsedMillis(startNanos));
         }
+    }
+
+    private StepRetrievalBatch retrieveStep(
+            ResearchRunEntity run,
+            ResearchStepEntity step,
+            List<UUID> documentIds,
+            int remainingCalls,
+            long runStartNanos,
+            RunLogState logState) {
+        if (isTimedOut(runStartNanos)) {
+            return new StepRetrievalBatch(List.of(), 0, 0, 0, 0, 0,
+                    List.of(), true, false);
+        }
+        requireNotCancelled(run.getId());
+        int allowedCalls = Math.min(documentIds.size(), Math.max(0, remainingCalls));
+        boolean budgetExhausted = allowedCalls < documentIds.size();
+        List<RetrievalTask> tasks = new ArrayList<>(allowedCalls);
+        AtomicInteger startedCalls = new AtomicInteger();
+        try {
+            for (int index = 0; index < allowedCalls; index++) {
+                UUID documentId = documentIds.get(index);
+                Future<DocumentRetrievalAttempt> future = researchIoExecutor.submit(
+                        () -> {
+                            startedCalls.incrementAndGet();
+                            logState.retrievalCalls.incrementAndGet();
+                            return retrieveDocument(run, step, documentId);
+                        });
+                tasks.add(new RetrievalTask(future));
+            }
+
+            List<DocumentRetrievalAttempt> attempts = new ArrayList<>(
+                    java.util.Collections.nCopies(tasks.size(), null));
+            boolean timedOut = false;
+            for (int index = 0; index < tasks.size(); index++) {
+                try {
+                    attempts.set(index, awaitRetrieval(run.getId(), runStartNanos, tasks.get(index).future()));
+                } catch (ResearchDeadlineException exception) {
+                    timedOut = true;
+                    break;
+                }
+            }
+            if (timedOut) {
+                collectCompletedAndCancelRemaining(tasks, attempts);
+            }
+
+            List<HitGroup> groups = new ArrayList<>();
+            List<String> errors = new ArrayList<>();
+            int successful = 0;
+            int failures = 0;
+            int rawHits = 0;
+            for (DocumentRetrievalAttempt attempt : attempts) {
+                if (attempt == null) {
+                    continue;
+                }
+                if (attempt.failure() == null) {
+                    successful++;
+                    rawHits += attempt.hits().size();
+                    groups.add(new HitGroup(step, attempt.documentId(), attempt.hits()));
+                    continue;
+                }
+                if (attempt.failure() instanceof InternalServiceException internal) {
+                    if ("VECTOR_STORE_UNAVAILABLE".equals(internal.getCode())) {
+                        throw internal;
+                    }
+                    failures++;
+                    errors.add("Document " + attempt.documentId() + ": "
+                            + safeSummary(internal.getMessage()));
+                    continue;
+                }
+                throw attempt.failure();
+            }
+            return new StepRetrievalBatch(
+                    List.copyOf(groups), tasks.size(), startedCalls.get(), successful, failures, rawHits,
+                    List.copyOf(errors), timedOut, budgetExhausted);
+        } finally {
+            tasks.forEach(task -> {
+                if (!task.future().isDone()) {
+                    task.future().cancel(true);
+                }
+            });
+        }
+    }
+
+    private DocumentRetrievalAttempt retrieveDocument(
+            ResearchRunEntity run,
+            ResearchStepEntity step,
+            UUID documentId) {
+        long startNanos = System.nanoTime();
+        LOGGER.debug(
+                "research.retrieval.started traceId={} runId={} step={} stepId={} documentId={}",
+                logValue(run.getTraceId()), run.getId(), step.getOrdinal(), step.getId(), documentId);
+        try {
+            List<RetrievalResultResponse> hits = retrievalService.searchDocument(
+                    run.getKnowledgeBaseId(), documentId, step.getQuery(),
+                    ResearchBudget.V1.perDocumentTopK(), run.getTraceId());
+            List<RetrievalResultResponse> stableHits = hits == null ? List.of() : List.copyOf(hits);
+            LOGGER.debug(
+                    "research.retrieval.succeeded traceId={} runId={} step={} stepId={} "
+                            + "documentId={} hitCount={} durationMs={}",
+                    logValue(run.getTraceId()), run.getId(), step.getOrdinal(), step.getId(),
+                    documentId, stableHits.size(), elapsedMillis(startNanos));
+            return new DocumentRetrievalAttempt(documentId, stableHits, null);
+        } catch (RuntimeException exception) {
+            String errorCode = exception instanceof InternalServiceException internal
+                    ? internal.getCode() : exception.getClass().getSimpleName();
+            LOGGER.debug(
+                    "research.retrieval.failed traceId={} runId={} step={} stepId={} "
+                            + "documentId={} durationMs={} errorCode={} errorSummary={}",
+                    logValue(run.getTraceId()), run.getId(), step.getOrdinal(), step.getId(),
+                    documentId, elapsedMillis(startNanos), errorCode, safeSummary(exception.getMessage()));
+            return new DocumentRetrievalAttempt(documentId, List.of(), exception);
+        }
+    }
+
+    private DocumentRetrievalAttempt awaitRetrieval(
+            UUID runId,
+            long startNanos,
+            Future<DocumentRetrievalAttempt> future) {
+        try {
+            while (true) {
+                long remaining = hardTimeoutMillis - elapsedMillis(startNanos);
+                if (remaining <= 0) {
+                    throw new ResearchDeadlineException();
+                }
+                try {
+                    return future.get(Math.min(remaining, 250), TimeUnit.MILLISECONDS);
+                } catch (TimeoutException exception) {
+                    requireNotCancelled(runId);
+                }
+            }
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new InternalServiceException(
+                    "RESEARCH_RUN_INTERRUPTED", "Research execution was interrupted", exception);
+        } catch (ExecutionException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof RuntimeException runtime) {
+                throw runtime;
+            }
+            throw new InternalServiceException(
+                    "RESEARCH_DEPENDENCY_UNAVAILABLE", "Research dependency failed", exception);
+        }
+    }
+
+    private void collectCompletedAndCancelRemaining(
+            List<RetrievalTask> tasks,
+            List<DocumentRetrievalAttempt> attempts) {
+        for (int index = 0; index < tasks.size(); index++) {
+            if (attempts.get(index) != null) {
+                continue;
+            }
+            Future<DocumentRetrievalAttempt> future = tasks.get(index).future();
+            if (!future.isDone()) {
+                future.cancel(true);
+            }
+            if (future.isDone() && !future.isCancelled()) {
+                attempts.set(index, completedRetrieval(future));
+            }
+        }
+    }
+
+    private DocumentRetrievalAttempt completedRetrieval(Future<DocumentRetrievalAttempt> future) {
+        try {
+            return future.get();
+        } catch (CancellationException exception) {
+            return null;
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new InternalServiceException(
+                    "RESEARCH_RUN_INTERRUPTED", "Research execution was interrupted", exception);
+        } catch (ExecutionException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof RuntimeException runtime) {
+                throw runtime;
+            }
+            throw new InternalServiceException(
+                    "RESEARCH_DEPENDENCY_UNAVAILABLE", "Research dependency failed", exception);
+        }
+    }
+
+    private int retainedEvidenceCount(ResearchStepEntity step, Ledger ledger) {
+        return (int) ledger.links().stream()
+                .filter(link -> link.stepId().equals(step.getId()))
+                .map(EvidenceLink::evidenceId)
+                .distinct()
+                .count();
     }
 
     private Ledger selectEvidence(List<HitGroup> groups) {
@@ -555,6 +798,7 @@ public class ResearchExecutorService {
     private String partialCode(
             boolean timedOut,
             int retrievalFailures,
+            boolean retrievalBudgetExhausted,
             boolean evidenceTruncated,
             GroundedAnswer grounded) {
         if (timedOut) {
@@ -562,6 +806,9 @@ public class ResearchExecutorService {
         }
         if (retrievalFailures > 0) {
             return "RESEARCH_PARTIAL_RETRIEVAL";
+        }
+        if (retrievalBudgetExhausted) {
+            return "RESEARCH_RETRIEVAL_BUDGET_REACHED";
         }
         if (evidenceTruncated) {
             return "RESEARCH_EVIDENCE_BUDGET_REACHED";
@@ -584,6 +831,8 @@ public class ResearchExecutorService {
                     "比较在执行时限内未能完成，以下仅展示超时前取得的结果。";
             case "RESEARCH_PARTIAL_RETRIEVAL" ->
                     "部分所选文档检索失败，以下结果仅基于成功取得的证据。";
+            case "RESEARCH_RETRIEVAL_BUDGET_REACHED" ->
+                    "本次比较已达到检索调用上限，以下结果仅基于预算内取得的证据。";
             case "RESEARCH_EVIDENCE_BUDGET_REACHED" ->
                     "候选证据超过本次保留上限，以下结果仅基于裁剪后证据。";
             case "RESEARCH_ANSWER_BUDGET_REACHED" ->
@@ -707,12 +956,31 @@ public class ResearchExecutorService {
         return summary.length() <= 1000 ? summary : summary.substring(0, 1000);
     }
 
+    private String logValue(String value) {
+        return value == null || value.isBlank() ? "-" : value;
+    }
+
     private long elapsedMillis(long startNanos) {
         return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
     }
 
     private OffsetDateTime now() { return OffsetDateTime.now(ZoneOffset.UTC); }
 
+    private record RetrievalTask(Future<DocumentRetrievalAttempt> future) { }
+    private record DocumentRetrievalAttempt(
+            UUID documentId,
+            List<RetrievalResultResponse> hits,
+            RuntimeException failure) { }
+    private record StepRetrievalBatch(
+            List<HitGroup> groups,
+            int reserved,
+            int attempted,
+            int successful,
+            int failures,
+            int rawHits,
+            List<String> errors,
+            boolean timedOut,
+            boolean budgetExhausted) { }
     private record HitGroup(ResearchStepEntity step, UUID documentId, List<RetrievalResultResponse> hits) { }
     private record SelectedEvidence(UUID id, RetrievalResultResponse hit, String excerpt) { }
     private record EvidenceLink(UUID stepId, UUID evidenceId, Double score) { }
@@ -728,7 +996,24 @@ public class ResearchExecutorService {
             boolean answerTruncated) { }
     private static final class StepProgress {
         private int attempted;
+        private int successful;
+        private int failures;
         private final List<String> errors = new ArrayList<>();
+    }
+    private static final class RunLogState {
+        private final String traceId;
+        private final UUID runId;
+        private String status = ResearchExecutionStatus.EXECUTING.name();
+        private int stepCount;
+        private int documentCount;
+        private final AtomicInteger retrievalCalls = new AtomicInteger();
+        private int evidenceCharacters;
+        private boolean truncated;
+
+        private RunLogState(String traceId, UUID runId) {
+            this.traceId = traceId;
+            this.runId = runId;
+        }
     }
     private static final class ResearchCancelledException extends RuntimeException { }
     private static final class ResearchDeadlineException extends RuntimeException { }

@@ -65,7 +65,7 @@
 
 - Use `develop` as the integration and day-to-day development branch. Create feature branches from `develop` when isolation is useful.
 - Do not commit directly to `main`. Changes reach `main` only through a reviewed pull request or an explicitly reviewed merge from `develop`.
-- Use Conventional Commits with an English type prefix such as `fix`, `feat`, `test`, `docs`, or `chore`. Write both the title description after the prefix (or optional scope) and the entire commit body in Chinese, for example `test: 建立 V2 路由与操作安全评估基线`; do not use an English title description for repository commits.
+- Use Conventional Commits with an English type prefix such as `fix`, `feat`, `test`, `docs`, or `chore`, but do not add a scope in parentheses. Use `feat: 优化研究检索并行与运行日志`, not `feat(research): 优化研究检索并行与运行日志`. Write both the title description after the prefix and the entire commit body in Chinese, for example `test: 建立 V2 路由与操作安全评估基线`; do not use an English title description for repository commits.
 - Keep `main` releasable. Before merging `develop` into `main`, run the relevant backend and frontend verification commands and review the complete diff.
 - Organize backend code by business capability, not as one repository-wide controller/service/mapper hierarchy.
 - Keep model-provider details behind Spring AI or a small application-level abstraction.

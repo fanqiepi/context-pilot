@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.beans.factory.ObjectProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,6 +35,7 @@ class ChatModelGatewayTests {
 
         ArgumentCaptor<Prompt> prompt = ArgumentCaptor.forClass(Prompt.class);
         verify(chatModel).call(prompt.capture());
+        assertThat(prompt.getValue().getOptions()).isInstanceOf(DeepSeekChatOptions.class);
         assertThat(prompt.getValue().getOptions().getMaxTokens()).isEqualTo(3000);
         assertThat(prompt.getValue().getOptions().getModel()).isEqualTo("deepseek-v4-flash");
     }

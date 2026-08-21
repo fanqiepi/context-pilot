@@ -12,6 +12,5 @@ public record ResearchBudget(
         long hardTimeoutMillis) {
 
     public static final ResearchBudget V1 = new ResearchBudget(4, 20, 3, 60, 24, 24000, 1000, 8000, 90000);
-    public static final int SYNTHESIS_MAX_OUTPUT_TOKENS = 3000;
     public static final int ANSWER_MAX_CHARACTERS = 1800;
 }

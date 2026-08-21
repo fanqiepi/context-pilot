@@ -9,8 +9,8 @@ import org.springframework.ai.chat.metadata.ChatResponseMetadata;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -46,7 +46,7 @@ public class ChatModelGateway {
         if (maxOutputTokens <= 0) {
             throw new IllegalArgumentException("maxOutputTokens must be positive");
         }
-        ChatOptions options = ChatOptions.builder()
+        DeepSeekChatOptions options = DeepSeekChatOptions.builder()
                 .model(configuredModel)
                 .maxTokens(maxOutputTokens)
                 .build();

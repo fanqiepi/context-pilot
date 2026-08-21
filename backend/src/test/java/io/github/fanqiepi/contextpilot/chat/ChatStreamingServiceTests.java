@@ -19,6 +19,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.Flux;
 
@@ -33,7 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class ChatStreamingServiceTests {
 
     @Mock
@@ -210,7 +212,7 @@ class ChatStreamingServiceTests {
     }
 
     @Test
-    void emitsSafeErrorAndPersistsFailedModelCall() {
+    void emitsSafeErrorAndPersistsFailedModelCall(CapturedOutput output) {
         ChatRequest request = request();
         PendingChatExchange exchange = exchange();
         ChatPrompt prompt = new ChatPrompt("system", "user", "v1");
@@ -242,6 +244,10 @@ class ChatStreamingServiceTests {
                 eq(modelCallId),
                 anyLong(),
                 eq("Chat model stream failed"));
+        assertThat(output)
+                .contains("ai.call.failed operation=CHAT_STREAM provider=DEEPSEEK")
+                .contains("traceId=trace-error callId=" + modelCallId)
+                .contains("errorType=java.lang.RuntimeException errorMessage=private provider detail");
     }
 
     @Test

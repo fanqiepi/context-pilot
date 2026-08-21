@@ -84,7 +84,7 @@ V4 的详细设计见 [V4 知识研究助手详细设计](v4-knowledge-research-
 
 生产模块包括 `DeterministicResearchPlanner`、`ResearchPlanValidator`、`ResearchStartService`、`ResearchExecutorService`、`ResearchQueryService`、`ResearchRunCommandService` 和 SSE 适配服务，仍采用模块化单体中的显式 Java 服务。运行状态与回答结果分离，90 秒内进入 `SUCCEEDED/PARTIAL/FAILED/CANCELLED`；取消使用条件更新，断线不取消，应用重启将遗留活动运行安全标记失败。数据库状态是事实来源，SSE 只负责进度；普通 RAG、V2/V3 动作与健康报告链路保持不变。
 
-以上合同与整体授权已同步到生产模块、Flyway V15、正式 API/SSE 和前端入口；切片是独立验证检查点而非重复授权门。研究综合使用独立的 3000 Token 输出上限和 1800 字符正文上限；`PARTIAL` 卡片按稳定 `errorCode` 展示准确原因，受控缺证据句式不被误判为无引用内容。模型规划仍未获准进入生产，V5 的显式长期记忆、V6 的外部工具互操作和更远期多 Agent 仍为方向性候选。
+以上合同与整体授权已同步到生产模块、Flyway V15、正式 API/SSE 和前端入口；切片是独立验证检查点而非重复授权门。研究综合的发布合同使用独立的 3000 Token 输出上限和 1800 字符正文上限；2026-08-21 DeepSeek V4 兼容性诊断期间暂不发送请求级 `max_tokens`，但继续保留 90 秒硬超时、单次模型调用和 1800 字符最终正文上限，发布门验证前必须重新确认生成预算。`PARTIAL` 卡片按稳定 `errorCode` 展示准确原因，受控缺证据句式不被误判为无引用内容。模型规划仍未获准进入生产，V5 的显式长期记忆、V6 的外部工具互操作和更远期多 Agent 仍为方向性候选。
 
 ## 基础设施职责
 

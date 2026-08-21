@@ -6,6 +6,8 @@ import java.util.concurrent.TimeUnit;
 
 import io.github.fanqiepi.contextpilot.model.ChatModelGateway;
 import io.github.fanqiepi.contextpilot.model.ChatModelResult;
+import io.github.fanqiepi.contextpilot.observability.AiCallContext;
+import io.github.fanqiepi.contextpilot.observability.AiCallLogger;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -111,45 +113,55 @@ public class ChatApplicationService {
                 chatModelGateway.configuredModel(),
                 prompt.version(),
                 traceId);
+        AiCallContext callContext = new AiCallContext(
+                "CHAT_COMPLETION", chatModelGateway.provider(), chatModelGateway.configuredModel(),
+                traceId, modelCallId, "assistantMessage", exchange.assistantMessageId(), prompt.version(),
+                prompt.systemText().length() + prompt.userText().length(), null, null);
         long startNanos = System.nanoTime();
+        AiCallLogger.started(callContext);
+        ChatModelResult result;
         try {
-            ChatModelResult result = chatModelGateway.generate(prompt.systemText(), prompt.userText());
-            long latencyMs = elapsedMillis(startNanos);
-            List<ChatCitationResponse> citations = prepared.citations();
-            persistenceService.completeSuccess(
-                    exchange.assistantMessageId(),
-                    modelCallId,
-                    result.content(),
-                    citations,
-                    result,
-                    latencyMs);
-            return new ChatAnswerResponse(
-                    exchange.conversationId(),
-                    exchange.userMessageId(),
-                    exchange.assistantMessageId(),
-                    result.content(),
-                    false,
-                    citations,
-                    result.model(),
-                    new ChatUsageResponse(
-                            result.promptTokens(),
-                            result.completionTokens(),
-                            result.totalTokens(),
-                            latencyMs),
-                    traceId,
-                    route.capabilityId(),
-                    route.capabilityVersion(),
-                    route.matchReason(),
-                    null,
-                    null);
+            result = chatModelGateway.generate(prompt.systemText(), prompt.userText());
         } catch (RuntimeException exception) {
+            long latencyMs = elapsedMillis(startNanos);
+            AiCallLogger.failed(callContext, latencyMs, exception);
             persistenceService.completeFailure(
                     exchange.assistantMessageId(),
                     modelCallId,
-                    elapsedMillis(startNanos),
+                    latencyMs,
                     "Chat model call failed");
             throw exception;
         }
+        long latencyMs = elapsedMillis(startNanos);
+        AiCallLogger.succeeded(
+                callContext, latencyMs, result.promptTokens(), result.completionTokens(), result.totalTokens(), null);
+        List<ChatCitationResponse> citations = prepared.citations();
+        persistenceService.completeSuccess(
+                exchange.assistantMessageId(),
+                modelCallId,
+                result.content(),
+                citations,
+                result,
+                latencyMs);
+        return new ChatAnswerResponse(
+                exchange.conversationId(),
+                exchange.userMessageId(),
+                exchange.assistantMessageId(),
+                result.content(),
+                false,
+                citations,
+                result.model(),
+                new ChatUsageResponse(
+                        result.promptTokens(),
+                        result.completionTokens(),
+                        result.totalTokens(),
+                        latencyMs),
+                traceId,
+                route.capabilityId(),
+                route.capabilityVersion(),
+                route.matchReason(),
+                null,
+                null);
     }
 
     private long elapsedMillis(long startNanos) {
