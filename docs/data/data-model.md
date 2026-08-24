@@ -1,6 +1,6 @@
 # ContextPilot 数据模型
 
-> 本文定义 V1-V3 已完成模型和 V4 第一阶段已授权、已由 Flyway V15 落地的研究模型；已经实施的物理结构仍以 Flyway 迁移为事实来源。
+> 本文定义 V1-V4 已完成模型，以及 V5 第一阶段已批准、尚待 Flyway 落地的隐式用户和显式记忆模型；已经实施的物理结构仍以 Flyway 迁移为事实来源。
 
 ## 核心实体
 
@@ -17,6 +17,10 @@
 | `action_request` | 保存需人工确认的业务操作提案、状态和安全结果摘要 | 关联会话、用户消息和提案助手消息 |
 | `knowledge_base_health_report`（V3 / V11） | 保存不可变的知识库健康检查快照 | 关联知识库、会话和检查消息 |
 | `knowledge_base_health_issue`（V3 / V11） | 保存报告中的文档异常、观察事实和修复建议 | 关联健康报告和目标文档 |
+| `app_user`（V5 计划） | 保存稳定的隐式本地用户主体 | 第一阶段只有 `LOCAL_OWNER` |
+| `user_memory`（V5 计划） | 保存全局回答偏好的所有者、状态、当前版本和过期时间 | 属于一个应用用户 |
+| `user_memory_revision`（V5 计划） | 保存每次创建或纠正的不可变内容版本与来源 | 属于一条用户记忆 |
+| `message_memory_context`（V5 计划） | 保存实际提供给模型的记忆版本和顺序 | 关联助手消息、记忆和 revision |
 
 ## 数据约定
 
@@ -97,3 +101,38 @@ V4 详细设计见 [V4 知识研究助手详细设计](../architecture/v4-knowle
 Flyway V15 为 `message_citation` 增加可空 `research_evidence_id`，V4 引用必须关联当前运行的真实证据，V1-V3 历史行保持空且不回填。`chat_message` 增加 `CANCELLED`，只用于取消的研究助手消息；部分完成与拒答仍保存为已完成消息。应用启动把遗留活动运行标记为 `FAILED/RESEARCH_RUN_INTERRUPTED`，不自动恢复；重新执行创建新运行并通过 `retry_of_run_id` 关联旧记录。
 
 Flyway `V15__create_document_comparison_research.sql` 已创建四表、唯一索引、外键、状态与预算检查约束，并以不回填方式兼容 V1-V3 历史数据。
+
+## V5 已批准的隐式用户与记忆数据结构
+
+V5 详细语义见 [V5 显式记忆详细设计](../architecture/v5-explicit-memory-design.md)。下一条 Flyway 迁移从 V15 继续递增，计划创建 `app_user`、`user_memory`、`user_memory_revision` 和 `message_memory_context`，并把 `CREATE_USER_MEMORY` 加入 `action_request` 的静态允许范围。迁移编号、物理列长度和索引名称在对应实现切片内冻结。
+
+### `app_user`
+
+- 使用 UUID 主键、唯一业务键、显示名称、状态、带时区时间戳和逻辑删除；
+- 迁移创建唯一活动业务键 `LOCAL_OWNER`，不提供普通用户 CRUD；
+- 该记录提供稳定持久归属，不代表登录、认证或多租户隔离。
+
+### `user_memory`
+
+- `owner_user_id` 必须引用当前服务端主体，客户端不能提交；
+- 第一阶段 `memory_type` 只允许 `RESPONSE_PREFERENCE`，`scope_type` 只允许 `GLOBAL`；
+- 状态只允许 `ACTIVE` 或 `DISABLED`，另保存当前 revision、可空 `expires_at`、规范化内容哈希、时间戳和逻辑删除；
+- 每个主体最多 100 条未删除、20 条活动记忆；创建、重新启用和纠正时锁定对应 `app_user` 行，在同一事务内计数并复核；
+- 相同主体下的活动规范化哈希使用部分唯一索引做精确去重，不进行语义去重；应用层在写入前返回稳定冲突语义。
+
+### `user_memory_revision`
+
+- 每条 revision 保存不可变版本号、规范化内容、SHA-256、来源类型、可空来源会话/消息、变更原因和时间；
+- 创建或纠正在事务内插入新 revision，并原子推进聚合当前版本；旧 revision 不原地覆盖；
+- 来源固定允许 `CHAT_CONFIRMED` 或 `MANAGEMENT`；普通日志不记录完整正文。
+
+### `message_memory_context`
+
+- 保存助手消息、记忆、实际注入 revision、稳定顺序和时间；
+- 同一消息与 revision 不重复关联；
+- 只保存真正加入 Prompt 的偏好，不把所有候选记忆都标记为已使用；
+- 后续纠正、禁用、过期或删除不改写历史关联，但普通历史接口不得重新暴露已删除正文。
+
+### `action_request` 扩展
+
+`CREATE_USER_MEMORY` 参数只允许固定类型、全局作用域、1-300 字符规范化内容和可选过期时间。确认成功后通过 `result_resource_id` 关联真实记忆；未确认、拒绝、过期或失败均不得产生记忆。既有 V2/V3 Action 历史必须保持兼容。
