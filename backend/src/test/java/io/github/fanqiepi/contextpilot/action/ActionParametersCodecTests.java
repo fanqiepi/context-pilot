@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 
 import io.github.fanqiepi.contextpilot.document.DocumentStatus;
+import io.github.fanqiepi.contextpilot.memory.UserMemoryScope;
+import io.github.fanqiepi.contextpilot.memory.UserMemoryType;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
@@ -34,7 +36,12 @@ class ActionParametersCodecTests {
                         DocumentStatus.SUCCEEDED,
                         " profile-v1 ",
                         reportId,
-                        reindexIssueId));
+                        reindexIssueId),
+                new CreateUserMemoryActionParameters(
+                        UserMemoryType.RESPONSE_PREFERENCE,
+                        UserMemoryScope.GLOBAL,
+                        "回答尽量简洁",
+                        null));
 
         for (ActionParameters value : parameters) {
             String json = codec.write(value.actionType(), value);

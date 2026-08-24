@@ -16,6 +16,7 @@ public record ActionRequestResponse(
         ActionParameters parameters,
         String displaySummary,
         ActionRequestStatus status,
+        UUID resultResourceId,
         String resultSummary,
         String errorSummary,
         String traceId,
@@ -24,6 +25,31 @@ public record ActionRequestResponse(
         OffsetDateTime executedAt,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt) {
+
+    public ActionRequestResponse(
+            UUID id,
+            UUID conversationId,
+            UUID userMessageId,
+            UUID assistantMessageId,
+            CapabilityId capabilityId,
+            String capabilityVersion,
+            ActionType actionType,
+            ActionParameters parameters,
+            String displaySummary,
+            ActionRequestStatus status,
+            String resultSummary,
+            String errorSummary,
+            String traceId,
+            OffsetDateTime expiresAt,
+            OffsetDateTime confirmedAt,
+            OffsetDateTime executedAt,
+            OffsetDateTime createdAt,
+            OffsetDateTime updatedAt) {
+        this(id, conversationId, userMessageId, assistantMessageId, capabilityId,
+                capabilityVersion, actionType, parameters, displaySummary, status, null,
+                resultSummary, errorSummary, traceId, expiresAt, confirmedAt, executedAt,
+                createdAt, updatedAt);
+    }
 
     static ActionRequestResponse from(ActionRequestEntity entity, ActionParametersCodec parametersCodec) {
         return new ActionRequestResponse(
@@ -37,6 +63,7 @@ public record ActionRequestResponse(
                 parametersCodec.read(entity.getActionType(), entity.getParametersJson()),
                 entity.getDisplaySummary(),
                 entity.getStatus(),
+                entity.getResultResourceId(),
                 entity.getResultSummary(),
                 entity.getErrorSummary(),
                 entity.getTraceId(),

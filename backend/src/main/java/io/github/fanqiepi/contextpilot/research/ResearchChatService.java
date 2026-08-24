@@ -41,7 +41,7 @@ public class ResearchChatService {
                         usage.promptTokens(), usage.completionTokens(), usage.totalTokens(), result.latencyMs()),
                 traceId, CapabilityId.KNOWLEDGE_QA, "v4",
                 CapabilityMatchReason.EXPLICIT_DOCUMENT_COMPARISON,
-                null, null, result.run());
+                null, null, result.run(), result.memoryContext());
     }
 
     public ResearchStart start(ChatRequest request, String traceId) {

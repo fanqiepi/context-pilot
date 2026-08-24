@@ -1,6 +1,6 @@
 # ContextPilot 技术架构
 
-> 状态：V1、V2 与 V3 均已完成；V4 第一阶段已选择固定维度/逐文档确定性编排并整体授权 Slices 2-7，生产实现已落地，正在完成最终验收。
+> 状态：V1、V2、V3 与 V4 第一阶段均已完成并通过验收；V5 第一阶段显式记忆架构已批准，Slices 1-6 已完成，仅剩 Slice 7 最终验收。
 
 ## 架构形式
 
@@ -20,6 +20,8 @@
 - `capability`（逻辑边界）：固定能力定义、版本和确定性路由；当前实现保持轻量，不加载动态 Skill 或插件。
 - `action`（V2 已实现边界）：已校验操作提案、人工确认状态和静态白名单业务执行；V2 只委托 `KnowledgeBaseService` 创建知识库。
 - `health`（V3 当前实现边界）：知识库健康只读事实、确定性问题分类、结构化健康结果以及后续不可变报告编排；数据库访问仅通过专用参数化 DataPort。
+- `identity`（V5 批准边界）：通过 `CurrentSubjectProvider` 提供服务端稳定的 `LOCAL_OWNER`；第一阶段不是登录、认证或多用户授权系统。
+- `memory`（V5 批准边界）：全局回答偏好的持久化、版本、管理、固定预算选择和消息上下文关联；不承载事实型记忆、任务状态或自动提取。
 - `common`：少量跨模块配置、错误类型和基础约定，不承载业务实现。
 
 模块按业务能力组织，简单功能不强制创建空的 controller/service/mapper 层。`chat` 可以编排检索与模型调用，供应商专用配置不得散落到业务模块。
@@ -42,6 +44,14 @@ V2：
                             -> 用户独立确认 -> 原子取得执行权
                             -> 白名单应用动作 -> KnowledgeBaseService
                             -> 保存结果并回显状态
+
+V5：
+请求 -> CurrentSubjectProvider -> LOCAL_OWNER
+显式“记住回答偏好” -> BUSINESS_ACTION/CREATE_USER_MEMORY
+                     -> 保存提案 -> 用户独立确认 -> MemoryService
+普通 RAG / V4 最终综合 -> MemoryContextService
+                          -> 当前主体活动偏好（最多 10 条/2000 字符）
+                          -> 独立 Prompt 数据区 -> 记录 message_memory_context
 ```
 
 文档解析使用 Spring AI 的 `TextReader`、`MarkdownDocumentReader` 和 `PagePdfDocumentReader`。PDF 按页解析以保留引用页码；切分采用确定性的字符窗口，默认最大 1200 个字符并重叠 150 个字符。上传后由有界 `TaskExecutor` 编排 `PENDING -> PROCESSING -> SUCCEEDED/FAILED`，原子状态更新防止重复处理。重试、重建索引和删除均按文档标识替换或清理派生向量，向量 ID 保持确定性。
@@ -84,7 +94,19 @@ V4 的详细设计见 [V4 知识研究助手详细设计](v4-knowledge-research-
 
 生产模块包括 `DeterministicResearchPlanner`、`ResearchPlanValidator`、`ResearchStartService`、`ResearchExecutorService`、`ResearchQueryService`、`ResearchRunCommandService` 和 SSE 适配服务，仍采用模块化单体中的显式 Java 服务。运行状态与回答结果分离，90 秒内进入 `SUCCEEDED/PARTIAL/FAILED/CANCELLED`；取消使用条件更新，断线不取消，应用重启将遗留活动运行安全标记失败。数据库状态是事实来源，SSE 只负责进度；普通 RAG、V2/V3 动作与健康报告链路保持不变。
 
-以上合同与整体授权已同步到生产模块、Flyway V15、正式 API/SSE 和前端入口；切片是独立验证检查点而非重复授权门。研究综合的发布合同使用独立的 3000 Token 输出上限和 1800 字符正文上限；2026-08-21 DeepSeek V4 兼容性诊断期间暂不发送请求级 `max_tokens`，但继续保留 90 秒硬超时、单次模型调用和 1800 字符最终正文上限，发布门验证前必须重新确认生成预算。`PARTIAL` 卡片按稳定 `errorCode` 展示准确原因，受控缺证据句式不被误判为无引用内容。模型规划仍未获准进入生产，V5 的显式长期记忆、V6 的外部工具互操作和更远期多 Agent 仍为方向性候选。
+以上合同与整体授权已同步到生产模块、Flyway V15、正式 API/SSE 和前端入口；切片是独立验证检查点而非重复授权门。真实端到端结果证明 DeepSeek Thinking Token 与原 3000 Token 请求级限额不兼容；2026-08-24 已正式批准研究综合不发送请求级 `max_tokens`，继续记录 usage，并保留 90 秒硬超时、单次模型调用和 1800 字符最终正文上限。`PARTIAL` 卡片按稳定 `errorCode` 展示准确原因，受控缺证据句式不被误判为无引用内容。V4 第一阶段据此完整验收通过。模型规划仍未获准进入生产；V5 仅批准下述显式偏好记忆边界，事实型/自动记忆仍未授权；V6 外部工具互操作和更远期多 Agent 仍为方向性候选。
+
+## V5 隐式主体与显式偏好记忆
+
+V5 详细合同见 [V5 显式记忆的个人助手详细设计](v5-explicit-memory-design.md)，身份决定见 [ADR 0002](decisions/0002-use-implicit-single-user-subject.md)。第一阶段引入 `identity` 和 `memory` 两个明确业务边界，但不增加登录、Spring Security 或多用户授权。
+
+`LocalSingleUserSubjectProvider` 从服务端稳定映射到数据库种子用户 `LOCAL_OWNER`。Controller、客户端 DTO 和模型输出都不能指定用户 ID；所有记忆 Mapper 查询必须包含当前主体 ID。该主体只提供持久归属，所有能访问实例的人仍共享同一身份，因此部署继续限定在本机或可信网络。
+
+首个聊天动作 `CREATE_USER_MEMORY` 只接受确定性显式句式中的 `GLOBAL/RESPONSE_PREFERENCE`，复用 V2 的持久化提案、独立确认、原子幂等和静态分派。普通聊天、历史、文档和模型输出不得自动产生记忆。管理页中的纠正、启用/禁用、过期和删除由用户直接操作专用强类型 API，使用当前主体过滤、版本条件更新和不可变 revision；模型不能调用这些接口。
+
+`MemoryContextService` 只向普通 RAG 和 V4 最终 Synthesizer 提供当前主体下活动、未过期的回答偏好，最多 10 条、合计 2000 字符。记忆位于独立的不可信 Prompt 数据区，只能影响表达方式；当前请求优先于偏好，系统规则、grounding、文档引用、拒答、研究范围和预算优先于二者。简单确定性回复、路由、健康报告和 Action 执行不读取记忆。每次实际注入的 revision 通过 `message_memory_context` 关联助手消息，支持 SSE 和历史解释。
+
+第一阶段不使用 Embedding 或模型选择记忆，不保存事实型记忆或任务状态，不做自动候选、语义去重、冲突合并或跨用户隔离。V5 Slices 1-7 已整体批准，Slices 1-6 的固定评估、持久化、确认创建、版本化管理、受限注入、SSE 和历史透明闭环均已通过本地工程门禁。当前只剩 Slice 7 的冻结评估、真实模型和最终版本验收；通过前不得标记 V5 第一阶段完成，批次安排也不能扩大范围或跳过门禁。
 
 ## 基础设施职责
 

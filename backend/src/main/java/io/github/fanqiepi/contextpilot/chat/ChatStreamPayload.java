@@ -1,6 +1,7 @@
 package io.github.fanqiepi.contextpilot.chat;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
@@ -9,6 +10,8 @@ import io.github.fanqiepi.contextpilot.action.ActionParameters;
 import io.github.fanqiepi.contextpilot.action.ActionType;
 import io.github.fanqiepi.contextpilot.research.ResearchRunResponse;
 import io.github.fanqiepi.contextpilot.research.ResearchStepResponse;
+import io.github.fanqiepi.contextpilot.memory.MemoryContextResponse;
+import io.github.fanqiepi.contextpilot.memory.MemoryContextItemResponse;
 
 public interface ChatStreamPayload {
 
@@ -32,6 +35,18 @@ public interface ChatStreamPayload {
             String traceId) implements ChatStreamPayload {
     }
 
+    record MemoryContextData(
+            List<MemoryContextItemResponse> items,
+            int count,
+            int characterCount,
+            boolean truncated) implements ChatStreamPayload {
+
+        public static MemoryContextData from(MemoryContextResponse response) {
+            return new MemoryContextData(
+                    response.items(), response.count(), response.characterCount(), response.truncated());
+        }
+    }
+
     record ActionRequired(
             UUID actionRequestId,
             UUID conversationId,
@@ -43,6 +58,7 @@ public interface ChatStreamPayload {
             ActionParameters parameters,
             String displaySummary,
             ActionRequestStatus status,
+            UUID resultResourceId,
             String resultSummary,
             String errorSummary,
             String traceId,
@@ -64,6 +80,7 @@ public interface ChatStreamPayload {
                     response.parameters(),
                     response.displaySummary(),
                     response.status(),
+                    response.resultResourceId(),
                     response.resultSummary(),
                     response.errorSummary(),
                     response.traceId(),

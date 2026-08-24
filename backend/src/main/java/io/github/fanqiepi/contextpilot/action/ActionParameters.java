@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public sealed interface ActionParameters permits
         CreateKnowledgeBaseActionParameters,
         RetryDocumentProcessingActionParameters,
-        ReindexDocumentActionParameters {
+        ReindexDocumentActionParameters,
+        CreateUserMemoryActionParameters {
 
     @JsonIgnore
     ActionType actionType();

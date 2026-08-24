@@ -6,6 +6,7 @@ import java.util.UUID;
 import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
 import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportResponse;
 import io.github.fanqiepi.contextpilot.research.ResearchRunResponse;
+import io.github.fanqiepi.contextpilot.memory.MemoryContextResponse;
 
 public record ChatAnswerResponse(
         UUID conversationId,
@@ -22,7 +23,29 @@ public record ChatAnswerResponse(
         CapabilityMatchReason capabilityMatchReason,
         KnowledgeBaseHealthReportResponse healthReport,
         ActionRequestResponse actionRequest,
-        ResearchRunResponse researchRun) {
+        ResearchRunResponse researchRun,
+        MemoryContextResponse memoryContext) {
+
+    public ChatAnswerResponse(
+            UUID conversationId,
+            UUID userMessageId,
+            UUID assistantMessageId,
+            String answer,
+            boolean refused,
+            List<ChatCitationResponse> citations,
+            String model,
+            ChatUsageResponse usage,
+            String traceId,
+            CapabilityId capabilityId,
+            String capabilityVersion,
+            CapabilityMatchReason capabilityMatchReason,
+            KnowledgeBaseHealthReportResponse healthReport,
+            ActionRequestResponse actionRequest,
+            ResearchRunResponse researchRun) {
+        this(conversationId, userMessageId, assistantMessageId, answer, refused, citations,
+                model, usage, traceId, capabilityId, capabilityVersion, capabilityMatchReason,
+                healthReport, actionRequest, researchRun, null);
+    }
 
     public ChatAnswerResponse(
             UUID conversationId,
@@ -41,6 +64,6 @@ public record ChatAnswerResponse(
             ActionRequestResponse actionRequest) {
         this(conversationId, userMessageId, assistantMessageId, answer, refused, citations,
                 model, usage, traceId, capabilityId, capabilityVersion, capabilityMatchReason,
-                healthReport, actionRequest, null);
+                healthReport, actionRequest, null, null);
     }
 }

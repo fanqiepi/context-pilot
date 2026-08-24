@@ -52,7 +52,10 @@ class V2RoutingActionEvaluationTests {
     private final CreateKnowledgeBaseIntentPolicy intentPolicy =
             new CreateKnowledgeBaseIntentPolicy();
     private final CapabilityRouter router = new CapabilityRouter(
-            simpleChatReplyPolicy, intentPolicy, new KnowledgeBaseHealthIntentPolicy());
+            simpleChatReplyPolicy,
+            intentPolicy,
+            new CreateUserMemoryIntentPolicy(),
+            new KnowledgeBaseHealthIntentPolicy());
 
     static Stream<V2EvaluationDataset.RoutingCase> routingCases() {
         return DATASET.routingCases().stream();
@@ -105,6 +108,7 @@ class V2RoutingActionEvaluationTests {
                 simpleChatReplyPolicy,
                 router,
                 intentPolicy,
+                new CreateUserMemoryIntentPolicy(),
                 actionRequestService,
                 mock(io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthService.class),
                 mock(io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportService.class));
@@ -190,7 +194,9 @@ class V2RoutingActionEvaluationTests {
             return 1;
         });
         when(executorDispatcher.execute(
-                eq(ActionType.CREATE_KNOWLEDGE_BASE), any(CreateKnowledgeBaseActionParameters.class)))
+                eq(ActionType.CREATE_KNOWLEDGE_BASE),
+                any(CreateKnowledgeBaseActionParameters.class),
+                any(io.github.fanqiepi.contextpilot.action.ActionExecutionContext.class)))
                 .thenThrow(new RuntimeException("simulated internal execution failure"));
         doAnswer(invocation -> {
             entity.setStatus(ActionRequestStatus.FAILED);

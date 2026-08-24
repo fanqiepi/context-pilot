@@ -3,6 +3,8 @@ package io.github.fanqiepi.contextpilot.action;
 import java.util.UUID;
 
 import io.github.fanqiepi.contextpilot.document.DocumentStatus;
+import io.github.fanqiepi.contextpilot.memory.UserMemoryScope;
+import io.github.fanqiepi.contextpilot.memory.UserMemoryType;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,8 +22,11 @@ class ActionExecutorDispatcherTests {
             mock(RetryDocumentProcessingActionExecutor.class);
     private final ReindexDocumentActionExecutor reindexExecutor =
             mock(ReindexDocumentActionExecutor.class);
+    private final CreateUserMemoryActionExecutor createUserMemoryExecutor =
+            mock(CreateUserMemoryActionExecutor.class);
     private final ActionExecutorDispatcher dispatcher =
-            new ActionExecutorDispatcher(createExecutor, retryExecutor, reindexExecutor);
+            new ActionExecutorDispatcher(
+                    createExecutor, retryExecutor, reindexExecutor, createUserMemoryExecutor);
 
     @Test
     void dispatchesCreateKnowledgeBaseWithItsStrongParameterType() {
@@ -67,5 +72,25 @@ class ActionExecutorDispatcherTests {
 
         assertThat(dispatcher.execute(ActionType.REINDEX_DOCUMENT, parameters)).isSameAs(expected);
         verify(reindexExecutor).execute(parameters);
+    }
+
+    @Test
+    void dispatchesCreateUserMemoryOnlyWithTrustedExecutionContext() {
+        CreateUserMemoryActionParameters parameters = new CreateUserMemoryActionParameters(
+                UserMemoryType.RESPONSE_PREFERENCE,
+                UserMemoryScope.GLOBAL,
+                "回答尽量简洁",
+                null);
+        ActionExecutionContext context = new ActionExecutionContext(
+                UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), "trace-memory");
+        ActionExecutionResult expected = new ActionExecutionResult(
+                "回答偏好已保存", UUID.randomUUID());
+        when(createUserMemoryExecutor.execute(parameters, context)).thenReturn(expected);
+
+        assertThatThrownBy(() -> dispatcher.execute(ActionType.CREATE_USER_MEMORY, parameters))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThat(dispatcher.execute(ActionType.CREATE_USER_MEMORY, parameters, context))
+                .isSameAs(expected);
+        verify(createUserMemoryExecutor).execute(parameters, context);
     }
 }

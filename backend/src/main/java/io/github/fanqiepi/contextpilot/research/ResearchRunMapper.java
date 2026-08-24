@@ -16,7 +16,7 @@ public interface ResearchRunMapper {
             id, knowledge_base_id, conversation_id, user_message_id, assistant_message_id,
             client_request_id, request_fingerprint, task_type, plan_version,
             selected_document_ids::text AS selected_document_ids_json,
-            execution_status, answer_status,
+            memory_mode, execution_status, answer_status,
             max_plan_steps, max_retrieval_calls, max_raw_hits, max_evidence_chunks,
             max_evidence_characters, hard_timeout_millis,
             actual_retrieval_calls, actual_raw_hits, actual_evidence_chunks,
@@ -31,7 +31,7 @@ public interface ResearchRunMapper {
     @Insert("""
             INSERT INTO research_run (
                 id, knowledge_base_id, conversation_id, user_message_id, assistant_message_id,
-                client_request_id, request_fingerprint, task_type, plan_version, selected_document_ids,
+                client_request_id, request_fingerprint, task_type, plan_version, selected_document_ids, memory_mode,
                 execution_status, answer_status, max_plan_steps, max_retrieval_calls, max_raw_hits,
                 max_evidence_chunks, max_evidence_characters, hard_timeout_millis,
                 actual_retrieval_calls, actual_raw_hits, actual_evidence_chunks,
@@ -40,7 +40,7 @@ public interface ResearchRunMapper {
             ) VALUES (
                 #{id}, #{knowledgeBaseId}, #{conversationId}, #{userMessageId}, #{assistantMessageId},
                 #{clientRequestId}, #{requestFingerprint}, #{taskType}, #{planVersion},
-                CAST(#{selectedDocumentIdsJson} AS jsonb),
+                CAST(#{selectedDocumentIdsJson} AS jsonb), #{memoryMode},
                 #{executionStatus}, #{answerStatus}, #{maxPlanSteps}, #{maxRetrievalCalls}, #{maxRawHits},
                 #{maxEvidenceChunks}, #{maxEvidenceCharacters}, #{hardTimeoutMillis},
                 #{actualRetrievalCalls}, #{actualRawHits}, #{actualEvidenceChunks},

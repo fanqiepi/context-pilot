@@ -19,12 +19,42 @@ import type {
   StreamHealthReportEvent,
   StreamActionRequiredEvent,
   StreamMessageEvent,
+  StreamMemoryContextEvent,
   StreamRouteEvent,
   StreamUsageEvent,
   ResearchRun,
   StreamResearchPlanEvent,
   StreamResearchStepEvent,
+  UserMemory,
+  UserMemoryDetail,
+  UserMemoryStatus,
+  UserMemoryUpdate,
 } from './types'
+
+export async function listUserMemories(filters?: {
+  status?: UserMemoryStatus
+  expired?: boolean
+}): Promise<UserMemory[]> {
+  const response = await apiClient.get<UserMemory[]>('/user-memories', { params: filters })
+  return response.data
+}
+
+export async function getUserMemory(id: string): Promise<UserMemoryDetail> {
+  const response = await apiClient.get<UserMemoryDetail>(`/user-memories/${id}`)
+  return response.data
+}
+
+export async function updateUserMemory(
+  id: string,
+  input: UserMemoryUpdate,
+): Promise<UserMemoryDetail> {
+  const response = await apiClient.patch<UserMemoryDetail>(`/user-memories/${id}`, input)
+  return response.data
+}
+
+export async function deleteUserMemory(id: string): Promise<void> {
+  await apiClient.delete(`/user-memories/${id}`)
+}
 
 export async function listKnowledgeBases(): Promise<KnowledgeBase[]> {
   const response = await apiClient.get<KnowledgeBase[]>('/knowledge-bases')
@@ -154,6 +184,7 @@ export async function cancelResearchRun(id: string): Promise<ResearchRun> {
 export interface ChatStreamHandlers {
   onMessage: (event: StreamMessageEvent) => void
   onRoute?: (event: StreamRouteEvent) => void
+  onMemoryContext?: (event: StreamMemoryContextEvent) => void
   onActionRequired: (event: StreamActionRequiredEvent) => void
   onHealthReport: (event: StreamHealthReportEvent) => void
   onResearchPlan?: (event: StreamResearchPlanEvent) => void
@@ -196,6 +227,9 @@ export async function streamChat(
           break
         case 'route':
           handlers.onRoute?.(payload as StreamRouteEvent)
+          break
+        case 'memory_context':
+          handlers.onMemoryContext?.(payload as StreamMemoryContextEvent)
           break
         case 'action_required':
           handlers.onActionRequired(payload as StreamActionRequiredEvent)

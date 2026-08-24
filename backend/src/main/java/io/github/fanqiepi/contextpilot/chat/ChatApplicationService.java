@@ -6,9 +6,12 @@ import java.util.concurrent.TimeUnit;
 
 import io.github.fanqiepi.contextpilot.model.ChatModelGateway;
 import io.github.fanqiepi.contextpilot.model.ChatModelResult;
+import io.github.fanqiepi.contextpilot.memory.MemoryContext;
+import io.github.fanqiepi.contextpilot.memory.MemoryContextService;
 import io.github.fanqiepi.contextpilot.observability.AiCallContext;
 import io.github.fanqiepi.contextpilot.observability.AiCallLogger;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 public class ChatApplicationService {
@@ -19,14 +22,25 @@ public class ChatApplicationService {
     private final ChatPreparationService preparationService;
     private final ChatPersistenceService persistenceService;
     private final ChatModelGateway chatModelGateway;
+    private final MemoryContextService memoryContextService;
 
     public ChatApplicationService(
             ChatPreparationService preparationService,
             ChatPersistenceService persistenceService,
             ChatModelGateway chatModelGateway) {
+        this(preparationService, persistenceService, chatModelGateway, null);
+    }
+
+    @Autowired
+    public ChatApplicationService(
+            ChatPreparationService preparationService,
+            ChatPersistenceService persistenceService,
+            ChatModelGateway chatModelGateway,
+            MemoryContextService memoryContextService) {
         this.preparationService = preparationService;
         this.persistenceService = persistenceService;
         this.chatModelGateway = chatModelGateway;
+        this.memoryContextService = memoryContextService;
     }
 
     public ChatAnswerResponse answer(ChatRequest request, String traceId) {
@@ -106,13 +120,18 @@ public class ChatApplicationService {
                     null);
         }
 
-        ChatPrompt prompt = prepared.prompt();
+        ChatPrompt basePrompt = prepared.prompt();
         UUID modelCallId = persistenceService.beginModelCall(
                 exchange.assistantMessageId(),
                 chatModelGateway.provider(),
                 chatModelGateway.configuredModel(),
-                prompt.version(),
+                basePrompt.version(),
                 traceId);
+        MemoryContext memoryContext = memoryContextService == null
+                ? MemoryContext.empty()
+                : memoryContextService.prepareForMessage(
+                        exchange.assistantMessageId(), request.effectiveMemoryMode(), traceId);
+        ChatPrompt prompt = basePrompt.withMemory(memoryContext);
         AiCallContext callContext = new AiCallContext(
                 "CHAT_COMPLETION", chatModelGateway.provider(), chatModelGateway.configuredModel(),
                 traceId, modelCallId, "assistantMessage", exchange.assistantMessageId(), prompt.version(),
@@ -161,7 +180,9 @@ public class ChatApplicationService {
                 route.capabilityVersion(),
                 route.matchReason(),
                 null,
-                null);
+                null,
+                null,
+                memoryContext.isEmpty() ? null : memoryContext.toResponse());
     }
 
     private long elapsedMillis(long startNanos) {

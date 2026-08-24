@@ -2,6 +2,7 @@ package io.github.fanqiepi.contextpilot.research;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import io.github.fanqiepi.contextpilot.memory.MemoryMode;
 
 public class ResearchRunEntity {
     private UUID id;
@@ -14,6 +15,7 @@ public class ResearchRunEntity {
     private ResearchTaskType taskType;
     private String planVersion;
     private String selectedDocumentIdsJson;
+    private MemoryMode memoryMode;
     private ResearchExecutionStatus executionStatus;
     private ResearchAnswerStatus answerStatus;
     private int maxPlanSteps;
@@ -51,6 +53,7 @@ public class ResearchRunEntity {
     public ResearchTaskType getTaskType() { return taskType; } public void setTaskType(ResearchTaskType v) { taskType = v; }
     public String getPlanVersion() { return planVersion; } public void setPlanVersion(String v) { planVersion = v; }
     public String getSelectedDocumentIdsJson() { return selectedDocumentIdsJson; } public void setSelectedDocumentIdsJson(String v) { selectedDocumentIdsJson = v; }
+    public MemoryMode getMemoryMode() { return memoryMode; } public void setMemoryMode(MemoryMode v) { memoryMode = v; }
     public ResearchExecutionStatus getExecutionStatus() { return executionStatus; } public void setExecutionStatus(ResearchExecutionStatus v) { executionStatus = v; }
     public ResearchAnswerStatus getAnswerStatus() { return answerStatus; } public void setAnswerStatus(ResearchAnswerStatus v) { answerStatus = v; }
     public int getMaxPlanSteps() { return maxPlanSteps; } public void setMaxPlanSteps(int v) { maxPlanSteps = v; }

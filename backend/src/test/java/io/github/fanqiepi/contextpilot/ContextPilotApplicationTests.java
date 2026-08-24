@@ -13,6 +13,9 @@ import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthIssueMapper;
 import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportMapper;
 import io.github.fanqiepi.contextpilot.health.PostgresKnowledgeBaseHealthDataPort;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseMapper;
+import io.github.fanqiepi.contextpilot.identity.AppUserMapper;
+import io.github.fanqiepi.contextpilot.memory.UserMemoryMapper;
+import io.github.fanqiepi.contextpilot.memory.UserMemoryRevisionMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -76,6 +79,15 @@ class ContextPilotApplicationTests {
 
     @MockitoBean
     private PostgresKnowledgeBaseHealthDataPort healthDataPort;
+
+    @MockitoBean
+    private AppUserMapper appUserMapper;
+
+    @MockitoBean
+    private UserMemoryMapper userMemoryMapper;
+
+    @MockitoBean
+    private UserMemoryRevisionMapper userMemoryRevisionMapper;
 
     @Test
     void contextLoads() {

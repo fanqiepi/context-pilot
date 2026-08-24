@@ -139,6 +139,36 @@ public class ActionRequestService {
     }
 
     @Transactional
+    public ActionRequestResponse proposeCreateUserMemory(
+            UUID conversationId,
+            UUID userMessageId,
+            UUID assistantMessageId,
+            String capabilityVersion,
+            String traceId,
+            CreateUserMemoryActionParameters parameters) {
+        OffsetDateTime now = now();
+        ActionRequestEntity entity = new ActionRequestEntity();
+        entity.setId(UUID.randomUUID());
+        entity.setConversationId(conversationId);
+        entity.setUserMessageId(userMessageId);
+        entity.setAssistantMessageId(assistantMessageId);
+        entity.setCapabilityId(CapabilityId.BUSINESS_ACTION);
+        entity.setCapabilityVersion(capabilityVersion);
+        entity.setActionType(ActionType.CREATE_USER_MEMORY);
+        entity.setParametersJson(parametersCodec.write(ActionType.CREATE_USER_MEMORY, parameters));
+        entity.setDisplaySummary("确认后将保存全局回答偏好：“%s”。".formatted(parameters.content()));
+        entity.setStatus(ActionRequestStatus.PENDING_CONFIRMATION);
+        entity.setTraceId(traceId);
+        entity.setExpiresAt(now.plusMinutes(properties.getConfirmationTimeoutMinutes()));
+        entity.setCreatedAt(now);
+        entity.setUpdatedAt(now);
+        if (actionRequestMapper.insert(entity) != 1) {
+            throw new IllegalStateException("Create user memory proposal could not be created");
+        }
+        return response(entity);
+    }
+
+    @Transactional
     public ActionRequestResponse findByHealthIssueId(UUID healthIssueId) {
         ActionRequestEntity entity = actionRequestMapper.selectByHealthIssueId(healthIssueId);
         if (entity == null) {
@@ -200,7 +230,14 @@ public class ActionRequestService {
                 current.getActionType(), current.getParametersJson());
         ActionExecutionResult result;
         try {
-            result = executorDispatcher.execute(current.getActionType(), parameters);
+            result = executorDispatcher.execute(
+                    current.getActionType(),
+                    parameters,
+                    new ActionExecutionContext(
+                            current.getId(),
+                            current.getConversationId(),
+                            current.getUserMessageId(),
+                            current.getTraceId()));
         } catch (BadRequestException | ConflictException exception) {
             completeFailure(id, exception.getMessage());
             return response(requireEntity(id));
@@ -210,7 +247,8 @@ public class ActionRequestService {
             completeFailure(id, internalFailureSummary(current.getActionType()));
             return response(requireEntity(id));
         }
-        if (actionRequestMapper.completeSuccess(id, safeSummary(result.resultSummary()), now()) != 1) {
+        if (actionRequestMapper.completeSuccess(
+                id, safeSummary(result.resultSummary()), result.resultResourceId(), now()) != 1) {
             throw new IllegalStateException("Claimed action request could not be completed");
         }
         return response(requireEntity(id));
@@ -287,6 +325,7 @@ public class ActionRequestService {
             case CREATE_KNOWLEDGE_BASE -> CREATE_KNOWLEDGE_BASE_FAILURE_SUMMARY;
             case RETRY_DOCUMENT_PROCESSING -> "提交文档重试任务失败，请稍后重试";
             case REINDEX_DOCUMENT -> "提交索引重建任务失败，请稍后重试";
+            case CREATE_USER_MEMORY -> "保存回答偏好失败，请稍后重试";
         };
     }
 

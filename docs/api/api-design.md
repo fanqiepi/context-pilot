@@ -1,6 +1,6 @@
 # REST API、SSE 与操作确认约定
 
-> 本文记录已完成的 V1/V2/V3 接口和已整体授权、正在验收的 V4 第一阶段正式合同。已实现字段以 OpenAPI 为主要事实来源；V4 使用固定维度/逐文档确定性编排，正式接口、SSE 与客户端类型已进入生产代码。
+> 本文记录已完成的 V1-V4 接口，以及 V5 第一阶段已批准的显式偏好记忆合同。V5 Slices 2-6 的隐式主体、确认创建、管理资源、受限注入、SSE 和历史字段均已实现；已实现字段以 OpenAPI 为主要事实来源。
 
 ## 通用约定
 
@@ -103,6 +103,74 @@ message
 `research_plan` 只包含固定编排产生的可读计划摘要和预算，不存在模型 Planner 原始输出或隐藏思维；`research_step` 包含稳定步骤 ID、顺序、状态、目标、命中/裁剪数量和安全失败摘要；`delta` 只承载最终综合回答；`citation` 只能来自已保存证据账本。所有事件通过 SSE `id` 携带运行内单调 `sequence`，研究计划、步骤和结束载荷同时包含对应序号。
 
 数据库状态是事实来源。SSE 断开不会取消运行，任务继续执行；取消必须调用独立接口。历史消息只返回可空 `researchRun` 摘要，完整步骤通过运行接口查询；活动运行刷新后由前端轮询恢复，第一阶段不提供 SSE 续传。V1-V3 旧消息返回 `null`。
+
+## V5 已批准的显式记忆合同
+
+V5 完整方案见 [V5 显式记忆详细设计](../architecture/v5-explicit-memory-design.md)。所有接口都从服务端 `CurrentSubjectProvider` 取得 `LOCAL_OWNER`，请求体、查询参数和请求头均不接受 `ownerUserId/userId`。
+
+### 聊天创建与使用（Slices 2-6 已实现）
+
+显式句式“请记住我的偏好：...”路由为 `BUSINESS_ACTION/CREATE_USER_MEMORY`，先创建不可变 Action 提案，再沿用 `/api/action-requests/{id}/confirm` 或 `/reject`。提案固定参数为：
+
+```json
+{
+  "memoryType": "RESPONSE_PREFERENCE",
+  "scope": "GLOBAL",
+  "content": "代码示例优先使用 Java",
+  "expiresAt": null
+}
+```
+
+当前实现使用 `BUSINESS_ACTION/v2/EXPLICIT_CREATE_USER_MEMORY`，确认成功后的 Action 返回 `resultResourceId`；未确认、拒绝或过期时不创建记忆。客户端仍不能覆盖已保存参数或提交用户 ID。
+
+普通聊天请求增加可选 `memoryMode`：
+
+```json
+{
+  "memoryMode": "USE"
+}
+```
+
+只允许 `USE` 或 `IGNORE`，默认 `USE`。客户端不能提交记忆 ID、内容列表、预算或用户 ID。服务端最多选择 10 条、2000 字符活动偏好；`IGNORE` 只影响本次请求，不修改持久化状态。
+
+### 记忆管理资源
+
+Slice 4 已实现以下资源。列表按 `updatedAt DESC, id DESC` 稳定排序；详情的历史版本只返回 revision、来源、变更原因和时间摘要，不返回旧正文。`PATCH` 的任一实际变更都会生成 `MANAGEMENT` revision，并以聚合 `version` 条件更新；重复 `DELETE` 对同一当前主体资源幂等返回 `204`。
+
+| 方法 | 路径 | 行为 |
+| --- | --- | --- |
+| `GET` | `/api/user-memories` | 查询当前主体的回答偏好，支持状态和是否过期过滤，稳定排序 |
+| `GET` | `/api/user-memories/{id}` | 查询当前 revision、来源、状态、版本和不暴露已删除正文的版本摘要 |
+| `PATCH` | `/api/user-memories/{id}` | 用户直接纠正内容、启用/禁用或调整过期时间；必须提交当前 `version` |
+| `DELETE` | `/api/user-memories/{id}` | 用户确认后逻辑删除；重复删除幂等返回 `204` |
+
+`PATCH` 使用强类型字段：可选 `content`、`status`、`expiresAt` 与必填 `version`，至少修改一项。纠正内容创建新 revision；状态或过期时间变更同样更新聚合版本并记录审计原因。管理 API 只接受用户在专用页面直接操作，模型、Prompt 和聊天回答不能调用。
+
+### SSE 与历史
+
+Slices 5-6 已实现以下合同。存在实际注入记忆时，聊天 SSE 在 `route` 后、模型输出前发送一次：
+
+```text
+message -> route -> memory_context -> delta* -> citation* -> usage? -> done
+```
+
+V4 研究保持原计划/步骤顺序，但 `memory_context` 必须位于 `research_plan` 之后、最终 `delta` 之前，且偏好不能改变计划和证据：
+
+```text
+message -> route -> research_plan -> research_step* -> memory_context? -> delta* -> citation* -> usage? -> done
+```
+
+`memory_context` 只返回 ID、revision、受限摘要、数量、字符数和 `truncated`，不返回用户 ID、Prompt 或内部哈希。没有活动偏好、读取降级或 `IGNORE` 时不发送。历史助手消息增加可空 `memoryContext` 摘要，来源是持久化 `message_memory_context`，不是按当前记忆重新计算；后续 revision 变化不改写旧消息，逻辑删除后仍保留 ID/revision 解释但正文显示为已删除。
+
+### 固定错误语义
+
+- `404 USER_MEMORY_NOT_FOUND`：当前主体范围内不存在；
+- `400 USER_MEMORY_CONTENT_INVALID`：内容为空、超过 300 字符或规范化失败；
+- `409 USER_MEMORY_VERSION_CONFLICT`：管理操作基于旧版本；
+- `409 USER_MEMORY_DUPLICATE`：管理纠正与现有活动偏好精确重复；聊天确认幂等返回现有记忆；
+- `409 USER_MEMORY_LIMIT_REACHED`：未删除或活动数量达到固定上限；
+- `USER_MEMORY_CONTEXT_TRUNCATED`：上下文摘要状态，不使回答失败；
+- 读取依赖失败时记录脱敏错误并安全降级到不使用记忆的现有回答链路。
 
 ## 知识库接口
 

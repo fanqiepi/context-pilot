@@ -68,6 +68,7 @@ export type CapabilityId = 'SIMPLE_CHAT' | 'KNOWLEDGE_QA' | 'BUSINESS_ACTION'
 export type CapabilityMatchReason =
   | 'SIMPLE_INTERACTION_WHITELIST'
   | 'EXPLICIT_CREATE_KNOWLEDGE_BASE'
+  | 'EXPLICIT_CREATE_USER_MEMORY'
   | 'EXPLICIT_KNOWLEDGE_BASE_HEALTH'
   | 'HEALTH_REPORT_ISSUE_SELECTED'
   | 'EXPLICIT_DOCUMENT_COMPARISON'
@@ -234,6 +235,7 @@ export type ActionType =
   | 'CREATE_KNOWLEDGE_BASE'
   | 'RETRY_DOCUMENT_PROCESSING'
   | 'REINDEX_DOCUMENT'
+  | 'CREATE_USER_MEMORY'
 export type ActionRequestStatus =
   | 'PENDING_CONFIRMATION'
   | 'EXECUTING'
@@ -264,6 +266,49 @@ export interface ReindexDocumentActionParameters {
   healthIssueId: string
 }
 
+export interface CreateUserMemoryActionParameters {
+  memoryType: 'RESPONSE_PREFERENCE'
+  scope: 'GLOBAL'
+  content: string
+  expiresAt: string | null
+}
+
+export type UserMemoryStatus = 'ACTIVE' | 'DISABLED'
+export type UserMemorySourceType = 'CHAT_CONFIRMED' | 'MANAGEMENT'
+
+export interface UserMemory {
+  id: string
+  memoryType: 'RESPONSE_PREFERENCE'
+  scope: 'GLOBAL'
+  status: UserMemoryStatus
+  content: string
+  currentRevision: number
+  sourceType: UserMemorySourceType
+  expiresAt: string | null
+  expired: boolean
+  version: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface UserMemoryRevisionSummary {
+  revision: number
+  sourceType: UserMemorySourceType
+  changeReason: string
+  createdAt: string
+}
+
+export interface UserMemoryDetail extends UserMemory {
+  revisions: UserMemoryRevisionSummary[]
+}
+
+export interface UserMemoryUpdate {
+  version: number
+  content?: string
+  status?: UserMemoryStatus
+  expiresAt?: string | null
+}
+
 interface ActionRequestBase<TActionType extends ActionType, TParameters> {
   id: string
   conversationId: string
@@ -275,6 +320,7 @@ interface ActionRequestBase<TActionType extends ActionType, TParameters> {
   parameters: TParameters
   displaySummary: string
   status: ActionRequestStatus
+  resultResourceId: string | null
   resultSummary: string | null
   errorSummary: string | null
   traceId: string
@@ -289,6 +335,7 @@ export type ActionRequest =
   | ActionRequestBase<'CREATE_KNOWLEDGE_BASE', CreateKnowledgeBaseActionParameters>
   | ActionRequestBase<'RETRY_DOCUMENT_PROCESSING', RetryDocumentProcessingActionParameters>
   | ActionRequestBase<'REINDEX_DOCUMENT', ReindexDocumentActionParameters>
+  | ActionRequestBase<'CREATE_USER_MEMORY', CreateUserMemoryActionParameters>
 
 export interface ConversationMessage {
   id: string
@@ -304,6 +351,7 @@ export interface ConversationMessage {
   healthReport: KnowledgeBaseHealthReport | null
   actionRequest: ActionRequest | null
   researchRun: ResearchRunSummary | null
+  memoryContext: MemoryContextSummary | null
   citations: Citation[]
   helpful: boolean
   createdAt: string
@@ -331,6 +379,7 @@ export interface ChatRequest {
   knowledgeBaseId: string
   question: string
   conversationId?: string
+  memoryMode?: 'USE' | 'IGNORE'
   research?: {
     clientRequestId: string
     taskType: 'DOCUMENT_COMPARISON'
@@ -338,6 +387,22 @@ export interface ChatRequest {
     retryOfRunId?: string
   }
 }
+
+export interface MemoryContextItem {
+  memoryId: string
+  revision: number
+  summary: string
+  contentHidden: boolean
+}
+
+export interface MemoryContextSummary {
+  items: MemoryContextItem[]
+  count: number
+  characterCount: number
+  truncated: boolean
+}
+
+export type StreamMemoryContextEvent = MemoryContextSummary
 
 export interface StreamMessageEvent {
   conversationId: string
