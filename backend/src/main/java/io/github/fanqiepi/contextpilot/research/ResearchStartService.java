@@ -120,6 +120,7 @@ public class ResearchStartService {
         run.setTaskType(research.taskType());
         run.setPlanVersion(plan.planVersion());
         run.setSelectedDocumentIdsJson(jsonCodec.writeDocumentIds(documentIds));
+        run.setMemoryMode(request.effectiveMemoryMode());
         run.setExecutionStatus(ResearchExecutionStatus.PLANNING);
         run.setMaxPlanSteps(budget.maximumPlanSteps());
         run.setMaxRetrievalCalls(budget.maximumRetrievalCalls());
@@ -159,7 +160,8 @@ public class ResearchStartService {
                 + (request.conversationId() == null ? "" : request.conversationId()) + "|"
                 + request.question().strip().replaceAll("\\s+", " ") + "|"
                 + ResearchTaskType.DOCUMENT_COMPARISON + "|" + canonicalDocuments + "|"
-                + (request.research().retryOfRunId() == null ? "" : request.research().retryOfRunId());
+                + (request.research().retryOfRunId() == null ? "" : request.research().retryOfRunId()) + "|"
+                + request.effectiveMemoryMode();
         try {
             return HexFormat.of().formatHex(
                     MessageDigest.getInstance("SHA-256").digest(canonical.getBytes(StandardCharsets.UTF_8)));

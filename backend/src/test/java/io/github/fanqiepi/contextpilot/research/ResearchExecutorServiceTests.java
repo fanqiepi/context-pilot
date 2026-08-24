@@ -16,6 +16,10 @@ import io.github.fanqiepi.contextpilot.common.InternalServiceException;
 import io.github.fanqiepi.contextpilot.document.EmbeddingIndexProperties;
 import io.github.fanqiepi.contextpilot.model.ChatModelGateway;
 import io.github.fanqiepi.contextpilot.model.ChatModelResult;
+import io.github.fanqiepi.contextpilot.memory.MemoryContext;
+import io.github.fanqiepi.contextpilot.memory.MemoryContextPreference;
+import io.github.fanqiepi.contextpilot.memory.MemoryContextService;
+import io.github.fanqiepi.contextpilot.memory.MemoryMode;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalResultResponse;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalService;
 import org.junit.jupiter.api.BeforeEach;
@@ -211,6 +215,63 @@ class ResearchExecutorServiceTests {
     }
 
     @Test
+    void injectsResponsePreferencesOnlyIntoTheFinalSynthesisPrompt() {
+        UUID runId = UUID.randomUUID();
+        UUID firstDocument = UUID.randomUUID();
+        UUID secondDocument = UUID.randomUUID();
+        ResearchRunEntity run = run(runId, List.of(firstDocument, secondDocument));
+        run.setMemoryMode(MemoryMode.USE);
+        ResearchStepEntity step = step(
+                runId, 1, "deployment", List.of(firstDocument, secondDocument));
+        when(runMapper.selectById(runId)).thenReturn(run);
+        when(runMapper.claimExecution(eq(runId), any())).thenReturn(1);
+        when(stepMapper.selectByRunId(runId)).thenReturn(List.of(step));
+        when(stepMapper.markRunning(any(), any())).thenReturn(1);
+        when(runMapper.updateCurrentStep(eq(runId), anyInt(), any())).thenReturn(1);
+        when(retrievalService.searchDocument(any(), any(), anyString(), eq(3), anyString()))
+                .thenReturn(List.of(new RetrievalResultResponse(
+                        UUID.randomUUID().toString(), firstDocument, "first.md", 0,
+                        null, "deployment evidence", 0.9)));
+        when(runMapper.beginSynthesis(eq(runId), eq(2), eq(2), eq(1), anyInt(), any()))
+                .thenReturn(1);
+        when(runMapper.complete(eq(runId), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(1);
+        when(evidenceMapper.insert(any())).thenReturn(1);
+        when(stepEvidenceMapper.insert(any())).thenReturn(1);
+        ChatMessageEntity question = new ChatMessageEntity();
+        question.setContent("比较部署方式");
+        when(chatMessageMapper.selectById(run.getUserMessageId())).thenReturn(question);
+        when(chatPersistenceService.beginModelCall(any(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(UUID.randomUUID());
+        when(chatModelGateway.provider()).thenReturn("DEEPSEEK");
+        when(chatModelGateway.configuredModel()).thenReturn("deepseek-v4-flash");
+        when(chatModelGateway.generate(anyString(), anyString()))
+                .thenReturn(new ChatModelResult("部署结论 [1]", "deepseek-v4-flash", 10, 5, 15));
+        when(queryService.get(runId)).thenReturn(response(runId, ResearchExecutionStatus.SUCCEEDED));
+        MemoryContextService memoryContextService = org.mockito.Mockito.mock(MemoryContextService.class);
+        MemoryContext memoryContext = new MemoryContext(List.of(
+                new MemoryContextPreference(
+                        UUID.randomUUID(), UUID.randomUUID(), 1,
+                        "回答尽量简洁")), 6, false);
+        when(memoryContextService.prepareForMessage(
+                run.getAssistantMessageId(), MemoryMode.USE, "trace"))
+                .thenReturn(memoryContext);
+        ResearchExecutorService memoryAwareService = new ResearchExecutorService(
+                runMapper, stepMapper, evidenceMapper, stepEvidenceMapper, jsonCodec, queryService,
+                researchDocumentMapper, retrievalService, new EmbeddingIndexProperties(), chatModelGateway,
+                chatPersistenceService, chatMessageMapper, messageCitationMapper, memoryContextService,
+                new TaskExecutorAdapter(Runnable::run), ResearchBudget.V1.hardTimeoutMillis());
+
+        ResearchExecutionResult result = memoryAwareService.execute(runId);
+
+        verify(chatModelGateway).generate(
+                org.mockito.ArgumentMatchers.contains("用户回答偏好"),
+                org.mockito.ArgumentMatchers.contains("<user_preferences>\n- 回答尽量简洁"));
+        assertThat(result.memoryContext()).isNotNull();
+        assertThat(result.memoryContext().count()).isOne();
+    }
+
+    @Test
     void convergesToTimeoutWithoutWaitingForABlockedRetrievalCall() {
         UUID runId = UUID.randomUUID();
         UUID firstDocument = UUID.randomUUID();
@@ -393,6 +454,7 @@ class ResearchExecutorServiceTests {
         run.setExecutionStatus(ResearchExecutionStatus.PLANNING);
         run.setSelectedDocumentIdsJson(jsonCodec.writeDocumentIds(documentIds));
         run.setTraceId("trace");
+        run.setMemoryMode(MemoryMode.USE);
         return run;
     }
 

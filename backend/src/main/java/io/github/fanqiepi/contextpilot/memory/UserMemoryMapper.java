@@ -42,6 +42,20 @@ public interface UserMemoryMapper {
             + "ORDER BY updated_at DESC, id DESC")
     List<UserMemoryEntity> selectOwnedAll(UUID ownerUserId);
 
+    @Select("SELECT memory.id AS memory_id, revision.id AS revision_id, "
+            + "revision.revision_number, revision.content "
+            + "FROM user_memory memory "
+            + "JOIN user_memory_revision revision ON revision.memory_id = memory.id "
+            + "AND revision.revision_number = memory.current_revision "
+            + "WHERE memory.owner_user_id = #{ownerUserId} "
+            + "AND memory.memory_type = 'RESPONSE_PREFERENCE' AND memory.scope_type = 'GLOBAL' "
+            + "AND memory.status = 'ACTIVE' AND memory.deleted = 0 AND revision.deleted = 0 "
+            + "AND (memory.expires_at IS NULL OR memory.expires_at > #{now}) "
+            + "ORDER BY memory.updated_at DESC, memory.id DESC")
+    List<UserMemoryContextCandidate> selectActiveContextCandidates(
+            @Param("ownerUserId") UUID ownerUserId,
+            @Param("now") OffsetDateTime now);
+
     @Select("SELECT " + SELECT_COLUMNS + " FROM user_memory "
             + "WHERE owner_user_id = #{ownerUserId} AND memory_type = 'RESPONSE_PREFERENCE' "
             + "AND scope_type = 'GLOBAL' AND status = 'ACTIVE' AND content_hash = #{contentHash} "
