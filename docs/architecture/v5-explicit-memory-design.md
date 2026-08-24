@@ -1,6 +1,6 @@
 # V5 显式记忆的个人助手详细设计
 
-> 状态：第一阶段范围与实现合同已批准；Slices 1-4 已完成，剩余 Slices 5-7 可连续实施；批准日期：2026-08-24；前置基线：V1、V2、V3 与 V4 第一阶段均已完成并通过验收。
+> 状态：第一阶段范围与实现合同已批准；Slices 1-6 已完成，仅剩 Slice 7 最终验收；批准日期：2026-08-24；前置基线：V1、V2、V3 与 V4 第一阶段均已完成并通过验收。
 
 ## 1. 文档目的
 
@@ -96,7 +96,7 @@ V5 在现有单用户知识工作空间中增加经用户知情、可管理、�
 
 ## 6. 数据合同
 
-Flyway V16 已建立以下结构，V17 已扩展 `CREATE_USER_MEMORY` Action；物理字段长度、索引名称和检查约束已经冻结，不得改变语义。
+Flyway V16 已建立以下结构，V17 已扩展 `CREATE_USER_MEMORY` Action，V18-V19 已补充研究请求的 `memory_mode` 与历史上下文摘要元数据；物理字段长度、索引名称和检查约束已经冻结，不得改变语义。
 
 ### 6.1 `app_user`
 
@@ -120,7 +120,7 @@ Flyway V16 已建立以下结构，V17 已扩展 `CREATE_USER_MEMORY` Action；�
 
 ### 6.4 `message_memory_context`
 
-- 保存助手消息、记忆、实际提供给模型的 revision、顺序和时间；
+- 保存助手消息、记忆、实际提供给模型的 revision、顺序、上下文字符数、截断状态和时间；
 - 只记录真正进入 Prompt 的版本，便于历史恢复和解释；
 - 记忆后续纠正、禁用或删除不会改写旧消息关联，但普通用户界面不得借历史关联重新暴露已删除正文。
 
@@ -214,15 +214,15 @@ V5 在生产注入前建立 `v5-explicit-memory-v1` 固定数据集，至少包�
 
 以下切片已经整体授权，可按顺序连续实施和独立验证，无需逐片重复请求授权：
 
-Slices 1-4 已完成固定评估、隐式主体与持久化、确认创建及版本化管理闭环。独立证据见 [Slice 1](../../evals/reports/2026-08-24-v5-explicit-memory-slice1.md)、[Slice 2](../../evals/reports/2026-08-24-v5-explicit-memory-slice2.md)、[Slice 3](../../evals/reports/2026-08-24-v5-explicit-memory-slice3.md) 和 [Slice 4](../../evals/reports/2026-08-24-v5-explicit-memory-slice4.md) 报告。
+Slices 1-6 已完成固定评估、隐式主体与持久化、确认创建、版本化管理、受限生产注入，以及 SSE/历史/降级闭环。独立证据见 [Slice 1](../../evals/reports/2026-08-24-v5-explicit-memory-slice1.md)、[Slice 2](../../evals/reports/2026-08-24-v5-explicit-memory-slice2.md)、[Slice 3](../../evals/reports/2026-08-24-v5-explicit-memory-slice3.md)、[Slice 4](../../evals/reports/2026-08-24-v5-explicit-memory-slice4.md)、[Slice 5](../../evals/reports/2026-08-24-v5-explicit-memory-slice5.md) 和 [Slice 6](../../evals/reports/2026-08-24-v5-explicit-memory-slice6.md) 报告。
 
-剩余切片为：
+切片状态为：
 
-5. **受限记忆注入**：普通 RAG 与 V4 Synthesizer 按固定预算加载偏好，持久化 `message_memory_context`，支持单次忽略。
-6. **SSE、历史与冲突闭环**：记忆上下文事件、断线/刷新恢复、版本冲突、过期和安全降级。
-7. **评估与验收**：专项评估、Testcontainers、全量回归、真实 DeepSeek 链路、桌面/窄屏页面验收和版本报告。
+5. **受限记忆注入（已完成）**：普通 RAG 与 V4 Synthesizer 按固定预算加载偏好，持久化 `message_memory_context`，支持单次忽略。
+6. **SSE、历史与冲突闭环（已完成）**：记忆上下文事件、断线/刷新恢复、版本冲突、过期和安全降级。
+7. **评估与验收（待执行）**：专项评估、Testcontainers、全量回归、真实 DeepSeek 链路、桌面/窄屏页面验收和版本报告。
 
-每个剩余切片必须保持可独立验证。机械字段可以在不改变本设计语义、预算、安全和失败边界的前提下细化；若生产注入收益不足或出现安全退化，应停止扩大注入并先修订场景。
+Slice 7 必须保持可独立验证。机械字段可以在不改变本设计语义、预算、安全和失败边界的前提下细化；若生产注入收益不足或出现安全退化，应停止扩大注入并先修订场景。
 
 ### 13.1 剩余开发批次
 
@@ -230,8 +230,8 @@ Slices 1-4 已完成固定评估、隐式主体与持久化、确认创建及版
 
 | 开发批次 | 包含切片 | 目标 |
 | --- | --- | --- |
-| 下一批 | Slice 5 + Slice 6 | 将生产 Prompt 注入与消息关联、SSE、历史恢复、冲突和安全降级闭合。 |
-| 验收批 | Slice 7 | 以专项评估、全量回归、真实模型和页面验收独立收口。 |
+| 已完成开发批 | Slice 5 + Slice 6 | 生产 Prompt 注入与消息关联、SSE、历史恢复、冲突和安全降级已闭合。 |
+| 下一批 | Slice 7 | 以专项评估、全量回归、真实模型和页面验收独立收口。 |
 
 开发批次只是工作组织方式，不是新的范围、授权或阶段系统。同一批次内仍按 Slice 编号顺序实现，每个 Slice 保留独立提交、最小相关测试和可复核证据；前一 Slice 的门禁未通过时，不得用批次安排跳过检查点或提前宣称后一 Slice 完成。
 

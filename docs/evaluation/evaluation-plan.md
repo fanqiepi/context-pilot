@@ -1,6 +1,6 @@
 # ContextPilot 评估计划
 
-> 状态：V1 功能型基线、V2 可控行动助手、V3 知识库维护助手与 V4 第一阶段知识研究助手均已完成；V5 第一阶段 Slices 1-4 已完成固定基线、持久化、确认创建与管理闭环，生产注入和最终验收随 Slices 5-7 闭合。
+> 状态：V1 功能型基线、V2 可控行动助手、V3 知识库维护助手与 V4 第一阶段知识研究助手均已完成；V5 第一阶段 Slices 1-6 已完成固定基线、持久化、确认创建、管理、生产注入与透明闭环，仅剩 Slice 7 最终验收。
 
 ## 目标
 
@@ -88,7 +88,7 @@ Slice 1 建立了 32 个语义案例和 12 个生命周期案例定义，并只�
 
 2026-08-17 固定离线与 DeepSeek 代表性运行结果见 [V4 Slice 1 评估报告](../../evals/reports/2026-08-17-v4-document-comparison-slice1.md)：离线候选范围化多步检索为 12/12，单轮 Top-K 5 为 0/12，对照子集双方均为 8/8；8 个代表案例各重复 3 次的真实模型候选多步为 9/9、单轮为 0/9，但候选 Token 为 2.64 倍、平均延迟为 3.25 倍。生产实现的 PostgreSQL/Flyway、持久化、取消、OpenAPI、前端构建和桌面/窄屏页面指标见 [V4 实施验收报告](v4-implementation-acceptance-report.md)。2026-08-21 又完成当前生产运行时的 DeepSeek/DashScope 端到端验证；2026-08-24 根据真实 Thinking Token 结果批准最终生成预算，V4 第一阶段完整验收通过。
 
-## V5 显式偏好记忆评估（Slices 1-4 已完成）
+## V5 显式偏好记忆评估（Slices 1-6 已完成）
 
 V5 评估范围见 [V5 显式记忆详细设计](../architecture/v5-explicit-memory-design.md)。第一阶段数据集命名为 `v5-explicit-memory-v1`，只评估稳定隐式主体下经确认的 `GLOBAL/RESPONSE_PREFERENCE`，不包含登录、多用户、事实型记忆或自动记忆。
 
@@ -123,6 +123,6 @@ Slice 1 在生产 Flyway、Action、管理页面和 Prompt 注入前建立：
 - 真实模型运行记录模型、Prompt 版本、注入数量/字符数、Token、延迟和脱敏失败，不记录完整偏好正文；
 - V1-V4 全量回归保持通过。
 
-Slices 5-7 的生产注入如果不能保持上述收益，或导致 grounding、引用与安全边界退化，则不得通过验收，并应停止扩大注入、修订设计。真实用户偏好、私密聊天、密钥和未脱敏请求不得进入评估资产。
+Slice 7 如果不能证明当前生产注入保持上述收益，或发现 grounding、引用与安全边界退化，则不得通过验收，并应停止扩大注入、修订设计。真实用户偏好、私密聊天、密钥和未脱敏请求不得进入评估资产。
 
-2026-08-24，Slices 1-4 已形成固定评估、真实 PostgreSQL 持久化、确认创建和版本化管理基线：无记忆风格匹配为 4/8，受限候选为 8/8；V5 固定评估 30/30 通过；Slice 4 后端全量 366 项测试为 0 失败、0 错误、3 项环境条件跳过，`/memories` 页面完成桌面与窄屏验收。独立证据见 [Slice 1](../../evals/reports/2026-08-24-v5-explicit-memory-slice1.md)、[Slice 2](../../evals/reports/2026-08-24-v5-explicit-memory-slice2.md)、[Slice 3](../../evals/reports/2026-08-24-v5-explicit-memory-slice3.md) 和 [Slice 4](../../evals/reports/2026-08-24-v5-explicit-memory-slice4.md) 报告；生产 Prompt 注入、历史关联、SSE 恢复、安全降级和真实模型遵循率仍由 Slices 5-7 闭合。
+2026-08-24，Slices 1-6 已形成固定评估、真实 PostgreSQL 持久化、确认创建、版本化管理与生产透明注入基线：无记忆风格匹配为 4/8，受限候选为 8/8；V5 固定评估既有 30/30 通过；Slices 5+6 后端全量 372 项测试为 0 失败、0 错误、3 项环境条件跳过，前端类型检查与构建通过，`/chat` 的单次忽略控件完成桌面和 390×844 窄屏检查。独立证据见 [Slice 1](../../evals/reports/2026-08-24-v5-explicit-memory-slice1.md) 至 [Slice 6](../../evals/reports/2026-08-24-v5-explicit-memory-slice6.md) 报告；真实 DeepSeek 偏好遵循率、安全对照复跑与最终版本报告仍由 Slice 7 闭合。

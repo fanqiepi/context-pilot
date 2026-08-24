@@ -1,6 +1,6 @@
 # REST API、SSE 与操作确认约定
 
-> 本文记录已完成的 V1-V4 接口，以及 V5 第一阶段已批准的显式偏好记忆合同。V5 Slices 2-4 的隐式主体、确认创建和管理资源已实现；注入、SSE 和历史字段仍在后续切片落地。已实现字段以 OpenAPI 为主要事实来源。
+> 本文记录已完成的 V1-V4 接口，以及 V5 第一阶段已批准的显式偏好记忆合同。V5 Slices 2-6 的隐式主体、确认创建、管理资源、受限注入、SSE 和历史字段均已实现；已实现字段以 OpenAPI 为主要事实来源。
 
 ## 通用约定
 
@@ -108,7 +108,7 @@ message
 
 V5 完整方案见 [V5 显式记忆详细设计](../architecture/v5-explicit-memory-design.md)。所有接口都从服务端 `CurrentSubjectProvider` 取得 `LOCAL_OWNER`，请求体、查询参数和请求头均不接受 `ownerUserId/userId`。
 
-### 聊天创建（Slices 2-3 已实现）与使用（后续切片）
+### 聊天创建与使用（Slices 2-6 已实现）
 
 显式句式“请记住我的偏好：...”路由为 `BUSINESS_ACTION/CREATE_USER_MEMORY`，先创建不可变 Action 提案，再沿用 `/api/action-requests/{id}/confirm` 或 `/reject`。提案固定参数为：
 
@@ -148,7 +148,7 @@ Slice 4 已实现以下资源。列表按 `updatedAt DESC, id DESC` 稳定排序
 
 ### SSE 与历史
 
-存在实际注入记忆时，聊天 SSE 在 `route` 后、模型输出前发送一次：
+Slices 5-6 已实现以下合同。存在实际注入记忆时，聊天 SSE 在 `route` 后、模型输出前发送一次：
 
 ```text
 message -> route -> memory_context -> delta* -> citation* -> usage? -> done
@@ -160,7 +160,7 @@ V4 研究保持原计划/步骤顺序，但 `memory_context` 必须位于 `resea
 message -> route -> research_plan -> research_step* -> memory_context? -> delta* -> citation* -> usage? -> done
 ```
 
-`memory_context` 只返回 ID、revision、受限摘要、数量、字符数和 `truncated`，不返回用户 ID、Prompt 或内部哈希。没有活动偏好、读取降级或 `IGNORE` 时不发送。历史助手消息增加可空 `memoryContext` 摘要，来源是持久化 `message_memory_context`，不是按当前记忆重新计算。
+`memory_context` 只返回 ID、revision、受限摘要、数量、字符数和 `truncated`，不返回用户 ID、Prompt 或内部哈希。没有活动偏好、读取降级或 `IGNORE` 时不发送。历史助手消息增加可空 `memoryContext` 摘要，来源是持久化 `message_memory_context`，不是按当前记忆重新计算；后续 revision 变化不改写旧消息，逻辑删除后仍保留 ID/revision 解释但正文显示为已删除。
 
 ### 固定错误语义
 

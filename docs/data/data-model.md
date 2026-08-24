@@ -1,6 +1,6 @@
 # ContextPilot 数据模型
 
-> 本文定义 V1-V4 已完成模型，以及 V5 第一阶段已批准并由 Slices 2-4 / Flyway V16-V17 落地的隐式用户、显式记忆、创建 Action 与管理闭环；已经实施的物理结构以 Flyway 迁移为事实来源。
+> 本文定义 V1-V4 已完成模型，以及 V5 第一阶段已批准并由 Slices 2-6 / Flyway V16-V19 落地的隐式用户、显式记忆、创建/管理、受限注入与历史透明闭环；已经实施的物理结构以 Flyway 迁移为事实来源。
 
 ## 核心实体
 
@@ -104,7 +104,7 @@ Flyway `V15__create_document_comparison_research.sql` 已创建四表、唯一�
 
 ## V5 已实施的隐式用户与记忆数据结构
 
-V5 详细语义见 [V5 显式记忆详细设计](../architecture/v5-explicit-memory-design.md)。Flyway V16 已创建 `app_user`、`user_memory`、`user_memory_revision` 和 `message_memory_context`；V17 已把 `CREATE_USER_MEMORY`、`result_resource_id` 和新聊天路由原因加入现有 Action/消息结构。物理结构以迁移为准。
+V5 详细语义见 [V5 显式记忆详细设计](../architecture/v5-explicit-memory-design.md)。Flyway V16 已创建 `app_user`、`user_memory`、`user_memory_revision` 和 `message_memory_context`；V17 已把 `CREATE_USER_MEMORY`、`result_resource_id` 和新聊天路由原因加入现有 Action/消息结构；V18 在 `research_run` 持久化 `USE/IGNORE`；V19 为消息上下文补充准确的字符数和截断摘要。物理结构以迁移为准。
 
 ### `app_user`
 
@@ -129,10 +129,15 @@ V5 详细语义见 [V5 显式记忆详细设计](../architecture/v5-explicit-mem
 
 ### `message_memory_context`
 
-- 保存助手消息、记忆、实际注入 revision、稳定顺序和时间；
+- 保存助手消息、记忆、实际注入 revision、稳定顺序、上下文字符数、截断状态和时间；
 - 同一消息与 revision 不重复关联；
 - 只保存真正加入 Prompt 的偏好，不把所有候选记忆都标记为已使用；
 - 后续纠正、禁用、过期或删除不改写历史关联，但普通历史接口不得重新暴露已删除正文。
+
+### `research_run` 的 V5 扩展
+
+- Flyway V18 增加非空 `memory_mode`，只允许 `USE` 或 `IGNORE`，既有运行默认 `USE`；
+- 研究启动把有效模式纳入幂等指纹并持久化，后台执行只读取冻结值，刷新或重启后不会被客户端当前状态改写。
 
 ### `action_request` 扩展
 
