@@ -59,6 +59,7 @@ const loadingWorkspace = ref(false)
 const loadingMessages = ref(false)
 const sending = ref(false)
 const researchMode = ref(false)
+const ignoreMemoryForNextRequest = ref(false)
 const documents = ref<SourceDocument[]>([])
 const selectedResearchDocumentIds = ref<string[]>([])
 const activeResearchRunId = ref('')
@@ -238,6 +239,7 @@ async function sendQuestion(): Promise<void> {
     healthReport: null,
     actionRequest: null,
     researchRun: null,
+    memoryContext: null,
     citations: [],
     helpful: false,
     createdAt: now,
@@ -257,6 +259,7 @@ async function sendQuestion(): Promise<void> {
     healthReport: null,
     actionRequest: null,
     researchRun: null,
+    memoryContext: null,
     citations: [],
     helpful: false,
     createdAt: now,
@@ -283,6 +286,7 @@ async function sendQuestion(): Promise<void> {
       {
         knowledgeBaseId: activeKnowledgeBaseId.value,
         question,
+        memoryMode: ignoreMemoryForNextRequest.value ? 'IGNORE' : 'USE',
         ...(activeConversationId.value
           ? { conversationId: activeConversationId.value }
           : {}),
@@ -315,6 +319,9 @@ async function sendQuestion(): Promise<void> {
         onActionRequired(event) {
           const { actionRequestId, ...actionRequest } = event
           assistantMessage.actionRequest = { id: actionRequestId, ...actionRequest }
+        },
+        onMemoryContext(event) {
+          assistantMessage.memoryContext = event
         },
         onHealthReport(event) {
           assistantMessage.healthReport = event
@@ -399,6 +406,7 @@ async function sendQuestion(): Promise<void> {
       ElMessage.error(assistantMessage.errorSummary)
     }
   } finally {
+    ignoreMemoryForNextRequest.value = false
     sending.value = false
     activeResearchRunId.value = ''
     if (assistantMessage.researchDetails) {
@@ -1093,6 +1101,27 @@ function formatScore(score: number | null): string {
                   </footer>
                 </section>
 
+                <details v-if="message.memoryContext" class="memory-context-card">
+                  <summary>
+                    <span>本次使用的偏好</span>
+                    <small>
+                      {{ message.memoryContext.count }} 条 ·
+                      {{ message.memoryContext.characterCount }} 字符
+                      <template v-if="message.memoryContext.truncated"> · 已按预算截断</template>
+                    </small>
+                  </summary>
+                  <ul>
+                    <li
+                      v-for="item in message.memoryContext.items"
+                      :key="`${item.memoryId}-${item.revision}`"
+                      :class="{ hidden: item.contentHidden }"
+                    >
+                      <span>{{ item.summary }}</span>
+                      <small>revision {{ item.revision }}</small>
+                    </li>
+                  </ul>
+                </details>
+
                 <div v-if="message.citations.length" class="citation-list">
                   <details v-for="citation in message.citations" :key="citation.rank">
                     <summary>
@@ -1169,6 +1198,10 @@ function formatScore(score: number | null): string {
                 "
               />
             </ElSelect>
+            <div class="memory-mode-toggle">
+              <span>本次忽略长期记忆</span>
+              <ElSwitch v-model="ignoreMemoryForNextRequest" :disabled="sending" />
+            </div>
           </div>
           <div class="composer">
             <ElInput
@@ -1640,6 +1673,56 @@ function formatScore(score: number | null): string {
   box-shadow: 0 10px 24px rgb(43 91 66 / 8%);
 }
 
+.memory-context-card {
+  max-width: 680px;
+  margin-top: 14px;
+  border: 1px solid #d8dfd9;
+  border-radius: 13px;
+  background: #f8faf7;
+}
+
+.memory-context-card summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 13px;
+  color: #435248;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.memory-context-card summary small,
+.memory-context-card li small {
+  color: #77837b;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.memory-context-card ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0 13px 13px 30px;
+}
+
+.memory-context-card li {
+  color: #536158;
+  font-size: 12px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.memory-context-card li small {
+  display: block;
+}
+
+.memory-context-card li.hidden {
+  color: #8b948e;
+  font-style: italic;
+}
+
 .health-card {
   display: grid;
   gap: 15px;
@@ -2088,7 +2171,7 @@ function formatScore(score: number | null): string {
 
 .research-controls {
   display: grid;
-  grid-template-columns: auto minmax(240px, 560px);
+  grid-template-columns: auto minmax(240px, 1fr) auto;
   align-items: center;
   gap: 12px;
   width: min(900px, 100%);
@@ -2102,6 +2185,15 @@ function formatScore(score: number | null): string {
   color: #4d5d54;
   font-size: 13px;
   font-weight: 600;
+}
+
+.memory-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #66736b;
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 .research-controls > .el-select {
@@ -2193,6 +2285,16 @@ function formatScore(score: number | null): string {
 
   .research-mode-toggle {
     justify-content: space-between;
+  }
+
+  .memory-mode-toggle {
+    justify-content: space-between;
+    white-space: normal;
+  }
+
+  .memory-context-card summary {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .health-overview,

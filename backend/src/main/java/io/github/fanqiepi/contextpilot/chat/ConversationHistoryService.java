@@ -22,6 +22,9 @@ import io.github.fanqiepi.contextpilot.research.ResearchQueryService;
 import io.github.fanqiepi.contextpilot.research.ResearchRunSummaryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.ObjectProvider;
+import io.github.fanqiepi.contextpilot.memory.MemoryContextResponse;
+import io.github.fanqiepi.contextpilot.memory.MessageMemoryContextHistoryRow;
+import io.github.fanqiepi.contextpilot.memory.MessageMemoryContextMapper;
 
 @Service
 public class ConversationHistoryService {
@@ -39,6 +42,7 @@ public class ConversationHistoryService {
     private final ActionRequestService actionRequestService;
     private final KnowledgeBaseHealthReportService healthReportService;
     private final ResearchQueryService researchQueryService;
+    private final MessageMemoryContextMapper messageMemoryContextMapper;
 
     public ConversationHistoryService(
             KnowledgeBaseService knowledgeBaseService,
@@ -56,6 +60,7 @@ public class ConversationHistoryService {
         this.actionRequestService = actionRequestService;
         this.healthReportService = healthReportService;
         this.researchQueryService = null;
+        this.messageMemoryContextMapper = null;
     }
 
     @Autowired
@@ -67,7 +72,8 @@ public class ConversationHistoryService {
             AnswerFeedbackMapper answerFeedbackMapper,
             ActionRequestService actionRequestService,
             KnowledgeBaseHealthReportService healthReportService,
-            ObjectProvider<ResearchQueryService> researchQueryService) {
+            ObjectProvider<ResearchQueryService> researchQueryService,
+            ObjectProvider<MessageMemoryContextMapper> messageMemoryContextMapper) {
         this.knowledgeBaseService = knowledgeBaseService;
         this.conversationMapper = conversationMapper;
         this.chatMessageMapper = chatMessageMapper;
@@ -76,6 +82,7 @@ public class ConversationHistoryService {
         this.actionRequestService = actionRequestService;
         this.healthReportService = healthReportService;
         this.researchQueryService = researchQueryService.getIfAvailable();
+        this.messageMemoryContextMapper = messageMemoryContextMapper.getIfAvailable();
     }
 
     @Transactional(readOnly = true)
@@ -128,6 +135,13 @@ public class ConversationHistoryService {
                 healthReportService.findByAssistantMessageIds(messageIds);
         Map<UUID, ResearchRunSummaryResponse> researchRunsByMessage = researchQueryService == null
                 ? Map.of() : researchQueryService.summariesByAssistantMessageIds(messageIds);
+        Map<UUID, MemoryContextResponse> memoryContextsByMessage = messageMemoryContextMapper == null
+                ? Map.of()
+                : messageMemoryContextMapper.selectHistoryByAssistantMessageIds(messageIds).stream()
+                        .collect(Collectors.groupingBy(
+                                MessageMemoryContextHistoryRow::getAssistantMessageId,
+                                Collectors.collectingAndThen(
+                                        Collectors.toList(), MemoryContextResponse::fromHistoryRows)));
 
         return messages.stream()
                 .map(message -> ConversationMessageResponse.from(
@@ -136,7 +150,8 @@ public class ConversationHistoryService {
                         actionsByMessage.get(message.getId()),
                         researchRunsByMessage.get(message.getId()),
                         citationsByMessage.getOrDefault(message.getId(), List.of()),
-                        helpfulMessageIds.contains(message.getId())))
+                        helpfulMessageIds.contains(message.getId()),
+                        memoryContextsByMessage.get(message.getId())))
                 .toList();
     }
 

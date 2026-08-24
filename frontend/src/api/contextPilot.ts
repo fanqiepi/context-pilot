@@ -19,6 +19,7 @@ import type {
   StreamHealthReportEvent,
   StreamActionRequiredEvent,
   StreamMessageEvent,
+  StreamMemoryContextEvent,
   StreamRouteEvent,
   StreamUsageEvent,
   ResearchRun,
@@ -183,6 +184,7 @@ export async function cancelResearchRun(id: string): Promise<ResearchRun> {
 export interface ChatStreamHandlers {
   onMessage: (event: StreamMessageEvent) => void
   onRoute?: (event: StreamRouteEvent) => void
+  onMemoryContext?: (event: StreamMemoryContextEvent) => void
   onActionRequired: (event: StreamActionRequiredEvent) => void
   onHealthReport: (event: StreamHealthReportEvent) => void
   onResearchPlan?: (event: StreamResearchPlanEvent) => void
@@ -225,6 +227,9 @@ export async function streamChat(
           break
         case 'route':
           handlers.onRoute?.(payload as StreamRouteEvent)
+          break
+        case 'memory_context':
+          handlers.onMemoryContext?.(payload as StreamMemoryContextEvent)
           break
         case 'action_required':
           handlers.onActionRequired(payload as StreamActionRequiredEvent)

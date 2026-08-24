@@ -52,6 +52,10 @@ public class ResearchStreamingService {
             events.add(event("research_step", new ChatStreamPayload.ResearchStep(
                     sequence, result.run().id(), step), sequence++));
         }
+        if (result.memoryContext() != null) {
+            events.add(event("memory_context", ChatStreamPayload.MemoryContextData.from(
+                    result.memoryContext()), sequence++));
+        }
         if (result.answer() != null && !result.answer().isBlank()) {
             events.add(event("delta", new ChatStreamPayload.Delta(result.answer()), sequence++));
         }

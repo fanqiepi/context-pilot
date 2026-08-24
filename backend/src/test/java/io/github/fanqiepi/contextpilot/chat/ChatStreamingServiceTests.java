@@ -13,6 +13,10 @@ import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportResponse;
 import io.github.fanqiepi.contextpilot.model.ChatModelChunk;
 import io.github.fanqiepi.contextpilot.model.ChatModelGateway;
 import io.github.fanqiepi.contextpilot.model.ChatModelResult;
+import io.github.fanqiepi.contextpilot.memory.MemoryContext;
+import io.github.fanqiepi.contextpilot.memory.MemoryContextPreference;
+import io.github.fanqiepi.contextpilot.memory.MemoryContextService;
+import io.github.fanqiepi.contextpilot.memory.MemoryMode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -99,6 +103,45 @@ class ChatStreamingServiceTests {
                 "deepseek-v4-flash",
                 "v1",
                 "trace-success");
+    }
+
+    @Test
+    void emitsMemoryContextAfterRouteAndBeforeModelOutput() {
+        ChatRequest request = request();
+        PendingChatExchange exchange = exchange();
+        ChatPrompt prompt = new ChatPrompt("system", "user", "v1");
+        UUID modelCallId = UUID.randomUUID();
+        MemoryContextService memoryContextService = mock(MemoryContextService.class);
+        MemoryContext context = new MemoryContext(List.of(
+                new MemoryContextPreference(
+                        UUID.randomUUID(), UUID.randomUUID(), 2,
+                        "回答尽量简洁")), 6, false);
+        ChatStreamingService memoryAwareService = new ChatStreamingService(
+                preparationService, persistenceService, chatModelGateway, memoryContextService);
+        when(preparationService.prepare(request, "trace-memory"))
+                .thenReturn(new PreparedChat(
+                        knowledgeRoute("trace-memory"), exchange, prompt, List.of()));
+        when(memoryContextService.prepareForMessage(
+                exchange.assistantMessageId(), MemoryMode.USE, "trace-memory"))
+                .thenReturn(context);
+        stubModelCall(exchange, modelCallId);
+        when(chatModelGateway.stream(
+                eq("system"),
+                org.mockito.ArgumentMatchers.contains("<user_preferences>")))
+                .thenReturn(Flux.just(new ChatModelChunk(
+                        "Answer", "deepseek-v4-flash", 10, 2, 12)));
+
+        List<ServerSentEvent<ChatStreamPayload>> events = memoryAwareService
+                .stream(request, "trace-memory")
+                .collectList()
+                .block(Duration.ofSeconds(5));
+
+        assertThat(events.stream().map(ServerSentEvent::event).toList())
+                .containsExactly("message", "route", "memory_context", "delta", "usage", "done");
+        ChatStreamPayload.MemoryContextData payload =
+                (ChatStreamPayload.MemoryContextData) events.get(2).data();
+        assertThat(payload.count()).isOne();
+        assertThat(payload.items().getFirst().summary()).isEqualTo("回答尽量简洁");
     }
 
     @Test

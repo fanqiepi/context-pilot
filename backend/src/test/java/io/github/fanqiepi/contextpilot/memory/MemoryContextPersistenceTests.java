@@ -2,6 +2,7 @@ package io.github.fanqiepi.contextpilot.memory;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.UUID;
 
 import io.github.fanqiepi.contextpilot.chat.CapabilityId;
@@ -11,7 +12,9 @@ import io.github.fanqiepi.contextpilot.chat.ChatMessageMapper;
 import io.github.fanqiepi.contextpilot.chat.ChatMessageRole;
 import io.github.fanqiepi.contextpilot.chat.ChatMessageStatus;
 import io.github.fanqiepi.contextpilot.chat.ConversationEntity;
+import io.github.fanqiepi.contextpilot.chat.ConversationHistoryService;
 import io.github.fanqiepi.contextpilot.chat.ConversationMapper;
+import io.github.fanqiepi.contextpilot.chat.ConversationMessageResponse;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseCreateRequest;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseResponse;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseService;
@@ -60,6 +63,8 @@ class MemoryContextPersistenceTests {
     @Autowired private KnowledgeBaseService knowledgeBaseService;
     @Autowired private ConversationMapper conversationMapper;
     @Autowired private ChatMessageMapper chatMessageMapper;
+    @Autowired private MessageMemoryContextMapper messageMemoryContextMapper;
+    @Autowired private ConversationHistoryService conversationHistoryService;
     @Autowired private JdbcTemplate jdbcTemplate;
 
     @Test
@@ -90,6 +95,40 @@ class MemoryContextPersistenceTests {
                 "SELECT BOOL_AND(context_truncated) FROM message_memory_context WHERE assistant_message_id = ?",
                 Boolean.class,
                 exchange.assistantMessageId())).isTrue();
+        List<MessageMemoryContextHistoryRow> rows = messageMemoryContextMapper
+                .selectHistoryByAssistantMessageIds(List.of(exchange.assistantMessageId()));
+        assertThat(rows).hasSize(9);
+        assertThat(rows).extracting(MessageMemoryContextHistoryRow::getRevisionNumber)
+                .containsOnly(1);
+        ConversationMessageResponse historyMessage = conversationHistoryService
+                .messages(exchange.conversationId()).stream()
+                .filter(message -> message.id().equals(exchange.assistantMessageId()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(historyMessage.memoryContext()).isNotNull();
+        assertThat(historyMessage.memoryContext().count()).isEqualTo(9);
+        assertThat(historyMessage.memoryContext().characterCount()).isEqualTo(context.characterCount());
+        assertThat(historyMessage.memoryContext().truncated()).isTrue();
+
+        UUID deletedMemoryId = context.preferences().getFirst().memoryId();
+        userMemoryService.delete(deletedMemoryId);
+        List<MessageMemoryContextHistoryRow> afterDeletion = messageMemoryContextMapper
+                .selectHistoryByAssistantMessageIds(List.of(exchange.assistantMessageId()));
+        assertThat(afterDeletion).filteredOn(row -> row.getMemoryId().equals(deletedMemoryId))
+                .singleElement()
+                .satisfies(row -> assertThat(row.getContent()).isNull());
+        ConversationMessageResponse deletedHistoryMessage = conversationHistoryService
+                .messages(exchange.conversationId()).stream()
+                .filter(message -> message.id().equals(exchange.assistantMessageId()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(deletedHistoryMessage.memoryContext().items())
+                .filteredOn(item -> item.memoryId().equals(deletedMemoryId))
+                .singleElement()
+                .satisfies(item -> {
+                    assertThat(item.contentHidden()).isTrue();
+                    assertThat(item.summary()).isEqualTo("该偏好已删除");
+                });
     }
 
     private Exchange createExchange() {

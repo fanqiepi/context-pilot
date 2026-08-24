@@ -351,6 +351,7 @@ export interface ConversationMessage {
   healthReport: KnowledgeBaseHealthReport | null
   actionRequest: ActionRequest | null
   researchRun: ResearchRunSummary | null
+  memoryContext: MemoryContextSummary | null
   citations: Citation[]
   helpful: boolean
   createdAt: string
@@ -378,6 +379,7 @@ export interface ChatRequest {
   knowledgeBaseId: string
   question: string
   conversationId?: string
+  memoryMode?: 'USE' | 'IGNORE'
   research?: {
     clientRequestId: string
     taskType: 'DOCUMENT_COMPARISON'
@@ -385,6 +387,22 @@ export interface ChatRequest {
     retryOfRunId?: string
   }
 }
+
+export interface MemoryContextItem {
+  memoryId: string
+  revision: number
+  summary: string
+  contentHidden: boolean
+}
+
+export interface MemoryContextSummary {
+  items: MemoryContextItem[]
+  count: number
+  characterCount: number
+  truncated: boolean
+}
+
+export type StreamMemoryContextEvent = MemoryContextSummary
 
 export interface StreamMessageEvent {
   conversationId: string

@@ -12,10 +12,13 @@ import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
 import io.github.fanqiepi.contextpilot.model.ChatModelChunk;
 import io.github.fanqiepi.contextpilot.model.ChatModelGateway;
 import io.github.fanqiepi.contextpilot.model.ChatModelResult;
+import io.github.fanqiepi.contextpilot.memory.MemoryContext;
+import io.github.fanqiepi.contextpilot.memory.MemoryContextService;
 import io.github.fanqiepi.contextpilot.observability.AiCallContext;
 import io.github.fanqiepi.contextpilot.observability.AiCallLogger;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 import reactor.core.publisher.SignalType;
@@ -29,23 +32,36 @@ public class ChatStreamingService {
     private final ChatPreparationService preparationService;
     private final ChatPersistenceService persistenceService;
     private final ChatModelGateway chatModelGateway;
+    private final MemoryContextService memoryContextService;
 
     public ChatStreamingService(
             ChatPreparationService preparationService,
             ChatPersistenceService persistenceService,
             ChatModelGateway chatModelGateway) {
+        this(preparationService, persistenceService, chatModelGateway, null);
+    }
+
+    @Autowired
+    public ChatStreamingService(
+            ChatPreparationService preparationService,
+            ChatPersistenceService persistenceService,
+            ChatModelGateway chatModelGateway,
+            MemoryContextService memoryContextService) {
         this.preparationService = preparationService;
         this.persistenceService = persistenceService;
         this.chatModelGateway = chatModelGateway;
+        this.memoryContextService = memoryContextService;
     }
 
     public Flux<ServerSentEvent<ChatStreamPayload>> stream(ChatRequest request, String traceId) {
-        return Flux.defer(() -> buildStream(preparationService.prepare(request, traceId), traceId))
+        return Flux.defer(() -> buildStream(
+                        preparationService.prepare(request, traceId), request, traceId))
                 .onErrorResume(exception -> Flux.just(errorEvent(exception, traceId)));
     }
 
     private Flux<ServerSentEvent<ChatStreamPayload>> buildStream(
             PreparedChat prepared,
+            ChatRequest request,
             String traceId) {
         PendingChatExchange exchange = prepared.exchange();
         ServerSentEvent<ChatStreamPayload> message = event(
@@ -102,13 +118,18 @@ public class ChatStreamingService {
                     event("done", new ChatStreamPayload.Done("REFUSED", traceId)));
         }
 
-        ChatPrompt prompt = prepared.prompt();
+        ChatPrompt basePrompt = prepared.prompt();
         UUID modelCallId = persistenceService.beginModelCall(
                 exchange.assistantMessageId(),
                 chatModelGateway.provider(),
                 chatModelGateway.configuredModel(),
-                prompt.version(),
+                basePrompt.version(),
                 traceId);
+        MemoryContext memoryContext = memoryContextService == null
+                ? MemoryContext.empty()
+                : memoryContextService.prepareForMessage(
+                        exchange.assistantMessageId(), request.effectiveMemoryMode(), traceId);
+        ChatPrompt prompt = basePrompt.withMemory(memoryContext);
         AiCallContext callContext = new AiCallContext(
                 "CHAT_STREAM", chatModelGateway.provider(), chatModelGateway.configuredModel(),
                 traceId, modelCallId, "assistantMessage", exchange.assistantMessageId(), prompt.version(),
@@ -145,7 +166,14 @@ public class ChatStreamingService {
             return Flux.fromIterable(events);
         });
 
-        return Flux.concat(Flux.just(message, route), deltas, tail)
+        Flux<ServerSentEvent<ChatStreamPayload>> head = memoryContext.isEmpty()
+                ? Flux.just(message, route)
+                : Flux.just(
+                        message,
+                        route,
+                        event("memory_context", ChatStreamPayload.MemoryContextData.from(
+                                memoryContext.toResponse())));
+        return Flux.concat(head, deltas, tail)
                 .onErrorResume(exception -> {
                     AiCallLogger.failed(callContext, lifecycle.elapsedMillis(), exception);
                     lifecycle.failSafely(FAILED_SUMMARY, exception);
