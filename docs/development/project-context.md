@@ -17,10 +17,7 @@ ContextPilot 是一个基于 Spring AI 的学习型、可控、可评估的个�
 - 2026-08-21 已为普通聊天、SSE 聊天、V4 研究综合、文档 Embedding 入库和检索 Embedding 补充安全的结构化调用日志。日志使用可用的 `traceId`、每次调用的 `callId` 和业务资源 ID 关联调用，记录耗时、Token、结果数及脱敏失败原因，不记录完整 Prompt、文档正文、模型回答或密钥；排查方法见 `docs/development/local-development.md`。
 - 2026-08-21 V4 研究执行日志已调整为 `INFO` 步骤/运行汇总与 `DEBUG` 单次检索明细，补齐 `traceId`、`runId`、步骤、文档数、证据字符数、截断状态和总耗时；同一步骤的逐文档检索改为默认并行度 4 的有界并行，仍按冻结文档顺序汇总，并由执行器再次强制最多 20 次调用。
 - 2026-08-21 已使用真实 `dashscope_qwen3_7_1024_v1` 与 DeepSeek `deepseek-v4-flash` 执行当前生产 V4 链路。数据库保留 4 次成功回答（10.002-62.916 秒、4-14 个证据与同量引用、单次模型调用）以及 1 次 90.058 秒进入 `PARTIAL/RESEARCH_TIMEOUT` 的真实终态；外部提供商执行缺口已关闭。成功运行的 `completion_tokens` 为 1257-9025，证明 DeepSeek Thinking Token 与原 3000 Token 请求级预算不兼容。2026-08-24 已正式批准不发送请求级 `max_tokens`，保留单次模型调用、90 秒硬超时、1800 字正文上限和 usage 记录，V4 第一阶段据此完整验收通过。
-- 2026-08-24 已批准 V5 第一阶段：只做用户显式确认的全局回答偏好记忆。系统使用服务端稳定 `LOCAL_OWNER` 和 `CurrentSubjectProvider`，不实现登录，也不把隐式主体宣传为认证；聊天创建复用 `CREATE_USER_MEMORY` 强类型提案/确认，单次回答最多注入 10 条、2000 字符，且不能改变 grounding、引用、拒答、研究计划或工具边界。详细设计见 `docs/architecture/v5-explicit-memory-design.md`，身份决定见 ADR 0002。
-- 2026-08-24 V5 Slice 1 已完成 `v5-explicit-memory-v1` 固定数据集、配置、测试侧无记忆/受限偏好对照和独立 Maven Profile。30 项离线测试全部通过：路由 12/12、安全隔离 6/6、预算合规 6/6，偏好/当前请求预期风格从无记忆基线 4/8 提升到候选 8/8。该证据不包含生产注入、PostgreSQL 生命周期或真实模型验收；随后已按顺序完成 Slice 2 的持久化和 Slice 3 的强类型提案与确认创建。
-- 2026-08-24 V5 Slice 2 已完成 Flyway V16、稳定 `LOCAL_OWNER`、`CurrentSubjectProvider`、记忆聚合、不可变 revision、所有者过滤与消息关联结构。JDK 21 下 7 项最小测试全部通过，实际 PostgreSQL 17 / pgvector 容器完成 V1-V16 迁移并验证精确去重和越权读取隔离；该持久化边界随后由 Slice 3 接入确认创建，仍未增加管理 API 或生产 Prompt 注入。
-- 2026-08-24 V5 Slice 3 已完成确定性显式偏好路由、`CREATE_USER_MEMORY` 强类型 Action、Flyway V17、独立确认、`result_resource_id`、重复/并发幂等与聊天操作卡片。全量后端 356 项测试通过（0 失败、0 错误、3 项条件跳过），V5 固定评估 30/30 通过，前端 typecheck/build 通过；下一批为 Slice 4，当前尚未实现管理 API 或生产 Prompt 注入。
+- 2026-08-24 V5 第一阶段范围与 Slices 1-7 已批准，Slices 1-3 已完成固定评估、隐式主体与持久化，以及可确认、幂等的 `CREATE_USER_MEMORY` 创建闭环。全量后端 356 项测试、V5 固定评估 30/30、前端 typecheck/build 和 PostgreSQL 17 / pgvector 生命周期验证均通过；详细证据见 `evals/reports/` 下三份 `2026-08-24-v5-explicit-memory-slice*.md` 报告。下一批为 Slice 4 管理 API 与页面；完整范围与安全合同见 `docs/architecture/v5-explicit-memory-design.md` 和 ADR 0002。
 - 日常开发和集成分支为 `develop`，不得直接提交到 `main`。
 
 ## 大版本路线
@@ -29,7 +26,7 @@ ContextPilot 是一个基于 Spring AI 的学习型、可控、可评估的个�
 - **V2：可控行动助手（已完成）**。完整实现 `CREATE_KNOWLEDGE_BASE` 的强类型提案、持久化、确认/拒绝、过期、原子幂等执行、审计和可恢复前端卡片。
 - **V3：知识库维护助手（已完成）**。面向“检查知识库健康状态并协助修复”场景，固定能力包括健康检查、失败文档重试和过期或缺失索引重建；完成范围和验收证据见 `docs/architecture/v3-knowledge-base-maintenance-design.md` 与 `docs/evaluation/v3-acceptance-report.md`。
 - **V4：知识研究助手（第一阶段已完成）**。第一阶段只做显式多文档比对；Slices 1-7、固定维度/逐文档确定性编排、DeepSeek/DashScope 生产端到端验证和最终生成预算决定均已闭合，范围与证据见 `docs/architecture/v4-knowledge-research-design.md` 和 `docs/evaluation/v4-implementation-acceptance-report.md`。
-- **V5：显式记忆的个人助手（第一阶段已批准）**。首版只交付隐式单用户下经确认的全局回答偏好、管理入口和透明受限注入；事实型记忆、自动提取和登录不在范围内。
+- **V5：显式记忆的个人助手（第一阶段实施中，Slices 1-3 已完成）**。首版只交付隐式单用户下经确认的全局回答偏好、管理入口和透明受限注入；事实型记忆、自动提取和登录不在范围内。
 - **V6：外部工具互操作（方向）**。只在明确场景驱动下评估 MCP 等协议；多 Agent 和工作流框架继续作为更远期探索项。
 
 ## 当前开发边界
@@ -42,7 +39,7 @@ ContextPilot 是一个基于 Spring AI 的学习型、可控、可评估的个�
 - V3 已按详细设计完成并通过验收；其单文档动作、不可变报告、实时资格复核、强类型静态分派和可靠派发边界继续有效，任何扩展都需要新版本授权。
 - V4 第一阶段 Slices 2-7 已按设计在生产 `src/main`、Flyway V15、正式 API/SSE 和前端入口中完成 `DOCUMENT_COMPARISON`，本地工程门禁、DeepSeek/DashScope 生产端到端验证与最终生成预算决定均已通过。后续维护必须保留该基线；模型 Planner、Agent 循环、LangGraph、MCP 和动态工具继续禁止。
 - V5 Slices 1-7 已整体批准，可按固定评估、隐式主体与持久化、创建提案、管理入口、受限注入、历史/冲突、最终验收的顺序连续实施。`LOCAL_OWNER` 不是登录或安全边界，客户端不得提交用户 ID；当前部署仍限定本机或可信网络。
-- V5 剩余实现建议分为四个开发批次：Slices 2+3、Slice 4、Slices 5+6、Slice 7。批次不合并切片检查点；同批次内仍按编号顺序实现，并为每个 Slice 保留独立提交、最小相关测试和验收证据。
+- V5 Slices 1-3 已完成；剩余实现依次为 Slice 4、Slices 5+6 和 Slice 7。批次不合并切片检查点；同批次内仍按编号顺序实现，并为每个 Slice 保留独立提交、最小相关测试和验收证据。
 - V5 第一阶段只允许 `CREATE_USER_MEMORY` 新动作和 `RESPONSE_PREFERENCE/GLOBAL` 记忆。普通聊天、文档或模型输出不得自动写入记忆；事实型记忆、任务记忆、向量记忆、登录、多用户和自动工具仍未授权。
 
 ## 技术栈
