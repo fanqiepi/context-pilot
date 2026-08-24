@@ -123,10 +123,6 @@ Slice 1 在生产 Flyway、Action、管理页面和 Prompt 注入前建立：
 - 真实模型运行记录模型、Prompt 版本、注入数量/字符数、Token、延迟和脱敏失败，不记录完整偏好正文；
 - V1-V4 全量回归保持通过。
 
-如果固定对照不能证明偏好记忆带来稳定、可解释的跨会话收益，或出现 grounding/引用退化，Slice 1 不得生成通过结论，后续生产注入必须停止并修订设计。真实用户偏好、私密聊天、密钥和未脱敏请求不得进入评估资产。
+Slices 5-7 的生产注入如果不能保持上述收益，或导致 grounding、引用与安全边界退化，则不得通过验收，并应停止扩大注入、修订设计。真实用户偏好、私密聊天、密钥和未脱敏请求不得进入评估资产。
 
-2026-08-24 已完成 `v5-explicit-memory-v1` Slice 1 固定资产和离线测试侧候选：12 个路由案例、8 个跨会话/当前请求/单次忽略案例、6 个安全与预算案例、12 个后续生命周期定义均已冻结。无记忆基线满足预期风格 4/8，受限候选为 8/8，提升 50 个百分点；3 个当前请求覆盖、12 个路由、6 个安全隔离和全部预算案例均为 100%。`-Pv5-evaluation test` 共运行 30 项测试，0 失败、0 错误、0 跳过。结果见 [V5 Slice 1 固定评估报告](../../evals/reports/2026-08-24-v5-explicit-memory-slice1.md)。这些结果只证明离线合同和结构性收益，真实 PostgreSQL 生命周期、生产 Prompt 注入与 DeepSeek 遵循率仍按后续切片验证。
-
-2026-08-24 Slices 2-3 已把稳定主体、记忆聚合、未确认零副作用、拒绝/过期、重复与并发确认、精确去重转为真实 PostgreSQL 17 / pgvector 自动化案例；全量后端 356 项测试通过，V5 固定评估再次 30/30 通过。证据见 [Slice 2 报告](../../evals/reports/2026-08-24-v5-explicit-memory-slice2.md) 与 [Slice 3 报告](../../evals/reports/2026-08-24-v5-explicit-memory-slice3.md)。历史 pin、生产 Prompt 注入和真实模型遵循率仍由后续切片闭合。
-
-2026-08-24 Slice 4 已把查询/详情、不可变管理 revision、内容纠正、启用/禁用、过期调整与过滤、旧版本冲突、精确重复冲突和幂等逻辑删除转为正式 API、真实 PostgreSQL 自动化案例和 `/memories` 页面；详情不返回历史正文，客户端不能提交主体。后端全量 366 项测试（0 失败/0 错误/3 项环境跳过）与 V5 固定评估 30/30 通过。完成证据见 [Slice 4 报告](../../evals/reports/2026-08-24-v5-explicit-memory-slice4.md)。历史消息 pin、生产 Prompt 注入、SSE 恢复、安全降级和真实模型遵循率仍由 Slices 5-7 闭合。
+2026-08-24，Slices 1-4 已形成固定评估、真实 PostgreSQL 持久化、确认创建和版本化管理基线：无记忆风格匹配为 4/8，受限候选为 8/8；V5 固定评估 30/30 通过；Slice 4 后端全量 366 项测试为 0 失败、0 错误、3 项环境条件跳过，`/memories` 页面完成桌面与窄屏验收。独立证据见 [Slice 1](../../evals/reports/2026-08-24-v5-explicit-memory-slice1.md)、[Slice 2](../../evals/reports/2026-08-24-v5-explicit-memory-slice2.md)、[Slice 3](../../evals/reports/2026-08-24-v5-explicit-memory-slice3.md) 和 [Slice 4](../../evals/reports/2026-08-24-v5-explicit-memory-slice4.md) 报告；生产 Prompt 注入、历史关联、SSE 恢复、安全降级和真实模型遵循率仍由 Slices 5-7 闭合。
