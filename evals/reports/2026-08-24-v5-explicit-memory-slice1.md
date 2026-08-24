@@ -50,4 +50,4 @@ $env:JAVA_HOME = 'F:\jdk21weizhi\microsoft-jdk-21.0.3-windows-x64\jdk-21.0.3+9'
 
 本次证明的是固定语义、预算和安全边界可以在确定性原型中同时成立，并且受限偏好相对无记忆基线存在结构性收益。它不证明真实模型一定遵循偏好，也不验证跨会话数据库读取、提案确认、并发幂等、管理 API、消息历史、SSE 恢复或页面体验。
 
-因此后续按已批准顺序进入 Slice 2：实现服务端 `CurrentSubjectProvider`、迁移创建的稳定 `LOCAL_OWNER`、记忆聚合/revision/message context 持久化和所有者过滤。真实 PostgreSQL 生命周期、生产 Prompt 与 DeepSeek 代表性案例必须在对应后续切片和最终验收中闭合。
+因此后续按已批准顺序进入第一开发批次：先完成 Slice 2 的服务端 `CurrentSubjectProvider`、迁移创建的稳定 `LOCAL_OWNER`、记忆聚合/revision/message context 持久化和所有者过滤，再完成 Slice 3 的确定性创建意图、强类型提案、独立确认和幂等执行。二者可在同一开发批次交付，但必须保留各自提交和验证证据。随后建议依次按 Slice 4、Slices 5+6、Slice 7 分批；真实 PostgreSQL 生命周期、生产 Prompt 与 DeepSeek 代表性案例必须在对应后续切片和最终验收中闭合。
