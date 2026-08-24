@@ -82,3 +82,22 @@ versioned deterministic planner in `src/main`, Flyway V15, persisted research ru
 and the Vue research UI. Run the full backend suite, the `v4-evaluation` profile, and the frontend
 production build; the current evidence and remaining external-provider gate are recorded in
 `docs/evaluation/v4-implementation-acceptance-report.md`.
+
+## Run the V5 Slice 1 explicit-memory evaluation
+
+V5 Slice 1 is offline and isolated from production memory code. From `backend/` on Windows:
+
+```powershell
+$env:JAVA_HOME = 'C:\path\to\jdk-21'
+.\mvnw.cmd -Pv5-evaluation test
+```
+
+The profile loads 12 explicit-creation routing cases, 8 cross-session preference/current-request
+cases, 6 safety and budget cases, and 12 deferred PostgreSQL lifecycle definitions. It compares a
+frozen no-memory response baseline with an evaluation-only bounded-preference candidate. The
+candidate does not call a model, database, production controller, application service, SSE path,
+or frontend code.
+
+The eight representative cases are repeated three times. Passing this profile establishes the
+versioned Slice 1 contract; it does not claim that production persistence, confirmation,
+management APIs, Prompt injection, history, real DeepSeek behavior, or page flows are complete.

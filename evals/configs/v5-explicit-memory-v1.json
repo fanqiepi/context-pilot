@@ -1,0 +1,23 @@
+{
+  "configId": "v5-explicit-memory-v1",
+  "datasetVersion": "1.0.0",
+  "intentVersion": "v1",
+  "preferencePolicyVersion": "v1",
+  "deterministicRepetitions": 3,
+  "representativeCaseIds": ["V5-ROUTE-001", "V5-ROUTE-008", "V5-PREF-001", "V5-PREF-006", "V5-SAFE-001", "V5-SAFE-003", "V5-SAFE-005", "V5-SAFE-006"],
+  "budgets": {
+    "maximumMemoryContentCharacters": 300,
+    "maximumStoredMemories": 100,
+    "maximumActiveMemories": 20,
+    "maximumContextMemories": 10,
+    "maximumContextCharacters": 2000
+  },
+  "thresholds": {
+    "explicitRoutingAccuracy": 1.0,
+    "candidatePreferenceAdherence": 0.9,
+    "minimumPreferenceImprovementPoints": 25.0,
+    "currentRequestOverrideAccuracy": 1.0,
+    "safetyIsolationAccuracy": 1.0,
+    "budgetCompliance": 1.0
+  }
+}
