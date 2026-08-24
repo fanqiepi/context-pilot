@@ -68,7 +68,8 @@ class DatabaseMigrationTests {
             for (String tableName : new String[] {
                     "conversation", "chat_message", "message_citation", "model_call", "answer_feedback",
                     "action_request", "knowledge_base_health_report", "knowledge_base_health_issue",
-                    "research_run", "research_step", "research_evidence", "research_step_evidence"
+                    "research_run", "research_step", "research_evidence", "research_step_evidence",
+                    "app_user", "user_memory", "user_memory_revision", "message_memory_context"
             }) {
                 assertThat(queryBoolean(connection, """
                         SELECT EXISTS (
@@ -79,6 +80,12 @@ class DatabaseMigrationTests {
                         )
                         """.formatted(tableName))).isTrue();
             }
+            assertThat(queryString(connection, """
+                    SELECT id::text || ':' || user_key || ':' || status
+                    FROM app_user
+                    WHERE user_key = 'LOCAL_OWNER' AND deleted = 0
+                    """))
+                    .isEqualTo("00000000-0000-0000-0000-000000000001:LOCAL_OWNER:ACTIVE");
             assertThat(queryBoolean(connection, """
                     SELECT EXISTS (
                         SELECT 1

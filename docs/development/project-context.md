@@ -6,7 +6,7 @@
 
 ContextPilot 是一个基于 Spring AI 的学习型、可控、可评估的个人知识工作助手。对用户而言，它以单用户知识库为工作空间，提供有依据的问答和安全的业务操作；对工程实践而言，它通过连续、可验收的真实场景逐步验证现代 Agent 能力，而不是以堆叠框架作为目标。
 
-项目按大版本演进。V1 功能型 RAG 基线、V2 可控行动助手、V3“知识库健康检查与维护助手”和 V4 第一阶段“知识研究助手”均已完成。V5 第一阶段显式记忆范围与 Slices 1-7 已批准，Slice 1 固定评估合同已经完成，当前建议在同一开发批次内依次完成 Slice 2 隐式主体与持久化、Slice 3 创建偏好提案；V6 的外部工具互操作和更远期多 Agent 模式仍只是方向。远期路线和设计草案都不自动代表开发授权。
+项目按大版本演进。V1 功能型 RAG 基线、V2 可控行动助手、V3“知识库健康检查与维护助手”和 V4 第一阶段“知识研究助手”均已完成。V5 第一阶段显式记忆范围与 Slices 1-7 已批准，Slices 1-2 已完成，当前继续同一开发批次的 Slice 3 创建偏好提案；V6 的外部工具互操作和更远期多 Agent 模式仍只是方向。远期路线和设计草案都不自动代表开发授权。
 
 ## 当前状态
 
@@ -19,6 +19,7 @@ ContextPilot 是一个基于 Spring AI 的学习型、可控、可评估的个�
 - 2026-08-21 已使用真实 `dashscope_qwen3_7_1024_v1` 与 DeepSeek `deepseek-v4-flash` 执行当前生产 V4 链路。数据库保留 4 次成功回答（10.002-62.916 秒、4-14 个证据与同量引用、单次模型调用）以及 1 次 90.058 秒进入 `PARTIAL/RESEARCH_TIMEOUT` 的真实终态；外部提供商执行缺口已关闭。成功运行的 `completion_tokens` 为 1257-9025，证明 DeepSeek Thinking Token 与原 3000 Token 请求级预算不兼容。2026-08-24 已正式批准不发送请求级 `max_tokens`，保留单次模型调用、90 秒硬超时、1800 字正文上限和 usage 记录，V4 第一阶段据此完整验收通过。
 - 2026-08-24 已批准 V5 第一阶段：只做用户显式确认的全局回答偏好记忆。系统使用服务端稳定 `LOCAL_OWNER` 和 `CurrentSubjectProvider`，不实现登录，也不把隐式主体宣传为认证；聊天创建复用 `CREATE_USER_MEMORY` 强类型提案/确认，单次回答最多注入 10 条、2000 字符，且不能改变 grounding、引用、拒答、研究计划或工具边界。详细设计见 `docs/architecture/v5-explicit-memory-design.md`，身份决定见 ADR 0002。
 - 2026-08-24 V5 Slice 1 已完成 `v5-explicit-memory-v1` 固定数据集、配置、测试侧无记忆/受限偏好对照和独立 Maven Profile。30 项离线测试全部通过：路由 12/12、安全隔离 6/6、预算合规 6/6，偏好/当前请求预期风格从无记忆基线 4/8 提升到候选 8/8。该证据不包含生产注入、PostgreSQL 生命周期或真实模型验收；下一开发批次依次实施 Slice 2 的 `CurrentSubjectProvider`、`LOCAL_OWNER` 与记忆持久化，以及 Slice 3 的强类型提案和确认创建。
+- 2026-08-24 V5 Slice 2 已完成 Flyway V16、稳定 `LOCAL_OWNER`、`CurrentSubjectProvider`、记忆聚合、不可变 revision、所有者过滤与消息关联结构。JDK 21 下 7 项最小测试全部通过，实际 PostgreSQL 17 / pgvector 容器完成 V1-V16 迁移并验证精确去重和越权读取隔离；当前继续实施 Slice 3，尚未增加管理 API 或生产 Prompt 注入。
 - 日常开发和集成分支为 `develop`，不得直接提交到 `main`。
 
 ## 大版本路线

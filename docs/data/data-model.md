@@ -1,6 +1,6 @@
 # ContextPilot 数据模型
 
-> 本文定义 V1-V4 已完成模型，以及 V5 第一阶段已批准、尚待 Flyway 落地的隐式用户和显式记忆模型；已经实施的物理结构仍以 Flyway 迁移为事实来源。
+> 本文定义 V1-V4 已完成模型，以及 V5 第一阶段已批准并由 Slice 2 / Flyway V16 落地的隐式用户和显式记忆模型；已经实施的物理结构以 Flyway 迁移为事实来源。
 
 ## 核心实体
 
@@ -17,10 +17,10 @@
 | `action_request` | 保存需人工确认的业务操作提案、状态和安全结果摘要 | 关联会话、用户消息和提案助手消息 |
 | `knowledge_base_health_report`（V3 / V11） | 保存不可变的知识库健康检查快照 | 关联知识库、会话和检查消息 |
 | `knowledge_base_health_issue`（V3 / V11） | 保存报告中的文档异常、观察事实和修复建议 | 关联健康报告和目标文档 |
-| `app_user`（V5 计划） | 保存稳定的隐式本地用户主体 | 第一阶段只有 `LOCAL_OWNER` |
-| `user_memory`（V5 计划） | 保存全局回答偏好的所有者、状态、当前版本和过期时间 | 属于一个应用用户 |
-| `user_memory_revision`（V5 计划） | 保存每次创建或纠正的不可变内容版本与来源 | 属于一条用户记忆 |
-| `message_memory_context`（V5 计划） | 保存实际提供给模型的记忆版本和顺序 | 关联助手消息、记忆和 revision |
+| `app_user`（V5 / V16） | 保存稳定的隐式本地用户主体 | 第一阶段只有 `LOCAL_OWNER` |
+| `user_memory`（V5 / V16） | 保存全局回答偏好的所有者、状态、当前版本和过期时间 | 属于一个应用用户 |
+| `user_memory_revision`（V5 / V16） | 保存每次创建或纠正的不可变内容版本与来源 | 属于一条用户记忆 |
+| `message_memory_context`（V5 / V16） | 保存实际提供给模型的记忆版本和顺序 | 关联助手消息、记忆和 revision |
 
 ## 数据约定
 
@@ -102,9 +102,9 @@ Flyway V15 为 `message_citation` 增加可空 `research_evidence_id`，V4 引�
 
 Flyway `V15__create_document_comparison_research.sql` 已创建四表、唯一索引、外键、状态与预算检查约束，并以不回填方式兼容 V1-V3 历史数据。
 
-## V5 已批准的隐式用户与记忆数据结构
+## V5 已实施的隐式用户与记忆数据结构
 
-V5 详细语义见 [V5 显式记忆详细设计](../architecture/v5-explicit-memory-design.md)。下一条 Flyway 迁移从 V15 继续递增，计划创建 `app_user`、`user_memory`、`user_memory_revision` 和 `message_memory_context`，并把 `CREATE_USER_MEMORY` 加入 `action_request` 的静态允许范围。迁移编号、物理列长度和索引名称在对应实现切片内冻结。
+V5 详细语义见 [V5 显式记忆详细设计](../architecture/v5-explicit-memory-design.md)。Flyway V16 已创建 `app_user`、`user_memory`、`user_memory_revision` 和 `message_memory_context`；`CREATE_USER_MEMORY` 对 `action_request` 的扩展由后续 Slice 3 迁移负责。物理结构以迁移为准。
 
 ### `app_user`
 
