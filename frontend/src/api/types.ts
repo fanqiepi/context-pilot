@@ -68,6 +68,7 @@ export type CapabilityId = 'SIMPLE_CHAT' | 'KNOWLEDGE_QA' | 'BUSINESS_ACTION'
 export type CapabilityMatchReason =
   | 'SIMPLE_INTERACTION_WHITELIST'
   | 'EXPLICIT_CREATE_KNOWLEDGE_BASE'
+  | 'EXPLICIT_CREATE_USER_MEMORY'
   | 'EXPLICIT_KNOWLEDGE_BASE_HEALTH'
   | 'HEALTH_REPORT_ISSUE_SELECTED'
   | 'EXPLICIT_DOCUMENT_COMPARISON'
@@ -234,6 +235,7 @@ export type ActionType =
   | 'CREATE_KNOWLEDGE_BASE'
   | 'RETRY_DOCUMENT_PROCESSING'
   | 'REINDEX_DOCUMENT'
+  | 'CREATE_USER_MEMORY'
 export type ActionRequestStatus =
   | 'PENDING_CONFIRMATION'
   | 'EXECUTING'
@@ -264,6 +266,13 @@ export interface ReindexDocumentActionParameters {
   healthIssueId: string
 }
 
+export interface CreateUserMemoryActionParameters {
+  memoryType: 'RESPONSE_PREFERENCE'
+  scope: 'GLOBAL'
+  content: string
+  expiresAt: string | null
+}
+
 interface ActionRequestBase<TActionType extends ActionType, TParameters> {
   id: string
   conversationId: string
@@ -275,6 +284,7 @@ interface ActionRequestBase<TActionType extends ActionType, TParameters> {
   parameters: TParameters
   displaySummary: string
   status: ActionRequestStatus
+  resultResourceId: string | null
   resultSummary: string | null
   errorSummary: string | null
   traceId: string
@@ -289,6 +299,7 @@ export type ActionRequest =
   | ActionRequestBase<'CREATE_KNOWLEDGE_BASE', CreateKnowledgeBaseActionParameters>
   | ActionRequestBase<'RETRY_DOCUMENT_PROCESSING', RetryDocumentProcessingActionParameters>
   | ActionRequestBase<'REINDEX_DOCUMENT', ReindexDocumentActionParameters>
+  | ActionRequestBase<'CREATE_USER_MEMORY', CreateUserMemoryActionParameters>
 
 export interface ConversationMessage {
   id: string

@@ -124,7 +124,9 @@ class DatabaseMigrationTests {
                       AND table_name = 'action_request'
                       AND column_name = 'parameters'
                     """)).isEqualTo("jsonb");
-            for (String columnName : new String[] {"target_document_id", "health_issue_id"}) {
+            for (String columnName : new String[] {
+                    "target_document_id", "health_issue_id", "result_resource_id"
+            }) {
                 assertThat(queryString(connection, """
                         SELECT data_type
                         FROM information_schema.columns
@@ -144,11 +146,14 @@ class DatabaseMigrationTests {
                     """))
                     .contains("CREATE_KNOWLEDGE_BASE")
                     .contains("RETRY_DOCUMENT_PROCESSING")
-                    .contains("REINDEX_DOCUMENT");
+                    .contains("REINDEX_DOCUMENT")
+                    .contains("CREATE_USER_MEMORY");
             for (String constraintName : new String[] {
                     "action_request_target_document_fk",
                     "action_request_health_issue_fk",
-                    "action_request_target_check"
+                    "action_request_target_check",
+                    "action_request_result_memory_fk",
+                    "action_request_result_resource_check"
             }) {
                 assertThat(queryBoolean(connection, """
                         SELECT EXISTS (
@@ -160,6 +165,16 @@ class DatabaseMigrationTests {
                         )
                         """.formatted(constraintName))).isTrue();
             }
+            assertThat(queryString(connection, """
+                    SELECT pg_get_constraintdef(constraint_info.oid)
+                    FROM pg_constraint constraint_info
+                    JOIN pg_class table_info ON constraint_info.conrelid = table_info.oid
+                    JOIN pg_namespace schema_info ON table_info.relnamespace = schema_info.oid
+                    WHERE schema_info.nspname = 'public'
+                      AND table_info.relname = 'chat_message'
+                      AND constraint_info.conname = 'chat_message_capability_match_reason_check'
+                    """))
+                    .contains("EXPLICIT_CREATE_USER_MEMORY");
             assertThat(queryBoolean(connection, """
                     SELECT EXISTS (
                         SELECT 1

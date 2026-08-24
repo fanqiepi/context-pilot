@@ -17,6 +17,7 @@ public class ActionRequestEntity {
     private String parametersJson;
     private UUID targetDocumentId;
     private UUID healthIssueId;
+    private UUID resultResourceId;
     private String displaySummary;
     private ActionRequestStatus status;
     private String resultSummary;
@@ -49,6 +50,8 @@ public class ActionRequestEntity {
     public void setTargetDocumentId(UUID targetDocumentId) { this.targetDocumentId = targetDocumentId; }
     public UUID getHealthIssueId() { return healthIssueId; }
     public void setHealthIssueId(UUID healthIssueId) { this.healthIssueId = healthIssueId; }
+    public UUID getResultResourceId() { return resultResourceId; }
+    public void setResultResourceId(UUID resultResourceId) { this.resultResourceId = resultResourceId; }
     public String getDisplaySummary() { return displaySummary; }
     public void setDisplaySummary(String displaySummary) { this.displaySummary = displaySummary; }
     public ActionRequestStatus getStatus() { return status; }

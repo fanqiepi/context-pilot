@@ -1,6 +1,6 @@
 # ContextPilot 数据模型
 
-> 本文定义 V1-V4 已完成模型，以及 V5 第一阶段已批准并由 Slice 2 / Flyway V16 落地的隐式用户和显式记忆模型；已经实施的物理结构以 Flyway 迁移为事实来源。
+> 本文定义 V1-V4 已完成模型，以及 V5 第一阶段已批准并由 Slices 2-3 / Flyway V16-V17 落地的隐式用户、显式记忆和创建 Action 模型；已经实施的物理结构以 Flyway 迁移为事实来源。
 
 ## 核心实体
 
@@ -104,7 +104,7 @@ Flyway `V15__create_document_comparison_research.sql` 已创建四表、唯一�
 
 ## V5 已实施的隐式用户与记忆数据结构
 
-V5 详细语义见 [V5 显式记忆详细设计](../architecture/v5-explicit-memory-design.md)。Flyway V16 已创建 `app_user`、`user_memory`、`user_memory_revision` 和 `message_memory_context`；`CREATE_USER_MEMORY` 对 `action_request` 的扩展由后续 Slice 3 迁移负责。物理结构以迁移为准。
+V5 详细语义见 [V5 显式记忆详细设计](../architecture/v5-explicit-memory-design.md)。Flyway V16 已创建 `app_user`、`user_memory`、`user_memory_revision` 和 `message_memory_context`；V17 已把 `CREATE_USER_MEMORY`、`result_resource_id` 和新聊天路由原因加入现有 Action/消息结构。物理结构以迁移为准。
 
 ### `app_user`
 
@@ -135,4 +135,4 @@ V5 详细语义见 [V5 显式记忆详细设计](../architecture/v5-explicit-mem
 
 ### `action_request` 扩展
 
-`CREATE_USER_MEMORY` 参数只允许固定类型、全局作用域、1-300 字符规范化内容和可选过期时间。确认成功后通过 `result_resource_id` 关联真实记忆；未确认、拒绝、过期或失败均不得产生记忆。既有 V2/V3 Action 历史必须保持兼容。
+Flyway V17 已实施该扩展。`CREATE_USER_MEMORY` 参数只允许固定类型、全局作用域、1-300 字符规范化内容和可选过期时间。确认成功后通过 `result_resource_id` 关联真实记忆；未确认、拒绝、过期或失败均不得产生记忆。既有 V2/V3 Action 历史保持兼容。

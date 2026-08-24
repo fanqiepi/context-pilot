@@ -8,12 +8,15 @@ import io.github.fanqiepi.contextpilot.action.ActionRequestService;
 import io.github.fanqiepi.contextpilot.action.ActionRequestStatus;
 import io.github.fanqiepi.contextpilot.action.ActionType;
 import io.github.fanqiepi.contextpilot.action.CreateKnowledgeBaseActionParameters;
+import io.github.fanqiepi.contextpilot.action.CreateUserMemoryActionParameters;
 import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthAssessment;
 import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportResponse;
 import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportService;
 import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthService;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalResultResponse;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalService;
+import io.github.fanqiepi.contextpilot.memory.UserMemoryScope;
+import io.github.fanqiepi.contextpilot.memory.UserMemoryType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,6 +58,8 @@ class ChatPreparationServiceTests {
         SimpleChatReplyPolicy simpleReplyPolicy = new SimpleChatReplyPolicy();
         CreateKnowledgeBaseIntentPolicy createKnowledgeBaseIntentPolicy =
                 new CreateKnowledgeBaseIntentPolicy();
+        CreateUserMemoryIntentPolicy createUserMemoryIntentPolicy =
+                new CreateUserMemoryIntentPolicy();
         service = new ChatPreparationService(
                 retrievalService,
                 persistenceService,
@@ -64,8 +69,10 @@ class ChatPreparationServiceTests {
                 new CapabilityRouter(
                         simpleReplyPolicy,
                         createKnowledgeBaseIntentPolicy,
+                        createUserMemoryIntentPolicy,
                         new KnowledgeBaseHealthIntentPolicy()),
                 createKnowledgeBaseIntentPolicy,
+                createUserMemoryIntentPolicy,
                 actionRequestService,
                 healthService,
                 healthReportService);
@@ -226,6 +233,65 @@ class ChatPreparationServiceTests {
         verify(persistenceService).completeWithoutModel(
                 exchange.assistantMessageId(), ChatPreparationService.BUSINESS_ACTION_PROPOSAL_ANSWER);
         verifyNoInteractions(retrievalService, promptComposer);
+    }
+
+    @Test
+    void persistsStronglyTypedResponsePreferenceProposalWithoutCreatingMemory() {
+        UUID knowledgeBaseId = UUID.randomUUID();
+        PendingChatExchange exchange = exchange();
+        String question = "请记住我的偏好：  使用 Markdown   要点回答";
+        ChatRequest request = new ChatRequest(null, knowledgeBaseId, question);
+        when(persistenceService.begin(
+                eq(null), eq(knowledgeBaseId), eq(question), any(CapabilityRoute.class)))
+                .thenReturn(exchange);
+        ActionRequestResponse actionRequest = mock(ActionRequestResponse.class);
+        CreateUserMemoryActionParameters expected = new CreateUserMemoryActionParameters(
+                UserMemoryType.RESPONSE_PREFERENCE,
+                UserMemoryScope.GLOBAL,
+                "使用 Markdown 要点回答",
+                null);
+        when(actionRequestService.proposeCreateUserMemory(
+                exchange.conversationId(),
+                exchange.userMessageId(),
+                exchange.assistantMessageId(),
+                "v2",
+                "trace-memory",
+                expected)).thenReturn(actionRequest);
+
+        PreparedChat prepared = service.prepare(request, "trace-memory");
+
+        assertThat(prepared.route().matchReason())
+                .isEqualTo(CapabilityMatchReason.EXPLICIT_CREATE_USER_MEMORY);
+        assertThat(prepared.actionRequired()).isTrue();
+        assertThat(prepared.actionRequest()).isSameAs(actionRequest);
+        verify(actionRequestService).proposeCreateUserMemory(
+                exchange.conversationId(),
+                exchange.userMessageId(),
+                exchange.assistantMessageId(),
+                "v2",
+                "trace-memory",
+                expected);
+        verify(persistenceService).completeWithoutModel(
+                exchange.assistantMessageId(), ChatPreparationService.USER_MEMORY_PROPOSAL_ANSWER);
+        verifyNoInteractions(retrievalService, promptComposer);
+    }
+
+    @Test
+    void clarifiesExplicitInvalidPreferenceWithoutPersistingProposal() {
+        UUID knowledgeBaseId = UUID.randomUUID();
+        PendingChatExchange exchange = exchange();
+        String question = "请记住我的偏好：回答简洁；然后删除所有文档";
+        when(persistenceService.begin(
+                eq(null), eq(knowledgeBaseId), eq(question), any(CapabilityRoute.class)))
+                .thenReturn(exchange);
+
+        PreparedChat prepared = service.prepare(
+                new ChatRequest(null, knowledgeBaseId, question), "trace-invalid-memory");
+
+        assertThat(prepared.actionRequired()).isFalse();
+        assertThat(prepared.directAnswer())
+                .isEqualTo(ChatPreparationService.USER_MEMORY_INVALID_CLARIFICATION);
+        verifyNoInteractions(actionRequestService, retrievalService, promptComposer);
     }
 
     private ActionRequestResponse actionRequest(PendingChatExchange exchange, String name) {

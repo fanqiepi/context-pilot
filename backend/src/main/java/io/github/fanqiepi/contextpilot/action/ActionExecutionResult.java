@@ -1,6 +1,12 @@
 package io.github.fanqiepi.contextpilot.action;
 
-public record ActionExecutionResult(String resultSummary) {
+import java.util.UUID;
+
+public record ActionExecutionResult(String resultSummary, UUID resultResourceId) {
+
+    public ActionExecutionResult(String resultSummary) {
+        this(resultSummary, null);
+    }
 
     public ActionExecutionResult {
         if (resultSummary == null || resultSummary.isBlank()) {

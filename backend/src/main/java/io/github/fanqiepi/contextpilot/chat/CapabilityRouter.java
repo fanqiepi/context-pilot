@@ -7,14 +7,17 @@ class CapabilityRouter {
 
     private final SimpleChatReplyPolicy simpleChatReplyPolicy;
     private final CreateKnowledgeBaseIntentPolicy createKnowledgeBaseIntentPolicy;
+    private final CreateUserMemoryIntentPolicy createUserMemoryIntentPolicy;
     private final KnowledgeBaseHealthIntentPolicy knowledgeBaseHealthIntentPolicy;
 
     CapabilityRouter(
             SimpleChatReplyPolicy simpleChatReplyPolicy,
             CreateKnowledgeBaseIntentPolicy createKnowledgeBaseIntentPolicy,
+            CreateUserMemoryIntentPolicy createUserMemoryIntentPolicy,
             KnowledgeBaseHealthIntentPolicy knowledgeBaseHealthIntentPolicy) {
         this.simpleChatReplyPolicy = simpleChatReplyPolicy;
         this.createKnowledgeBaseIntentPolicy = createKnowledgeBaseIntentPolicy;
+        this.createUserMemoryIntentPolicy = createUserMemoryIntentPolicy;
         this.knowledgeBaseHealthIntentPolicy = knowledgeBaseHealthIntentPolicy;
     }
 
@@ -23,6 +26,13 @@ class CapabilityRouter {
             return CapabilityRoute.matched(
                     CapabilityId.SIMPLE_CHAT,
                     CapabilityMatchReason.SIMPLE_INTERACTION_WHITELIST,
+                    traceId);
+        }
+        if (createUserMemoryIntentPolicy.matchesExplicitRequest(question)) {
+            return CapabilityRoute.matched(
+                    CapabilityId.BUSINESS_ACTION,
+                    "v2",
+                    CapabilityMatchReason.EXPLICIT_CREATE_USER_MEMORY,
                     traceId);
         }
         if (createKnowledgeBaseIntentPolicy.matches(question)) {

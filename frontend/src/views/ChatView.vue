@@ -648,6 +648,7 @@ function actionTitle(actionType: ActionType): string {
     CREATE_KNOWLEDGE_BASE: '创建知识库',
     RETRY_DOCUMENT_PROCESSING: '重试文档处理',
     REINDEX_DOCUMENT: '重建文档索引',
+    CREATE_USER_MEMORY: '保存回答偏好',
   }[actionType]
 }
 
@@ -656,6 +657,7 @@ function actionConfirmLabel(actionType: ActionType): string {
     CREATE_KNOWLEDGE_BASE: '确认创建',
     RETRY_DOCUMENT_PROCESSING: '确认重试',
     REINDEX_DOCUMENT: '确认重建',
+    CREATE_USER_MEMORY: '确认保存',
   }[actionType]
 }
 
@@ -678,6 +680,17 @@ function actionParameterRows(actionRequest: ActionRequest): Array<{ label: strin
         {
           label: '检查时 Profile',
           value: actionRequest.parameters.observedEmbeddingProfileId || '来源未知',
+        },
+      ]
+    case 'CREATE_USER_MEMORY':
+      return [
+        { label: '类型', value: '全局回答偏好' },
+        { label: '内容', value: actionRequest.parameters.content },
+        {
+          label: '过期时间',
+          value: actionRequest.parameters.expiresAt
+            ? formatDate(actionRequest.parameters.expiresAt)
+            : '不过期',
         },
       ]
   }

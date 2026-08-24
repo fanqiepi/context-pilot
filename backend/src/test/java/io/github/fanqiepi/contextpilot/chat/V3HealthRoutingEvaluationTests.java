@@ -20,6 +20,7 @@ class V3HealthRoutingEvaluationTests {
     private final CapabilityRouter router = new CapabilityRouter(
             new SimpleChatReplyPolicy(),
             new CreateKnowledgeBaseIntentPolicy(),
+            new CreateUserMemoryIntentPolicy(),
             new KnowledgeBaseHealthIntentPolicy());
 
     static Stream<V3EvaluationDataset.RoutingCase> routingCases() {

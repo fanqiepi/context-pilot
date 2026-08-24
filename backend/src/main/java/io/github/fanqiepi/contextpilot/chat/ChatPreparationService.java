@@ -7,10 +7,13 @@ import java.util.Optional;
 import io.github.fanqiepi.contextpilot.action.ActionRequestResponse;
 import io.github.fanqiepi.contextpilot.action.ActionRequestService;
 import io.github.fanqiepi.contextpilot.action.CreateKnowledgeBaseActionParameters;
+import io.github.fanqiepi.contextpilot.action.CreateUserMemoryActionParameters;
 import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthAssessment;
 import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportResponse;
 import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportService;
 import io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthService;
+import io.github.fanqiepi.contextpilot.memory.UserMemoryScope;
+import io.github.fanqiepi.contextpilot.memory.UserMemoryType;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalResultResponse;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalSearchRequest;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalService;
@@ -25,6 +28,11 @@ public class ChatPreparationService {
     static final String CREATE_KNOWLEDGE_BASE_NAME_CLARIFICATION =
             "请提供要创建的知识库名称，例如：创建一个名为 Java 学习的知识库。"
                     + "在你明确确认前不会创建知识库。";
+    static final String USER_MEMORY_PROPOSAL_ANSWER =
+            "已生成回答偏好提案。请核对内容，并通过操作卡片明确确认或取消。";
+    static final String USER_MEMORY_INVALID_CLARIFICATION =
+            "请只提供一条 1-300 字符的回答偏好，例如：请记住我的偏好：代码示例优先使用 Java。"
+                    + "在你明确确认前不会保存。";
 
     private final RetrievalService retrievalService;
     private final ChatPersistenceService persistenceService;
@@ -33,6 +41,7 @@ public class ChatPreparationService {
     private final SimpleChatReplyPolicy simpleReplyPolicy;
     private final CapabilityRouter capabilityRouter;
     private final CreateKnowledgeBaseIntentPolicy createKnowledgeBaseIntentPolicy;
+    private final CreateUserMemoryIntentPolicy createUserMemoryIntentPolicy;
     private final ActionRequestService actionRequestService;
     private final KnowledgeBaseHealthService healthService;
     private final KnowledgeBaseHealthReportService healthReportService;
@@ -45,6 +54,7 @@ public class ChatPreparationService {
             SimpleChatReplyPolicy simpleReplyPolicy,
             CapabilityRouter capabilityRouter,
             CreateKnowledgeBaseIntentPolicy createKnowledgeBaseIntentPolicy,
+            CreateUserMemoryIntentPolicy createUserMemoryIntentPolicy,
             ActionRequestService actionRequestService,
             KnowledgeBaseHealthService healthService,
             KnowledgeBaseHealthReportService healthReportService) {
@@ -55,6 +65,7 @@ public class ChatPreparationService {
         this.simpleReplyPolicy = simpleReplyPolicy;
         this.capabilityRouter = capabilityRouter;
         this.createKnowledgeBaseIntentPolicy = createKnowledgeBaseIntentPolicy;
+        this.createUserMemoryIntentPolicy = createUserMemoryIntentPolicy;
         this.actionRequestService = actionRequestService;
         this.healthService = healthService;
         this.healthReportService = healthReportService;
@@ -128,6 +139,9 @@ public class ChatPreparationService {
             ChatRequest request,
             String question,
             CapabilityRoute route) {
+        if (route.matchReason() == CapabilityMatchReason.EXPLICIT_CREATE_USER_MEMORY) {
+            return prepareCreateUserMemory(request, question, route);
+        }
         CreateKnowledgeBaseIntentPolicy.CreateKnowledgeBaseIntent intent =
                 createKnowledgeBaseIntentPolicy.parse(question)
                         .orElseThrow(() -> new IllegalStateException(
@@ -153,6 +167,35 @@ public class ChatPreparationService {
                 exchange.assistantMessageId(), BUSINESS_ACTION_PROPOSAL_ANSWER);
         return PreparedChat.action(
                 route, exchange, BUSINESS_ACTION_PROPOSAL_ANSWER, actionRequest);
+    }
+
+    private PreparedChat prepareCreateUserMemory(
+            ChatRequest request,
+            String question,
+            CapabilityRoute route) {
+        CreateUserMemoryIntentPolicy.Evaluation evaluation = createUserMemoryIntentPolicy.evaluate(question);
+        if (evaluation.decision() != CreateUserMemoryIntentPolicy.Decision.PROPOSE) {
+            PendingChatExchange exchange = persistenceService.begin(
+                    request.conversationId(), request.knowledgeBaseId(), question, route);
+            return PreparedChat.direct(route, exchange, USER_MEMORY_INVALID_CLARIFICATION);
+        }
+        CreateUserMemoryActionParameters parameters = new CreateUserMemoryActionParameters(
+                UserMemoryType.RESPONSE_PREFERENCE,
+                UserMemoryScope.GLOBAL,
+                evaluation.content(),
+                null);
+        PendingChatExchange exchange = persistenceService.begin(
+                request.conversationId(), request.knowledgeBaseId(), question, route);
+        ActionRequestResponse actionRequest = actionRequestService.proposeCreateUserMemory(
+                exchange.conversationId(),
+                exchange.userMessageId(),
+                exchange.assistantMessageId(),
+                route.capabilityVersion(),
+                route.traceId(),
+                parameters);
+        persistenceService.completeWithoutModel(
+                exchange.assistantMessageId(), USER_MEMORY_PROPOSAL_ANSWER);
+        return PreparedChat.action(route, exchange, USER_MEMORY_PROPOSAL_ANSWER, actionRequest);
     }
 
     private List<RetrievalResultResponse> selectEvidence(List<RetrievalResultResponse> results) {

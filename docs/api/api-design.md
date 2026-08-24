@@ -1,6 +1,6 @@
 # REST API、SSE 与操作确认约定
 
-> 本文记录已完成的 V1-V4 接口，以及 V5 第一阶段已批准、尚待实现的显式偏好记忆合同。已实现字段以 OpenAPI 为主要事实来源；V5 计划字段在对应切片落地后由 OpenAPI 接管。
+> 本文记录已完成的 V1-V4 接口，以及 V5 第一阶段已批准的显式偏好记忆合同。V5 Slices 2-3 的隐式主体与确认创建已实现；管理、注入、SSE 和历史字段仍在后续切片落地。已实现字段以 OpenAPI 为主要事实来源。
 
 ## 通用约定
 
@@ -108,7 +108,7 @@ message
 
 V5 完整方案见 [V5 显式记忆详细设计](../architecture/v5-explicit-memory-design.md)。所有接口都从服务端 `CurrentSubjectProvider` 取得 `LOCAL_OWNER`，请求体、查询参数和请求头均不接受 `ownerUserId/userId`。
 
-### 聊天创建与使用
+### 聊天创建（Slices 2-3 已实现）与使用（后续切片）
 
 显式句式“请记住我的偏好：...”路由为 `BUSINESS_ACTION/CREATE_USER_MEMORY`，先创建不可变 Action 提案，再沿用 `/api/action-requests/{id}/confirm` 或 `/reject`。提案固定参数为：
 
@@ -120,6 +120,8 @@ V5 完整方案见 [V5 显式记忆详细设计](../architecture/v5-explicit-mem
   "expiresAt": null
 }
 ```
+
+当前实现使用 `BUSINESS_ACTION/v2/EXPLICIT_CREATE_USER_MEMORY`，确认成功后的 Action 返回 `resultResourceId`；未确认、拒绝或过期时不创建记忆。客户端仍不能覆盖已保存参数或提交用户 ID。
 
 普通聊天请求增加可选 `memoryMode`：
 

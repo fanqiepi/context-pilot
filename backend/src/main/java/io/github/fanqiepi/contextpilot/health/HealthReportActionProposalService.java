@@ -169,8 +169,8 @@ public class HealthReportActionProposalService {
         switch (actionType) {
             case RETRY_DOCUMENT_PROCESSING -> requireRetryableDocument(report, issue);
             case REINDEX_DOCUMENT -> requireReindexableDocument(report, issue);
-            case CREATE_KNOWLEDGE_BASE -> throw new IllegalArgumentException(
-                    "Health report issues cannot create knowledge bases");
+            case CREATE_KNOWLEDGE_BASE, CREATE_USER_MEMORY -> throw new IllegalArgumentException(
+                    "Health report issues cannot create unrelated resources");
         }
     }
 
@@ -259,8 +259,8 @@ public class HealthReportActionProposalService {
                             issue.getObservedEmbeddingProfileId(),
                             report.getId(),
                             issue.getId()));
-            case CREATE_KNOWLEDGE_BASE -> throw new IllegalArgumentException(
-                    "Health report issues cannot create knowledge bases");
+            case CREATE_KNOWLEDGE_BASE, CREATE_USER_MEMORY -> throw new IllegalArgumentException(
+                    "Health report issues cannot create unrelated resources");
         };
     }
 
@@ -272,8 +272,8 @@ public class HealthReportActionProposalService {
                     "为健康报告中的文档“%s”生成重试处理提案。".formatted(issue.getOriginalFilename());
             case REINDEX_DOCUMENT ->
                     "为健康报告中的文档“%s”生成索引重建提案。".formatted(issue.getOriginalFilename());
-            case CREATE_KNOWLEDGE_BASE -> throw new IllegalArgumentException(
-                    "Health report issues cannot create knowledge bases");
+            case CREATE_KNOWLEDGE_BASE, CREATE_USER_MEMORY -> throw new IllegalArgumentException(
+                    "Health report issues cannot create unrelated resources");
         };
     }
 
@@ -281,8 +281,8 @@ public class HealthReportActionProposalService {
         return switch (actionType) {
             case RETRY_DOCUMENT_PROCESSING -> RETRY_ASSISTANT_PROPOSAL_MESSAGE;
             case REINDEX_DOCUMENT -> REINDEX_ASSISTANT_PROPOSAL_MESSAGE;
-            case CREATE_KNOWLEDGE_BASE -> throw new IllegalArgumentException(
-                    "Health report issues cannot create knowledge bases");
+            case CREATE_KNOWLEDGE_BASE, CREATE_USER_MEMORY -> throw new IllegalArgumentException(
+                    "Health report issues cannot create unrelated resources");
         };
     }
 
@@ -333,7 +333,7 @@ public class HealthReportActionProposalService {
                                     issue.getObservedEmbeddingProfileId())
                             && parameters.healthReportId().equals(report.getId())
                             && parameters.healthIssueId().equals(issue.getId());
-            case CREATE_KNOWLEDGE_BASE -> false;
+            case CREATE_KNOWLEDGE_BASE, CREATE_USER_MEMORY -> false;
         };
     }
 

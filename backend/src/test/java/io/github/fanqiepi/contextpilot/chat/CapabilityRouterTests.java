@@ -9,6 +9,7 @@ class CapabilityRouterTests {
     private final CapabilityRouter router = new CapabilityRouter(
             new SimpleChatReplyPolicy(),
             new CreateKnowledgeBaseIntentPolicy(),
+            new CreateUserMemoryIntentPolicy(),
             new KnowledgeBaseHealthIntentPolicy());
 
     @Test
@@ -30,6 +31,18 @@ class CapabilityRouterTests {
                 .isEqualTo(CapabilityId.BUSINESS_ACTION);
         assertThat(router.route("新建知识库：架构资料", "trace-short").matchReason())
                 .isEqualTo(CapabilityMatchReason.EXPLICIT_CREATE_KNOWLEDGE_BASE);
+    }
+
+    @Test
+    void routesOnlyExplicitResponsePreferenceCreationToTheV2BusinessAction() {
+        CapabilityRoute route = router.route(
+                "请记住我的偏好：代码示例优先使用 Java", "trace-memory");
+
+        assertThat(route.capabilityId()).isEqualTo(CapabilityId.BUSINESS_ACTION);
+        assertThat(route.capabilityVersion()).isEqualTo("v2");
+        assertThat(route.matchReason()).isEqualTo(CapabilityMatchReason.EXPLICIT_CREATE_USER_MEMORY);
+        assertThat(router.route("记住我喜欢 Java", "trace-ambiguous").matchReason())
+                .isEqualTo(CapabilityMatchReason.DEFAULT_KNOWLEDGE_QA);
     }
 
     @Test
