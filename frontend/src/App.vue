@@ -16,6 +16,7 @@ import { RouterLink, RouterView } from 'vue-router'
       <nav class="app-nav" aria-label="主导航">
         <RouterLink to="/library">资料库</RouterLink>
         <RouterLink to="/chat">知识问答</RouterLink>
+        <RouterLink to="/memories">回答偏好</RouterLink>
       </nav>
 
       <div class="environment-pill"><span></span> 本地工作台</div>

@@ -273,6 +273,42 @@ export interface CreateUserMemoryActionParameters {
   expiresAt: string | null
 }
 
+export type UserMemoryStatus = 'ACTIVE' | 'DISABLED'
+export type UserMemorySourceType = 'CHAT_CONFIRMED' | 'MANAGEMENT'
+
+export interface UserMemory {
+  id: string
+  memoryType: 'RESPONSE_PREFERENCE'
+  scope: 'GLOBAL'
+  status: UserMemoryStatus
+  content: string
+  currentRevision: number
+  sourceType: UserMemorySourceType
+  expiresAt: string | null
+  expired: boolean
+  version: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface UserMemoryRevisionSummary {
+  revision: number
+  sourceType: UserMemorySourceType
+  changeReason: string
+  createdAt: string
+}
+
+export interface UserMemoryDetail extends UserMemory {
+  revisions: UserMemoryRevisionSummary[]
+}
+
+export interface UserMemoryUpdate {
+  version: number
+  content?: string
+  status?: UserMemoryStatus
+  expiresAt?: string | null
+}
+
 interface ActionRequestBase<TActionType extends ActionType, TParameters> {
   id: string
   conversationId: string

@@ -1,6 +1,6 @@
 # ContextPilot 数据模型
 
-> 本文定义 V1-V4 已完成模型，以及 V5 第一阶段已批准并由 Slices 2-3 / Flyway V16-V17 落地的隐式用户、显式记忆和创建 Action 模型；已经实施的物理结构以 Flyway 迁移为事实来源。
+> 本文定义 V1-V4 已完成模型，以及 V5 第一阶段已批准并由 Slices 2-4 / Flyway V16-V17 落地的隐式用户、显式记忆、创建 Action 与管理闭环；已经实施的物理结构以 Flyway 迁移为事实来源。
 
 ## 核心实体
 
@@ -125,6 +125,7 @@ V5 详细语义见 [V5 显式记忆详细设计](../architecture/v5-explicit-mem
 - 每条 revision 保存不可变版本号、规范化内容、SHA-256、来源类型、可空来源会话/消息、变更原因和时间；
 - 创建或纠正在事务内插入新 revision，并原子推进聚合当前版本；旧 revision 不原地覆盖；
 - 来源固定允许 `CHAT_CONFIRMED` 或 `MANAGEMENT`；普通日志不记录完整正文。
+- Slice 4 的内容、状态或过期时间实际变更都会新增 `MANAGEMENT` revision 记录变更原因，并以聚合 `version` 条件更新；详情只公开旧版本摘要，不公开历史正文。
 
 ### `message_memory_context`
 

@@ -304,3 +304,24 @@ a {
     flex-direction: column;
   }
 }
+
+@media (max-width: 560px) {
+  .app-header {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .brand {
+    justify-self: center;
+  }
+
+  .app-nav {
+    width: 100%;
+  }
+
+  .app-nav a {
+    flex: 1;
+    padding-inline: 6px;
+    text-align: center;
+  }
+}

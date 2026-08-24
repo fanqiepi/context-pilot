@@ -1,6 +1,6 @@
 # ContextPilot 评估计划
 
-> 状态：V1 功能型基线、V2 可控行动助手、V3 知识库维护助手与 V4 第一阶段知识研究助手均已完成；V5 第一阶段 Slices 1-3 已完成固定基线、持久化与确认创建，管理、生产注入和最终验收随 Slices 4-7 闭合。
+> 状态：V1 功能型基线、V2 可控行动助手、V3 知识库维护助手与 V4 第一阶段知识研究助手均已完成；V5 第一阶段 Slices 1-4 已完成固定基线、持久化、确认创建与管理闭环，生产注入和最终验收随 Slices 5-7 闭合。
 
 ## 目标
 
@@ -88,7 +88,7 @@ Slice 1 建立了 32 个语义案例和 12 个生命周期案例定义，并只�
 
 2026-08-17 固定离线与 DeepSeek 代表性运行结果见 [V4 Slice 1 评估报告](../../evals/reports/2026-08-17-v4-document-comparison-slice1.md)：离线候选范围化多步检索为 12/12，单轮 Top-K 5 为 0/12，对照子集双方均为 8/8；8 个代表案例各重复 3 次的真实模型候选多步为 9/9、单轮为 0/9，但候选 Token 为 2.64 倍、平均延迟为 3.25 倍。生产实现的 PostgreSQL/Flyway、持久化、取消、OpenAPI、前端构建和桌面/窄屏页面指标见 [V4 实施验收报告](v4-implementation-acceptance-report.md)。2026-08-21 又完成当前生产运行时的 DeepSeek/DashScope 端到端验证；2026-08-24 根据真实 Thinking Token 结果批准最终生成预算，V4 第一阶段完整验收通过。
 
-## V5 显式偏好记忆评估（Slices 1-3 已完成）
+## V5 显式偏好记忆评估（Slices 1-4 已完成）
 
 V5 评估范围见 [V5 显式记忆详细设计](../architecture/v5-explicit-memory-design.md)。第一阶段数据集命名为 `v5-explicit-memory-v1`，只评估稳定隐式主体下经确认的 `GLOBAL/RESPONSE_PREFERENCE`，不包含登录、多用户、事实型记忆或自动记忆。
 
@@ -127,4 +127,6 @@ Slice 1 在生产 Flyway、Action、管理页面和 Prompt 注入前建立：
 
 2026-08-24 已完成 `v5-explicit-memory-v1` Slice 1 固定资产和离线测试侧候选：12 个路由案例、8 个跨会话/当前请求/单次忽略案例、6 个安全与预算案例、12 个后续生命周期定义均已冻结。无记忆基线满足预期风格 4/8，受限候选为 8/8，提升 50 个百分点；3 个当前请求覆盖、12 个路由、6 个安全隔离和全部预算案例均为 100%。`-Pv5-evaluation test` 共运行 30 项测试，0 失败、0 错误、0 跳过。结果见 [V5 Slice 1 固定评估报告](../../evals/reports/2026-08-24-v5-explicit-memory-slice1.md)。这些结果只证明离线合同和结构性收益，真实 PostgreSQL 生命周期、生产 Prompt 注入与 DeepSeek 遵循率仍按后续切片验证。
 
-2026-08-24 Slices 2-3 已把稳定主体、记忆聚合、未确认零副作用、拒绝/过期、重复与并发确认、精确去重转为真实 PostgreSQL 17 / pgvector 自动化案例；全量后端 356 项测试通过，V5 固定评估再次 30/30 通过。证据见 [Slice 2 报告](../../evals/reports/2026-08-24-v5-explicit-memory-slice2.md) 与 [Slice 3 报告](../../evals/reports/2026-08-24-v5-explicit-memory-slice3.md)。纠正、禁用、过期排除、逻辑删除、版本冲突、历史 pin、生产 Prompt 注入和真实模型遵循率仍由 Slices 4-7 闭合。
+2026-08-24 Slices 2-3 已把稳定主体、记忆聚合、未确认零副作用、拒绝/过期、重复与并发确认、精确去重转为真实 PostgreSQL 17 / pgvector 自动化案例；全量后端 356 项测试通过，V5 固定评估再次 30/30 通过。证据见 [Slice 2 报告](../../evals/reports/2026-08-24-v5-explicit-memory-slice2.md) 与 [Slice 3 报告](../../evals/reports/2026-08-24-v5-explicit-memory-slice3.md)。历史 pin、生产 Prompt 注入和真实模型遵循率仍由后续切片闭合。
+
+2026-08-24 Slice 4 已把查询/详情、不可变管理 revision、内容纠正、启用/禁用、过期调整与过滤、旧版本冲突、精确重复冲突和幂等逻辑删除转为正式 API、真实 PostgreSQL 自动化案例和 `/memories` 页面；详情不返回历史正文，客户端不能提交主体。后端全量 366 项测试（0 失败/0 错误/3 项环境跳过）与 V5 固定评估 30/30 通过。完成证据见 [Slice 4 报告](../../evals/reports/2026-08-24-v5-explicit-memory-slice4.md)。历史消息 pin、生产 Prompt 注入、SSE 恢复、安全降级和真实模型遵循率仍由 Slices 5-7 闭合。

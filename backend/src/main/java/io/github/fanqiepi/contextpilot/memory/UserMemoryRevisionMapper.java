@@ -1,5 +1,6 @@
 package io.github.fanqiepi.contextpilot.memory;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.ibatis.annotations.Insert;
@@ -38,4 +39,13 @@ public interface UserMemoryRevisionMapper {
             @Param("ownerUserId") UUID ownerUserId,
             @Param("memoryId") UUID memoryId,
             @Param("revisionNumber") int revisionNumber);
+
+    @Select("SELECT " + SELECT_COLUMNS + " FROM user_memory_revision revision "
+            + "JOIN user_memory memory ON memory.id = revision.memory_id "
+            + "WHERE revision.memory_id = #{memoryId} AND memory.owner_user_id = #{ownerUserId} "
+            + "AND revision.deleted = 0 AND memory.deleted = 0 "
+            + "ORDER BY revision.revision_number DESC")
+    List<UserMemoryRevisionEntity> selectOwnedRevisionHistory(
+            @Param("ownerUserId") UUID ownerUserId,
+            @Param("memoryId") UUID memoryId);
 }

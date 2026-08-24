@@ -24,7 +24,36 @@ import type {
   ResearchRun,
   StreamResearchPlanEvent,
   StreamResearchStepEvent,
+  UserMemory,
+  UserMemoryDetail,
+  UserMemoryStatus,
+  UserMemoryUpdate,
 } from './types'
+
+export async function listUserMemories(filters?: {
+  status?: UserMemoryStatus
+  expired?: boolean
+}): Promise<UserMemory[]> {
+  const response = await apiClient.get<UserMemory[]>('/user-memories', { params: filters })
+  return response.data
+}
+
+export async function getUserMemory(id: string): Promise<UserMemoryDetail> {
+  const response = await apiClient.get<UserMemoryDetail>(`/user-memories/${id}`)
+  return response.data
+}
+
+export async function updateUserMemory(
+  id: string,
+  input: UserMemoryUpdate,
+): Promise<UserMemoryDetail> {
+  const response = await apiClient.patch<UserMemoryDetail>(`/user-memories/${id}`, input)
+  return response.data
+}
+
+export async function deleteUserMemory(id: string): Promise<void> {
+  await apiClient.delete(`/user-memories/${id}`)
+}
 
 export async function listKnowledgeBases(): Promise<KnowledgeBase[]> {
   const response = await apiClient.get<KnowledgeBase[]>('/knowledge-bases')
