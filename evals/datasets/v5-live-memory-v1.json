@@ -1,0 +1,10 @@
+{
+  "datasetId": "v5-live-memory-v1",
+  "description": "Public synthetic live acceptance: each case runs RAG and DOCUMENT_COMPARISON, with IGNORE baseline then USE candidate in fresh sessions. Style predicates are mechanical indicators, not semantic grounding judgments.",
+  "cases": [
+    {"id":"V5-LIVE-001","preference":"优先使用英文回答","question":"概括 Atlas 和 Borealis 的部署方式。","style":"ENGLISH"},
+    {"id":"V5-LIVE-002","preference":"使用 Markdown 要点回答","question":"概括 Atlas 和 Borealis 的部署方式。","style":"BULLETS"},
+    {"id":"V5-LIVE-003","preference":"回答尽量简洁","question":"概括 Atlas 和 Borealis 的部署方式。","style":"CONCISE"},
+    {"id":"V5-LIVE-004","preference":"优先使用英文回答","question":"这次请用中文概括 Atlas 和 Borealis 的部署方式。","style":"CHINESE"}
+  ]
+}
