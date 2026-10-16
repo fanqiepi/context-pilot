@@ -1,0 +1,114 @@
+{
+  "mode": "LIVE_DEBUG_NOT_FINAL_EVALUATION",
+  "startedAt": "2026-10-15T21:26:14.093905800+08:00",
+  "run": {
+    "budgetVersion": "upgrade-budget-v1",
+    "clientRequestId": "a4a8760c-4a89-4c08-9cb7-46b1a7fdd080",
+    "createdAt": "2026-10-15T13:26:15.86368Z",
+    "deadline": "2026-10-15T13:29:15.86368Z",
+    "deleted": 0,
+    "documentSnapshots": "[{\"id\": \"529e82cc-a70b-4a0f-9c5a-507d9450211b\", \"sha256\": \"470d0668b1749e438d9e85d80a05bb7ffdc2ce58ca1a90dab07e1e681048af08\", \"filename\": \"legacy-worker.md\", \"indexedAt\": \"2026-10-15T13:26:15.693564Z\", \"profileId\": \"v4_eval_dashscope_qwen3_7_1024_v1\"}]",
+    "draft": "## 结论概览\n\n本地证据仅有一处调度描述：旧工作进程按 FIFO 调度，不支持任务优先级 [L1]。指定的 spring-ai v2.0.0 发布记录中，未出现任何与调度器、FIFO/LIFO、优先级队列、任务抢占或工作进程编排相关的新特性、缺陷修复或变更条目 [R1]。因此，**“升级到 v2.0.0 即可改变任务调度/支持任务优先级”的建议无法由本次获取的发布证据支持**，应标为待验证，不能作为可保存报告的既成结论。\n\n## 升级影响\n\n1. 与调度能力相关的直接影响：无从证实 [R1] 未提及；本地侧仅有“不支持优先级”的能力缺口陈述 [L1]。二者不能拼接为“升级即修复”。\n2. v2.0.0 记录到的实际变更集中在模型提供方、消息/记忆仓储、选项参数、文档与依赖层面：更新 Google GenAI 模型、OpenAiChatModel 仅用 Jackson 2、image.observation 空值标注、Prompt 整理、保留 OpenAI tool call 附加属性 [R1]；缺陷修复涉及 Cassandra/Mongo/Jdbc 三个 ChatMemoryRepository 过滤不支持的工具消息、移除 advisor builder 的 streamToolCallResponses、补 OpenAiChatOptions 的 promptCacheKey [R1]。\n3. 依赖与基线变更：MCP SDK 升级到 2.0.0、Spring Boot 升级到 4.1.0 [R1]。这类基线跃迁通常影响面大于调度本身，属于需要单独评估的升级影响面 [R1]。\n4. 跨版本升级说明存在但未纳入本次证据：发布记录指向官方升级说明与 2.0.0 参考文档链接，并有一项“合并 2.0.0 升级说明”的文档变更条目 [R1]；链接内容本身未在本次工具结果中返回，不得据链接推测内容。\n\n## 迁移清单\n\n- 若坚持推进“任务优先级”目标：先补齐发布侧证据（见资料缺口），再决定是否把调度改造纳入本次升级范围；在证据补齐前不要将其登记为 v2.0.0 带来的能力 [R1]。\n- 与 v2.0.0 明确相关的迁移项（按发布记录逐条对照）：ChatMemoryRepository 相关实现对不支持工具消息的过滤行为 [R1]；advisor builder 中 streamToolCallResponses 的移除 [R1]；OpenAiChatOptions 的 promptCacheKey 参数补齐 [R1]；OpenAiChatModel 的 Jackson 2 使用方式 [R1]。\n- 基线迁移：核对 MCP SDK 2.0.0 与 Spring Boot 4.1.0 的兼容性，并据此安排回归范围 [R1]。\n- 调度改造本身（引入优先级、替换 FIFO 队列、调整工作进程取任务逻辑）— 待验证，无发布依据 [L1][R1]。\n\n## 验证清单\n\n1. 复现旧行为基线：确认当前工作进程确实为 FIFO 且无优先级参数 [L1]。\n2. 在 v2.0.0 上检索调度相关配置项/开关是否存在 — 待验证，发布记录未提供 [R1]。\n3. 对第 2 步涉及的 ChatMemoryRepository 过滤、advisor builder 移除项、OpenAiChatOptions 参数做编译与运行期验证 [R1]。\n4. 对 MCP SDK 2.0.0、Spring Boot 4.1.0 组合做构建与集成验证 [R1]。\n5. 调度吞吐/延迟对比测试仅可作自研改造的验证手段，不可用于证明升级带来的调度能力 [L1][R1]。\n\n## 资料缺口说明\n\n本次仅覆盖显式选中的 1 篇本地文档与标签 v2.0.0，中间版本不在覆盖范围内，故不能输出完整的迁移分析。发布记录中给出的升级说明与参考文档链接文本存在 [R1]，但其正文未在本次工具返回中取得，其中的调度相关内容无法核验。\n\n## 建议（与发布事实区分）\n\n- 发布事实：v2.0.0 的条目清单中无调度/优先级条目 [R1]；旧方案为 FIFO 且不支持优先级 [L1]。\n- 建议（待验证）：如需优先级调度，视为独立于 v2.0.0 的自研或另行取证工作；先取得官方升级说明正文与相应版本记录后，再判断是否纳入升级范围。",
+    "draftHash": "bb7efb7f1c714966e4d4123166365e864203048dfca4d52afe0584bb1bf8facf",
+    "errorCode": null,
+    "gaps": "[\"本地文档仅有“旧工作进程按 FIFO 调度，不支持任务优先级”这一句 [L1]，无调度配置、队列实现或版本号信息，无法定位改造点。\", \"v2.0.0 发布记录中无任何调度、优先级、工作进程编排相关条目，无法支持“升级改变任务调度”的结论 [R1]。\", \"发布记录指向的官方升级说明（upgrade-notes）与 2.0.0 参考文档链接未取回正文，内容不可核验 [R1]。\", \"未提供旧方案所对应的具体版本号，无法确定升级起点与跨越范围。\", \"所选标签仅 v2.0.0，中间版本记录不在覆盖范围内，不能声称完整迁移分析。\", \"缺少工作进程调度相关的源码、配置或测试证据用于验证优先级改造可行性。\", \"缺少 Spring Boot 4.1.0、MCP SDK 2.0.0 与调度逻辑相互影响的说明 [R1]。\", \"无性能或并发指标数据，无法评估调度变更的运行时影响。\"]",
+    "httpCalls": 1,
+    "id": "878083dd-f865-417d-9f7d-57ccadd1b412",
+    "knowledgeBaseId": "a61bf905-a47b-4e7e-a758-2941e9545b65",
+    "modelCalls": 3,
+    "ownerId": "00000000-0000-0000-0000-000000000001",
+    "promptVersion": "upgrade-research-v1",
+    "question": "旧工作进程按 FIFO 调度，不支持任务优先级。请检索旧方案中的 scheduling 说明，并核查指定 Spring AI 发布记录能否支持改变任务调度的升级建议；没有依据时明确标注缺口。",
+    "releaseTags": "[\"v2.0.0\"]",
+    "repositoryKey": "spring-ai",
+    "requestHash": "dc1e76f4f40f52576c676e560f2273e63bddcfb9b2b05e96e566b5996cb1bca9",
+    "retrievalCalls": 2,
+    "retryOfRunId": null,
+    "revision": 13,
+    "schemaVersion": "upgrade-tools-v1",
+    "status": "PARTIAL",
+    "toolRequests": 3,
+    "traceId": "v6-live-debug-12bdf5fc-5036-48f5-8e5d-b3b74455be5b",
+    "updatedAt": "2026-10-15T13:26:32.062279Z"
+  },
+  "tools": [
+    {
+      "cacheHit": false,
+      "startedAt": "2026-10-15T13:26:18.078Z",
+      "parameterSummary": "selectedDocuments=1, queryCharacters=29",
+      "ordinal": 1,
+      "toolName": "search_selected_documents",
+      "status": "SUCCEEDED",
+      "finishedAt": "2026-10-15T13:26:18.429Z"
+    },
+    {
+      "cacheHit": false,
+      "startedAt": "2026-10-15T13:26:18.435Z",
+      "parameterSummary": "tag=v2.0.0",
+      "ordinal": 2,
+      "toolName": "get_release_notes",
+      "status": "SUCCEEDED",
+      "finishedAt": "2026-10-15T13:26:19.301Z"
+    },
+    {
+      "cacheHit": false,
+      "startedAt": "2026-10-15T13:26:21.735Z",
+      "parameterSummary": "selectedDocuments=1, queryCharacters=36",
+      "ordinal": 3,
+      "toolName": "search_selected_documents",
+      "status": "SUCCEEDED",
+      "finishedAt": "2026-10-15T13:26:21.920Z"
+    }
+  ],
+  "modelCalls": [
+    {
+      "provider": "DEEPSEEK",
+      "model": "deepseek-flash",
+      "inputTokens": 986,
+      "outputTokens": 169,
+      "totalTokens": 1155,
+      "latencyMs": 2159,
+      "ordinal": 1,
+      "status": "SUCCEEDED"
+    },
+    {
+      "provider": "DEEPSEEK",
+      "model": "deepseek-flash",
+      "inputTokens": 2203,
+      "outputTokens": 305,
+      "totalTokens": 2508,
+      "latencyMs": 2413,
+      "ordinal": 2,
+      "status": "SUCCEEDED"
+    },
+    {
+      "provider": "DEEPSEEK",
+      "model": "deepseek-flash",
+      "inputTokens": 2661,
+      "outputTokens": 1483,
+      "totalTokens": 4144,
+      "latencyMs": 10119,
+      "ordinal": 3,
+      "status": "SUCCEEDED"
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "L1",
+      "type": "LOCAL",
+      "hash": "e502755fb6904dde55fce921102e7d5bb504e78faa0c3c3550a24be2c31350ce",
+      "truncated": false,
+      "fetchedAt": "2026-10-15T13:26:18.421341Z"
+    },
+    {
+      "sourceId": "R1",
+      "type": "RELEASE",
+      "hash": "839b68cf6cc9848e0f3cb6f85fb22b7ecd5bcd3625b3d88482aa89efadca972b",
+      "truncated": false,
+      "fetchedAt": "2026-10-15T13:26:19.293761Z"
+    }
+  ],
+  "reportConfirmed": true,
+  "status": "ENGINEERING_GATES_PASSED_SEMANTICS_UNREVIEWED",
+  "finishedAt": "2026-10-15T21:26:32.409145+08:00"
+}

@@ -37,6 +37,12 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 + "org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration"
 })
 class ContextPilotApplicationTests {
+    @MockitoBean
+    private io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeRunMapper upgradeRunMapper;
+    @MockitoBean
+    private io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeExecutionMapper upgradeExecutionMapper;
+    @MockitoBean
+    private io.github.fanqiepi.contextpilot.researchreport.ResearchReportMapper researchReportMapper;
 
     @Autowired
     private WebApplicationContext applicationContext;

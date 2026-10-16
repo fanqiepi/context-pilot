@@ -49,39 +49,73 @@ V3 健康检查默认最多返回 100 条异常明细，可通过 `HEALTH_ISSUE_
 
 聊天中输入完整句“检查这个知识库有没有异常”“检查当前知识库的健康状态”或 `knowledge base health check` 可触发确定性健康报告。额外附带总结、修复或自动执行要求的复合请求不会命中健康白名单。健康路径使用 `KNOWLEDGE_QA/v2`，SSE 会发送 `health_report`，且不调用聊天模型。
 
-V13 会在后端启动时由 Flyway 自动扩展动作表，V14 会增加健康明细选择消息的匹配依据。不要手工执行这些 SQL；如手工改过结构但未登记迁移历史，Flyway 会因对象已存在或校验不一致而拒绝启动。切片 5 和切片 6 已允许在健康卡片中为可操作的失败文档或索引异常生成提案，客户端只发送报告 ID 和明细 ID；确认前后端会再次检查实时状态、profile、实际向量、处理开关和 VectorStore 可用性。切片 6 和切片 7 均没有新增数据库迁移。切片 7 在事务提交后派发文档任务，队列拒绝时保留 `PENDING`，并在应用启动和默认每 60 秒的低频扫描中按批次恢复；可通过 `DOCUMENT_PROCESSING_RECOVERY_BATCH_SIZE` 和 `DOCUMENT_PROCESSING_RECOVERY_INTERVAL_MILLIS` 调整批次与间隔。
+健康卡片可为失败文档或索引异常生成提案；客户端只发送报告 ID 和明细 ID，确认时后端复核实时状态、profile、向量、处理开关和 VectorStore 可用性。文档任务在事务提交后派发，队列拒绝时保留 `PENDING`；应用启动及默认每 60 秒扫描恢复遗留任务，配置项为 `DOCUMENT_PROCESSING_RECOVERY_BATCH_SIZE` 和 `DOCUMENT_PROCESSING_RECOVERY_INTERVAL_MILLIS`。迁移由 Flyway 自动执行，不手工重放 SQL。
 
-## 启动和验证
+## 启动与验证
 
-后端：
+默认模型集成和文档自动处理关闭，上传文档会保持 `PENDING`。以下分别说明无密钥功能验证和真实模型运行，配置以 `application.yml` / `application-offline.yml` 为准。
+
+### 两种运行方式的共同准备
+
+从仓库根目录复制 `.env.example` 为 `.env`（已有文件则保留），配置本地数据库后执行 `docker compose up -d`。Compose 读取 `.env`，Spring Boot 不会自动读取它；若更改数据库密码，应在后端终端中设置相同的 `POSTGRES_PASSWORD`，不要把密钥打印到日志或提交到仓库。
+
+前端在独立终端从 `frontend/` 运行 `npm ci`、`npm run dev`。开发代理默认指向 `http://127.0.0.1:18080`，可通过 `VITE_API_PROXY_TARGET` 覆盖。启动后端前确认 Java 21，Windows 可使用项目约定 JDK：
 
 ```powershell
-cd backend
-.\mvnw.cmd test
-.\mvnw.cmd spring-boot:run
+$env:JAVA_HOME = 'F:\jdk21weizhi\microsoft-jdk-21.0.3-windows-x64\jdk-21.0.3+9'
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
 ```
 
-不配置任何模型 API Key 时，可使用离线 Profile 验证“上传、异步解析、切分、pgvector 入库、检索、删除清理”完整流程：
+### 无密钥演示
+
+在新的后端终端中，从 `backend/` 执行，避免继承真实模型开关：
 
 ```powershell
 $env:SPRING_PROFILES_ACTIVE = 'offline'
+$env:SPRING_AI_CHAT_MODEL = 'none'
+$env:SPRING_AI_EMBEDDING_MODEL = 'none'
+$env:SPRING_AI_VECTOR_STORE = 'pgvector'
+$env:DOCUMENT_PROCESSING_ENABLED = 'true'
 .\mvnw.cmd spring-boot:run
 ```
 
-离线 Profile 使用确定性的 1024 维测试向量，只适合功能测试，不代表真实语义检索效果。默认 Profile 不自动处理新上传文档，文档会保持 `PENDING`。
+可使用 `evals/corpora/v4-document-comparison-v1/` 中的公开合成 Markdown 验证文档上传、处理状态、隔离检索与页面；其中 `quartz-injection.md` 是对抗样例，`shadow-out-of-scope.md` 用于范围隔离，不应混作普通可信资料。该方式使用确定性测试向量且没有真实聊天模型，不能证明真实回答、偏好遵循、多文档综合质量或检索优化收益。
 
-前端：
+### 真实 DeepSeek + DashScope
+
+在新的后端终端中，从 `backend/` 执行；通过本地安全配置事先注入 `DEEPSEEK_API_KEY` 和 `DASHSCOPE_API_KEY`，不要在共享命令记录中写实际密钥：
 
 ```powershell
-cd frontend
-npm ci
-npm run typecheck
-npm run dev
+$env:SPRING_PROFILES_ACTIVE = 'default'
+$env:SPRING_AI_CHAT_MODEL = 'deepseek'
+$env:SPRING_AI_EMBEDDING_MODEL = 'openai'
+$env:SPRING_AI_VECTOR_STORE = 'pgvector'
+$env:DOCUMENT_PROCESSING_ENABLED = 'true'
+.\mvnw.cmd spring-boot:run
 ```
 
-前端开发代理默认指向 `http://127.0.0.1:18080`；后端使用其他端口时，可通过 `VITE_API_PROXY_TARGET` 覆盖代理目标。
+默认聊天为 `deepseek-v4-flash`，Embedding 为 `qwen3.7-text-embedding` / 1024 维。保持真实与离线 profile ID 隔离；切换后旧文档需通过现有重建入口生成当前 profile 的索引，不得通过改 ID 冒充真实向量。
 
-真实模型集成默认关闭。后续启用真实服务时，才需要在后端进程中设置 `DEEPSEEK_API_KEY`、`DASHSCOPE_API_KEY` 和对应 Spring AI 模型配置。
+用公开样例验证上传 → 处理完成 → 知识问答/显式多文档比对 → 引用/历史，再验证偏好提案、确认、单次忽略及使用卡片。真实服务会发送公开样例片段并产生调用费用，记录 traceId、usage 和失败终态。版本评估命令见 [evals](../../evals/README.md)；V5 最终验收已完成，见 [验收报告](../evaluation/v5-acceptance-report.md)。录屏和完整应用从干净环境复跑仍是展示交付项，不能把 Testcontainers 数据库验证等同于干净机器安装验证。
+
+### 工程检查
+
+| 位置 | 命令 | 用途 |
+| --- | --- | --- |
+| `backend/` | `.\mvnw.cmd test` | 后端回归 |
+| `backend/` | `.\mvnw.cmd package` | 测试与打包 |
+| `frontend/` | `npm run typecheck` | TypeScript 检查 |
+| `frontend/` | `npm run build` | 类型检查与生产构建 |
+
+Unix 使用 `./mvnw`。付费模型测试的启用条件见[评估入口](../../evals/README.md)，测试通过不等于真实语义验收通过。
+
+## V6 升级研究联调
+
+在上述真实模型、Embedding、pgvector 和文档处理配置基础上设置 `$env:UPGRADE_RESEARCH_ENABLED='true'`，打开 `/upgrade-research`。默认关闭新建研究，既有运行与报告仍可查看；重启时遗留活动运行会失败收敛，不自动重新调用模型。只支持固定 `spring-projects/spring-ai` 公开仓库及用户明确选择的标签。可选 `GITHUB_RELEASE_TOKEN` 仅由后端读取；不要把 token 放进前端或来源 URL。
+
+单次运行最多 4 次模型调用、8 次工具请求、9 次逐文档检索、3 次 HTTP 请求和 180 秒总时间。默认不发送请求级 `max_tokens`；调用数和时间限制不构成费用硬上限。研究草稿不自动成为报告，须创建保存提案并单独确认。
+
+真实调试测试使用独立 Testcontainers 数据库和公开调试文档；须事先配置本地 `local-secrets`，从 `backend/` 执行 `./mvnw.cmd -Dtest=V6LiveDebugTests -Dcontextpilot.evaluation.v6-debug=true test`。结果保存在 `target/v6-live-debug.json`，包含公开调试回答；这是调试证据，不进入最终任务成绩。普通 `test`/`package` 跳过付费调试。最终语义评测与生产验收尚未完成，不能凭一次调试通过宣称 V6 已验收。
 
 ## AI 调用日志
 

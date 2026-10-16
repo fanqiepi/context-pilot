@@ -1,0 +1,32 @@
+{
+  "contractVersion": "v6-upgrade-research-v1",
+  "budgetVersion": "upgrade-budget-v1",
+  "repositoryAllowlist": {"spring-ai": "spring-projects/spring-ai"},
+  "allowedTools": ["search_selected_documents", "read_evidence", "get_release_notes"],
+  "budgets": {"modelCalls":4,"toolRequests":8,"retrievalCalls":9,"httpCalls":3,"runTimeoutMs":180000,"modelTimeoutMs":60000,"httpTimeoutMs":10000,"httpMaxBytes":262144,"inputCharacters":40000,"evidenceCharacters":24000,"answerCharacters":3000,"localEvidence":18,"releaseEvidence":3,"toolCallsPerRound":3,"toolArgumentCharacters":2000},
+  "thresholds": {"taskSuccess":0.85,"citationSupport":0.95,"missingAndRefusalAccuracy":0.9,"unauthorizedReads":0,"unconfirmedReportWrites":0,"budgetViolations":0,"dispatchAfterCancellation":0},
+  "lifecycleCases": [
+    {"id":"V6-LIFE-001","scenario":"同键同输入并发启动","expected":"同一运行，单次派发"},
+    {"id":"V6-LIFE-002","scenario":"同键不同输入","expected":"409，原运行不变"},
+    {"id":"V6-LIFE-003","scenario":"队列容量耗尽","expected":"429，无残留排队任务"},
+    {"id":"V6-LIFE-004","scenario":"提交后派发失败","expected":"FAILED/DISPATCH_FAILED"},
+    {"id":"V6-LIFE-005","scenario":"取消与调用登记竞争","expected":"取消提交后无新登记"},
+    {"id":"V6-LIFE-006","scenario":"取消与完成竞争","expected":"一个不可逆终态"},
+    {"id":"V6-LIFE-007","scenario":"总超时且远端不响应中断","expected":"FAILED/DEADLINE_EXCEEDED，不复活"},
+    {"id":"V6-LIFE-008","scenario":"进程重启有遗留活动任务","expected":"FAILED/PROCESS_RESTARTED，无自动重跑"},
+    {"id":"V6-LIFE-009","scenario":"SSE断线重连","expected":"同一运行快照，revision不倒退"},
+    {"id":"V6-LIFE-010","scenario":"重复保存提案","expected":"同一动作，不增加聊天消息"},
+    {"id":"V6-LIFE-011","scenario":"待确认提案标题冲突","expected":"409 REPORT_PROPOSAL_CONFLICT"},
+    {"id":"V6-LIFE-012","scenario":"确认前/拒绝后/过期后","expected":"零报告插入"},
+    {"id":"V6-LIFE-013","scenario":"4路并发确认","expected":"一个报告，同一结果ID"},
+    {"id":"V6-LIFE-014","scenario":"报告插入后抛错","expected":"报告与动作同事务回滚"},
+    {"id":"V6-LIFE-015","scenario":"成功状态更新失败","expected":"报告插入回滚"},
+    {"id":"V6-LIFE-016","scenario":"来源删除或重建","expected":"研究失败/确认拒绝，不混合版本"},
+    {"id":"V6-LIFE-017","scenario":"报告删除后重放确认","expected":"不恢复、不插入第二份报告"},
+    {"id":"V6-LIFE-018","scenario":"删除运行后重放启动","expected":"409 UPGRADE_RUN_DELETED"},
+    {"id":"V6-LIFE-019","scenario":"HTTP重定向/超大结果/无效JSON/空正文","expected":"有界失败，无后续地址访问"},
+    {"id":"V6-LIFE-020","scenario":"HTTP 401/403/404/429/500","expected":"分别记录错误，不自动重试"},
+    {"id":"V6-LIFE-021","scenario":"模型超时/重复call ID/第四轮工具请求","expected":"协议或超时失败，无隐藏重试"},
+    {"id":"V6-LIFE-022","scenario":"输入或账本字数超限","expected":"受限终止，不自动摘要扩大预算"}
+  ]
+}

@@ -32,3 +32,8 @@ export function renderMarkdown(source: string): string {
     FORBID_TAGS,
   })
 }
+
+// Research links are rendered separately from the server-validated source ledger.
+export function renderResearchMarkdown(source: string): string {
+  return DOMPurify.sanitize(renderMarkdown(source), { FORBID_TAGS: ['a'] })
+}

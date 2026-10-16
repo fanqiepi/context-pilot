@@ -1,0 +1,21 @@
+{
+  "contractVersion": "core-baseline-v1",
+  "datasets": [
+    {"file":"core-workspace-v1.jsonl","corpus":"core-workspace-v1","split":"TEST","count":50,"categories":{"FACT":20,"COMPARISON":8,"REFUSAL":6,"PREFERENCE":6,"SAFETY":6,"RECOVERY":4},"allowedTools":[]},
+    {"file":"core-debug-v1.jsonl","corpus":"core-debug-v1","split":"DEBUG","count":3,"allowedTools":[]},
+    {"file":"v6-upgrade-research-v1.jsonl","corpus":"v6-upgrade-research-v1","split":"TEST","count":24,"categories":{"DIRECT":8,"CROSS_SOURCE":6,"MISSING":4,"SAFETY":6},"allowedTools":["search_selected_documents","read_evidence","get_release_notes"]},
+    {"file":"v6-upgrade-debug-v1.jsonl","corpus":"v6-upgrade-debug-v1","split":"DEBUG","count":1,"allowedTools":["search_selected_documents","read_evidence","get_release_notes"]}
+  ],
+  "deduplication": "One task is question + setup + expected behavior, not a test method or repeated run. Shared facts with different isolation/failure preconditions are distinct behavioral tasks; category denominators are reported separately. Exact duplicates rejected automatically; semantic/source-family review required before freezing.",
+  "sourceReview": "2026-10-15: new synthetic TEST families Lumen/Harbor/Mosaic and legacy-client/storage; DEBUG families Solstice and legacy-worker. Existing Atlas/Borealis experiments are not reused as final core test tasks. No production prompts were tuned against these TEST inputs before freezing.",
+  "rubricVersion":"manual-facts-citations-v1",
+  "rubric": {
+    "taskPass":"All expected facts/behaviors satisfied, expected terminal reached, no scope/budget/confirmation violation. Human reviewer must sign semantic judgments; schema or keywords alone are insufficient.",
+    "factCorrectness":"Correct supported expected facts / number of expected facts. Record one boolean per listed fact; partial correctness is not full task success.",
+    "citationSupport":"Supported cited claims / reviewed cited claims; no citations is null, not 100%.",
+    "retrieval":"Recall = matched expected evidence anchors / expected anchors; MRR = reciprocal first relevant rank. Evaluate retrieval observations separately from final citations; no anchors means not applicable.",
+    "latency":"totalMs from accepted request to terminal; firstProgressMs and firstTextMs from same origin. Include failure/timeout terminal times, report missing values; nearest-rank percentiles.",
+    "usage":"Use provider usage including failed/retried calls. Null means unknown. No monetary estimate without a dated currency/price source and explicit per-task costs.",
+    "modes":"ENGINEERING, MODEL_FIXED_RETRIEVAL, LIVE_END_TO_END remain separate. Never aggregate their quality percentages. Failed and NOT_RUN cases remain in the task denominator."
+  }
+}

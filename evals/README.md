@@ -3,6 +3,19 @@
 The `evals/` directory contains public, versioned, deterministic evaluation inputs and reports.
 It must not contain real user documents, credentials, or unredacted production requests.
 
+## V6 当前验证状态
+
+V6 已有受限执行、确认保存、页面及工程测试，首轮冻结专项尚未达到验收条件。详见 [实现验证记录](../docs/evaluation/v6-implementation-review.md)。普通后端 `test`/`package` 不自动进行付费调用。
+
+从 `backend/` 使用 JDK 21 执行：
+
+```powershell
+.\mvnw.cmd '-Dtest=V6LiveDebugTests' '-Dcontextpilot.evaluation.v6-debug=true' test
+.\mvnw.cmd '-Dtest=V6FixtureEvaluationTests' '-Dcontextpilot.evaluation.v6-fixture=true' test
+```
+
+两者需要本机 `local-secrets` 配置与 Docker，使用独立数据库和公开资料。前者是可变 GitHub 来源的真实调试；后者使用真实模型/检索与合成 release fixtures 收集冻结结果。结果文件分别是 `backend/target/v6-live-debug.json`、`backend/target/v6-fixture-evaluation.json`。**结果采集成功不代表语义验收通过**；人工事实/引用评分、统一核心基线及 16 次最终生产验收仍须完成。已观察的 TEST 输入不能继续作为调参后的独立泛化证明。
+
 ## Run the V2 routing and action-safety evaluation
 
 Prerequisites: JDK 21 and Docker with access to the `pgvector/pgvector:0.8.2-pg17-bookworm`
@@ -80,7 +93,7 @@ model answers, document contents, or credentials. The fixed versioned summary is
 The Slice 1 prototype remains evaluation-only. The authorized production baseline uses the
 versioned deterministic planner in `src/main`, Flyway V15, persisted research runs, formal API/SSE,
 and the Vue research UI. Run the full backend suite, the `v4-evaluation` profile, and the frontend
-production build; the current evidence and remaining external-provider gate are recorded in
+production build; completed production and external-provider acceptance evidence is recorded in
 `docs/evaluation/v4-implementation-acceptance-report.md`.
 
 ## Run the V5 Slice 1 explicit-memory evaluation
@@ -101,3 +114,41 @@ or frontend code.
 The eight representative cases are repeated three times. Passing this profile establishes the
 versioned Slice 1 contract; it does not claim that production persistence, confirmation,
 management APIs, Prompt injection, history, real DeepSeek behavior, or page flows are complete.
+
+## Current acceptance and cross-version reporting
+
+### V5 production and live acceptance checkpoints
+
+From `backend/`, run `./mvnw -Pv5-production-acceptance package` (Windows:
+`.\mvnw.cmd -Pv5-production-acceptance package`). This runs the full regression suite,
+including the frozen V5 prototype, its production routing counterpart and real PostgreSQL
+memory lifecycle tests. The existing environment gates require Docker instead of silently
+accepting skipped database tests. Live providers remain opt-in.
+
+Run `.\mvnw.cmd -Pv5-live-model-acceptance test` with the ignored `local-secrets` configuration
+to execute `v5-live-memory-v1`. It creates a disposable Testcontainers database, ingests the
+public Atlas/Borealis corpus through real DashScope and pgvector, and executes four preference
+scenarios on each production RAG/V4 path. Each scenario uses a persisted, separately confirmed
+proposal and compares IGNORE with USE in fresh conversations: 16 answer calls in total.
+The profile incurs provider charges; it must never be run with private corpus inputs.
+
+`backend/target/v5-live-acceptance-results.json` records sanitized per-run gates, trace IDs,
+provider-returned model names, latency and tokens. `backend/target/v5-live-public-answer-review.md`
+is a local review artifact containing only these public synthetic answers; it is not committed.
+The automatic result explicitly requires manual review: valid citation numbers and style
+predicates do not prove semantic grounding. A missing provider, ingestion failure, assertion
+failure or unavailable Docker must not be reported as acceptance success. Page/SSE acceptance
+and manual answer review remain separate checks.
+
+V5 production Slices 1–7 are complete. The frozen evaluation, real PostgreSQL lifecycle,
+full regression, four live DeepSeek scenarios on each RAG/V4 path and page checks passed on
+2026-10-15; see [V5 acceptance](../docs/evaluation/v5-acceptance-report.md).
+The Slice 1 profile alone is not production acceptance evidence.
+
+The career-oriented unified 50-task baseline and shared baseline/candidate report entry point
+are planned, not delivered. Existing dataset case counts, test methods and repeated executions
+must not be added together as independent semantic tasks. Public synthetic source documents are
+under `corpora/`. See [evaluation requirements](../docs/evaluation/evaluation-plan.md) for dataset
+separation, metrics and reproducibility, and the [dated review](../docs/archive/2026-10-15-career-readiness-review.md)
+for current gaps. Keep offline evaluation, live-model/fixed-retrieval experiments and real
+embedding/pgvector end-to-end results separate.

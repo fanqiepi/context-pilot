@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    { path: '/upgrade-research', name: 'upgrade-research', component: () => import('@/views/UpgradeResearchView.vue') },
     {
       path: '/',
       redirect: '/library',

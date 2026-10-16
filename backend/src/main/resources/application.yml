@@ -41,6 +41,8 @@ spring:
         dimensions: 1024
 
 contextpilot:
+  upgrade-research:
+    enabled: ${UPGRADE_RESEARCH_ENABLED:false}
   research:
     enabled: ${RESEARCH_ENABLED:true}
     retrieval-parallelism: ${RESEARCH_RETRIEVAL_PARALLELISM:4}

@@ -1,0 +1,1 @@
+{"id":"V6-DEBUG-001","category":"DIRECT","question":"新调度方案如何兼容旧客户端？","sources":["legacy-worker.md#scheduling","release-debug.md#scheduling"],"facts":["默认 normal","两级优先级","结果格式不变"],"terminal":"SUCCEEDED"}

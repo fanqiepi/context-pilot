@@ -85,6 +85,10 @@ public class KnowledgeBaseService {
     @Transactional
     public void delete(UUID id) {
         requireEntity(id);
+        if (knowledgeBaseMapper.lockActive(id) == null) throw notFound(id);
+        if (knowledgeBaseMapper.countActiveUpgradeResources(id) > 0) {
+            throw new ConflictException("KNOWLEDGE_BASE_HAS_RESEARCH", "Delete associated upgrade runs and reports first");
+        }
         if (knowledgeBaseMapper.countActiveDocuments(id) > 0) {
             throw new ConflictException(
                     "KNOWLEDGE_BASE_NOT_EMPTY",

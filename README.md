@@ -1,41 +1,36 @@
 # ContextPilot
 
-ContextPilot 是一个基于 Spring AI 的学习型、可控、可评估的个人知识工作助手。V1 功能型 RAG 基线已完成，采用前后端分离的模块化单体架构，提供文档摄取、检索增强生成、引用、流式回答、会话历史、调用记录和单向“有用”反馈。
+基于 Spring AI 的可追溯知识研究与受控行动助手，采用 Java / Vue 前后端分离的模块化单体架构。
 
-V2 是当前版本，已实现固定能力路由和首个需人工确认的 `CREATE_KNOWLEDGE_BASE` 操作：聊天先生成并持久化强类型提案，只有独立确认请求可以触发原子幂等执行。实现继续采用显式 Java 应用服务，不引入 Agent、LangGraph、动态插件或通用工具平台；当前状态和完成结论以 `docs/` 为准。
+## 当前能力
 
-## 环境要求
+- **V1–V3 已验收**：文档摄取、知识库隔离检索、引用与拒答、SSE、历史与反馈；经确认创建知识库、重试文档和重建索引。
+- **V4 第一阶段已验收**：2–5 份文档比对、确定性多步骤检索、证据追溯和有界执行。
+- **V5 第一阶段已验收**：经确认保存回答偏好、版本化管理、受限注入、单次忽略和历史追溯。
+- **V6 首版已实现，验收未通过**：受控升级研究与报告确认保存；新建研究默认关闭，见[实现记录](docs/evaluation/v6-implementation-review.md)。
 
-- Java 21
-- Maven 3.6.3+（仓库已包含 Maven Wrapper）
-- Node.js 22.12+
-- Docker Desktop / Docker Compose
+逐项状态、证据与简历素材见[功能清单](docs/development/feature-inventory.md)。未来范围只在[产品需求](docs/requirements/product-requirements.md)维护。
 
-如果 Windows 同时安装了多个 JDK，可在当前 PowerShell 会话中切换后再运行 Maven Wrapper：
+当前没有登录认证与多用户隔离，仅适用于本机或可信网络。业务动作必须经过持久化提案、独立确认和幂等执行；V4 保持确定性编排，V6 的三个只读工具仅用于固定范围的升级研究。
 
-```powershell
-$env:JAVA_HOME = 'C:\path\to\jdk-21'
-$env:Path = "$env:JAVA_HOME\bin;$env:Path"
-java -version
-```
+## 本地运行
 
-## 本地启动
+需要 Java 21、Node.js 22.12+ 和 Docker Compose；后端使用仓库自带 Maven Wrapper。
 
-1. 执行 `java -version`，确认当前终端使用的是 JDK 21；Maven 构建会拒绝其他 Java 版本。
-2. 复制 `.env.example` 为 `.env`，供 Docker Compose 读取本地数据库密码。不要提交 `.env`。
-3. 启动 PostgreSQL 与 pgvector：`docker compose up -d`。
-4. Spring Boot 不会自动读取根目录 `.env`。从其他工作目录启动后端时，需要将 `STORAGE_ROOT` 设置为仓库根目录下 `data/uploads/` 的绝对路径；当前无需配置真实模型密钥。
-5. 启动后端：进入 `backend`，执行 `./mvnw spring-boot:run`；Windows PowerShell 使用 `.\mvnw.cmd spring-boot:run`。
-6. 启动前端：进入 `frontend`，执行 `npm ci` 后运行 `npm run dev`。
+1. 在仓库根目录复制 `.env.example` 为 `.env`，已有文件则保留；配置数据库密码后执行 `docker compose up -d`。
+2. 在后端终端设置对应 `POSTGRES_PASSWORD`；Spring Boot 不自动读取根目录 `.env`。
+3. 从 `backend/` 执行 `.\mvnw.cmd spring-boot:run`。
+4. 在另一终端从 `frontend/` 执行 `npm ci` 和 `npm run dev`。
 
-本机 PostgreSQL 映射端口为 `15432`，默认数据库名和用户均为 `context_pilot`。后端默认不启用模型调用和向量存储自动配置；配置 `SPRING_AI_CHAT_MODEL=deepseek`、`SPRING_AI_EMBEDDING_MODEL=openai`、`SPRING_AI_VECTOR_STORE=pgvector` 及对应 API Key 后再启用。
+默认模型集成和文档自动处理关闭。无密钥演示使用 `offline` Profile，真实问答需配置 DeepSeek、DashScope 和 pgvector；完整步骤、JDK 切换、端口及验证命令见[本地开发](docs/development/local-development.md)。Unix 使用 `./mvnw`。
 
-无需 API Key 验证文档处理与检索时，在启动后端前设置 `$env:SPRING_PROFILES_ACTIVE = 'offline'`。该 Profile 使用确定性测试 Embedding 自动完成异步解析、切分、pgvector 入库和知识库隔离检索，不代表真实语义质量。
+后端默认 `18080`，PostgreSQL 映射端口 `15432`；接口文档为 `http://localhost:18080/doc.html`。上传文件存于 Git 忽略的 `data/uploads/`；真实模式下文档片段会发送至模型服务，凭据只保存在后端。
 
-后端默认监听 `18080`，可通过 `SERVER_PORT` 覆盖。Knife4j 接口文档地址为 `http://localhost:18080/doc.html`，原始 OpenAPI JSON 位于 `http://localhost:18080/v3/api-docs`。
+## 文档入口
 
-## 数据流向
-
-上传文件保存在被 Git 忽略的 `data/uploads/`。文档分段发送到阿里云百炼 `qwen3.7-text-embedding` 生成 1024 维向量，检索命中的分段发送到 DeepSeek 生成回答；模型密钥只允许保存在后端环境变量中。
-
-正式的需求、当前状态、下一阶段授权范围、架构、数据模型、接口、评估和本地开发约定位于 [`docs/`](docs/)；数据库结构以 Flyway 迁移脚本为准，根目录早期规划文档仅作为历史背景。
+| 要做什么 | 入口 |
+| --- | --- |
+| 浏览分类文档 | [文档导航](docs/README.md) |
+| 开始开发或继续会话 | [项目背景](docs/development/project-context.md)、[仓库规则](AGENTS.md) |
+| 了解实现与数据流 | [技术架构](docs/architecture/technical-architecture.md) |
+| 运行评估、查看证据 | [评估入口](evals/README.md)、[版本验收导航](docs/README.md#评估与验收) |

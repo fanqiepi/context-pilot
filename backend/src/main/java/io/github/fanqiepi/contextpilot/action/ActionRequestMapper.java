@@ -17,7 +17,7 @@ public interface ActionRequestMapper {
             id, conversation_id, user_message_id, assistant_message_id,
             capability_id, capability_version, action_type,
             parameters::text AS parameters_json,
-            target_document_id, health_issue_id, result_resource_id,
+            target_document_id, health_issue_id, result_resource_id, upgrade_run_id,
             display_summary, status, result_summary, error_summary, trace_id,
             expires_at, confirmed_at, executed_at, created_at, updated_at, deleted
             """;
@@ -26,14 +26,14 @@ public interface ActionRequestMapper {
             INSERT INTO action_request (
                 id, conversation_id, user_message_id, assistant_message_id,
                 capability_id, capability_version, action_type, parameters,
-                target_document_id, health_issue_id, result_resource_id,
+                target_document_id, health_issue_id, result_resource_id, upgrade_run_id,
                 display_summary, status, trace_id, expires_at,
                 created_at, updated_at, deleted
             ) VALUES (
                 #{id}, #{conversationId}, #{userMessageId}, #{assistantMessageId},
                 #{capabilityId}, #{capabilityVersion}, #{actionType},
                 CAST(#{parametersJson} AS jsonb),
-                #{targetDocumentId}, #{healthIssueId}, #{resultResourceId},
+                #{targetDocumentId}, #{healthIssueId}, #{resultResourceId}, #{upgradeRunId},
                 #{displaySummary}, #{status}, #{traceId}, #{expiresAt},
                 #{createdAt}, #{updatedAt}, #{deleted}
             )

@@ -242,6 +242,10 @@ public class ActionRequestService {
             completeFailure(id, exception.getMessage());
             return response(requireEntity(id));
         } catch (RuntimeException exception) {
+            if (current.getActionType() == ActionType.SAVE_RESEARCH_REPORT) {
+                // Roll back the report INSERT and execution claim together; never commit a partial save.
+                throw exception;
+            }
             LOGGER.error("Action execution failed, actionRequestId={}, traceId={}",
                     id, current.getTraceId(), exception);
             completeFailure(id, internalFailureSummary(current.getActionType()));
@@ -326,6 +330,7 @@ public class ActionRequestService {
             case RETRY_DOCUMENT_PROCESSING -> "提交文档重试任务失败，请稍后重试";
             case REINDEX_DOCUMENT -> "提交索引重建任务失败，请稍后重试";
             case CREATE_USER_MEMORY -> "保存回答偏好失败，请稍后重试";
+            case SAVE_RESEARCH_REPORT -> "保存研究报告失败，请稍后重试";
         };
     }
 

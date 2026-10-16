@@ -82,6 +82,12 @@ public class ChatPersistenceService {
     }
 
     @Transactional
+    public PendingChatExchange beginReportSave(UUID conversationId, UUID knowledgeBaseId, String question, String traceId) {
+        return begin(conversationId, knowledgeBaseId, question, CapabilityRoute.matched(
+                CapabilityId.BUSINESS_ACTION, "v6", CapabilityMatchReason.UPGRADE_REPORT_SAVE_SELECTED, traceId));
+    }
+
+    @Transactional
     public UUID beginModelCall(
             UUID assistantMessageId,
             String provider,

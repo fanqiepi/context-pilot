@@ -18,6 +18,9 @@ public class ActionRequestEntity {
     private UUID targetDocumentId;
     private UUID healthIssueId;
     private UUID resultResourceId;
+    private UUID upgradeRunId;
+    public UUID getUpgradeRunId() { return upgradeRunId; }
+    public void setUpgradeRunId(UUID value) { upgradeRunId=value; }
     private String displaySummary;
     private ActionRequestStatus status;
     private String resultSummary;
