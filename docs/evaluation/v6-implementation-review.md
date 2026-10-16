@@ -48,3 +48,15 @@
 ## 最终工程检查
 
 2026-10-15 21:49 的后端 `mvnw.cmd package`：425 项，418 通过、7 项条件跳过，0 失败、0 错误，打包成功。前端 `npm run build`（含类型检查）通过；冻结数据再次校验通过，`git diff --check` 通过。临时 UI 后端、Vite 与专用 PostgreSQL 容器已停止清理；没有修改用户现有数据库，没有提交或合并 Git 变更。
+
+## 2026-10-16 本地开启与复核
+
+按用户“开启，做验证”的要求，本地后端通过进程环境变量 `UPGRADE_RESEARCH_ENABLED=true` 开启，监听 `127.0.0.1:18080`；前端为 `http://127.0.0.1:5200/upgrade-research`。仓库默认开关仍为 false。接口返回 `enabled=true`，浏览器确认研究输入与开始按钮已启用；此项仅为页面冒烟检查。
+
+- JDK 21 执行 `-Dtest=Upgrade*Tests,ResearchReport*Tests,V6LiveDebugTests -Dcontextpilot.evaluation.v6-debug=true test`：30 项通过，0 失败、错误或跳过。真实调试使用独立 Testcontainers 数据库、公开合成文档、DeepSeek、DashScope 和真实 GitHub 发布记录。
+- 前端 `npm run build`（包含类型检查）通过，仍有大 chunk 提示。
+- 真实调试终态 PARTIAL：3 次模型调用、3 次工具请求、2 次检索、1 次 HTTP 请求；运行创建到终态约 15.65 秒。已返回模型 usage 合计 7709 tokens，不含 Embedding 用量，也不代表费用统计。
+- 验证提案创建后尚无报告、提案可查询恢复、独立确认后动作成功并保存报告。此链路在临时测试库执行。
+- 人工调试观察：回答仍把调度依据核查扩展为无关迁移清单，将未选择中间版本等列为缺口。本次不构成完整事实／引用评分，不能宣称语义验收通过。
+
+安全摘要见 [本轮记录](../../evals/reports/2026-10-16-v6-local-validation.json)；完整公开样例调试回答保存在本地 `backend/target/v6-live-debug.json`。未覆盖之前冻结专项结果，未执行统一 50 项核心任务或最终 16 次生产验收。验证后本地前后端保留运行；开启状态属于本次启动进程，普通重启需重新设置环境变量（本地启动脚本为 gitignored 的 `backend/target/start-v6-local.ps1`）。

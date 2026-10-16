@@ -878,7 +878,7 @@ function formatScore(score: number | null): string {
               <div class="message-avatar">{{ message.role === 'USER' ? '你' : 'CP' }}</div>
               <div class="message-body">
                 <div class="message-meta">
-                  <strong>{{ message.role === 'USER' ? '你' : 'ContextPilot' }}</strong>
+                  <strong>{{ message.role === 'USER' ? '你' : '研序' }}</strong>
                   <span>{{ formatDate(message.createdAt) }}</span>
                   <ElTag v-if="message.status === 'FAILED'" size="small" type="danger">
                     失败

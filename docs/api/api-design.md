@@ -290,3 +290,7 @@ message -> route -> action_required -> done(AWAITING_CONFIRMATION)
 确认和拒绝接口不接受客户端覆盖 `actionType`、参数、会话、消息或 trace ID。执行参数完全来自服务端已校验并持久化的提案。状态冲突返回 `409`，提案不存在或已逻辑删除返回 `404`。
 
 `CREATE_KNOWLEDGE_BASE` 提案只包含规范化后的 `name` 和可选 `description`。确认成功后调用现有知识库领域服务；名称冲突沿用 `KNOWLEDGE_BASE_NAME_CONFLICT` 语义。执行错误保存并返回安全摘要，不暴露堆栈、SQL 或内部类名。
+
+## 研究任务工作台 API
+
+新增 /api/research-tasks 的创建、分页列表、详情、逻辑删除、commands 与 events 接口。命令采用 START、PAUSE、RESUME、CANCEL、SUPPLEMENT 静态枚举及 expectedRevision；不接受 ownerId。细节见[设计](../architecture/research-task-workspace-design.md)。

@@ -107,7 +107,7 @@ class ContextPilotApplicationTests {
                 .andExpect(status().isOk());
         mockMvc.perform(get("/v3/api-docs"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.info.title").value("ContextPilot API"))
+                .andExpect(jsonPath("$.info.title").value("研序 API"))
                 .andExpect(jsonPath("$.paths['/api/knowledge-bases']").exists())
                 .andExpect(jsonPath("$.paths['/api/knowledge-bases/{id}']").exists())
                 .andExpect(jsonPath("$.paths['/api/documents/{documentId}/retry']").exists())

@@ -5,15 +5,16 @@ import { RouterLink, RouterView } from 'vue-router'
 <template>
   <div class="app-shell">
     <header class="app-header">
-      <RouterLink class="brand" to="/library" aria-label="ContextPilot 首页">
-        <span class="brand-mark">CP</span>
+      <RouterLink class="brand" to="/library" aria-label="研序 首页">
+        <span class="brand-mark">研</span>
         <span>
-          <strong>ContextPilot</strong>
-          <small>Knowledge workspace</small>
+          <strong>研序</strong>
+          <small>技术研究 Agent</small>
         </span>
       </RouterLink>
 
       <nav class="app-nav" aria-label="主导航">
+        <RouterLink to="/research-tasks">研究任务</RouterLink>
         <RouterLink to="/library">资料库</RouterLink>
         <RouterLink to="/chat">知识问答</RouterLink>
         <RouterLink to="/upgrade-research">升级研究</RouterLink>

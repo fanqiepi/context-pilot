@@ -1,5 +1,7 @@
 # ContextPilot repository guidance
 
+- The user-facing project name is 研序, confirmed on 2026-10-16; use 研序｜技术研究 Agent for the project title. ContextPilot remains the legacy technical identifier for repository/package/configuration names and historical evidence. Do not rename those identifiers as part of display branding.
+
 ## Required session startup
 
 - At the beginning of every new conversation, read `docs/development/project-context.md` before inspecting, planning, or changing the repository.
@@ -9,7 +11,7 @@
 
 - ContextPilot is a learning-oriented, controllable, and evaluable personal knowledge-work assistant built with Spring AI. Its user-facing product carrier is a single-user knowledge workspace; its engineering purpose is to explore modern agent capabilities through coherent, testable scenarios rather than by accumulating frameworks.
 - V1, the functional RAG baseline, is complete. It covers document ingestion, retrieval-augmented generation, citations, streaming responses, conversation history, call records, positive-only helpful feedback, fixed capability routing, and embedding-index governance.
-- The roadmap advances by major version. A version under implementation is specified in detail; the next version defines a scenario and boundary; later versions are directional candidates and are not implementation authorization.
+- The roadmap advances by named user capabilities. Specify an approved capability in detail; candidates define scenarios and boundaries and are not implementation authorization. Historical V1–V6 identifiers remain for evidence traceability, not as names for new goals.
 - V2 is complete. It adds the persisted, confirmable `CREATE_KNOWLEDGE_BASE` business action while preserving the modular monolith and existing RAG behavior.
 - V3 is complete. Its approved detailed design and completion record are at `docs/architecture/v3-knowledge-base-maintenance-design.md` and `docs/evaluation/v3-acceptance-report.md`; preserve the V1/V2/V3 baselines in subsequent maintenance.
 - V4's first-phase `DOCUMENT_COMPARISON` is complete and fully accepted. Slice 1 evidence demonstrates a need for scoped multi-step retrieval but does not justify a model Planner, so the production baseline uses versioned deterministic dimension detection and per-document orchestration. Slices 2-7, local engineering gates, and the 2026-08-21 DeepSeek/DashScope production end-to-end runs are complete. The 2026-08-24 release decision approves no request-level `max_tokens` for the DeepSeek Synthesizer while retaining one model call, a 90-second hard timeout, a 1800-character final-answer limit, and usage recording. Preserve the implementation and independently verifiable slices documented in `docs/architecture/v4-knowledge-research-design.md`. Do not introduce production agents, model planning, LangGraph or other workflow engines, MCP integration, microservices, message queues, multi-tenancy, plugin systems, dynamic tools, or model-generated SQL under the current scope.
@@ -34,10 +36,12 @@
 
 ## Roadmap governance
 
-- On 2026-10-15 the user explicitly approved implementation of `docs/architecture/v6-upgrade-research-design.md` ("允许，继续执行任务"). V6 Slices 1-7 are authorized as one contract, not repeated approval gates. This is the only exception to earlier restrictions on production model tool loops and new actions: isolated UPGRADE_IMPACT, three statically dispatched read tools, the fixed public Spring AI repository, and user-initiated SAVE_RESEARCH_REPORT proposals with independent confirmation. Preserve V1-V5 and all other exclusions. The unified core evaluation baseline remains a Slice 1 prerequisite. Budgets are approved initial limits, not measured performance claims.
+- On 2026-10-16 the user changed development priorities: advance additional coherent major user capabilities and establish the overall architecture first, then consolidate non-blocking details, quality optimization and final evaluation. Do not automatically prioritize V7 retrieval optimization next or require all V6 quality debt to be closed before discussing the next capability. Preserve necessary safety/regression checks and truthful acceptance status. This priority change does not authorize unspecified features; the single detailed roadmap and scope approval remain in `docs/requirements/product-requirements.md`.
 
-- Use `docs/requirements/product-requirements.md` as the single detailed roadmap. Avoid parallel phase systems such as P/N/I/A-D numbering for future work.
-- Describe V1-V5 as completed baselines, V6 as approved and under implementation, and V7+ only as goals and entry conditions. The dated career review remains a historical snapshot.
+- On 2026-10-15 the user explicitly approved implementation of `docs/architecture/v6-upgrade-research-design.md` ("允许，继续执行任务"). V6 Slices 1-7 are authorized as one contract, not repeated approval gates. This is the scoped upgrade-research exception to earlier restrictions on production model tool loops and new actions (the later Research Task Workspace exception is documented below): isolated UPGRADE_IMPACT, three statically dispatched read tools, the fixed public Spring AI repository, and user-initiated SAVE_RESEARCH_REPORT proposals with independent confirmation. Preserve V1-V5 and all other exclusions. The unified core evaluation baseline remains a Slice 1 prerequisite. Budgets are approved initial limits, not measured performance claims.
+
+- Use `docs/requirements/product-requirements.md` as the single detailed roadmap. As requested on 2026-10-16, name tasks and goals by concrete capabilities (for example, Research Task Workspace or Project Source Integration), not V6/V7 or another phase numbering scheme. Preserve historical filenames, migrations, API versions and evidence IDs unless a separate migration is needed.
+- Describe knowledge QA, confirmed actions, knowledge-base maintenance, document comparison and explicit preferences as completed baselines; upgrade impact research remains implemented but awaiting acceptance. Later named capabilities are candidates until approved. The dated career review remains a historical snapshot.
 - A roadmap candidate is not authorization. Before starting a later major version, update this file and the relevant requirements, architecture, data, API, and evaluation documents with an explicitly approved scope.
 - Plan capabilities from user scenarios first. Frameworks such as LangGraph, MCP, workflow runtimes, or multi-agent libraries are implementation candidates, not roadmap goals by themselves.
 - Keep the three top-level routing classes stable for the current scope: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, and `BUSINESS_ACTION`. Future knowledge tasks or business actions should normally be modeled beneath these classes unless a later approved design demonstrates the need for another top-level route.
@@ -105,3 +109,7 @@
 - Frontend local start: from `frontend/`, run `npm run dev`.
 - Local PostgreSQL and pgvector: from the repository root, run `docker compose up -d` and inspect it with `docker compose ps`.
 - When behavior, architecture, prompts, or evaluation criteria change, update the corresponding project documentation in the same change.
+
+## Research task workspace authorization
+
+The user requested implementation along the discussed technical roadmap on 2026-10-16. The first capability is Research Task Workspace, specified in docs/architecture/research-task-workspace-design.md: isolated bounded model planning, server-validated document search steps, persistent task checkpoints, clarification/supplement, pause/resume/cancel and grounded synthesis. This is an additional scoped exception to the older model-planning exclusion. Existing V1–V6 contracts remain intact. MCP, multi-agent execution and external write tools remain later candidates. No extra confirmation is required for implementation checkpoints within this contract.

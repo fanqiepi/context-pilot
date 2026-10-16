@@ -1,5 +1,9 @@
 # ContextPilot evaluation assets
 
+## 研究任务工作台
+
+工程验证：在 `backend/` 使用 JDK 21 执行 `./mvnw.cmd -Dtest=Task*Tests test`；需要 Docker，真实模型默认跳过。公开合成资料的真实 DeepSeek/DashScope 流程验证显式运行 `./mvnw.cmd -Dtest=TaskWorkspaceLiveTests -Dcontextpilot.evaluation.task-live=true test`，需要本地 local-secrets，会产生供应商调用。输出位于 `backend/target/task-workspace-live.json`；不得将流程通过当作独立语义质量验收。当前证据见[工作台验证记录](../docs/evaluation/research-task-workspace-verification.md)。
+
 The `evals/` directory contains public, versioned, deterministic evaluation inputs and reports.
 It must not contain real user documents, credentials, or unredacted production requests.
 

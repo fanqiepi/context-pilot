@@ -467,7 +467,7 @@ function formatDate(value: string): string {
             v-model="knowledgeForm.name"
             maxlength="100"
             show-word-limit
-            placeholder="例如：ContextPilot 项目资料"
+            placeholder="例如：研序 项目资料"
           />
         </ElFormItem>
         <ElFormItem label="描述">

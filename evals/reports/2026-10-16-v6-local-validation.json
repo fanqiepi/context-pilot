@@ -1,0 +1,98 @@
+{
+  "date": "2026-10-16",
+  "mode": "LIVE_DEBUG_NOT_FINAL_EVALUATION",
+  "status": "ENGINEERING_GATES_PASSED_SEMANTICS_UNREVIEWED",
+  "runId": "6b15270c-fab3-42ac-9247-79e810007ac6",
+  "traceId": "v6-live-debug-52216c4d-9fa1-47c5-a6e4-a833b512db66",
+  "runStatus": "PARTIAL",
+  "startedAt": "2026-10-16T12:26:28.571016200+08:00",
+  "finishedAt": "2026-10-16T12:26:45.696651800+08:00",
+  "modelCalls": [
+    {
+      "provider": "DEEPSEEK",
+      "model": "deepseek-flash",
+      "inputTokens": 1037,
+      "outputTokens": 167,
+      "totalTokens": 1204,
+      "latencyMs": 3617,
+      "ordinal": 1,
+      "status": "SUCCEEDED"
+    },
+    {
+      "provider": "DEEPSEEK",
+      "model": "deepseek-flash",
+      "inputTokens": 2251,
+      "outputTokens": 250,
+      "totalTokens": 2501,
+      "latencyMs": 1865,
+      "ordinal": 2,
+      "status": "SUCCEEDED"
+    },
+    {
+      "provider": "DEEPSEEK",
+      "model": "deepseek-flash",
+      "inputTokens": 2654,
+      "outputTokens": 1350,
+      "totalTokens": 4004,
+      "latencyMs": 8464,
+      "ordinal": 3,
+      "status": "SUCCEEDED"
+    }
+  ],
+  "tools": [
+    {
+      "cacheHit": false,
+      "startedAt": "2026-10-16T04:26:33.331Z",
+      "parameterSummary": "selectedDocuments=1, queryCharacters=30",
+      "ordinal": 1,
+      "toolName": "search_selected_documents",
+      "status": "SUCCEEDED",
+      "finishedAt": "2026-10-16T04:26:33.516Z"
+    },
+    {
+      "cacheHit": false,
+      "startedAt": "2026-10-16T04:26:33.519Z",
+      "parameterSummary": "tag=v2.0.0",
+      "ordinal": 2,
+      "toolName": "get_release_notes",
+      "status": "SUCCEEDED",
+      "finishedAt": "2026-10-16T04:26:34.818Z"
+    },
+    {
+      "cacheHit": false,
+      "startedAt": "2026-10-16T04:26:36.703Z",
+      "parameterSummary": "selectedDocuments=1, queryCharacters=46",
+      "ordinal": 3,
+      "toolName": "search_selected_documents",
+      "status": "SUCCEEDED",
+      "finishedAt": "2026-10-16T04:26:36.85Z"
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "L1",
+      "fetchedAt": "2026-10-16T04:26:33.511024Z",
+      "truncated": false,
+      "hash": "e502755fb6904dde55fce921102e7d5bb504e78faa0c3c3550a24be2c31350ce",
+      "type": "LOCAL"
+    },
+    {
+      "sourceId": "R1",
+      "fetchedAt": "2026-10-16T04:26:34.811878Z",
+      "truncated": false,
+      "hash": "839b68cf6cc9848e0f3cb6f85fb22b7ecd5bcd3625b3d88482aa89efadca972b",
+      "type": "RELEASE"
+    }
+  ],
+  "reportConfirmed": true,
+  "totalReturnedModelTokens": 7709.0,
+  "engineeringTests": {
+    "total": 30,
+    "skipped": 0,
+    "failures": 0,
+    "errors": 0
+  },
+  "frontendBuild": "PASSED",
+  "localEnabled": true,
+  "semanticReview": "Debug observation only: response expands beyond scheduling question into unrelated migration checklist and unnecessary evidence gaps. Not final acceptance."
+}

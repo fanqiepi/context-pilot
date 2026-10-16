@@ -1,4 +1,7 @@
-# ContextPilot 文档导航
+# 研序 文档导航
+
+- [研究任务工作台设计](architecture/research-task-workspace-design.md)：有限规划、澄清、执行与检查点恢复。
+- [研究任务工作台验证](evaluation/research-task-workspace-verification.md)：工程回归、真实模型与页面证据及质量边界。
 
 按用途查阅；当前状态看功能清单，未来范围看产品需求，验收结论看版本报告。
 

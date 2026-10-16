@@ -41,6 +41,8 @@ spring:
         dimensions: 1024
 
 contextpilot:
+  task-workspace:
+    enabled: ${TASK_WORKSPACE_ENABLED:false}
   upgrade-research:
     enabled: ${UPGRADE_RESEARCH_ENABLED:false}
   research:

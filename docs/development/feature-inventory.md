@@ -1,4 +1,4 @@
-# ContextPilot 功能清单与简历素材
+# 研序 功能清单与简历素材
 
 最后核对：2026-10-16。覆盖当前工作区（含尚未提交的 V6 实现），不代表已发布版本。
 
@@ -59,6 +59,12 @@
 
 ## 评估与交付清单
 
+### 研究任务工作台（2026-10-16 新增）
+
+独立入口 `/research-tasks`，支持选定文档内的模型有限规划、计划预览、必要澄清、逐步检索、带引用综合、暂停／取消／检查点恢复、补充条件开启新轮次、历史检查点查看及逻辑删除。仅服务端验证的 `SEARCH_DOCUMENTS` 步骤可以执行，固定综合不开放任意工具。首版代码与代表流程已验证，完整语义质量评估仍待集中收口；依据为[设计](../architecture/research-task-workspace-design.md)和[验证记录](../evaluation/research-task-workspace-verification.md)。
+
+该功能不包含 MCP 接入、多 Agent、外部行动交付，也不代表升级影响研究质量问题已经解决。
+
 本节追踪已有合同的证据完成情况，不另建版本路线。
 
 - [x] V1–V5 验收基线及版本化证据。
@@ -76,7 +82,7 @@
 
 ## 可用于简历的素材
 
-项目名称建议：**ContextPilot：基于 Spring AI 的可追溯知识研究与受控行动助手**。
+项目名称：**研序｜技术研究 Agent**（2026-10-16 用户确认；原名 ContextPilot）。
 
 技术栈：Java 21、Spring Boot 4.1、Spring AI 2.0、PostgreSQL／pgvector、MyBatis-Plus、Flyway、Vue 3、TypeScript、SSE；DeepSeek 负责生成，DashScope 负责 Embedding。
 

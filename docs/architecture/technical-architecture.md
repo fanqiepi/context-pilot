@@ -1,4 +1,4 @@
-# ContextPilot 技术架构
+# 研序 技术架构
 
 > 本文维护模块职责和编排机制；逐项功能及版本状态见[功能清单](../development/feature-inventory.md)，运行配置见[本地开发](../development/local-development.md)。
 
@@ -131,3 +131,7 @@ V5 详细合同见 [V5 显式记忆的个人助手详细设计](v5-explicit-memo
 ## 版本化资产
 
 提示词位于 `backend/src/main/resources/prompts/`，数据库迁移位于 `backend/src/main/resources/db/migration/`，评估数据位于 `evals/`，重要技术决策记录为 ADR。
+
+## 研究任务工作台模块
+
+新增独立 taskworkspace 模块：控制器 → 带事务的任务状态服务 → 有界执行器 → 计划模型／限定文档检索／综合模型。任务检查点和事件同事务持久化，执行令牌阻止过期结果写回；不改变既有聊天路由、比对或升级研究。详细合同见[研究任务工作台](research-task-workspace-design.md)。

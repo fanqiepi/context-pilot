@@ -1,4 +1,4 @@
-# ContextPilot 评估计划
+# 研序 评估计划
 
 > 状态：V1 功能型基线、V2 可控行动助手、V3 知识库维护助手与 V4 第一阶段知识研究助手均已完成；V5 第一阶段 Slices 1-6 已完成固定基线、持久化、确认创建、管理、生产注入与透明闭环，Slice 7 已于 2026-10-15 通过最终验收，见 [V5 验收报告](v5-acceptance-report.md)。
 
@@ -158,3 +158,7 @@ Slice 1 在生产 Flyway、Action、管理页面和 Prompt 注入前建立：
 Slice 7 如果不能证明当前生产注入保持上述收益，或发现 grounding、引用与安全边界退化，则不得通过验收，并应停止扩大注入、修订设计。真实用户偏好、私密聊天、密钥和未脱敏请求不得进入评估资产。
 
 2026-08-24，Slices 1-6 已形成固定评估、真实 PostgreSQL 持久化、确认创建、版本化管理与生产透明注入基线：无记忆风格匹配为 4/8，受限候选为 8/8；V5 固定评估既有 30/30 通过；Slices 5+6 后端全量 372 项测试为 0 失败、0 错误、3 项环境条件跳过，前端类型检查与构建通过，`/chat` 的单次忽略控件完成桌面和 390×844 窄屏检查。独立证据见 [Slice 1](../../evals/reports/2026-08-24-v5-explicit-memory-slice1.md) 至 [Slice 6](../../evals/reports/2026-08-24-v5-explicit-memory-slice6.md) 报告；真实 DeepSeek/DashScope 对照、最终全量回归和页面验收已于 2026-10-15 由 Slice 7 闭合，详见 [V5 验收报告](v5-acceptance-report.md)；以上 372 项是 Slice 6 的历史记录。
+
+## 研究任务工作台验证
+
+新增计划边界、任务幂等、并发 revision、暂停取消、检查点恢复、新轮次、来源变化与真实 PostgreSQL 持久化验证。页面验证计划预览和补充继续；真实模型采用公开资料并单独记录。工程通过不等于语义验收，具体门禁见[设计](../architecture/research-task-workspace-design.md)。
