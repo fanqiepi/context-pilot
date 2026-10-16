@@ -1,5 +1,11 @@
 # REST API、SSE 与操作确认约定
 
+## V6 目标 API（已批准，实施状态以 OpenAPI 为准）
+
+完整请求、状态码、分页与 SSE 合同见 [V6 详细设计第 7 节](../architecture/v6-upgrade-research-design.md)。已实现 `/api/upgrade-research/repositories`、`/api/upgrade-research/runs` 及运行详情、事件、取消、保存提案、终态逻辑删除接口，以及 `/api/research-reports` 的列表、详情和逻辑删除；仍在版本验收阶段。
+
+研究入口显式声明文档、仓库键和标签，不改变现有聊天或 V4 请求。保存提案由用户调用，正文只取服务端不可变草稿；确认继续走 `/api/action-requests/{id}/confirm`。SSE 发送快照与安全进度，最终正文校验后一次返回；断线不取消，重连读数据库快照。owner、预算、来源地址和确认时的 action 参数均不得由客户端覆盖。运行详情与 SSE 快照包含 `run`、`sources`、`tools`、`modelCalls` 和 `saveActionId`，并在顶层提供 `runId`、`traceId`、`revision`。仓库目录返回 `enabled`，关闭时仅新建运行返回 409，历史与报告接口仍可读。
+
 > 本文记录已完成的 V1-V4 接口，以及 V5 第一阶段已批准的显式偏好记忆合同。V5 Slices 2-6 的隐式主体、确认创建、管理资源、受限注入、SSE 和历史字段均已实现；已实现字段以 OpenAPI 为主要事实来源。
 
 ## 通用约定

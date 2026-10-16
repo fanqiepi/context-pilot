@@ -21,6 +21,11 @@ public class ApiExceptionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
+    @ExceptionHandler(io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeQueueFullException.class)
+    public ResponseEntity<ApiErrorResponse> handleUpgradeQueueFull(Exception exception,HttpServletRequest request) {
+        return response(HttpStatus.TOO_MANY_REQUESTS,"UPGRADE_QUEUE_FULL","Upgrade research capacity is full",request);
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiErrorResponse> handleBadRequest(
             BadRequestException exception,

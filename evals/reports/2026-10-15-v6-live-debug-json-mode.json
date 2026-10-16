@@ -1,0 +1,114 @@
+{
+  "mode": "LIVE_DEBUG_NOT_FINAL_EVALUATION",
+  "startedAt": "2026-10-15T21:33:43.362357600+08:00",
+  "run": {
+    "budgetVersion": "upgrade-budget-v1",
+    "clientRequestId": "af7fd3a7-9ec1-4ac8-8966-825cf0122f96",
+    "createdAt": "2026-10-15T13:33:44.837799Z",
+    "deadline": "2026-10-15T13:36:44.837799Z",
+    "deleted": 0,
+    "documentSnapshots": "[{\"id\": \"93b9581e-7256-45d2-bbd3-797fc0dec67b\", \"sha256\": \"470d0668b1749e438d9e85d80a05bb7ffdc2ce58ca1a90dab07e1e681048af08\", \"filename\": \"legacy-worker.md\", \"indexedAt\": \"2026-10-15T13:33:44.595466Z\", \"profileId\": \"v4_eval_dashscope_qwen3_7_1024_v1\"}]",
+    "draft": "## 结论摘要\n旧方案的调度限制仅有单一表述：旧工作进程按 FIFO 调度，不支持任务优先级 [L1]。指定的 Spring AI 发布记录 v2.0.0 [R1] 中未出现任何与调度策略、FIFO/优先级队列、工作进程（worker）或任务排序相关的条目，因此**无法从证据支持“升级到 v2.0.0 即可改变任务调度/获得优先级支持”的建议**。该升级建议当前属于待验证假设，需额外的中间版本或框架调度文档方可确认。\n\n## 升级影响\n- 本地证据仅确认现状：调度为 FIFO、无任务优先级 [L1]；未给出实现类、配置项或可替换的调度接口，故无法判断升级影响面。\n- 发布证据 v2.0.0 [R1] 的新特性集中在模型与客户端层面：Google GenAI 模型更新、`OpenAiChatModel` 仅使用 Jackson 2、`org.springframework.ai.image.observation` 空标记、`Prompt` 调整、OpenAI 工具调用附加属性保留 [R1]，与调度无关。\n- v2.0.0 的缺陷修复同样聚焦聊天记忆仓库与 OpenAI 选项（`CassandraChatMemoryRepository`、`MongoChatMemoryRepository`、`JdbcChatMemoryRepository` 过滤不支持的工具消息，移除 advisor builder 的 `streamToolCallResponses`，补充 `OpenAiChatOptions.promptCacheKey`）[R1]，不涉及调度。\n- 依赖升级为 MCP SDK 2.0.0 与 Spring Boot 4.1.0 [R1]，属于平台级变更，可能带来 API 兼容风险，但证据未说明其对任务调度的影响。\n- 发布记录仅指向 1.1.x → 2.0.0 的升级说明链接及 2.0.0 参考文档 [R1]；这些外部内容未在本次工具返回范围内，不能作为依据。\n- 覆盖范围提示：仅覆盖显式选中的文档与 v2.0.0 标签，中间版本未纳入，故不构成完整迁移分析。\n\n## 迁移清单\n1. 现状基线：记录当前 FIFO 调度行为与无优先级的事实 [L1]。\n2. 升级目标：若按 v2.0.0 升级，可预期的变更仅限发布记录所列新特性、修复与依赖升级 [R1]；调度改造不属于发布记录内容，需单独设计。\n3. 依赖影响：核对 MCP SDK 2.0.0 与 Spring Boot 4.1.0 的兼容性影响（待验证，发布记录未展开细节）[R1]。\n4. 调度改造方案：不得将其归因于 v2.0.0；须另行取证后再立项（待验证）。\n5. 回滚预案：基于依赖升级风险准备回滚路径（待验证）[R1]。\n\n## 验证清单\n- [ ] 用中间版本发布记录或框架调度文档，确认是否存在优先级/调度相关能力（当前资料缺口）。\n- [ ] 在升级环境中回归验证：模型调用、`OpenAiChatModel` Jackson 2 行为、ai.image.observation 空标记 API、`Prompt`、工具调用附加属性 [R1]。\n- [ ] 验证聊天记忆仓库（Cassandra/Mongo/Jdbc）对不支持工具消息的过滤行为 [R1]。\n- [ ] 验证 advisor builder 中 `streamToolCallResponses` 移除后的编译与运行影响 [R1]。\n- [ ] 验证 `OpenAiChatOptions.promptCacheKey` 新增参数 [R1]。\n- [ ] 单独验证任务调度是否仍为 FIFO、优先级是否仍缺失 [L1]；若期望变化，需先补齐证据。\n- [ ] 核验 MCP SDK 2.0.0、Spring Boot 4.1.0 与现有应用的兼容性 [R1]。\n\n## 资料缺口与证据强度\n本地证据为单条摘要 [L1]，缺少调度实现、配置与扩展点细节；发布证据 [R1] 无调度相关条目。二者组合**不支持**调度升级结论，仅支持“平台与模型层变更”的范围界定。因此本报告只能给出影响界定与验证清单，不能宣称可完成调度迁移。\n\n保存提示：本结果不会自动保存；如需留存，请由你主动发起保存提案并独立确认。",
+    "draftHash": "3f8477eae91973882ce2dd2c7da032e4dda5a70f78a0f62fa71e870b7d525cd9",
+    "errorCode": null,
+    "gaps": "[\"本地文档仅有单条调度摘要，缺少调度器实现、配置项与可扩展点说明。\", \"v2.0.0 发布记录无调度、FIFO、优先级或工作进程相关条目，无法支持调度升级建议。\", \"未覆盖 1.1.x 至 2.0.0 之间的中间版本，无法判断调度能力是否在此期间变化。\", \"发布记录指向的升级说明与参考文档链接内容未在本次工具返回范围内，无法引用。\", \"缺少任务优先级需求的业务分级标准与验收指标。\", \"缺少 MCP SDK 2.0.0、Spring Boot 4.1.0 升级的兼容性细节与已知破坏性变更清单。\", \"缺少旧工作进程的线程模型、队列容量与吞吐基线数据。\", \"缺少该建议的提出方与上下文来源，无法核验其预期依据。\"]",
+    "httpCalls": 1,
+    "id": "aa8c838d-a6c9-461e-bc08-ee188a2b4e05",
+    "knowledgeBaseId": "b99b5a8d-a69a-4796-ac1e-d419c5955f3b",
+    "modelCalls": 3,
+    "ownerId": "00000000-0000-0000-0000-000000000001",
+    "promptVersion": "upgrade-research-v1",
+    "question": "旧工作进程按 FIFO 调度，不支持任务优先级。请检索旧方案中的 scheduling 说明，并核查指定 Spring AI 发布记录能否支持改变任务调度的升级建议；没有依据时明确标注缺口。",
+    "releaseTags": "[\"v2.0.0\"]",
+    "repositoryKey": "spring-ai",
+    "requestHash": "28ba0fc58fe305c41adb788dae4ec218010d7df5558c0fd39db207d2a3cc4eab",
+    "retrievalCalls": 2,
+    "retryOfRunId": null,
+    "revision": 13,
+    "schemaVersion": "upgrade-tools-v1",
+    "status": "PARTIAL",
+    "toolRequests": 3,
+    "traceId": "v6-live-debug-cef1ed40-226e-43b5-8ee9-c006039cba7e",
+    "updatedAt": "2026-10-15T13:33:58.155306Z"
+  },
+  "tools": [
+    {
+      "cacheHit": false,
+      "startedAt": "2026-10-15T13:33:46.691Z",
+      "parameterSummary": "selectedDocuments=1, queryCharacters=24",
+      "ordinal": 1,
+      "toolName": "search_selected_documents",
+      "status": "SUCCEEDED",
+      "finishedAt": "2026-10-15T13:33:47.135Z"
+    },
+    {
+      "cacheHit": false,
+      "startedAt": "2026-10-15T13:33:47.140Z",
+      "parameterSummary": "tag=v2.0.0",
+      "ordinal": 2,
+      "toolName": "get_release_notes",
+      "status": "SUCCEEDED",
+      "finishedAt": "2026-10-15T13:33:48.088Z"
+    },
+    {
+      "cacheHit": false,
+      "startedAt": "2026-10-15T13:33:49.901Z",
+      "parameterSummary": "selectedDocuments=1, queryCharacters=31",
+      "ordinal": 3,
+      "toolName": "search_selected_documents",
+      "status": "SUCCEEDED",
+      "finishedAt": "2026-10-15T13:33:50.133Z"
+    }
+  ],
+  "modelCalls": [
+    {
+      "provider": "DEEPSEEK",
+      "model": "deepseek-flash",
+      "inputTokens": 1007,
+      "outputTokens": 141,
+      "totalTokens": 1148,
+      "latencyMs": 1805,
+      "ordinal": 1,
+      "status": "SUCCEEDED"
+    },
+    {
+      "provider": "DEEPSEEK",
+      "model": "deepseek-flash",
+      "inputTokens": 2193,
+      "outputTokens": 204,
+      "totalTokens": 2397,
+      "latencyMs": 1791,
+      "ordinal": 2,
+      "status": "SUCCEEDED"
+    },
+    {
+      "provider": "DEEPSEEK",
+      "model": "deepseek-flash",
+      "inputTokens": 2547,
+      "outputTokens": 1269,
+      "totalTokens": 3816,
+      "latencyMs": 7998,
+      "ordinal": 3,
+      "status": "SUCCEEDED"
+    }
+  ],
+  "sources": [
+    {
+      "fetchedAt": "2026-10-15T13:33:47.124964Z",
+      "truncated": false,
+      "hash": "e502755fb6904dde55fce921102e7d5bb504e78faa0c3c3550a24be2c31350ce",
+      "type": "LOCAL",
+      "sourceId": "L1"
+    },
+    {
+      "fetchedAt": "2026-10-15T13:33:48.079207Z",
+      "truncated": false,
+      "hash": "839b68cf6cc9848e0f3cb6f85fb22b7ecd5bcd3625b3d88482aa89efadca972b",
+      "type": "RELEASE",
+      "sourceId": "R1"
+    }
+  ],
+  "reportConfirmed": true,
+  "status": "ENGINEERING_GATES_PASSED_SEMANTICS_UNREVIEWED",
+  "finishedAt": "2026-10-15T21:33:58.283424200+08:00"
+}

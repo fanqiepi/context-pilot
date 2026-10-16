@@ -1,0 +1,23 @@
+{
+  "frozenAt": "2026-10-15",
+  "sha256": {
+    "configs/core-baseline-v1.json": "5bf10744a2676a364d6c1fd4694d15c0ace947ee582cf190b7586cdb4a456392",
+    "configs/v6-upgrade-research-v1.json": "320aadb056c937852ecc9dc1b79fd0e753bc3027a4ab85eed852acedb6b09ff1",
+    "corpora/core-debug-v1/solstice.md": "84d79704908472032e366698844ddcf3a6088dfcc62b8e03c36b170ecbd55959",
+    "corpora/core-workspace-v1/adversarial.md": "645280b3379d0d7be781113c02dfe535feab48b5d90447d59ace9357cfdfcdd8",
+    "corpora/core-workspace-v1/harbor.md": "12645e2ed78e8342aade89f50a69106ff3fa3c33648d450df89a0c57252f883c",
+    "corpora/core-workspace-v1/lumen.md": "2ee66e38c59e1995395d9062f41572b84c06edc8f0883d416f90a04a136d03f7",
+    "corpora/core-workspace-v1/mosaic.md": "def5b3de5694fb08994d0bb28057a5f539dacceba76746cfdad8024a0efa9a67",
+    "corpora/core-workspace-v1/shadow.md": "33e0b46e6877db24c98eb1c6ec79ae1c592ff9779b23ae85812c1fb495183e5d",
+    "corpora/v6-upgrade-debug-v1/legacy-worker.md": "470d0668b1749e438d9e85d80a05bb7ffdc2ce58ca1a90dab07e1e681048af08",
+    "corpora/v6-upgrade-debug-v1/release-debug.md": "c5755b09f4c4766f5835d4e6b9094ca8531c09c1a68c9937890563fce40c31e3",
+    "corpora/v6-upgrade-research-v1/legacy-client.md": "73ca2dee2c681a94d09587d83652ac3eae16d2f3d8668cd7ef3a06a5e58dd39b",
+    "corpora/v6-upgrade-research-v1/legacy-storage.md": "3d63dd74c4b7b91bea372c51c510655289d84bb1d78bb48c97bcc08d177c62d6",
+    "corpora/v6-upgrade-research-v1/release-fixture-2.md": "efb8ef682d63a7a3137154dc2f4b25058a4770a3fa1bbe28c72ca97ff3fa59bc",
+    "corpora/v6-upgrade-research-v1/release-fixture-3.md": "52be3da3cbd6593455555fb6342d5381d16ac9eddd12e182da4eaeff5b64ae5d",
+    "datasets/core-debug-v1.jsonl": "2c3b46f0e11302084113ca6535c5b53634c3105b442f14f835331df27ee60216",
+    "datasets/core-workspace-v1.jsonl": "45746a46bc58879b486b6d61c0c32b0b0089e745f645ca08acb2cd1fd1afe033",
+    "datasets/v6-upgrade-debug-v1.jsonl": "1cf3c7e707d638de28489066af4eae77e02a7e2d890c0ea881a131dd0c038de5",
+    "datasets/v6-upgrade-research-v1.jsonl": "aeecaa80cb7162bd3013b1dc9c011c6322a3441febaaa2ae8dc36d66225c2c7c"
+  }
+}

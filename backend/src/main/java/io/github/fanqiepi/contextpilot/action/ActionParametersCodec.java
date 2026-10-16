@@ -47,6 +47,7 @@ public class ActionParametersCodec {
             case RETRY_DOCUMENT_PROCESSING -> RetryDocumentProcessingActionParameters.class;
             case REINDEX_DOCUMENT -> ReindexDocumentActionParameters.class;
             case CREATE_USER_MEMORY -> CreateUserMemoryActionParameters.class;
+            case SAVE_RESEARCH_REPORT -> SaveResearchReportActionParameters.class;
         };
         try {
             ActionParameters parameters = objectMapper.readValue(parametersJson, parameterType);

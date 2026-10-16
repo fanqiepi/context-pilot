@@ -24,6 +24,8 @@ import io.github.fanqiepi.contextpilot.retrieval.RetrievalResultResponse;
 import io.github.fanqiepi.contextpilot.retrieval.RetrievalService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.ArgumentCaptor;
@@ -359,8 +361,16 @@ class ResearchExecutorServiceTests {
                 isNull(), isNull(), any());
     }
 
-    @Test
-    void reportsUnsupportedContentRemovalWithAnAccuratePartialReason() {
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "没有引用的推断",
+            "Borealis 支持离线；Atlas 的部署证据未涉及离线方式 [1][2]。",
+            "Atlas 的部署证据未提到配置管理方式 [1]。",
+            "Atlas does not mention offline deployment [1].",
+            "Offline deployment is not specified for Atlas [1].",
+            "## Atlas 未提及离线部署 [1]"
+    })
+    void reportsUnsupportedContentRemovalWithAnAccuratePartialReason(String unsupported) {
         UUID runId = UUID.randomUUID();
         UUID firstDocument = UUID.randomUUID();
         UUID secondDocument = UUID.randomUUID();
@@ -394,7 +404,7 @@ class ResearchExecutorServiceTests {
         when(chatModelGateway.configuredModel()).thenReturn("deepseek-v4-flash");
         when(chatModelGateway.generate(anyString(), anyString()))
                 .thenReturn(new ChatModelResult(
-                        "## 安全性\n可信结论 [1]\n没有引用的推断",
+                        "## 安全性\n可信结论 [1]\n" + unsupported,
                         "deepseek-v4-flash", 10, 5, 15));
         when(queryService.get(runId)).thenReturn(response(runId, ResearchExecutionStatus.PARTIAL));
 
@@ -403,7 +413,7 @@ class ResearchExecutorServiceTests {
         assertThat(result.answer())
                 .startsWith("综合结果中缺少有效引用的内容已被移除")
                 .contains("可信结论 [1]")
-                .doesNotContain("没有引用的推断");
+                .doesNotContain(unsupported);
         verify(runMapper).complete(eq(runId), eq(ResearchExecutionStatus.PARTIAL),
                 eq(ResearchAnswerStatus.ANSWERED), eq(10), eq(5), eq(15),
                 eq("RESEARCH_UNSUPPORTED_CONTENT_REMOVED"),

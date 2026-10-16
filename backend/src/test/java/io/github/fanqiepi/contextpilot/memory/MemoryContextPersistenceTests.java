@@ -131,6 +131,53 @@ class MemoryContextPersistenceTests {
                 });
     }
 
+    @Test
+    void newSessionsUseCurrentRevisionsWhileHistoryKeepsTheActualVersion() {
+        Exchange first = createExchange();
+        var created = userMemoryService.createConfirmedResponsePreference(
+                "优先使用英文回答", null, first.conversationId(), first.userMessageId());
+        MemoryContext original = contextPersistenceService.loadAndRecord(first.assistantMessageId());
+        assertThat(original.preferences()).singleElement()
+                .satisfies(item -> assertThat(item.revision()).isEqualTo(1));
+
+        UserMemoryUpdateRequest correction = new UserMemoryUpdateRequest();
+        correction.setVersion(1L);
+        correction.setContent("优先使用中文回答");
+        userMemoryService.update(created.memoryId(), correction);
+        MemoryContext corrected = contextPersistenceService.loadAndRecord(createExchange().assistantMessageId());
+        assertThat(corrected.preferences()).singleElement().satisfies(item -> {
+            assertThat(item.revision()).isEqualTo(2);
+            assertThat(item.content()).isEqualTo("优先使用中文回答");
+        });
+        assertThat(messageMemoryContextMapper.selectHistoryByAssistantMessageIds(
+                List.of(first.assistantMessageId()))).singleElement().satisfies(row -> {
+                    assertThat(row.getRevisionNumber()).isEqualTo(1);
+                    assertThat(row.getContent()).isEqualTo("优先使用英文回答");
+                });
+
+        UserMemoryUpdateRequest disable = new UserMemoryUpdateRequest();
+        disable.setVersion(2L);
+        disable.setStatus(UserMemoryStatus.DISABLED);
+        userMemoryService.update(created.memoryId(), disable);
+        assertThat(contextPersistenceService.loadAndRecord(createExchange().assistantMessageId()).isEmpty()).isTrue();
+
+        UserMemoryUpdateRequest enable = new UserMemoryUpdateRequest();
+        enable.setVersion(3L);
+        enable.setStatus(UserMemoryStatus.ACTIVE);
+        userMemoryService.update(created.memoryId(), enable);
+        jdbcTemplate.update("UPDATE user_memory SET expires_at = CURRENT_TIMESTAMP - INTERVAL '1 second' WHERE id = ?",
+                created.memoryId());
+        assertThat(contextPersistenceService.loadAndRecord(createExchange().assistantMessageId()).isEmpty()).isTrue();
+        assertThat(userMemoryService.get(created.memoryId()).currentRevision()).isEqualTo(4);
+        userMemoryService.delete(created.memoryId());
+        assertThat(contextPersistenceService.loadAndRecord(createExchange().assistantMessageId()).isEmpty()).isTrue();
+        assertThat(messageMemoryContextMapper.selectHistoryByAssistantMessageIds(
+                List.of(first.assistantMessageId()))).singleElement().satisfies(row -> {
+                    assertThat(row.getRevisionNumber()).isEqualTo(1);
+                    assertThat(row.getContent()).isNull();
+                });
+    }
+
     private Exchange createExchange() {
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
         KnowledgeBaseResponse workspace = knowledgeBaseService.create(

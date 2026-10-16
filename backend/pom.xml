@@ -164,6 +164,20 @@
 
     <profiles>
         <profile>
+            <id>v6-tool-protocol-probe</id>
+            <build><plugins><plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes><include>**/V6ToolProtocolProbeTests.java</include></includes>
+                    <systemPropertyVariables>
+                        <contextpilot.evaluation.v6-probe>true</contextpilot.evaluation.v6-probe>
+                        <spring.profiles.active>local-secrets</spring.profiles.active>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin></plugins></build>
+        </profile>
+        <profile>
             <id>v2-evaluation</id>
             <build>
                 <plugins>
@@ -247,6 +261,44 @@
                                 <contextpilot.evaluation.live-model>true</contextpilot.evaluation.live-model>
                                 <contextpilot.evaluation.output>${project.build.directory}/v4-live-model-results.json</contextpilot.evaluation.output>
                                 <spring.profiles.active>local-secrets</spring.profiles.active>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>v5-live-model-acceptance</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/V5LiveModelAcceptanceTests.java</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <contextpilot.evals.root>${project.basedir}/../evals</contextpilot.evals.root>
+                                <contextpilot.evaluation.v5-live>true</contextpilot.evaluation.v5-live>
+                                <spring.profiles.active>local-secrets</spring.profiles.active>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>v5-production-acceptance</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <contextpilot.evals.root>${project.basedir}/../evals</contextpilot.evals.root>
+                                <contextpilot.evaluation.require-docker>true</contextpilot.evaluation.require-docker>
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>

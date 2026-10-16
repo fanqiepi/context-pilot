@@ -3,6 +3,11 @@ package io.github.fanqiepi.contextpilot.memory;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import io.github.fanqiepi.contextpilot.chat.CapabilityId;
 import io.github.fanqiepi.contextpilot.chat.CapabilityMatchReason;
@@ -17,12 +22,15 @@ import io.github.fanqiepi.contextpilot.common.ResourceNotFoundException;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseCreateRequest;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
@@ -145,6 +153,57 @@ class UserMemoryManagementPersistenceTests {
                 "SELECT deleted FROM user_memory WHERE id = ?", Integer.class, created.memoryId())).isOne();
         assertThatThrownBy(() -> userMemoryService.get(created.memoryId()))
                 .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    void concurrentCreationCannotExceedActiveOrStoredLimit(boolean storedLimit) throws Exception {
+        List<UUID> createdIds = new ArrayList<>();
+        int capacity = storedLimit ? 100 : 20;
+        try {
+            for (int index = 0; index < capacity - 1; index++) {
+                UUID id = createMemory("容量验证 " + UUID.randomUUID()).memoryId();
+                createdIds.add(id);
+                if (storedLimit) {
+                    UserMemoryUpdateRequest disable = updateRequest(1);
+                    disable.setStatus(UserMemoryStatus.DISABLED);
+                    userMemoryService.update(id, disable);
+                }
+            }
+            CountDownLatch ready = new CountDownLatch(2);
+            CountDownLatch start = new CountDownLatch(1);
+            try (var executor = Executors.newFixedThreadPool(2)) {
+                var first = executor.submit(() -> createAtCapacity(ready, start));
+                var second = executor.submit(() -> createAtCapacity(ready, start));
+                try {
+                    assertThat(ready.await(10, TimeUnit.SECONDS)).isTrue();
+                } finally {
+                    start.countDown();
+                }
+                UUID firstId = first.get(20, TimeUnit.SECONDS);
+                UUID secondId = second.get(20, TimeUnit.SECONDS);
+                if (firstId != null) createdIds.add(firstId);
+                if (secondId != null) createdIds.add(secondId);
+                assertThat((firstId == null) != (secondId == null)).isTrue();
+            }
+            assertThat(userMemoryService.list(storedLimit ? null : UserMemoryStatus.ACTIVE, false))
+                    .hasSize(capacity);
+        } finally {
+            // Only this test's confirmed synthetic records are logically deleted.
+            createdIds.forEach(userMemoryService::delete);
+        }
+    }
+
+    private UUID createAtCapacity(CountDownLatch ready, CountDownLatch start) throws Exception {
+        ready.countDown();
+        if (!start.await(10, TimeUnit.SECONDS)) throw new IllegalStateException("Start signal timed out");
+        try {
+            return createMemory("并发容量验证 " + UUID.randomUUID()).memoryId();
+        } catch (ConflictException exception) {
+            assertThat(exception.getCode()).isEqualTo("USER_MEMORY_LIMIT_REACHED");
+            return null;
+        }
     }
 
     private UserMemoryUpdateRequest updateRequest(long version) {

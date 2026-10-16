@@ -9,6 +9,11 @@ import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface KnowledgeBaseMapper extends BaseMapper<KnowledgeBaseEntity> {
+    @Select("SELECT id FROM knowledge_base WHERE id=#{id} AND deleted=0 FOR UPDATE")
+    UUID lockActive(UUID id);
+
+    @Select("SELECT (SELECT count(*) FROM upgrade_research_run WHERE knowledge_base_id=#{id} AND deleted=0) + (SELECT count(*) FROM research_report WHERE knowledge_base_id=#{id} AND deleted=0)")
+    long countActiveUpgradeResources(UUID id);
 
     @Select("SELECT COUNT(*) FROM source_document WHERE knowledge_base_id = #{knowledgeBaseId} AND deleted = 0")
     long countActiveDocuments(@Param("knowledgeBaseId") UUID knowledgeBaseId);

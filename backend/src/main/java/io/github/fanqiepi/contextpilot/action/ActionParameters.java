@@ -6,7 +6,8 @@ public sealed interface ActionParameters permits
         CreateKnowledgeBaseActionParameters,
         RetryDocumentProcessingActionParameters,
         ReindexDocumentActionParameters,
-        CreateUserMemoryActionParameters {
+        CreateUserMemoryActionParameters,
+        SaveResearchReportActionParameters {
 
     @JsonIgnore
     ActionType actionType();

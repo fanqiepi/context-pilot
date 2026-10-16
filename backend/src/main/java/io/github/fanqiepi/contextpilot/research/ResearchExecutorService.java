@@ -54,6 +54,13 @@ public class ResearchExecutorService {
     private static final Pattern CITATION_PATTERN = Pattern.compile("\\[(\\d+)]");
     private static final Pattern MARKDOWN_HEADING_PATTERN = Pattern.compile("^#{1,6}\\s+\\S.*$");
     private static final String NO_EVIDENCE_SUFFIX = "：本次检索未找到相关内容。";
+    // A valid citation number does not justify claims about what an entire document omits.
+    // Missing evidence must use the standalone, selected-filename statement below.
+    private static final Pattern NONCANONICAL_ABSENCE = Pattern.compile(
+            "未(?:提及|提到|涉及|说明|描述)|没有(?:提及|提到|涉及|说明|描述)"
+                    + "|(?:does not|doesn't|do not|don't)\\s+(?:mention|specify|describe|cover)"
+                    + "|not\\s+(?:mentioned|specified|described|covered)|no\\s+evidence",
+            Pattern.CASE_INSENSITIVE);
     private static final String SYSTEM_PROMPT = """
             你是严格依据证据的多文档比较助手。只能使用提供的证据回答，不得采用外部知识。
             使用简洁 Markdown，按比较维度和文档组织标题、段落或条目，不生成表格。
@@ -780,6 +787,14 @@ public class ResearchExecutorService {
                 if (!retained.isEmpty() && !retained.getLast().isEmpty()) {
                     retained.add("");
                 }
+                continue;
+            }
+            if (isAllowedNoEvidenceStatement(normalized, selectedDocumentNames)) {
+                retained.add(normalized);
+                continue;
+            }
+            if (NONCANONICAL_ABSENCE.matcher(normalized).find()) {
+                removedUnsupported = true;
                 continue;
             }
             Matcher matcher = CITATION_PATTERN.matcher(normalized);

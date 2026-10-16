@@ -72,6 +72,7 @@ export type CapabilityMatchReason =
   | 'EXPLICIT_KNOWLEDGE_BASE_HEALTH'
   | 'HEALTH_REPORT_ISSUE_SELECTED'
   | 'EXPLICIT_DOCUMENT_COMPARISON'
+  | 'UPGRADE_REPORT_SAVE_SELECTED'
   | 'DEFAULT_KNOWLEDGE_QA'
 
 export type ResearchTaskType = 'DOCUMENT_COMPARISON'
@@ -236,6 +237,7 @@ export type ActionType =
   | 'RETRY_DOCUMENT_PROCESSING'
   | 'REINDEX_DOCUMENT'
   | 'CREATE_USER_MEMORY'
+  | 'SAVE_RESEARCH_REPORT'
 export type ActionRequestStatus =
   | 'PENDING_CONFIRMATION'
   | 'EXECUTING'
@@ -336,6 +338,7 @@ export type ActionRequest =
   | ActionRequestBase<'RETRY_DOCUMENT_PROCESSING', RetryDocumentProcessingActionParameters>
   | ActionRequestBase<'REINDEX_DOCUMENT', ReindexDocumentActionParameters>
   | ActionRequestBase<'CREATE_USER_MEMORY', CreateUserMemoryActionParameters>
+  | ActionRequestBase<'SAVE_RESEARCH_REPORT', { runId: string; draftHash: string; title: string }>
 
 export interface ConversationMessage {
   id: string

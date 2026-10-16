@@ -1,10 +1,10 @@
 # ContextPilot 技术架构
 
-> 状态：V1、V2、V3 与 V4 第一阶段均已完成并通过验收；V5 第一阶段显式记忆架构已批准，Slices 1-6 已完成，仅剩 Slice 7 最终验收。
+> 本文维护模块职责和编排机制；逐项功能及版本状态见[功能清单](../development/feature-inventory.md)，运行配置见[本地开发](../development/local-development.md)。
 
 ## 架构形式
 
-系统采用 Vue 前端与 Spring Boot 后端分离的模块化单体。后端使用 Java 21、Spring Boot 4.1.x 和 Spring AI 2.0.x；V2 继续使用显式 Java 应用服务和持久化状态迁移，不拆分微服务，不引入消息队列、Agent、LangGraph、MCP 或其他工作流运行时。更远版本是否采用这些技术，必须由已经确认的用户场景和评估数据决定。
+系统采用 Vue 前端与 Spring Boot 后端分离的模块化单体，后端使用 Java 21、Spring Boot 4.1.x 和 Spring AI 2.0.x。业务编排由显式 Java 服务和持久化状态迁移实现；V6 在独立模块内使用受限原生工具调用，不引入微服务、消息队列、MCP 或工作流框架。
 
 前端使用 Vue 3、TypeScript、Vue Router 和 Element Plus。`/library` 承载知识库、文档上传与处理状态管理，`/chat` 承载知识库选择、会话历史、流式问答和单向“有用”反馈。普通 HTTP 请求统一通过 Axios 访问 `/api`，SSE 使用 `@microsoft/fetch-event-source` 解析具名事件；聊天页对突发到达的 `delta` 使用短缓冲渐进渲染，并在缓冲区清空后再展示引用和完成状态。开发服务器将 `/api` 和 `/actuator` 代理到后端。模型密钥不进入浏览器；助手回答使用 `marked` 解析 Markdown，并在 `v-html` 展示前通过 `DOMPurify` 清洗，禁止脚本、样式、表单、嵌入内容和远程媒体标签。用户消息继续按纯文本展示，模型输出和文档内容中的原始 HTML 均不受信任。
 
@@ -18,10 +18,12 @@
 - `observation`：模型调用记录和最小指标。
 - `feedback`：已完成助手回答的“有用”标记、取消和可信上下文关联。
 - `capability`（逻辑边界）：固定能力定义、版本和确定性路由；当前实现保持轻量，不加载动态 Skill 或插件。
-- `action`（V2 已实现边界）：已校验操作提案、人工确认状态和静态白名单业务执行；V2 只委托 `KnowledgeBaseService` 创建知识库。
+- `action`：强类型持久化提案、独立确认、原子幂等执行及静态领域服务分派。
 - `health`（V3 当前实现边界）：知识库健康只读事实、确定性问题分类、结构化健康结果以及后续不可变报告编排；数据库访问仅通过专用参数化 DataPort。
-- `identity`（V5 批准边界）：通过 `CurrentSubjectProvider` 提供服务端稳定的 `LOCAL_OWNER`；第一阶段不是登录、认证或多用户授权系统。
-- `memory`（V5 批准边界）：全局回答偏好的持久化、版本、管理、固定预算选择和消息上下文关联；不承载事实型记忆、任务状态或自动提取。
+- `identity`（V5）：通过 `CurrentSubjectProvider` 提供服务端稳定的 `LOCAL_OWNER`；第一阶段不是登录、认证或多用户授权系统。
+- `memory`（V5）：全局回答偏好的持久化、版本、管理、固定预算选择和消息上下文关联；不承载事实型记忆、任务状态或自动提取。
+- `research`：V4 确定性多文档比对、运行状态与证据账本。
+- `upgraderesearch` / `researchreport`：V6 受限工具循环、来源与调用审计、经确认的报告保存。
 - `common`：少量跨模块配置、错误类型和基础约定，不承载业务实现。
 
 模块按业务能力组织，简单功能不强制创建空的 controller/service/mapper 层。`chat` 可以编排检索与模型调用，供应商专用配置不得散落到业务模块。
@@ -94,7 +96,7 @@ V4 的详细设计见 [V4 知识研究助手详细设计](v4-knowledge-research-
 
 生产模块包括 `DeterministicResearchPlanner`、`ResearchPlanValidator`、`ResearchStartService`、`ResearchExecutorService`、`ResearchQueryService`、`ResearchRunCommandService` 和 SSE 适配服务，仍采用模块化单体中的显式 Java 服务。运行状态与回答结果分离，90 秒内进入 `SUCCEEDED/PARTIAL/FAILED/CANCELLED`；取消使用条件更新，断线不取消，应用重启将遗留活动运行安全标记失败。数据库状态是事实来源，SSE 只负责进度；普通 RAG、V2/V3 动作与健康报告链路保持不变。
 
-以上合同与整体授权已同步到生产模块、Flyway V15、正式 API/SSE 和前端入口；切片是独立验证检查点而非重复授权门。真实端到端结果证明 DeepSeek Thinking Token 与原 3000 Token 请求级限额不兼容；2026-08-24 已正式批准研究综合不发送请求级 `max_tokens`，继续记录 usage，并保留 90 秒硬超时、单次模型调用和 1800 字符最终正文上限。`PARTIAL` 卡片按稳定 `errorCode` 展示准确原因，受控缺证据句式不被误判为无引用内容。V4 第一阶段据此完整验收通过。模型规划仍未获准进入生产；V5 仅批准下述显式偏好记忆边界，事实型/自动记忆仍未授权；V6 外部工具互操作和更远期多 Agent 仍为方向性候选。
+2026-08-24 批准的 DeepSeek 兼容性决定：研究综合不发送请求级 `max_tokens`，仍记录 usage，并保留单次模型调用、90 秒硬超时和 1800 字符正文上限。`PARTIAL` 原因按稳定 `errorCode` 展示。验证及决定过程见 [V4 验收报告](../evaluation/v4-implementation-acceptance-report.md)。
 
 ## V5 隐式主体与显式偏好记忆
 
@@ -106,7 +108,17 @@ V5 详细合同见 [V5 显式记忆的个人助手详细设计](v5-explicit-memo
 
 `MemoryContextService` 只向普通 RAG 和 V4 最终 Synthesizer 提供当前主体下活动、未过期的回答偏好，最多 10 条、合计 2000 字符。记忆位于独立的不可信 Prompt 数据区，只能影响表达方式；当前请求优先于偏好，系统规则、grounding、文档引用、拒答、研究范围和预算优先于二者。简单确定性回复、路由、健康报告和 Action 执行不读取记忆。每次实际注入的 revision 通过 `message_memory_context` 关联助手消息，支持 SSE 和历史解释。
 
-第一阶段不使用 Embedding 或模型选择记忆，不保存事实型记忆或任务状态，不做自动候选、语义去重、冲突合并或跨用户隔离。V5 Slices 1-7 已整体批准，Slices 1-6 的固定评估、持久化、确认创建、版本化管理、受限注入、SSE 和历史透明闭环均已通过本地工程门禁。当前只剩 Slice 7 的冻结评估、真实模型和最终版本验收；通过前不得标记 V5 第一阶段完成，批次安排也不能扩大范围或跳过门禁。
+第一阶段不使用 Embedding 或模型选择记忆，不保存事实型记忆或任务状态，不做自动候选、语义去重、冲突合并或跨用户隔离。V5 Slices 1-7 已完成，2026-10-15 通过冻结评估、真实 PostgreSQL 生命周期、真实模型对照、页面验证和完整构建，详见 [V5 验收报告](../evaluation/v5-acceptance-report.md)。后续维护继续保留这些门禁，完成 V5 不扩大 V6 实施范围。
+
+## V6 受控升级研究
+
+[V6 批准设计](v6-upgrade-research-design.md)规定独立 `UPGRADE_IMPACT` 运行，不复用 V4 的计划、预算或终态枚举。应用逐轮调用 Spring AI 原生 DeepSeek 工具协议，只分派选定文档检索、证据读取和固定 Spring AI 仓库发布记录读取三个只读工具。
+
+应用负责资源与强类型参数校验、工具结果回传、重复调用缓存、调用数／上下文／时间预算、来源快照和终态竞争。外部内容始终作为不可信证据。每轮使用 JSON 对象输出模式，不设置请求级 `max_tokens`；最终内容仍须通过结构与引用校验。
+
+保存由用户发起 `SAVE_RESEARCH_REPORT` 提案，模型不能创建或确认提案。独立确认调用报告领域服务，报告写入与动作成功标记同事务提交。数据、接口和保存幂等语义见 V6 设计及 Flyway V20/V21。
+
+首版 API、页面和执行链路已实现，验收未通过，新建运行默认关闭；已知问题及证据见[实现记录](../evaluation/v6-implementation-review.md)。MCP、检索优化及其他未来范围只在[产品需求](../requirements/product-requirements.md)维护。
 
 ## 基础设施职责
 

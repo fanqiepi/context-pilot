@@ -9,16 +9,25 @@ public class ActionExecutorDispatcher {
     private final RetryDocumentProcessingActionExecutor retryDocumentProcessingExecutor;
     private final ReindexDocumentActionExecutor reindexDocumentExecutor;
     private final CreateUserMemoryActionExecutor createUserMemoryExecutor;
+    private final SaveResearchReportActionExecutor saveResearchReportExecutor;
 
     public ActionExecutorDispatcher(
             CreateKnowledgeBaseActionExecutor createKnowledgeBaseExecutor,
             RetryDocumentProcessingActionExecutor retryDocumentProcessingExecutor,
             ReindexDocumentActionExecutor reindexDocumentExecutor,
             CreateUserMemoryActionExecutor createUserMemoryExecutor) {
+        this(createKnowledgeBaseExecutor,retryDocumentProcessingExecutor,reindexDocumentExecutor,createUserMemoryExecutor,null);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public ActionExecutorDispatcher(CreateKnowledgeBaseActionExecutor createKnowledgeBaseExecutor,
+            RetryDocumentProcessingActionExecutor retryDocumentProcessingExecutor,ReindexDocumentActionExecutor reindexDocumentExecutor,
+            CreateUserMemoryActionExecutor createUserMemoryExecutor,SaveResearchReportActionExecutor saveResearchReportExecutor) {
         this.createKnowledgeBaseExecutor = createKnowledgeBaseExecutor;
         this.retryDocumentProcessingExecutor = retryDocumentProcessingExecutor;
         this.reindexDocumentExecutor = reindexDocumentExecutor;
         this.createUserMemoryExecutor = createUserMemoryExecutor;
+        this.saveResearchReportExecutor = saveResearchReportExecutor;
     }
 
     public ActionExecutionResult execute(ActionType actionType, ActionParameters parameters) {
@@ -33,6 +42,10 @@ public class ActionExecutorDispatcher {
             throw new IllegalArgumentException("Action type and parameter type must match");
         }
         return switch (actionType) {
+            case SAVE_RESEARCH_REPORT -> {
+                if(context==null || saveResearchReportExecutor==null)throw new IllegalArgumentException("Report save requires execution context");
+                yield saveResearchReportExecutor.execute((SaveResearchReportActionParameters)parameters,context);
+            }
             case CREATE_KNOWLEDGE_BASE -> createKnowledgeBaseExecutor.execute(
                     (CreateKnowledgeBaseActionParameters) parameters);
             case RETRY_DOCUMENT_PROCESSING -> retryDocumentProcessingExecutor.execute(

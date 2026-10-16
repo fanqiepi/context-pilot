@@ -657,6 +657,7 @@ function actionTitle(actionType: ActionType): string {
     RETRY_DOCUMENT_PROCESSING: '重试文档处理',
     REINDEX_DOCUMENT: '重建文档索引',
     CREATE_USER_MEMORY: '保存回答偏好',
+    SAVE_RESEARCH_REPORT: '保存研究报告',
   }[actionType]
 }
 
@@ -666,11 +667,14 @@ function actionConfirmLabel(actionType: ActionType): string {
     RETRY_DOCUMENT_PROCESSING: '确认重试',
     REINDEX_DOCUMENT: '确认重建',
     CREATE_USER_MEMORY: '确认保存',
+    SAVE_RESEARCH_REPORT: '确认保存报告',
   }[actionType]
 }
 
 function actionParameterRows(actionRequest: ActionRequest): Array<{ label: string; value: string }> {
   switch (actionRequest.actionType) {
+    case 'SAVE_RESEARCH_REPORT':
+      return [{ label: '报告标题', value: actionRequest.parameters.title }, { label: '研究运行', value: actionRequest.parameters.runId }]
     case 'CREATE_KNOWLEDGE_BASE':
       return [
         { label: '名称', value: actionRequest.parameters.name },

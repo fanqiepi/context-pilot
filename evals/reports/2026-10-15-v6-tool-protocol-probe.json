@@ -1,0 +1,46 @@
+{
+  "probeVersion" : "v6-tool-protocol-v1",
+  "startedAt" : "2026-10-15T20:30:14.768427800+08:00",
+  "evidenceMode" : "SYNTHETIC_TOOL_RESULT_NO_RETRIEVAL",
+  "calls" : [ {
+    "ordinal" : 1,
+    "status" : "SUCCEEDED",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 358,
+      "completionTokens" : 57,
+      "totalTokens" : 415,
+      "nativeUsage" : {
+        "completion_tokens" : 57,
+        "prompt_tokens" : 358,
+        "total_tokens" : 415,
+        "prompt_tokens_details" : {
+          "cached_tokens" : 0
+        }
+      }
+    },
+    "latencyMs" : 1698
+  }, {
+    "ordinal" : 2,
+    "status" : "SUCCEEDED",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 167,
+      "completionTokens" : 71,
+      "totalTokens" : 238,
+      "nativeUsage" : {
+        "completion_tokens" : 71,
+        "prompt_tokens" : 167,
+        "total_tokens" : 238,
+        "prompt_tokens_details" : {
+          "cached_tokens" : 0
+        }
+      }
+    },
+    "latencyMs" : 1126
+  } ],
+  "status" : "PASSED",
+  "nativeToolCallReturned" : true,
+  "toolResultAccepted" : true,
+  "finishedAt" : "2026-10-15T20:30:17.684928200+08:00"
+}

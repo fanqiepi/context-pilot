@@ -113,6 +113,7 @@ class KnowledgeBaseServiceTests {
     void deletesExistingKnowledgeBase() {
         UUID id = UUID.randomUUID();
         when(knowledgeBaseMapper.selectById(id)).thenReturn(entity(id, "Notes"));
+        when(knowledgeBaseMapper.lockActive(id)).thenReturn(id);
         when(knowledgeBaseMapper.countActiveDocuments(id)).thenReturn(0L);
         when(knowledgeBaseMapper.deleteById(id)).thenReturn(1);
 
@@ -126,6 +127,7 @@ class KnowledgeBaseServiceTests {
     void rejectsDeletingKnowledgeBaseWithDocuments() {
         UUID id = UUID.randomUUID();
         when(knowledgeBaseMapper.selectById(id)).thenReturn(entity(id, "Notes"));
+        when(knowledgeBaseMapper.lockActive(id)).thenReturn(id);
         when(knowledgeBaseMapper.countActiveDocuments(id)).thenReturn(1L);
 
         assertThatThrownBy(() -> knowledgeBaseService.delete(id))

@@ -1,0 +1,328 @@
+{
+  "datasetId" : "v5-live-memory-v1",
+  "startedAt" : "2026-10-15T19:47:18.395268500+08:00",
+  "retrieval" : "REAL_DASHSCOPE_PGVECTOR",
+  "results" : [ {
+    "caseId" : "V5-LIVE-001",
+    "path" : "RAG",
+    "mode" : "IGNORE",
+    "traceId" : "317b26aa-fd49-42ae-8568-6f406de5c453",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 415,
+      "completionTokens" : 211,
+      "totalTokens" : 626,
+      "latencyMs" : 2325
+    },
+    "answerCharacters" : 207,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : false
+  }, {
+    "caseId" : "V5-LIVE-001",
+    "path" : "RAG",
+    "mode" : "USE",
+    "traceId" : "1c628f6f-1ae6-42e9-964e-346658757995",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 432,
+      "completionTokens" : 362,
+      "totalTokens" : 794,
+      "latencyMs" : 2918
+    },
+    "answerCharacters" : 389,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : true,
+    "planUnchanged" : true,
+    "newSession" : true
+  }, {
+    "caseId" : "V5-LIVE-001",
+    "path" : "DOCUMENT_COMPARISON",
+    "mode" : "IGNORE",
+    "traceId" : "f6c5456e-e0d0-4f63-9bce-c68365cb2431",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 492,
+      "completionTokens" : 802,
+      "totalTokens" : 1294,
+      "latencyMs" : 5584
+    },
+    "answerCharacters" : 334,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : false
+  }, {
+    "caseId" : "V5-LIVE-001",
+    "path" : "DOCUMENT_COMPARISON",
+    "mode" : "USE",
+    "traceId" : "02e65bfd-1072-4b7e-af04-c89117af3c7a",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 509,
+      "completionTokens" : 749,
+      "totalTokens" : 1258,
+      "latencyMs" : 5155
+    },
+    "answerCharacters" : 712,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : true,
+    "planUnchanged" : true,
+    "newSession" : true
+  }, {
+    "caseId" : "V5-LIVE-002",
+    "path" : "RAG",
+    "mode" : "IGNORE",
+    "traceId" : "6732747e-a81f-4db1-8746-568d07d2c972",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 415,
+      "completionTokens" : 153,
+      "totalTokens" : 568,
+      "latencyMs" : 1459
+    },
+    "answerCharacters" : 192,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : false
+  }, {
+    "caseId" : "V5-LIVE-002",
+    "path" : "RAG",
+    "mode" : "USE",
+    "traceId" : "f95642a3-f006-4296-b069-3fe53bca44ed",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 434,
+      "completionTokens" : 250,
+      "totalTokens" : 684,
+      "latencyMs" : 1778
+    },
+    "answerCharacters" : 253,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : true,
+    "planUnchanged" : true,
+    "newSession" : true
+  }, {
+    "caseId" : "V5-LIVE-002",
+    "path" : "DOCUMENT_COMPARISON",
+    "mode" : "IGNORE",
+    "traceId" : "48910639-3cff-4714-99e2-c7585bf2d5bd",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 492,
+      "completionTokens" : 1132,
+      "totalTokens" : 1624,
+      "latencyMs" : 6858
+    },
+    "answerCharacters" : 339,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : true
+  }, {
+    "caseId" : "V5-LIVE-002",
+    "path" : "DOCUMENT_COMPARISON",
+    "mode" : "USE",
+    "traceId" : "146ed851-2f04-4c63-b85f-e74dd73b7b0d",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 511,
+      "completionTokens" : 909,
+      "totalTokens" : 1420,
+      "latencyMs" : 6238
+    },
+    "answerCharacters" : 269,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : true,
+    "planUnchanged" : true,
+    "newSession" : true
+  }, {
+    "caseId" : "V5-LIVE-003",
+    "path" : "RAG",
+    "mode" : "IGNORE",
+    "traceId" : "70b2eefd-6936-4f97-bf7e-aed93c3dfb1b",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 415,
+      "completionTokens" : 181,
+      "totalTokens" : 596,
+      "latencyMs" : 1499
+    },
+    "answerCharacters" : 246,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : true
+  }, {
+    "caseId" : "V5-LIVE-003",
+    "path" : "RAG",
+    "mode" : "USE",
+    "traceId" : "99ba8fbf-704e-4410-82c7-67a74679d353",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 431,
+      "completionTokens" : 183,
+      "totalTokens" : 614,
+      "latencyMs" : 1420
+    },
+    "answerCharacters" : 212,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : true,
+    "planUnchanged" : true,
+    "newSession" : true
+  }, {
+    "caseId" : "V5-LIVE-003",
+    "path" : "DOCUMENT_COMPARISON",
+    "mode" : "IGNORE",
+    "traceId" : "544431b7-c5b6-4f9e-99b9-821a5f2ee73a",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 492,
+      "completionTokens" : 521,
+      "totalTokens" : 1013,
+      "latencyMs" : 4353
+    },
+    "answerCharacters" : 253,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : true
+  }, {
+    "caseId" : "V5-LIVE-003",
+    "path" : "DOCUMENT_COMPARISON",
+    "mode" : "USE",
+    "traceId" : "d9139d0b-faf1-4dc3-afb6-05775f8f534e",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 508,
+      "completionTokens" : 253,
+      "totalTokens" : 761,
+      "latencyMs" : 2230
+    },
+    "answerCharacters" : 158,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : true,
+    "planUnchanged" : true,
+    "newSession" : true
+  }, {
+    "caseId" : "V5-LIVE-004",
+    "path" : "RAG",
+    "mode" : "IGNORE",
+    "traceId" : "4f24ae54-7f01-4788-89da-7e342e56617d",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 419,
+      "completionTokens" : 239,
+      "totalTokens" : 658,
+      "latencyMs" : 3622
+    },
+    "answerCharacters" : 256,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : true
+  }, {
+    "caseId" : "V5-LIVE-004",
+    "path" : "RAG",
+    "mode" : "USE",
+    "traceId" : "1af41f0c-a7fb-4728-8dc8-2bb9be6245bb",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 436,
+      "completionTokens" : 217,
+      "totalTokens" : 653,
+      "latencyMs" : 1812
+    },
+    "answerCharacters" : 190,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : true,
+    "planUnchanged" : true,
+    "newSession" : true
+  }, {
+    "caseId" : "V5-LIVE-004",
+    "path" : "DOCUMENT_COMPARISON",
+    "mode" : "IGNORE",
+    "traceId" : "bff4745e-3fdf-4ffa-b558-599f4a5c258d",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 496,
+      "completionTokens" : 288,
+      "totalTokens" : 784,
+      "latencyMs" : 2935
+    },
+    "answerCharacters" : 306,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : true
+  }, {
+    "caseId" : "V5-LIVE-004",
+    "path" : "DOCUMENT_COMPARISON",
+    "mode" : "USE",
+    "traceId" : "75f4d63f-7797-46be-b540-acd8376f72d6",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 513,
+      "completionTokens" : 718,
+      "totalTokens" : 1231,
+      "latencyMs" : 5324
+    },
+    "answerCharacters" : 301,
+    "answered" : true,
+    "citationsValid" : true,
+    "memoryCorrect" : true,
+    "historyCorrect" : true,
+    "oneModelCall" : true,
+    "stylePassed" : true,
+    "planUnchanged" : true,
+    "newSession" : true
+  } ],
+  "status" : "AUTOMATED_GATES_PASSED_MANUAL_REVIEW_REQUIRED",
+  "finishedAt" : "2026-10-15T19:48:18.225489800+08:00"
+}
