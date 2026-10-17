@@ -113,3 +113,7 @@
 ## Research task workspace authorization
 
 The user requested implementation along the discussed technical roadmap on 2026-10-16. The first capability is Research Task Workspace, specified in docs/architecture/research-task-workspace-design.md: isolated bounded model planning, server-validated document search steps, persistent task checkpoints, clarification/supplement, pause/resume/cancel and grounded synthesis. This is an additional scoped exception to the older model-planning exclusion. Existing V1–V6 contracts remain intact. MCP, multi-agent execution and external write tools remain later candidates. No extra confirmation is required for implementation checkpoints within this contract.
+
+## Project source integration authorization
+
+On 2026-10-16 the user explicitly approved docs/architecture/project-source-integration-design.md (按这个方案开发). Implement the full Project Source Integration contract: a dedicated read-only MCP client/server for the fixed public spring-projects/spring-ai repository, immutable TXT/Markdown previews, and the user-initiated, independently confirmed IMPORT_PROJECT_DOCUMENTS action. This is a scoped exception to the earlier MCP exclusion. Preserve all existing baselines and all other exclusions. Implementation checkpoints do not require repeated authorization.

@@ -152,3 +152,7 @@ Flyway V17 已实施该扩展。`CREATE_USER_MEMORY` 参数只允许固定类型
 ## 研究任务工作台
 
 新增 research_task 与 research_task_event，分别记录当前任务检查点和 revision 对应历史；归属来自 LOCAL_OWNER，创建幂等键唯一，状态变更持行锁并校验 revision，JSON 检查点保存限定计划、证据及步骤完成状态。逻辑删除不物理清除历史。具体约束以新增 Flyway 迁移与[设计](../architecture/research-task-workspace-design.md)为准。
+
+## 项目资料接入（首版已交付）
+
+2026-10-16 用户批准专用只读 MCP 接入固定公开项目资料、不可变预览及独立确认导入知识库。详细边界以 [项目资料接入数据合同](../architecture/project-source-integration-design.md#数据合同) 为准；首版工程与公开流程验证已通过，证据见 docs/evaluation/project-source-integration-verification.md；独立语义质量评估不包含在本次结论内。

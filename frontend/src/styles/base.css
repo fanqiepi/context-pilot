@@ -115,6 +115,8 @@ a {
 }
 
 .app-nav a {
+  white-space: nowrap;
+  flex-shrink: 0;
   padding: 9px 18px;
   border-radius: 10px;
   color: #68716a;
@@ -277,7 +279,8 @@ a {
 
 @media (max-width: 760px) {
   .app-header {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
     min-height: auto;
     padding: 12px 18px;
   }
@@ -288,7 +291,9 @@ a {
   }
 
   .app-nav {
-    justify-self: end;
+    justify-self: stretch;
+    overflow-x: auto;
+    max-width: 100%;
   }
 
   .app-nav a {

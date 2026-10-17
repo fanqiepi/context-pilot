@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    { path: '/project-sources', name: 'project-sources', component: () => import('@/views/ProjectSourcesView.vue') },
     { path: '/research-tasks', name: 'research-tasks', component: () => import('@/views/ResearchTasksView.vue') },
     { path: '/upgrade-research', name: 'upgrade-research', component: () => import('@/views/UpgradeResearchView.vue') },
     {

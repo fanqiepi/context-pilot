@@ -144,3 +144,7 @@ ai.call.failed operation=CHAT_STREAM provider=DEEPSEEK model=deepseek-v4-flash t
 ```
 
 后端默认监听 `18080`，Knife4j 接口文档位于 `http://localhost:18080/doc.html`，原始 OpenAPI JSON 位于 `http://localhost:18080/v3/api-docs`。如需使用其他端口，可设置 `SERVER_PORT`；修改后还应同步调整前端开发代理目标。
+
+## 项目资料接入
+
+独立 MCP 服务、功能开关、确认导入、公开研究演示与恢复说明见 [项目资料接入运行指南](project-source-integration.md)。

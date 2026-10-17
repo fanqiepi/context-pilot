@@ -14,6 +14,7 @@ import { RouterLink, RouterView } from 'vue-router'
       </RouterLink>
 
       <nav class="app-nav" aria-label="主导航">
+        <RouterLink to="/project-sources">项目资料</RouterLink>
         <RouterLink to="/research-tasks">研究任务</RouterLink>
         <RouterLink to="/library">资料库</RouterLink>
         <RouterLink to="/chat">知识问答</RouterLink>

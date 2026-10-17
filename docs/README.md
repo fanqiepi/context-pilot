@@ -2,6 +2,7 @@
 
 - [研究任务工作台设计](architecture/research-task-workspace-design.md)：有限规划、澄清、执行与检查点恢复。
 - [研究任务工作台验证](evaluation/research-task-workspace-verification.md)：工程回归、真实模型与页面证据及质量边界。
+- [项目资料接入设计](architecture/project-source-integration-design.md)：已授权的固定项目资料读取与确认导入合同。
 
 按用途查阅；当前状态看功能清单，未来范围看产品需求，验收结论看版本报告。
 
@@ -48,3 +49,6 @@
 | `archive/` | 带日期的历史规划或审阅快照 |
 
 概览文档用摘要和链接引用详细合同，不重复复制版本过程或测试数字。修改行为时同步其所属设计及功能清单；历史证据不改写为当前结果。接口字段需核对 OpenAPI，已实施数据库结构需核对 Flyway；出现冲突应记录并明确处理，不能静默选择。根目录被 Git 忽略的早期本地规划笔记不属于正式文档，也不是构建或开发前提。
+
+- [项目资料接入运行指南](development/project-source-integration.md)：启动、确认导入与公开研究演示。
+- [项目资料接入验证](evaluation/project-source-integration-verification.md)：首版工程与公开流程证据。

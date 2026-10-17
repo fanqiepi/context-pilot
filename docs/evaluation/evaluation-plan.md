@@ -162,3 +162,7 @@ Slice 7 如果不能证明当前生产注入保持上述收益，或发现 groun
 ## 研究任务工作台验证
 
 新增计划边界、任务幂等、并发 revision、暂停取消、检查点恢复、新轮次、来源变化与真实 PostgreSQL 持久化验证。页面验证计划预览和补充继续；真实模型采用公开资料并单独记录。工程通过不等于语义验收，具体门禁见[设计](../architecture/research-task-workspace-design.md)。
+
+## 项目资料接入（首版已交付）
+
+2026-10-16 用户批准专用只读 MCP 接入固定公开项目资料、不可变预览及独立确认导入知识库。详细边界以 [项目资料接入验证合同](../architecture/project-source-integration-design.md#必要验证和交付) 为准；首版工程与公开流程验证已通过，证据见 docs/evaluation/project-source-integration-verification.md；独立语义质量评估不包含在本次结论内。

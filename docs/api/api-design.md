@@ -294,3 +294,7 @@ message -> route -> action_required -> done(AWAITING_CONFIRMATION)
 ## 研究任务工作台 API
 
 新增 /api/research-tasks 的创建、分页列表、详情、逻辑删除、commands 与 events 接口。命令采用 START、PAUSE、RESUME、CANCEL、SUPPLEMENT 静态枚举及 expectedRevision；不接受 ownerId。细节见[设计](../architecture/research-task-workspace-design.md)。
+
+## 项目资料接入（首版已交付）
+
+2026-10-16 用户批准专用只读 MCP 接入固定公开项目资料、不可变预览及独立确认导入知识库。详细边界以 [项目资料接入 API 合同](../architecture/project-source-integration-design.md#api-和页面合同) 为准；首版工程与公开流程验证已通过，证据见 docs/evaluation/project-source-integration-verification.md；独立语义质量评估不包含在本次结论内。

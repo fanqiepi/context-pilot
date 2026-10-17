@@ -38,6 +38,12 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 })
 class ContextPilotApplicationTests {
     @MockitoBean
+    private io.github.fanqiepi.contextpilot.projectsource.ProjectPreviewMapper projectPreviewMapper;
+    @MockitoBean
+    private io.github.fanqiepi.contextpilot.projectsource.ProjectImportMapper projectImportMapper;
+    @MockitoBean
+    private io.github.fanqiepi.contextpilot.projectsource.ProjectSourcePreviewService projectPreviews;
+    @MockitoBean
     private io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeRunMapper upgradeRunMapper;
     @MockitoBean
     private io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeExecutionMapper upgradeExecutionMapper;
@@ -109,6 +115,7 @@ class ContextPilotApplicationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.info.title").value("研序 API"))
                 .andExpect(jsonPath("$.paths['/api/knowledge-bases']").exists())
+                .andExpect(jsonPath("$.paths['/api/project-source-previews']").exists())
                 .andExpect(jsonPath("$.paths['/api/knowledge-bases/{id}']").exists())
                 .andExpect(jsonPath("$.paths['/api/documents/{documentId}/retry']").exists())
                 .andExpect(jsonPath("$.paths['/api/knowledge-bases/{knowledgeBaseId}/search']").exists())

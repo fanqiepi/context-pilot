@@ -1,0 +1,177 @@
+{
+  "baseCommit": "c88b9f9d51dbe6693fb8a40c03744e81372bd0e8",
+  "files": [
+    {
+      "path": "backend/pom.xml",
+      "sha256": "29440bc270b32e5b3be7fc99a56bfbdf377615d64fa0daf6eda7439339e09f22"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionExecutionContext.java",
+      "sha256": "b890d27c02e7d539b00df9487289065312c288e17413dc79f9f7072818bd430b"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionExecutorDispatcher.java",
+      "sha256": "f817a9e64b9e1d33e7372e20c87620cf26b3e12d89e45bc80126903ca04ae8a2"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionParameters.java",
+      "sha256": "30aed75bdd9e5852103ae11faa5a781e257f40a2c1c230942ab59274745a481c"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionParametersCodec.java",
+      "sha256": "0bd1a9f40ba743e0b23d55afb8f15eacdcba0347806514eae1d94828f0e15c15"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionRequestService.java",
+      "sha256": "ba61b6eb259c7d722697250c7274f9e38fe589430d519791e36317bfc4afc59c"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionType.java",
+      "sha256": "27fd87b902e4ce314863a00d85525f8aa9abaa2d49fcd634a5252f9fb5126578"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ImportProjectDocumentsActionParameters.java",
+      "sha256": "06094fd9986bc009025f7f1c460f1bf56acfa77455b1a518d65868b606ea062e"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/common/ApiExceptionHandler.java",
+      "sha256": "bd2d0581fb9292aff1586f07361b025c8de392e093d231a1176ae4d8c2fb5dcd"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/ProjectDocumentRegistrationService.java",
+      "sha256": "013ae5207ecc7a6a8fcb453389bd21308f3ad3eba6d6b8f974eae70a52b5eaaf"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/HealthReportActionProposalService.java",
+      "sha256": "9b812b916aec4d535b8f6fe6d2ad20e98d443b76535bbe6562bfe289ff322e46"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/GitHubProjectSourceReader.java",
+      "sha256": "e7d9592064b5c809924458b3c3f3adc7420a9e51e6d3305e623993f5e7140f30"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectDocumentSnapshot.java",
+      "sha256": "2344032414423e31c2ec46eea42e927a8062e216135125ac2b757df3f7547be7"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectImportMapper.java",
+      "sha256": "092cba9da1762ea37f4040c15a0e02c8ba2e20c54f018a386588ac0d2fe4f917"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectImportProposalService.java",
+      "sha256": "69094dc8a081d37f5559799e4b8671888479e628710205b3dcfb0f194cf148b4"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectImportWriter.java",
+      "sha256": "883542bfc94fecb8b9c7bc4679c34d9dbb8f1eb4d80d4082c0ee058403915bb3"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectPreviewEntity.java",
+      "sha256": "c9101bd313d90d254b53859e74c78edc5a261da7c83f180fdf5ee4f6fcea6587"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectPreviewMapper.java",
+      "sha256": "e9ea00c8bf1a66ea2a3f0d0dba928d3fcf0762db1d0fd8f0596fe52a38b3246a"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourceController.java",
+      "sha256": "c3aa92c920e4de5b936b67282444a6db37e412b5692c16f6b39c74cdda9f2ee4"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourceException.java",
+      "sha256": "160f67b775088e434c414082edb2ea0d79906835a24a049f4cc3a5c510871acb"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourceMcpClient.java",
+      "sha256": "638386ea78648c1e06dcf21aab36175b21666c536d71cd04b70cf00d04619bcc"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourceMcpServer.java",
+      "sha256": "9dfb5d346abd7472ca83fa81f88b689bf4f2859aa59ebdb55f19c6fd5d388fd8"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourceMcpTools.java",
+      "sha256": "ad24cea84170bc5417401d4befe112da43fc966145044efc7a9cd2b2f2539742"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourcePolicy.java",
+      "sha256": "390edd4daa034d5792fd158a206622a8142b94ee4dfc6fbb7a0a09aeed6330bc"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourcePort.java",
+      "sha256": "8ab486847b7f152f3339aa583471a31bdcae0d916ba0c526a1967c0eacd38d40"
+    },
+    {
+      "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourcePreviewService.java",
+      "sha256": "9b717b55c162d8b93d409e0d01cb92e7cacb03b0b8671af58a1cb457263dce58"
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V23__create_project_source_previews.sql",
+      "sha256": "ca0c2dcae574ed02d97ee32fb79205d2021d1fe4baa9b991837cd7d2b8c95e21"
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V24__add_confirmed_project_import.sql",
+      "sha256": "f127589f805e4e5a5a191a8480243cfec023d61e9826547c65edfa83f8191540"
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V25__track_project_import_staged_files.sql",
+      "sha256": "2d5eb449282aa207d224dd6cef73fff9bfe367574c539317502ab84bf727c1cb"
+    },
+    {
+      "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/ContextPilotApplicationTests.java",
+      "sha256": "36eabaad5c51f816b9f0260188b7dac60ed0a8dbcb77587423c4cae020744803"
+    },
+    {
+      "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/projectsource/GitHubProjectSourceReaderTests.java",
+      "sha256": "aceb12a29f7da34fd6bbbd1cb75b67818c418c6aa49ac8dbe84eb247e086699c"
+    },
+    {
+      "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourceLiveTests.java",
+      "sha256": "be23c0ad8a1dd2c31be088a0fa206735acb184685f00bb47d647181de5b3f185"
+    },
+    {
+      "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourceMcpTests.java",
+      "sha256": "07abf9f766ddeb8c48bae786b7c7b979f0fcfa2d9d4d735e17f1b8a4dcbb6581"
+    },
+    {
+      "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourcePersistenceTests.java",
+      "sha256": "676d45c78ce9b2a4d062886847b605827c7d36aee89722d4b2aeb6dc44464dc5"
+    },
+    {
+      "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourcePolicyTests.java",
+      "sha256": "00e07eff2c7c5c6427b33d1a446204059269cf5cdc6b973c5d1213d4f556d572"
+    },
+    {
+      "path": "backend/start-project-source-mcp.ps1",
+      "sha256": "91b485889a30de1c85111c2fd2e7892a77779613ef2da1734e658bddbdbdb997"
+    },
+    {
+      "path": "frontend/src/api/projectSources.ts",
+      "sha256": "a1fcf543d37c9b780cd8af9450a455bbdafdacb6b36ba0211641be16b57f1939"
+    },
+    {
+      "path": "frontend/src/App.vue",
+      "sha256": "ec7843d8ff8b1507f3b2cce10e6f13da48dec10a92a96394f424222067744e0c"
+    },
+    {
+      "path": "frontend/src/router/index.ts",
+      "sha256": "40139463cb966f1bd4aa7c4cac732af7004ebc15e8021d542d27d73d1d320559"
+    },
+    {
+      "path": "frontend/src/styles/base.css",
+      "sha256": "88f54e2c38d537ed9b31e1eca9b40931fb798c1ad7765d67ab642de60b7ae3cb"
+    },
+    {
+      "path": "frontend/src/views/KnowledgeBaseView.vue",
+      "sha256": "f88f3a6532b16b9af7c115f1d3640e753942f30aab027caf71febb25f909ce90"
+    },
+    {
+      "path": "frontend/src/views/ProjectSourcesView.vue",
+      "sha256": "fb20711686174b9d76c6e5b470aba7741d88623c918c22f2c3f80c1f47fb1116"
+    },
+    {
+      "path": "backend/src/main/resources/db/migration/V26__add_project_preview_error_path.sql",
+      "sha256": "c307304c469ddfa92a7b31d574cfc12bbbb60b83a94611142e1dc6be4d0568c8"
+    }
+  ]
+}

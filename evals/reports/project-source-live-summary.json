@@ -1,0 +1,35 @@
+{
+  "mode": "PUBLIC_DEBUG_NOT_SEMANTIC_ACCEPTANCE",
+  "status": "FLOW_PASSED_REQUIRES_HUMAN_REVIEW",
+  "startedAt": "2026-10-17T08:37:38.050816100Z",
+  "finishedAt": "2026-10-17T08:37:52.822380200Z",
+  "mcpProtocol": "2025-11-25",
+  "repository": "spring-projects/spring-ai",
+  "ref": "v1.0.0",
+  "path": "README.md",
+  "commit": "fcd2803f36f35939c20ed152c9c1b0863fa35dcf",
+  "sourceHash": "c38d40416f5154f53e5a7fd20fc519d6ead9e7910c3744cd9d04d24e1eddd5e9",
+  "researchStatus": "COMPLETED",
+  "calls": [
+    {
+      "phase": "PLANNING",
+      "status": "SUCCEEDED",
+      "model": "deepseek-flash",
+      "inputTokens": 367,
+      "outputTokens": 357,
+      "totalTokens": 724,
+      "latencyMs": 2667
+    },
+    {
+      "phase": "SYNTHESIS",
+      "status": "SUCCEEDED",
+      "model": "deepseek-flash",
+      "inputTokens": 957,
+      "outputTokens": 838,
+      "totalTokens": 1795,
+      "latencyMs": 4594
+    }
+  ],
+  "evidenceCount": 4,
+  "qualityObservation": "主要结论对应 E1/E4，截断的 ETL 文本被作为资料缺口；单一公开流程，不是独立语义验收。"
+}

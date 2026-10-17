@@ -15,7 +15,8 @@
 | 回答偏好记忆 | 2026-10-15 已验收 | [记忆验收](../evaluation/v5-acceptance-report.md) |
 | 升级影响研究 | 首版已实现但质量验收未通过；新建研究默认关闭，本地显式开启 | [设计](../architecture/v6-upgrade-research-design.md)、[实现记录](../evaluation/v6-implementation-review.md) |
 | 研究任务工作台 | 已实现有限规划、检查点与补充继续；工程和公开样例验证见记录 | [设计](../architecture/research-task-workspace-design.md)、[验证](../evaluation/research-task-workspace-verification.md) |
-| 项目资料接入、研究审查、检索优化 | 后续候选 | [唯一详细路线](../requirements/product-requirements.md) |
+| 项目资料接入 | 首版已交付，工程与公开流程验证通过 | [设计](../architecture/project-source-integration-design.md)、[验证](../evaluation/project-source-integration-verification.md) |
+| 研究审查、检索优化 | 后续候选 | [唯一详细路线](../requirements/product-requirements.md) |
 
 统一 50 项核心任务已冻结，完整执行、V6 最终验收及展示交付尚未完成。待办和功能状态在[功能清单](feature-inventory.md)维护；测试次数及实际成绩以验收报告为准，不在本文重复登记。
 
@@ -30,7 +31,7 @@
 - V5 只保存经确认的全局回答偏好，最多注入 10 条／2000 字符，仅影响呈现；禁止自动提取、改变证据或控制工具。
 - `LOCAL_OWNER` 只提供持久归属，不是认证边界；客户端不能指定用户 ID，部署限本机或可信网络。
 - 2026-10-15 已整体批准 V6 Slices 1–7，切片不是重复授权门。唯一工具循环例外为独立 `UPGRADE_IMPACT`、三个静态只读工具和固定 Spring AI 公开仓库；`SAVE_RESEARCH_REPORT` 仅由用户发起提案并独立确认。
-- MCP、多 Agent、工作流引擎、混合检索／Rerank、自动记忆、登录与多租户仍未授权；具体范围以已批准版本合同为准。
+- 通用 MCP、多 Agent、工作流引擎、混合检索／Rerank、自动记忆、登录与多租户仍未授权；专用只读 MCP 已在项目资料接入合同中批准；具体范围以已批准版本合同为准。
 - 研究任务工作台另行授权有限模型计划与应用执行：仅检索用户选定文档，计划整体校验，执行令牌阻止过期结果写回；不扩展升级研究允许列表，不自动执行业务动作。合同见[工作台设计](../architecture/research-task-workspace-design.md)。
 
 ## 技术与工作入口

@@ -10,6 +10,12 @@ public class ActionExecutorDispatcher {
     private final ReindexDocumentActionExecutor reindexDocumentExecutor;
     private final CreateUserMemoryActionExecutor createUserMemoryExecutor;
     private final SaveResearchReportActionExecutor saveResearchReportExecutor;
+    private io.github.fanqiepi.contextpilot.projectsource.ProjectImportWriter projectImportWriter;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public void setProjectImportWriter(io.github.fanqiepi.contextpilot.projectsource.ProjectImportWriter writer) {
+        this.projectImportWriter = writer;
+    }
 
     public ActionExecutorDispatcher(
             CreateKnowledgeBaseActionExecutor createKnowledgeBaseExecutor,
@@ -41,7 +47,14 @@ public class ActionExecutorDispatcher {
         if (parameters == null || parameters.actionType() != actionType) {
             throw new IllegalArgumentException("Action type and parameter type must match");
         }
+        if (context != null && actionType != ActionType.IMPORT_PROJECT_DOCUMENTS && context.conversationId() == null) {
+            throw new IllegalArgumentException("Existing chat actions require chat provenance");
+        }
         return switch (actionType) {
+            case IMPORT_PROJECT_DOCUMENTS -> {
+                if(context==null || projectImportWriter==null)throw new IllegalArgumentException("Project import requires execution context");
+                yield projectImportWriter.execute((ImportProjectDocumentsActionParameters)parameters,context);
+            }
             case SAVE_RESEARCH_REPORT -> {
                 if(context==null || saveResearchReportExecutor==null)throw new IllegalArgumentException("Report save requires execution context");
                 yield saveResearchReportExecutor.execute((SaveResearchReportActionParameters)parameters,context);

@@ -135,3 +135,7 @@ V5 详细合同见 [V5 显式记忆的个人助手详细设计](v5-explicit-memo
 ## 研究任务工作台模块
 
 新增独立 taskworkspace 模块：控制器 → 带事务的任务状态服务 → 有界执行器 → 计划模型／限定文档检索／综合模型。任务检查点和事件同事务持久化，执行令牌阻止过期结果写回；不改变既有聊天路由、比对或升级研究。详细合同见[研究任务工作台](research-task-workspace-design.md)。
+
+## 项目资料接入（首版已交付）
+
+2026-10-16 用户批准专用只读 MCP 接入固定公开项目资料、不可变预览及独立确认导入知识库。详细边界以 [项目资料接入设计](project-source-integration-design.md) 为准；首版工程与公开流程验证已通过，证据见 docs/evaluation/project-source-integration-verification.md；独立语义质量评估不包含在本次结论内。
