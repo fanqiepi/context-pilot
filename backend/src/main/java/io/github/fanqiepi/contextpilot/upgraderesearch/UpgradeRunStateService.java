@@ -58,7 +58,7 @@ public class UpgradeRunStateService {
         run.setDocumentSnapshots(UpgradeJson.write(snapshots));run.setRepositoryKey(request.repositoryKey());
         run.setReleaseTags(UpgradeJson.write(request.releaseTags().stream().distinct().sorted().toList()));
         run.setRetryOfRunId(request.retryOfRunId());run.setBudgetVersion(UpgradeBudget.VERSION);
-        run.setPromptVersion("upgrade-research-v1");run.setSchemaVersion("upgrade-tools-v1");
+        run.setPromptVersion("upgrade-research-v6");run.setSchemaVersion("upgrade-tools-v1");
         run.setDeadline(now.plusSeconds(UpgradeBudget.RUN_SECONDS));run.setTraceId(traceId);
         run.setCreatedAt(now);run.setUpdatedAt(now);
         mapper.insertRun(run);

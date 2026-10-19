@@ -24,8 +24,9 @@ import org.testcontainers.utility.DockerImageName;
 
 import static org.assertj.core.api.Assertions.*;
 
-@SpringBootTest(properties={"spring.ai.model.chat=none","spring.ai.model.embedding=none",
+@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT, properties={"spring.ai.model.chat=none","spring.ai.model.embedding=none",
         "spring.ai.vectorstore.type=none","contextpilot.upgrade-research.enabled=false"})
+@org.springframework.test.annotation.DirtiesContext(classMode = org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS)
 @Testcontainers
 class UpgradeRunPersistenceTests {
     @Container static final PostgreSQLContainer POSTGRES=new PostgreSQLContainer(DockerImageName
@@ -44,6 +45,8 @@ class UpgradeRunPersistenceTests {
     @Autowired UpgradeExecutionState executionState;
     @Autowired UpgradeExecutionMapper executionMapper;
     @Autowired UpgradeQueryService query;
+    @Autowired UpgradeResearchController controller;
+    @org.springframework.boot.test.web.server.LocalServerPort int port;
     @Autowired io.github.fanqiepi.contextpilot.researchreport.ResearchReportProposalService proposals;
     @Autowired io.github.fanqiepi.contextpilot.researchreport.ResearchReportMapper reports;
     @Autowired io.github.fanqiepi.contextpilot.action.ActionRequestService actions;
@@ -133,7 +136,11 @@ class UpgradeRunPersistenceTests {
         assertThat(proposal.actionType()).isEqualTo(io.github.fanqiepi.contextpilot.action.ActionType.SAVE_RESEARCH_REPORT);
         assertThat(proposal.status()).isEqualTo(io.github.fanqiepi.contextpilot.action.ActionRequestStatus.PENDING_CONFIRMATION);
         assertThat(reports.byRun(run.getId(),run.getOwnerId())).isNull();
+        int messageCount=jdbc.queryForObject("SELECT count(*) FROM chat_message",Integer.class);
         assertThat(proposals.propose(run.getId(),saveRequest).id()).isEqualTo(proposal.id());
+        assertThat(proposals.propose(run.getId(),new io.github.fanqiepi.contextpilot.researchreport.ReportSaveRequest(
+                UUID.randomUUID(),saveRequest.title(),null)).id()).isEqualTo(proposal.id());
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM chat_message",Integer.class)).isEqualTo(messageCount);
         assertThat(query.get(run.getId()).saveActionId()).isEqualTo(proposal.id());
         var confirmers=Executors.newFixedThreadPool(4);
         try {
@@ -169,7 +176,7 @@ class UpgradeRunPersistenceTests {
         var run=readyRun();
         var proposal=proposals.propose(run.getId(),new io.github.fanqiepi.contextpilot.researchreport.ReportSaveRequest(UUID.randomUUID(),"first",null));
         assertThatThrownBy(()->proposals.propose(run.getId(),new io.github.fanqiepi.contextpilot.researchreport.ReportSaveRequest(UUID.randomUUID(),"different",null)))
-                .isInstanceOf(ConflictException.class);
+                .isInstanceOf(ConflictException.class).extracting("code").isEqualTo("REPORT_PROPOSAL_CONFLICT");
         actions.reject(proposal.id());actions.confirm(proposal.id());assertThat(reports.byRun(run.getId(),run.getOwnerId())).isNull();
         var expiring=proposals.propose(run.getId(),new io.github.fanqiepi.contextpilot.researchreport.ReportSaveRequest(UUID.randomUUID(),"second",null));
         jdbc.update("UPDATE action_request SET created_at=CURRENT_TIMESTAMP-INTERVAL '2 hours',expires_at=CURRENT_TIMESTAMP-INTERVAL '1 hour' WHERE id=?",expiring.id());
@@ -185,6 +192,199 @@ class UpgradeRunPersistenceTests {
         // Test fixture for the report transaction boundary, not semantic quality evidence.
         executionState.finish(run.getId(),UpgradeRunStatus.SUCCEEDED,"Public synthetic draft",List.of());
         return state.get(run.getId());
+    }
+
+    @Test void simultaneousStartRequestsDispatchOnlyOnce() throws Exception {
+        var subjects=org.mockito.Mockito.mock(io.github.fanqiepi.contextpilot.identity.CurrentSubjectProvider.class);
+        org.mockito.Mockito.when(subjects.currentSubject()).thenReturn(new io.github.fanqiepi.contextpilot.identity.UserSubject(
+                UUID.fromString("00000000-0000-0000-0000-000000000001"),"LOCAL_OWNER"));
+        var dispatched=new CountDownLatch(1);var count=new java.util.concurrent.atomic.AtomicInteger();
+        var start=new UpgradeResearchStartService(mapper,state,subjects,id->{count.incrementAndGet();dispatched.countDown();},transactions);
+        var pool=Executors.newFixedThreadPool(4);var barrier=new CyclicBarrier(4);var request=request();
+        try {
+            List<Callable<UUID>> calls=new ArrayList<>();
+            for(int i=0;i<4;i++)calls.add(()->{barrier.await(5,TimeUnit.SECONDS);return start.start(request,"start-race").run().getId();});
+            Set<UUID> ids=new HashSet<>();for(var result:pool.invokeAll(calls))ids.add(result.get(10,TimeUnit.SECONDS));
+            assertThat(dispatched.await(5,TimeUnit.SECONDS)).isTrue();
+            assertThat(ids).hasSize(1);assertThat(count).hasValue(1);
+        }finally{pool.shutdownNow();start.shutdown();}
+    }
+
+    @Test void cancellationRacesWithRegistrationWithoutLeavingActiveCalls() throws Exception {
+        var run=state.register(request(),"registration-race").run();state.claim(run.getId());
+        var pool=Executors.newFixedThreadPool(2);var barrier=new CyclicBarrier(2);
+        try {
+            var registration=pool.submit(()->{
+                barrier.await(5,TimeUnit.SECONDS);
+                try{return executionState.beginModel(run.getId());}
+                catch(UpgradeToolException error){assertThat(error.code()).isEqualTo("RUN_NOT_ACTIVE");return null;}
+            });
+            var cancellation=pool.submit(()->{barrier.await(5,TimeUnit.SECONDS);return state.cancel(run.getId());});
+            cancellation.get(10,TimeUnit.SECONDS);var call=registration.get(10,TimeUnit.SECONDS);
+            assertThat(state.get(run.getId()).getStatus()).isEqualTo(UpgradeRunStatus.CANCELLED);
+            assertThat(jdbc.queryForObject("SELECT count(*) FROM upgrade_research_model_call WHERE run_id=? AND status<>'CANCELLED'",Integer.class,run.getId())).isZero();
+            assertThatThrownBy(()->executionState.beginModel(run.getId())).extracting("code").isEqualTo("RUN_NOT_ACTIVE");
+            assertThat(state.get(run.getId()).getModelCalls()).isEqualTo(call==null?0:1);
+        }finally{pool.shutdownNow();}
+    }
+
+    @Test @org.junit.jupiter.api.Timeout(20)
+    void activeStreamCanDisconnectAndReconnectToSameRunWithoutRevisionRollback() throws Exception {
+        var run=state.register(request(),"reconnect-trace").run();state.claim(run.getId());
+        var request=java.net.http.HttpRequest.newBuilder(java.net.URI.create(
+                "http://127.0.0.1:"+port+"/api/upgrade-research/runs/"+run.getId()+"/events"))
+                .timeout(java.time.Duration.ofSeconds(10)).GET().build();
+        try(var client=java.net.http.HttpClient.newHttpClient()){
+            var response=client.send(request,java.net.http.HttpResponse.BodyHandlers.ofInputStream());
+            assertThat(response.statusCode()).isEqualTo(200);
+            long revision=-1;
+            try(var reader=new java.io.BufferedReader(new java.io.InputStreamReader(response.body(),java.nio.charset.StandardCharsets.UTF_8))){
+                String line;
+                while((line=reader.readLine())!=null){
+                    if(line.startsWith("data:")){
+                        var snapshot=UpgradeJson.MAPPER.readTree(line.substring(5)).path("run");
+                        assertThat(snapshot.path("id").asText()).isEqualTo(run.getId().toString());
+                        assertThat(snapshot.path("status").asText()).isEqualTo("RUNNING");
+                        revision=snapshot.path("revision").asLong();break;
+                    }
+                }
+            }
+            assertThat(revision).isGreaterThanOrEqualTo(1);
+            assertThat(state.get(run.getId()).getStatus()).isEqualTo(UpgradeRunStatus.RUNNING);
+            executionState.finish(run.getId(),UpgradeRunStatus.SUCCEEDED,"public synthetic reconnect result",List.of());
+            var replay=client.send(request,java.net.http.HttpResponse.BodyHandlers.ofString());
+            assertThat(replay.statusCode()).isEqualTo(200);
+            assertThat(replay.body()).contains("event:snapshot","event:result","event:done","reconnect-trace");
+            for(String line:replay.body().split("\\n"))if(line.startsWith("data:")){
+                var payload=UpgradeJson.MAPPER.readTree(line.substring(5));
+                var snapshot=payload.has("run")?payload.path("run"):payload;
+                assertThat(snapshot.path("revision").asLong()).isGreaterThanOrEqualTo(revision);
+            }
+            assertThat(state.get(run.getId()).getStatus()).isEqualTo(UpgradeRunStatus.SUCCEEDED);
+        }finally{controller.shutdown();}
+    }
+
+    @Test void deletingSourceDuringRunRejectsCompletionAndReportProposal() {
+        var request=request();var run=state.register(request,"source-deletion").run();state.claim(run.getId());
+        jdbc.update("UPDATE source_document SET deleted=1 WHERE id=?",request.documentIds().getFirst());
+        assertThatThrownBy(()->executionState.finish(run.getId(),UpgradeRunStatus.SUCCEEDED,"stale",List.of()))
+                .extracting("code").isEqualTo("SOURCE_CHANGED");
+        state.fail(run.getId(),"SOURCE_CHANGED");
+        assertThat(state.get(run.getId()).getDraft()).isNull();
+        assertThatThrownBy(()->proposals.propose(run.getId(),new io.github.fanqiepi.contextpilot.researchreport.ReportSaveRequest(
+                UUID.randomUUID(),"stale",null))).extracting("code").isEqualTo("REPORT_DRAFT_UNAVAILABLE");
+        assertThat(reports.byRun(run.getId(),run.getOwnerId())).isNull();
+    }
+
+    @Test void committedRunFailsWhenDispatchIsRejected() {
+        var subjects=org.mockito.Mockito.mock(io.github.fanqiepi.contextpilot.identity.CurrentSubjectProvider.class);
+        org.mockito.Mockito.when(subjects.currentSubject()).thenReturn(new io.github.fanqiepi.contextpilot.identity.UserSubject(
+                UUID.fromString("00000000-0000-0000-0000-000000000001"),"LOCAL_OWNER"));
+        var worker=org.mockito.Mockito.mock(UpgradeRunWorker.class);
+        var start=new UpgradeResearchStartService(mapper,state,subjects,worker,transactions);
+        start.shutdown();
+        var request=request();
+        var result=start.start(request,"dispatch-rejected");
+        assertThat(result.run().getStatus()).isEqualTo(UpgradeRunStatus.FAILED);
+        assertThat(result.run().getErrorCode()).isEqualTo("DISPATCH_FAILED");
+        assertThat(start.start(request,"replay").run().getId()).isEqualTo(result.run().getId());
+        org.mockito.Mockito.verifyNoInteractions(worker);
+    }
+
+    @Test void concurrentCompletionAndCancellationHaveOneIrreversibleTerminal() throws Exception {
+        var run=state.register(request(),"completion-race").run();state.claim(run.getId());
+        var barrier=new CyclicBarrier(2);var pool=Executors.newFixedThreadPool(2);
+        try {
+            var completion=pool.submit(()->{
+                barrier.await(5,TimeUnit.SECONDS);
+                try {executionState.finish(run.getId(),UpgradeRunStatus.SUCCEEDED,"synthetic",List.of());return true;}
+                catch(UpgradeToolException error){assertThat(error.code()).isEqualTo("RUN_NOT_ACTIVE");return false;}
+            });
+            var cancellation=pool.submit(()->{
+                barrier.await(5,TimeUnit.SECONDS);
+                try {state.cancel(run.getId());return true;}
+                catch(ConflictException error){assertThat(error.getCode()).isEqualTo("UPGRADE_RUN_NOT_CANCELLABLE");return false;}
+            });
+            assertThat(completion.get(10,TimeUnit.SECONDS) ^ cancellation.get(10,TimeUnit.SECONDS)).isTrue();
+            var terminal=state.get(run.getId());
+            assertThat(terminal.getStatus()).isIn(UpgradeRunStatus.SUCCEEDED,UpgradeRunStatus.CANCELLED);
+            state.fail(run.getId(),"LATE_FAILURE");
+            assertThat(state.get(run.getId()).getRevision()).isEqualTo(terminal.getRevision());
+            assertThat(state.claim(run.getId())).isFalse();
+        } finally {pool.shutdownNow();}
+    }
+
+    @Test void evidenceCharacterLimitRejectsInsertionAtomically() {
+        var request=request();var run=state.register(request,"ledger-budget").run();state.claim(run.getId());
+        var evidence=new UpgradeEvidence(UUID.randomUUID(),run.getId(),"L1","LOCAL",request.documentIds().getFirst(),
+                "chunk-budget",profiles.currentProfile().id(),"a".repeat(64),null,null,null,null,
+                UpgradeRunStateService.now(),"x".repeat(UpgradeBudget.EVIDENCE_CHARACTERS+1),false,false);
+        assertThatThrownBy(()->executionState.addEvidence(evidence)).extracting("code").isEqualTo("EVIDENCE_BUDGET_EXCEEDED");
+        assertThat(executionMapper.sources(run.getId())).isEmpty();
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(booleans={false,true})
+    @org.junit.jupiter.api.Timeout(80)
+    void expiredRunRejectsLateUninterruptibleModelResult(boolean totalDeadline) throws Exception {
+        var run=state.register(request(),"late-provider").run();
+        var entered=new CountDownLatch(1);var release=new CountDownLatch(1);var returned=new CountDownLatch(1);
+        var model=org.mockito.Mockito.mock(org.springframework.ai.chat.model.ChatModel.class);
+        org.mockito.Mockito.when(model.call(org.mockito.ArgumentMatchers.any(org.springframework.ai.chat.prompt.Prompt.class)))
+            .thenAnswer(call->{
+                entered.countDown();
+                while(release.getCount()>0){try{release.await();}catch(InterruptedException ignored){/* Simulated remote ignores cancellation. */}}
+                returned.countDown();
+                return new org.springframework.ai.chat.model.ChatResponse(List.of(new org.springframework.ai.chat.model.Generation(
+                    new org.springframework.ai.chat.messages.AssistantMessage("{}"))));
+            });
+        var retrieval=org.mockito.Mockito.mock(io.github.fanqiepi.contextpilot.retrieval.RetrievalService.class);
+        var releases=org.mockito.Mockito.mock(ReleaseNotesClient.class);
+        var worker=new UpgradeResearchExecutor(state,executionState,new UpgradeResearchModelGateway(model),retrieval,releases,
+                new org.springframework.core.io.ClassPathResource("prompts/upgrade-research-v1.txt"),0.5);
+        var pool=Executors.newSingleThreadExecutor();
+        try {
+            var future=pool.submit(()->worker.execute(run.getId()));
+            assertThat(entered.await(5,TimeUnit.SECONDS)).isTrue();
+            if(totalDeadline)jdbc.update("UPDATE upgrade_research_run SET created_at=CURRENT_TIMESTAMP-INTERVAL '181 seconds',deadline=CURRENT_TIMESTAMP-INTERVAL '1 second' WHERE id=?",run.getId());
+            future.get(totalDeadline?5:70,TimeUnit.SECONDS);
+            var expired=state.get(run.getId());
+            assertThat(expired.getStatus()).isEqualTo(UpgradeRunStatus.FAILED);
+            assertThat(expired.getErrorCode()).isEqualTo(totalDeadline?"DEADLINE_EXCEEDED":"CALL_TIMEOUT");
+            if(!totalDeadline)assertThat(expired.getDeadline()).isAfter(UpgradeRunStateService.now());
+            release.countDown();assertThat(returned.await(5,TimeUnit.SECONDS)).isTrue();
+            assertThat(state.get(run.getId()).getRevision()).isEqualTo(expired.getRevision());
+            assertThat(state.get(run.getId()).getDraft()).isNull();
+            assertThat(jdbc.queryForObject("SELECT status FROM upgrade_research_model_call WHERE run_id=?",String.class,run.getId())).isEqualTo("FAILED");
+            org.mockito.Mockito.verifyNoInteractions(retrieval,releases);
+        }finally{release.countDown();worker.shutdown();pool.shutdownNow();}
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(booleans={false,true})
+    void duplicateCallIdAndFourthRoundToolsStopWithoutExtraReads(boolean fourthRound) throws Exception {
+        var run=state.register(request(),"protocol-boundary").run();
+        var model=org.mockito.Mockito.mock(org.springframework.ai.chat.model.ChatModel.class);
+        var retrieval=org.mockito.Mockito.mock(io.github.fanqiepi.contextpilot.retrieval.RetrievalService.class);
+        var releases=org.mockito.Mockito.mock(ReleaseNotesClient.class);
+        var rounds=new java.util.concurrent.atomic.AtomicInteger();
+        org.mockito.Mockito.when(model.call(org.mockito.ArgumentMatchers.any(org.springframework.ai.chat.prompt.Prompt.class)))
+            .thenAnswer(call->{
+                int round=rounds.incrementAndGet();
+                var message=org.springframework.ai.chat.messages.AssistantMessage.builder().content("").toolCalls(List.of(
+                    new org.springframework.ai.chat.messages.AssistantMessage.ToolCall(fourthRound?"call-"+round:"duplicate",
+                        "function","get_release_notes","{\"tag\":\"v2.0.0\"}"))).build();
+                return new org.springframework.ai.chat.model.ChatResponse(List.of(new org.springframework.ai.chat.model.Generation(message)));
+            });
+        org.mockito.Mockito.when(releases.read(org.mockito.ArgumentMatchers.anyString(),org.mockito.ArgumentMatchers.any()))
+            .thenThrow(new UpgradeToolException("RELEASE_NOT_FOUND"));
+        var worker=new UpgradeResearchExecutor(state,executionState,new UpgradeResearchModelGateway(model),retrieval,releases,
+                new org.springframework.core.io.ClassPathResource("prompts/upgrade-research-v1.txt"),0.5);
+        try {worker.execute(run.getId());}finally{worker.shutdown();}
+        assertThat(state.get(run.getId()).getErrorCode()).isEqualTo("TOOL_PROTOCOL_INVALID");
+        assertThat(rounds).hasValue(fourthRound?4:2);
+        org.mockito.Mockito.verify(releases,org.mockito.Mockito.times(1)).read(org.mockito.ArgumentMatchers.anyString(),org.mockito.ArgumentMatchers.any());
+        org.mockito.Mockito.verifyNoInteractions(retrieval);
     }
 
     @Test void cancellationPreventsNewCallRegistrationAndLateResultPersistence() {

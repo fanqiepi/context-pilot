@@ -1,0 +1,7 @@
+{
+  "initialKnowledgeBases": [
+    []
+  ],
+  "result": "FAILED",
+  "error": "Database is not empty"
+}

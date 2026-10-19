@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class ChatPromptComposer {
 
-    static final String PROMPT_VERSION = "rag-answer-system-v2";
+    static final String PROMPT_VERSION = "rag-answer-system-v3";
     private final String systemText;
 
     public ChatPromptComposer() {
         try {
-            systemText = new ClassPathResource("prompts/rag-answer-system-v2.txt")
+            systemText = new ClassPathResource("prompts/rag-answer-system-v3.txt")
                     .getContentAsString(StandardCharsets.UTF_8);
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to load RAG prompt", exception);

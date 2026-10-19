@@ -1,0 +1,4 @@
+migrations=28
+latest=28
+documents_deleted=1
+vectors_after_delete=0

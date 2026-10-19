@@ -1,0 +1,92 @@
+[
+  {
+    "path": "node_modules/@babel/parser",
+    "before": "7.29.7",
+    "after": "7.29.9"
+  },
+  {
+    "path": "node_modules/@babel/types",
+    "before": "7.29.7",
+    "after": "7.29.8"
+  },
+  {
+    "path": "node_modules/@jridgewell/sourcemap-codec",
+    "before": "1.5.5",
+    "after": "1.6.0"
+  },
+  {
+    "path": "node_modules/@vue/compiler-core",
+    "before": "3.5.40",
+    "after": "3.5.44"
+  },
+  {
+    "path": "node_modules/@vue/compiler-dom",
+    "before": "3.5.40",
+    "after": "3.5.44"
+  },
+  {
+    "path": "node_modules/@vue/compiler-sfc",
+    "before": "3.5.40",
+    "after": "3.5.44"
+  },
+  {
+    "path": "node_modules/@vue/compiler-ssr",
+    "before": "3.5.40",
+    "after": "3.5.44"
+  },
+  {
+    "path": "node_modules/@vue/reactivity",
+    "before": "3.5.40",
+    "after": "3.5.44"
+  },
+  {
+    "path": "node_modules/@vue/runtime-core",
+    "before": "3.5.40",
+    "after": "3.5.44"
+  },
+  {
+    "path": "node_modules/@vue/runtime-dom",
+    "before": "3.5.40",
+    "after": "3.5.44"
+  },
+  {
+    "path": "node_modules/@vue/server-renderer",
+    "before": "3.5.40",
+    "after": "3.5.44"
+  },
+  {
+    "path": "node_modules/@vue/shared",
+    "before": "3.5.40",
+    "after": "3.5.44"
+  },
+  {
+    "path": "node_modules/axios",
+    "before": "1.18.1",
+    "after": "1.20.0"
+  },
+  {
+    "path": "node_modules/dompurify",
+    "before": "3.4.13",
+    "after": "3.4.17"
+  },
+  {
+    "path": "node_modules/nanoid",
+    "before": "3.3.16",
+    "after": "3.3.20"
+  },
+  {
+    "path": "node_modules/postcss",
+    "before": "8.5.20",
+    "after": "8.5.31"
+  },
+  {
+    "path": "node_modules/source-map-js",
+    "before": "1.2.1",
+    "after": "1.2.2"
+  },
+  {
+    "path": "node_modules/vue",
+    "before": "3.5.40",
+    "after": "3.5.44"
+  }
+]

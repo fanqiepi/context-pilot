@@ -385,6 +385,7 @@ async function sendQuestion(): Promise<void> {
       assistantMessage.updatedAt = new Date().toISOString()
     } else if (doneEvent) {
       assistantMessage.status = doneEvent.status === 'CANCELLED' ? 'CANCELLED' : 'COMPLETED'
+      assistantMessage.refused = doneEvent.status === 'REFUSED'
       assistantMessage.traceId = doneEvent.traceId
       assistantMessage.updatedAt = new Date().toISOString()
     } else {
@@ -883,6 +884,7 @@ function formatScore(score: number | null): string {
                   <ElTag v-if="message.status === 'FAILED'" size="small" type="danger">
                     失败
                   </ElTag>
+                  <ElTag v-else-if="message.refused" size="small" type="info">依据不足或已拒答</ElTag>
                 </div>
 
                 <div

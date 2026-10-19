@@ -31,11 +31,19 @@ public class UpgradeResearchModelGateway {
 
     @Autowired
     public UpgradeResearchModelGateway(@Value("${spring.ai.deepseek.api-key:}") String key) {
-        this(DeepSeekChatModel.builder().deepSeekApi(DeepSeekApi.builder().apiKey(key).build())
+        this(DeepSeekChatModel.builder().deepSeekApi(DeepSeekApi.builder().apiKey(key)
+                .restClientBuilder(httpClientBuilder()).build())
                 .options(DeepSeekChatOptions.builder().model("deepseek-v4-flash").build())
                 .retryTemplate(new RetryTemplate(RetryPolicy.withMaxRetries(0))).build());
     }
     UpgradeResearchModelGateway(ChatModel model){this.model=model;}
+    static org.springframework.web.client.RestClient.Builder httpClientBuilder(){
+        // The classpath-selected Reactor factory otherwise stops silent responses at 10s,
+        // before the executor's approved 60s hard deadline. Keep both bounds aligned.
+        var factory=new org.springframework.http.client.ReactorClientHttpRequestFactory();
+        factory.setReadTimeout(java.time.Duration.ofSeconds(UpgradeBudget.MODEL_SECONDS));
+        return org.springframework.web.client.RestClient.builder().requestFactory(factory);
+    }
     public ChatResponse call(List<Message> history,boolean toolsAllowed){
         int characters=0;
         for(var message:history){

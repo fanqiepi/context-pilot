@@ -39,7 +39,13 @@ public class ChatModelGateway {
     }
 
     public ChatModelResult generate(String systemText, String userText) {
-        return generate(prompt(systemText, userText));
+        ChatModelResult result = generate(prompt(systemText, userText));
+        if (!systemText.startsWith(AnswerStatusDecoder.PROTOCOL)) return result;
+        var decoder = new AnswerStatusDecoder();
+        String body = decoder.accept(result.content());
+        decoder.finish();
+        return new ChatModelResult(body.strip(), result.model(), result.promptTokens(), result.completionTokens(),
+                result.totalTokens(), decoder.refused());
     }
 
     public ChatModelResult generate(String systemText, String userText, int maxOutputTokens) {
@@ -90,7 +96,12 @@ public class ChatModelGateway {
         return Flux.defer(() -> {
                     ChatModel chatModel = requireChatModel();
                     try {
-                        return chatModel.stream(prompt(systemText, userText)).map(this::toChunk);
+                        Flux<ChatModelChunk> chunks = chatModel.stream(prompt(systemText, userText)).map(this::toChunk);
+                        if (!systemText.startsWith(AnswerStatusDecoder.PROTOCOL)) return chunks;
+                        var decoder = new AnswerStatusDecoder();
+                        return chunks.map(chunk -> new ChatModelChunk(decoder.accept(chunk.content()), chunk.model(),
+                                chunk.promptTokens(), chunk.completionTokens(), chunk.totalTokens(), decoder.refused()))
+                                .concatWith(Flux.defer(() -> { decoder.finish(); return Flux.empty(); }));
                     } catch (RuntimeException exception) {
                         return Flux.error(streamFailure(exception));
                     }

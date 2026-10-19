@@ -59,8 +59,9 @@ class ChatStreamingServiceTests {
                 chatModelGateway);
     }
 
-    @Test
-    void emitsStableSuccessfulEventOrderAndPersistsBeforeDone() {
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(booleans = {false, true})
+    void emitsStableSuccessfulEventOrderAndPersistsBeforeDone(boolean refused) {
         ChatRequest request = request();
         PendingChatExchange exchange = exchange();
         ChatCitationResponse citation = citation();
@@ -71,7 +72,7 @@ class ChatStreamingServiceTests {
                         knowledgeRoute("trace-success"), exchange, prompt, List.of(citation)));
         stubModelCall(exchange, modelCallId);
         when(chatModelGateway.stream("system", "user")).thenReturn(Flux.just(
-                new ChatModelChunk("Hello ", "deepseek-v4-flash", null, null, null),
+                new ChatModelChunk("Hello ", "deepseek-v4-flash", null, null, null, refused),
                 new ChatModelChunk("world", "deepseek-v4-flash", 20, 4, 24)));
 
         List<ServerSentEvent<ChatStreamPayload>> events = service
@@ -90,12 +91,13 @@ class ChatStreamingServiceTests {
         assertThat(usage.totalTokens()).isEqualTo(24);
         ChatStreamPayload.Done done = (ChatStreamPayload.Done) events.getLast().data();
         assertThat(done.traceId()).isEqualTo("trace-success");
+        assertThat(done.status()).isEqualTo(refused ? "REFUSED" : "COMPLETED");
         verify(persistenceService).completeSuccess(
                 eq(exchange.assistantMessageId()),
                 eq(modelCallId),
                 eq("Hello world"),
                 eq(List.of(citation)),
-                eq(new ChatModelResult("Hello world", "deepseek-v4-flash", 20, 4, 24)),
+                eq(new ChatModelResult("Hello world", "deepseek-v4-flash", 20, 4, 24, refused)),
                 anyLong());
         verify(persistenceService).beginModelCall(
                 exchange.assistantMessageId(),
@@ -162,7 +164,7 @@ class ChatStreamingServiceTests {
                 .containsExactly("message", "route", "delta", "done");
         ChatStreamPayload.Done done = (ChatStreamPayload.Done) events.getLast().data();
         assertThat(done.status()).isEqualTo("REFUSED");
-        verify(persistenceService).completeWithoutModel(
+        verify(persistenceService).completeRefusalWithoutModel(
                 exchange.assistantMessageId(),
                 ChatApplicationService.INSUFFICIENT_EVIDENCE_ANSWER);
     }

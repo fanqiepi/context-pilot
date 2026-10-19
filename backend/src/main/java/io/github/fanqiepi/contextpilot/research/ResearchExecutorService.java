@@ -389,6 +389,7 @@ public class ResearchExecutorService {
             boolean completedAfterTimeout = isTimedOut(startNanos);
             boolean partial = retrievalFailures > 0 || retrievalBudgetExhausted || ledger.truncated()
                     || grounded.removedUnsupportedContent() || grounded.answerTruncated()
+                    || grounded.hasEvidenceGaps()
                     || completedAfterTimeout;
             logState.truncated |= grounded.answerTruncated();
             String answer = grounded.hasSupportedContent() ? grounded.content() : REFUSAL;
@@ -777,10 +778,11 @@ public class ResearchExecutorService {
             int evidenceCount,
             Set<String> selectedDocumentNames) {
         if (rawAnswer == null || rawAnswer.isBlank()) {
-            return new GroundedAnswer("", false, true, false);
+            return new GroundedAnswer("", false, true, false, false);
         }
         List<String> retained = new ArrayList<>();
         boolean removedUnsupported = false;
+        boolean evidenceGaps = false;
         for (String line : rawAnswer.strip().split("\\R")) {
             String normalized = line.strip();
             if (normalized.isEmpty()) {
@@ -791,6 +793,7 @@ public class ResearchExecutorService {
             }
             if (isAllowedNoEvidenceStatement(normalized, selectedDocumentNames)) {
                 retained.add(normalized);
+                evidenceGaps = true;
                 continue;
             }
             if (NONCANONICAL_ABSENCE.matcher(normalized).find()) {
@@ -823,7 +826,7 @@ public class ResearchExecutorService {
         }
         boolean supported = retained.stream().anyMatch(this::hasCitation);
         return new GroundedAnswer(
-                String.join("\n", retained), supported, removedUnsupported, answerTruncated);
+                String.join("\n", retained), supported, removedUnsupported, answerTruncated, evidenceGaps);
     }
 
     private boolean isHeading(String line) {
@@ -894,6 +897,9 @@ public class ResearchExecutorService {
         if (grounded.removedUnsupportedContent()) {
             return "RESEARCH_UNSUPPORTED_CONTENT_REMOVED";
         }
+        if (grounded.hasEvidenceGaps()) {
+            return "RESEARCH_EVIDENCE_GAP";
+        }
         return "RESEARCH_PARTIAL";
     }
 
@@ -914,6 +920,8 @@ public class ResearchExecutorService {
                     "综合回答超过长度上限，以下仅展示在长度预算内保留的结果。";
             case "RESEARCH_UNSUPPORTED_CONTENT_REMOVED" ->
                     "综合结果中缺少有效引用的内容已被移除，以下仅展示通过引用校验的部分。";
+            case "RESEARCH_EVIDENCE_GAP" ->
+                    "所选资料未覆盖部分比较内容，以下保留有依据的结论和明确的资料缺口。";
             default -> "本次比较仅部分完成，以下展示当前可验证的结果。";
         };
     }
@@ -1068,7 +1076,8 @@ public class ResearchExecutorService {
             String content,
             boolean hasSupportedContent,
             boolean removedUnsupportedContent,
-            boolean answerTruncated) { }
+            boolean answerTruncated,
+            boolean hasEvidenceGaps) { }
     private static final class StepProgress {
         private int attempted;
         private int successful;

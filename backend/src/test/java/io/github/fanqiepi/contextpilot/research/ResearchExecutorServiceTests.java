@@ -314,8 +314,9 @@ class ResearchExecutorServiceTests {
         }
     }
 
-    @Test
-    void keepsFixedNoEvidenceStatementWithoutDowngradingTheRun() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void canonicalEvidenceGapIsPartialOnlyWhenSupportedContentRemains(boolean supportedContent) {
         UUID runId = UUID.randomUUID();
         UUID firstDocument = UUID.randomUUID();
         UUID secondDocument = UUID.randomUUID();
@@ -347,18 +348,26 @@ class ResearchExecutorServiceTests {
         when(chatModelGateway.configuredModel()).thenReturn("deepseek-v4-flash");
         when(chatModelGateway.generate(anyString(), anyString()))
                 .thenReturn(new ChatModelResult(
-                        "## 安全性\n`first.md`：本次检索未找到相关内容。\n`second.md` 提供安全说明 [1]",
+                        "## 安全性\n`first.md`：本次检索未找到相关内容。"
+                                + (supportedContent ? "\n`second.md` 提供安全说明 [1]" : ""),
                         "deepseek-v4-flash", 10, 5, 15));
-        when(queryService.get(runId)).thenReturn(response(runId, ResearchExecutionStatus.SUCCEEDED));
+        when(queryService.get(runId)).thenReturn(response(runId,
+                supportedContent ? ResearchExecutionStatus.PARTIAL : ResearchExecutionStatus.SUCCEEDED));
 
         ResearchExecutionResult result = service.execute(runId);
 
-        assertThat(result.answer())
-                .contains("`first.md`：本次检索未找到相关内容。")
-                .doesNotContain("部分完成");
-        verify(runMapper).complete(eq(runId), eq(ResearchExecutionStatus.SUCCEEDED),
-                eq(ResearchAnswerStatus.ANSWERED), eq(10), eq(5), eq(15),
-                isNull(), isNull(), any());
+        if (supportedContent) {
+            assertThat(result.answer()).contains("`first.md`：本次检索未找到相关内容。")
+                    .startsWith("所选资料未覆盖部分比较内容");
+            verify(runMapper).complete(eq(runId), eq(ResearchExecutionStatus.PARTIAL),
+                    eq(ResearchAnswerStatus.ANSWERED), eq(10), eq(5), eq(15),
+                    eq("RESEARCH_EVIDENCE_GAP"), anyString(), any());
+        } else {
+            assertThat(result.citations()).isEmpty();
+            verify(runMapper).complete(eq(runId), eq(ResearchExecutionStatus.SUCCEEDED),
+                    eq(ResearchAnswerStatus.REFUSED), eq(10), eq(5), eq(15),
+                    isNull(), isNull(), any());
+        }
     }
 
     @ParameterizedTest

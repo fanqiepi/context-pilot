@@ -17,8 +17,9 @@ class UpgradeResearchControllerTests {
     private final ResearchReportProposalService proposals=mock(ResearchReportProposalService.class);
     private UpgradeResearchController controller;
     private MockMvc mvc;
+    private ObjectProvider<UpgradeResearchStartService> provider;
     @BeforeEach @SuppressWarnings("unchecked") void setup(){
-        ObjectProvider<UpgradeResearchStartService> provider=mock(ObjectProvider.class);
+        provider=mock(ObjectProvider.class);
         controller=new UpgradeResearchController(provider,state,query,proposals);
         mvc=MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new ApiExceptionHandler()).build();
     }
@@ -46,5 +47,19 @@ class UpgradeResearchControllerTests {
         UUID id=UUID.randomUUID();when(query.get(id)).thenThrow(new ResourceNotFoundException("UPGRADE_RUN_NOT_FOUND","Missing"));
         mvc.perform(get("/api/upgrade-research/runs/{id}/events",id)).andExpect(status().isNotFound());
         verifyNoInteractions(state);
+    }
+
+    @Test void requestAndProposalConflictsExpose409AndExactCodes() throws Exception {
+        var start=mock(UpgradeResearchStartService.class);when(provider.getIfAvailable()).thenReturn(start);
+        when(start.start(any(),anyString())).thenThrow(new ConflictException("UPGRADE_REQUEST_ID_CONFLICT","conflict"));
+        String input=UpgradeJson.write(Map.of("clientRequestId",UUID.randomUUID(),"knowledgeBaseId",UUID.randomUUID(),
+                "documentIds",List.of(UUID.randomUUID()),"repositoryKey","spring-ai","releaseTags",List.of("v2"),"question","Assess"));
+        mvc.perform(post("/api/upgrade-research/runs").contentType("application/json").content(input))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("UPGRADE_REQUEST_ID_CONFLICT"));
+        UUID run=UUID.randomUUID();when(proposals.propose(eq(run),any()))
+                .thenThrow(new ConflictException("REPORT_PROPOSAL_CONFLICT","conflict"));
+        mvc.perform(post("/api/upgrade-research/runs/{id}/save-proposals",run).contentType("application/json")
+                .content(UpgradeJson.write(Map.of("clientRequestId",UUID.randomUUID(),"title","different"))))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("REPORT_PROPOSAL_CONFLICT"));
     }
 }

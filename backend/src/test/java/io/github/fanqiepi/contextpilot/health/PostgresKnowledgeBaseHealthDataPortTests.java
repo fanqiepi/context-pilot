@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "spring.ai.model.embedding=none"
 })
 @ActiveProfiles("offline")
+@org.springframework.test.annotation.DirtiesContext(classMode = org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS)
 @Testcontainers(disabledWithoutDocker = true)
 class PostgresKnowledgeBaseHealthDataPortTests {
 

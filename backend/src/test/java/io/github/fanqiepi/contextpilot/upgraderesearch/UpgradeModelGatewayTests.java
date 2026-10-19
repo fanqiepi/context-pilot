@@ -10,6 +10,28 @@ import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.*;
 
 class UpgradeModelGatewayTests {
+    @Test @org.junit.jupiter.api.Timeout(25)
+    void providerTransportAllowsResponseBeyondDefaultTenSeconds() throws Exception {
+        var server=com.sun.net.httpserver.HttpServer.create(new java.net.InetSocketAddress("127.0.0.1",0),0);
+        var requests=new java.util.concurrent.atomic.AtomicInteger();
+        server.createContext("/delayed",exchange->{
+            requests.incrementAndGet();
+            try {
+                Thread.sleep(11_000);
+                byte[] body="ok".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                exchange.sendResponseHeaders(200,body.length);
+                exchange.getResponseBody().write(body);
+            }catch(InterruptedException interrupted){Thread.currentThread().interrupt();}
+            finally{exchange.close();}
+        });
+        server.start();
+        try {
+            var client=UpgradeResearchModelGateway.httpClientBuilder().build();
+            assertThat(client.get().uri("http://127.0.0.1:"+server.getAddress().getPort()+"/delayed")
+                    .retrieve().body(String.class)).isEqualTo("ok");
+            assertThat(requests.get()).isEqualTo(1);
+        }finally{server.stop(0);}
+    }
     @Test void inputBudgetIsCheckedBeforeProviderAndNoRetryOccurs(){
         var model=mock(ChatModel.class);var gateway=new UpgradeResearchModelGateway(model);
         assertThatThrownBy(()->gateway.call(List.of(new UserMessage("x".repeat(40001))),true))

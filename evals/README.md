@@ -1,5 +1,19 @@
 # ContextPilot evaluation assets
 
+## 统一 50 项核心实跑
+
+先在仓库根目录运行 `node evals/tools/baseline.mjs validate`。使用 JDK 21，在 `backend/` 显式执行：
+
+```powershell
+.\mvnw.cmd '-Dtest=CoreWorkspaceLiveTests' '-Dcontextpilot.evaluation.core-live=true' "-Dcontextpilot.evaluation.code=$(git rev-parse HEAD)" test
+```
+
+需要 Docker 和本地 `local-secrets`。该测试创建独立 PostgreSQL/pgvector 数据库，导入冻结公开语料，通过生产 RAG、固定多文档比对、提案确认和偏好注入服务采集结果；会调用 DeepSeek/DashScope。普通 `test`/`package` 跳过此项。输出 `backend/target/core-live-results.json` 包含公开回答、引用、历史、逐条终态、模型审计、冻结资产哈希和生产源码哈希。它只使用公开合成数据，不能改为私人语料后提交输出。
+
+恢复案例明确记录实验边界：CORE-047 取消生产 SSE Flux 的订阅后查询同一运行（不是 TCP 断线实验）；CORE-048 把真实检索回调延迟至取消后；CORE-049 四路并发确认；CORE-050 注入记忆读取异常。其余问题不使用模型或检索结果 Mock。各案例失败继续保留，NOT_RUN 不计为执行成功；结果采集测试通过也不代表 50 项语义验收通过。人工事实/引用评分必须另行完成，不能把终态匹配当作准确率。
+
+冻结 TEST 只用于阶段评估。首次观测结果不得覆盖或用于反复调参后声称独立泛化提升；后续优化使用 DEBUG，并按已有合同另设独立验收输入。
+
 ## 研究任务工作台
 
 工程验证：在 `backend/` 使用 JDK 21 执行 `./mvnw.cmd -Dtest=Task*Tests test`；需要 Docker，真实模型默认跳过。公开合成资料的真实 DeepSeek/DashScope 流程验证显式运行 `./mvnw.cmd -Dtest=TaskWorkspaceLiveTests -Dcontextpilot.evaluation.task-live=true test`，需要本地 local-secrets，会产生供应商调用。输出位于 `backend/target/task-workspace-live.json`；不得将流程通过当作独立语义质量验收。当前证据见[工作台验证记录](../docs/evaluation/research-task-workspace-verification.md)。
@@ -149,8 +163,9 @@ full regression, four live DeepSeek scenarios on each RAG/V4 path and page check
 2026-10-15; see [V5 acceptance](../docs/evaluation/v5-acceptance-report.md).
 The Slice 1 profile alone is not production acceptance evidence.
 
-The career-oriented unified 50-task baseline and shared baseline/candidate report entry point
-are planned, not delivered. Existing dataset case counts, test methods and repeated executions
+The unified 50-task inputs are frozen, and the shared asset validation and baseline/candidate
+report entry point is available in [tools](tools/README.md). Complete task execution and human
+semantic review remain outstanding. Existing dataset case counts, test methods and repeated executions
 must not be added together as independent semantic tasks. Public synthetic source documents are
 under `corpora/`. See [evaluation requirements](../docs/evaluation/evaluation-plan.md) for dataset
 separation, metrics and reproducibility, and the [dated review](../docs/archive/2026-10-15-career-readiness-review.md)

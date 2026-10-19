@@ -14,6 +14,7 @@
 | [项目首页](../README.md) | 项目介绍与启动入口 |
 | [项目背景](development/project-context.md) | 新会话必读：当前状态和开发边界 |
 | [功能清单与简历素材](development/feature-inventory.md) | 固定编号的能力清单、证据、待办及对外表述 |
+| [一页技术复盘](development/technical-retrospective.md) | 核心取舍、收尾发现与可核查的成果边界 |
 | [本地开发](development/local-development.md) | 环境、配置、启动、验证和日志排查 |
 | [仓库规则](../AGENTS.md) | 开发约定、授权范围与安全要求 |
 
@@ -33,6 +34,10 @@
 - [评估执行入口](../evals/README.md)：数据、语料、运行方式和逐次报告；[统一基线工具](../evals/tools/README.md)。
 - 已验收：[V2](evaluation/v2-acceptance-report.md)、[V3](evaluation/v3-acceptance-report.md)、[V4 第一阶段](evaluation/v4-implementation-acceptance-report.md)、[V5 第一阶段](evaluation/v5-acceptance-report.md)。
 - 未通过验收：[V6 实现验证与剩余问题](evaluation/v6-implementation-review.md)。
+- [升级研究生命周期证据映射](evaluation/upgrade-lifecycle-evidence.md)：22 项合同对应的测试、复现方式与尚未补齐的直接证据。
+- [统一核心任务首次实跑](evaluation/core-workspace-first-run.md)：50 项原始观测、待人工复核材料与状态差异。
+- [升级研究范围调试](evaluation/upgrade-scope-debug.md)：独立资料上的失败对照与尚未采用的 Prompt 候选。
+- [收尾工程回归](evaluation/closeout-engineering-regression.md)：状态修复后的全量打包、测试退出修复与条件跳过范围。
 
 ## 历史档案
 

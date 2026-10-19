@@ -91,7 +91,7 @@ V4 详细方案见 [V4 知识研究助手详细设计](../architecture/v4-knowle
 - `409 RESEARCH_DOCUMENT_NOT_ELIGIBLE`：任一文档状态或索引不满足启动资格；
 - `409 RESEARCH_RUN_NOT_CANCELLABLE`：运行已进入非取消终态；
 - `RESEARCH_PLAN_INVALID`、`RESEARCH_TIMEOUT`、`RESEARCH_DEPENDENCY_UNAVAILABLE` 和 `RESEARCH_RUN_INTERRUPTED`：作为运行失败码持久化，并通过同步响应或 SSE 安全摘要返回。
-- `RESEARCH_PARTIAL_RETRIEVAL`、`RESEARCH_EVIDENCE_BUDGET_REACHED`、`RESEARCH_ANSWER_BUDGET_REACHED` 和 `RESEARCH_UNSUPPORTED_CONTENT_REMOVED`：作为部分完成原因持久化；运行查询与历史摘要返回 `errorCode/errorSummary`，前端据此展示对应原因，不使用笼统的降级说明。
+- `RESEARCH_PARTIAL_RETRIEVAL`、`RESEARCH_EVIDENCE_BUDGET_REACHED`、`RESEARCH_ANSWER_BUDGET_REACHED`、`RESEARCH_UNSUPPORTED_CONTENT_REMOVED` 和 `RESEARCH_EVIDENCE_GAP`：作为部分完成原因持久化；运行查询与历史摘要返回 `errorCode/errorSummary`，前端据此展示对应原因，不使用笼统的降级说明。`RESEARCH_EVIDENCE_GAP` 为 2026-10-19 批准的状态对齐：有有效结论，同时保留了严格匹配所选文件名的规范无证据声明，运行返回 PARTIAL，SSE done 返回 PARTIAL；没有任何有效结论仍按既有拒答规则处理。
 
 SSE 顺序固定为：
 
@@ -302,3 +302,7 @@ message -> route -> action_required -> done(AWAITING_CONFIRMATION)
 ## 研究成果审查（2026-10-19 已批准）
 
 新增任务下 reviews 创建/分页、research-reviews 详情/取消/逻辑删除接口。客户端不提供证据或主体，revision 防止覆盖；补充继续复用用户主动 SUPPLEMENT。详细字段、预算、失败语义和验收合同见[研究成果审查设计](../architecture/research-result-review-design.md)。
+
+## 普通问答拒答状态修正（2026-10-19）
+
+普通 RAG 即使检索到了相关片段，模型仍可在同一次回答中明确声明无法回答当前问题；服务端解析受限状态协议，非流式返回 refused=true，SSE 返回 done(REFUSED)。内部状态首行不会进入正文、delta 或历史。协议缺失、非法或正文为空时失败，不默认为成功、不额外重试分类。会话历史新增可空 refused：新普通回答保存明确布尔值，历史未知记录为 null；研究比对优先使用既有 researchRun.answerStatus。数据库消息完成状态与回答是否拒答是两个维度，拒答仍为已完成消息。

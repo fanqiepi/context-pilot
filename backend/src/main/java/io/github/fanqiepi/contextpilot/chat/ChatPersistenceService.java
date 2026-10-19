@@ -111,7 +111,12 @@ public class ChatPersistenceService {
 
     @Transactional
     public void completeWithoutModel(UUID assistantMessageId, String answer) {
-        completeMessage(assistantMessageId, answer, ChatMessageStatus.COMPLETED, null);
+        completeMessage(assistantMessageId, answer, ChatMessageStatus.COMPLETED, null, false);
+    }
+
+    @Transactional
+    public void completeRefusalWithoutModel(UUID assistantMessageId, String answer) {
+        completeMessage(assistantMessageId, answer, ChatMessageStatus.COMPLETED, null, true);
     }
 
     @Transactional
@@ -123,7 +128,7 @@ public class ChatPersistenceService {
             ChatModelResult result,
             long latencyMs) {
         OffsetDateTime now = now();
-        completeMessage(assistantMessageId, answer, ChatMessageStatus.COMPLETED, null);
+        completeMessage(assistantMessageId, answer, ChatMessageStatus.COMPLETED, null, result.refused());
         for (ChatCitationResponse citation : citations) {
             MessageCitationEntity entity = new MessageCitationEntity();
             entity.setId(UUID.randomUUID());
@@ -307,12 +312,18 @@ public class ChatPersistenceService {
             String content,
             ChatMessageStatus status,
             String errorSummary) {
+        completeMessage(messageId, content, status, errorSummary, null);
+    }
+
+    private void completeMessage(UUID messageId, String content, ChatMessageStatus status,
+            String errorSummary, Boolean refused) {
         ChatMessageEntity message = chatMessageMapper.selectById(messageId);
         if (message == null) {
             throw new IllegalStateException("Pending assistant message was not found");
         }
         message.setContent(content);
         message.setStatus(status);
+        message.setRefused(refused);
         message.setErrorSummary(errorSummary);
         message.setUpdatedAt(now());
         chatMessageMapper.updateById(message);

@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest(properties={"spring.ai.model.chat=none","spring.ai.model.embedding=none","spring.ai.vectorstore.type=none",
         "PROJECT_SOURCE_ENABLED=true","contextpilot.document.processing.enabled=false"})
+@org.springframework.test.annotation.DirtiesContext(classMode = org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS)
 @Testcontainers
 class ProjectSourcePersistenceTests {
     static volatile String remoteCommit="a".repeat(40);

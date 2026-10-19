@@ -29,7 +29,7 @@ public class UpgradeResearchExecutor implements UpgradeRunWorker {
             r->{Thread t=new Thread(r,"upgrade-bounded-io");t.setDaemon(true);return t;},new ThreadPoolExecutor.AbortPolicy());
     public UpgradeResearchExecutor(UpgradeRunStateService runs,UpgradeExecutionState state,UpgradeResearchModelGateway model,
             RetrievalService retrieval,ReleaseNotesClient releases,
-            @Value("classpath:prompts/upgrade-research-v1.txt") Resource prompt,
+            @Value("classpath:prompts/upgrade-research-v6.txt") Resource prompt,
             @Value("${contextpilot.chat.min-similarity:0.5}") double minSimilarity) throws java.io.IOException {
         this.runs=runs;this.state=state;this.model=model;this.retrieval=retrieval;this.releases=releases;
         this.system=prompt.getContentAsString(StandardCharsets.UTF_8);this.minSimilarity=minSimilarity;

@@ -1,0 +1,49 @@
+{
+  "mode" : "MODEL_FIXED_EVIDENCE_DEBUG_NOT_PRODUCTION_ACCEPTANCE",
+  "startedAt" : "2026-10-19T17:03:05.698956+08:00",
+  "humanReview" : "NOT_REVIEWED",
+  "evidenceEnvelope" : false,
+  "stageInstruction" : true,
+  "explicitFinalInstruction" : false,
+  "evidence" : [ {
+    "sourceId" : "L1",
+    "truncated" : false,
+    "chunkId" : "debug-fixed-1",
+    "excerpt" : "# 调试旧方案（公开合成）\n\n## scheduling\n旧工作进程按 FIFO 调度，不支持任务优先级。\n",
+    "documentId" : "5a32235b-c37b-4e73-a293-10b60418bc31",
+    "sourceType" : "LOCAL",
+    "untrusted" : true
+  }, {
+    "sourceType" : "RELEASE",
+    "excerpt" : "# 调试发布记录（公开合成，非真实发布）\n\n## scheduling\n调试新版引入两级优先队列，空优先级映射为 normal；不改变任务结果格式。\n",
+    "sourceId" : "R1",
+    "tag" : "debug-release",
+    "truncated" : false,
+    "untrusted" : true
+  } ],
+  "harnessSha256" : "49ca5094dad513fcb2c9c523215b238375c98f40e6443cb2e78b919350242372",
+  "results" : [ {
+    "prompt" : "upgrade-research-v4",
+    "debugCase" : "MISSING",
+    "question" : "请根据旧方案和所选发布记录，说明优先级缺省与结果格式的兼容变化，并给出新版在故障后承诺的恢复时间。没有恢复时间依据时明确列为缺口，不推测数值。",
+    "promptSha256" : "256046c76e9ab097b80f7fe62178380fc7cd7443475eefcef999849d41a0365f",
+    "rawAnswer" : "{\"answer\":\"直接回答：旧方案在 scheduling 上按 FIFO 调度，不支持任务优先级 [L1]；所选发布记录显示新版引入两级优先队列，并将“空优先级”映射为 normal [R1]。因此，优先级缺省的兼容变化是：空优先级请求在新版采用 normal 缺省，而旧版没有优先级概念；发布记录未说明该映射发生在客户端、服务端还是协议层。结果格式方面，发布记录明确“不改变任务结果格式” [R1]，就所选证据看，本次优先级变化不应要求调整结果格式解析；但该结论仅限记录明示范围，不能外推为所有字段、错误码或序列化细节完全不变。\\n\\n**升级影响**：调度模型由旧版 FIFO 变为两级优先队列 [L1][R1]，空优先级请求进入 normal；normal 层内部是否仍保持 FIFO、不同优先级如何排序及是否存在抢占，证据未说明，不能推断。**恢复时间**：所选发布记录没有承诺故障后的恢复时间，无法给出具体数值或时限；该未知项列为必要缺口。\\n\\n**迁移清单**\\n- 建议验证：识别空优先级请求，确认其按 normal 处理符合业务预期 [R1]。\\n- 建议验证：核对调用方是否依赖旧版 FIFO 顺序；新版两级队列的层内顺序未承诺。\\n- 结果格式：发布记录称不改变任务结果格式 [R1]，建议以回归样例确认解析逻辑；不涉及实际数据格式迁移操作。\\n- 故障恢复：没有可依据的时间承诺，不制定具体 RTO 数值。\\n\\n**验证清单**\\n- 建议验证：空优先级输入在新版映射为 normal。\\n- 建议验证：新旧结果样例格式一致、下游解析正常。\\n- 建议验证：两级优先级调度行为及与旧 FIFO 的差异，按业务可接受性评估。\\n\\n**范围说明**：材料只覆盖所选旧方案与 debug-release，不覆盖未选中间版本；没有承诺 normal 队列内部保持 FIFO、恢复时限、完整迁移方案或性能保证。\\n\\n**资料缺口**：新版故障后恢复时间承诺缺失。当前问题除恢复时间外所需证据已具备；未执行实际迁移或测试。\",\"missingEvidence\":[\"所选发布记录未给出故障后恢复时间（时限或数值），旧方案也无相关承诺；因此无法回答新版承诺的恢复时间。\"]}",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 1157,
+      "completionTokens" : 2340,
+      "totalTokens" : 3497,
+      "nativeUsage" : {
+        "completion_tokens" : 2340,
+        "prompt_tokens" : 1157,
+        "total_tokens" : 3497,
+        "prompt_tokens_details" : {
+          "cached_tokens" : 512
+        }
+      }
+    },
+    "status" : "OBSERVED",
+    "latencyMs" : 14126
+  } ],
+  "finishedAt" : "2026-10-19T17:03:20.113346+08:00"
+}

@@ -1,0 +1,2598 @@
+[
+  {
+    "path": ".env.example",
+    "sha256": "70f4eaa31e2618a6e6dea49d862e485bbd63660681b2047a21e253e8efaab375"
+  },
+  {
+    "path": ".gitattributes",
+    "sha256": "0225dc6e60b2159da52380478d14e6f30ce33c5d818414ccbf0b6d37e8562e75"
+  },
+  {
+    "path": ".github/workflows/ci.yml",
+    "sha256": "4e432c123e818fb57d27e1cf4b8769d67b5a57900c6f3933b3547b93c4f979a8"
+  },
+  {
+    "path": ".gitignore",
+    "sha256": "70b555e3a32a6f63bb98b6c3661eb789999673be87a5fb98a788dbc336d53e07"
+  },
+  {
+    "path": "AGENTS.md",
+    "sha256": "2c2e8bd94da29be7a5b9775be5e0cd0b22a3f58953fde8cde05f7495549aa78f"
+  },
+  {
+    "path": "backend/.gitignore",
+    "sha256": "108413156797f9a6041d7002dfe761ff47cb546ce119fa4af18ae6726275e5c3"
+  },
+  {
+    "path": "backend/.mvn/wrapper/maven-wrapper.properties",
+    "sha256": "40c5027248dd23a9780caef4d0efadba78e32c0cac8c2107b05ba01b7b548c13"
+  },
+  {
+    "path": "backend/config/application-local-secrets.example.yml",
+    "sha256": "b9fe30ba150d17b2fa992c0f0706619babdb7d367288aee95d21a639ea2fb789"
+  },
+  {
+    "path": "backend/mvnw",
+    "sha256": "cae96cef89ebea3531221f4ae17c23cf8edf67d00eae8306d4186ae1bbed4d02"
+  },
+  {
+    "path": "backend/mvnw.cmd",
+    "sha256": "9bfa296c3e8a5b58ce94fe38f52ed1756118c59e481e422eb7d0f2f233793387"
+  },
+  {
+    "path": "backend/pom.xml",
+    "sha256": "29440bc270b32e5b3be7fc99a56bfbdf377615d64fa0daf6eda7439339e09f22"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionExecutionContext.java",
+    "sha256": "b890d27c02e7d539b00df9487289065312c288e17413dc79f9f7072818bd430b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionExecutionResult.java",
+    "sha256": "ab7d510442adc70093ba1865a38c7baf531d233b9f9463e7c268eee41622eaab"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionExecutorDispatcher.java",
+    "sha256": "f817a9e64b9e1d33e7372e20c87620cf26b3e12d89e45bc80126903ca04ae8a2"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionParameters.java",
+    "sha256": "30aed75bdd9e5852103ae11faa5a781e257f40a2c1c230942ab59274745a481c"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionParametersCodec.java",
+    "sha256": "0bd1a9f40ba743e0b23d55afb8f15eacdcba0347806514eae1d94828f0e15c15"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionRequestController.java",
+    "sha256": "e57ef2fdca5a3c56a6c5fbd837fbe3e75bcf57bd27b39b2113255e725cbefbe0"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionRequestEntity.java",
+    "sha256": "7a318b95b8f25592f4ab1344f9cc6aa6c1a516e8712626f7d516654161d417a7"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionRequestMapper.java",
+    "sha256": "626716e54e1cc686ee8bc2af47bd2479498c4ff5355db5cad550775de77a6615"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionRequestProperties.java",
+    "sha256": "9381830afd493e5ac3d4f3dd8ba524c91cf0d3892dfea6743dfb3abb5ed3baa9"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionRequestResponse.java",
+    "sha256": "3330eab86b360344ccec3f34413f320171d6e46afe403b8dc9c0f076b59f13a2"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionRequestService.java",
+    "sha256": "ba61b6eb259c7d722697250c7274f9e38fe589430d519791e36317bfc4afc59c"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionRequestStatus.java",
+    "sha256": "11f0250f0bdc4a697bef0499eddf202cc10c61da978319a05e955686b75bef93"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ActionType.java",
+    "sha256": "27fd87b902e4ce314863a00d85525f8aa9abaa2d49fcd634a5252f9fb5126578"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/CreateKnowledgeBaseActionExecutor.java",
+    "sha256": "085c4a46b0e3ca90948352dfc98f8168015f3f92d130b654a276804613ed11b8"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/CreateKnowledgeBaseActionParameters.java",
+    "sha256": "198f324dd81304e4f5b49603b0b533d399d4572b7f397b634fe4597cd08ea9a8"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/CreateUserMemoryActionExecutor.java",
+    "sha256": "fa0a99d0be70b1e6f3f3ab9d563b6c6aa17b77a19661a6c95c7fff44e932c527"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/CreateUserMemoryActionParameters.java",
+    "sha256": "b7193d34dfaccc203c48660b8000b9f432295d23de6c9dffbcf2725fd183a4aa"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/DocumentActionParameterValidation.java",
+    "sha256": "660e56f74d5a1b2c75973538d79050c6b7a8dde799a28a1400f33222499ff183"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ImportProjectDocumentsActionParameters.java",
+    "sha256": "06094fd9986bc009025f7f1c460f1bf56acfa77455b1a518d65868b606ea062e"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/package-info.java",
+    "sha256": "9c3bc8e83ed377fe9f7dfa2564844cce75b0826fb95ed16968042b7ca3e497aa"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ReindexDocumentActionExecutor.java",
+    "sha256": "b6888351749b0d83804a82bce4ec18b25c2fa3295eceef6585590a4c422723ad"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/ReindexDocumentActionParameters.java",
+    "sha256": "d221aa4a74a5b7b43e047a31a47491ca7026ca7e677f94db3e91c264e6616c57"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/RetryDocumentProcessingActionExecutor.java",
+    "sha256": "320b03e62c77cf744a515ecf826460b8207b253d52741c754ac6bb4c1033e081"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/RetryDocumentProcessingActionParameters.java",
+    "sha256": "5e50800b9f030596ce7d64905a7c6d4ca294ecdc86791e1d288f5ebc609724bb"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/SaveResearchReportActionExecutor.java",
+    "sha256": "5187add59cb2bbb2accb1b292522e2358bf6834fe3fe33d694d41f217a4414ec"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/action/SaveResearchReportActionParameters.java",
+    "sha256": "5ca0f48c44d063828a8e1ee2b9808c9202cdf6fc6869f9d56ff6066026d68bcc"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/CapabilityId.java",
+    "sha256": "4d0830551cdd9f007b4837b70881720607864a92d221db4e29b57f437af2d27b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/CapabilityMatchReason.java",
+    "sha256": "7f52b3f83eb21f476848c096f078072e5a559c9e70ae3681cf19b9da969c05ad"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/CapabilityRoute.java",
+    "sha256": "3e5e6409bbcc05aaf9c68fcfa38ef80e29a4ecb27e97220763f6b5f1cf0c90ee"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/CapabilityRouter.java",
+    "sha256": "fbd34ca4ddc00bd0909504d8e683507d227ea0d4fbd461922b5b8e08618bc654"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatAnswerResponse.java",
+    "sha256": "ad49d1fe9d15bc217a6f26c6ea10fff7db6176dd392fefcf37fca9344cac310a"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatApplicationService.java",
+    "sha256": "74ccb6ec5beee8b7f2801291cc4cf3aa00274a2cf0fb90ae52c0d4f01c0a9f05"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatCitationResponse.java",
+    "sha256": "0ac1dd7bb2fa146eaa2785f6fb7c061167d1e6aa40791ad9106c2f388a3dcb5b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatController.java",
+    "sha256": "2a0d8c2bd8142b4ecff81cc239ff8221b7bc0851b79fa0e0a1a8f899c6e2d7b6"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatMessageEntity.java",
+    "sha256": "b38b8678c16793d8b945be01c8e3744b6941773925cb83df7bf000ca4f9780b0"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatMessageMapper.java",
+    "sha256": "755746f4d1b0e2ebd3261bcfa34dbf21b66e44525c41d5d0b3fad9076dc45ed3"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatMessageRole.java",
+    "sha256": "8c9734c9e4fbc763b67f5ea8261a14290835c5d7a673718eb6ecd235d7842406"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatMessageStatus.java",
+    "sha256": "beb4ccd62795020811917d8e6177565eaf2e22f1f02a09158f97dad73e6ee1f7"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatPersistenceService.java",
+    "sha256": "55d892616df541b5bcb5faf18fecd0fbf1693e2d97998b073aa2cdcc494ace84"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatPreparationService.java",
+    "sha256": "5a94281fb0a9691f5365f7f16820dfe566c9603819389ae24decb025278d1d2c"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatPrompt.java",
+    "sha256": "83e7e96c8cd0aa4ad4d00569af1e1ff9df9aca5f2723808cd0113f3541138cca"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatPromptComposer.java",
+    "sha256": "554325d334968aeefd9f420bbbbecc0c56c86df27e87e83ec2e06441829d9309"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatProperties.java",
+    "sha256": "7350a17d9d1c369237f124358c9118bf4d69943f6e0063318e5225868dbb2d0b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatRequest.java",
+    "sha256": "028b15c727d3b308aafc0dba8dadecab555c00077fb7286ed21415e86516c27d"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatStreamingService.java",
+    "sha256": "eddf22891980faf86a95f6665ef243dc9e6cdee92b74155ff2364677ae719215"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatStreamPayload.java",
+    "sha256": "a6169960faef7a17da4b928f0f0dedb5d774e947bd1400f122c949dc54c97a26"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatUsageResponse.java",
+    "sha256": "f2040b6ab514d439f1cff7c1c02d4d581372b6b4e9afb4a86916efb87d0cd9d4"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ChatWebMvcConfiguration.java",
+    "sha256": "c282ac2c48d80f69e656654385a2043596a171633a6993c9c52feccdbdf8fac9"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ConversationController.java",
+    "sha256": "cc4701085600883d42c699f51595a24255ee9b0d9b26e48372396a6af15f76f8"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ConversationEntity.java",
+    "sha256": "0d7572b229b4338eaff9d50633cb4b37a9670ea357ac36a2cf1f18ec3154c0a7"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ConversationHistoryService.java",
+    "sha256": "13e8dc8f2917522c8f96e3f996d8e5c415ab3e295b98fb9561e90a198202857e"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ConversationMapper.java",
+    "sha256": "901bcbd72c1613a1379ee3922e169a4da31197849ca8b26402c93fd9b5a82c33"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ConversationMessageResponse.java",
+    "sha256": "ee9ad269087c82aa9bb04d7a3d652431c28a87489dbe8b6d4666dc9863a50b7d"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ConversationSummaryResponse.java",
+    "sha256": "16c29b60f5ea48d1943eeb5d84010793cd8ecaf1e178951524ff8abc48527fa7"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/CreateKnowledgeBaseIntentPolicy.java",
+    "sha256": "472783596babd43f8faf45a5bb3716f48c6c44c5cc0a4f6407a58f8252c33975"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/CreateUserMemoryIntentPolicy.java",
+    "sha256": "76cea9ec435e0362382a1aa1af2fcf4aed8b604b54775096f0f0eed7698dce2b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/KnowledgeBaseHealthIntentPolicy.java",
+    "sha256": "d62d8ebda9d23eda96b8d3f3af89761dd6a4bb3e3e7cded8386dcd46d03bbe16"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/MessageCitationEntity.java",
+    "sha256": "91eb546889f555fa7397d8b1f50a624967372ff59d3329e2d5315b911b1ba4e7"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/MessageCitationMapper.java",
+    "sha256": "ff6925d5e812d09ab02af6f807165ffd7a8ae83288798fe5130054d18950da59"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ModelCallEntity.java",
+    "sha256": "aad7419836250e1fd69092353e1c5b17646453ea76e498cf187b5ed337532b1d"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ModelCallMapper.java",
+    "sha256": "70d323bdbd32b36af0fca01575b407b1f3fe7663810645144c88c9f5eae60cca"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/ModelCallStatus.java",
+    "sha256": "54d5ce9e78729dcd8c90639f3710dc2efe146fdccbf4a0b5c3eeb8b8c22afd63"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/package-info.java",
+    "sha256": "c6e6df4425c55a11bc07418b89641d1d371440cadad7af9608984eb5df35a956"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/PendingChatExchange.java",
+    "sha256": "7b8818d52625cf2f5b79b27951c02ffc9417885dc14a5c6114fba1700fb1b899"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/PreparedChat.java",
+    "sha256": "3de0002a80fe9d62e789701925a18d95f86dc3968d72b8d82f0003ac4c02e00d"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/chat/SimpleChatReplyPolicy.java",
+    "sha256": "102934ad46df73adb829b5ddef1e69cbc65bd0371350cfad9a842727cec5e4d9"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/common/ApiErrorResponse.java",
+    "sha256": "7cd8c0535d84a9c2d7254115a2f11b1efe23d92599cbeaf8e62d7fbf92618596"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/common/ApiExceptionHandler.java",
+    "sha256": "bd2d0581fb9292aff1586f07361b025c8de392e093d231a1176ae4d8c2fb5dcd"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/common/BadRequestException.java",
+    "sha256": "5af513f1d0c640ffd4acd707dd3f4fa6054e93171475700d3003e62e0a78e1fd"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/common/ConflictException.java",
+    "sha256": "87e927c651e1c74a5cc5c54ba8f693a58264dedfca7bb257648685f8a188ea24"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/common/InternalServiceException.java",
+    "sha256": "2c4c63eabdf098220ad88cb217f591cdb5f2f5b0dc04a1a59a83ea69c833361f"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/common/openapi/OpenApiConfiguration.java",
+    "sha256": "21f5e6c21c10edc7c6650fdb1764886cc09ac121d629df27dce7a8a95446cb60"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/common/package-info.java",
+    "sha256": "c5c34ff4b9bc902ad6168b1f1b56672ea1a98dd5aab544a296ee59da245f5329"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/common/PayloadTooLargeException.java",
+    "sha256": "3338c1b5a4cf5c413698469162e9661cb63ab3ff2cdc84a2e4a7abfb47ee58c2"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/common/persistence/PostgresUuidTypeHandler.java",
+    "sha256": "3400d4e5e2d1d73dd351004c9a0e298f10576d44b0f83638763c42884d9fd1c9"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/common/RequestIdFilter.java",
+    "sha256": "7069e7a9a605efad7507e0c82c3319b25f8b602ce510a0963b959fef11e23d49"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/common/ResourceNotFoundException.java",
+    "sha256": "9a8cadfd606eb3f1625c20853e5c33149d25e18c9621e44cc9427a5958dae817"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/ContextPilotApplication.java",
+    "sha256": "58f0b488d2b855cbd1bcea7aa2294607997a1c9f787ceaccdc2301260692c83c"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/DocumentController.java",
+    "sha256": "8ae2ad3975661f9f2f45236ea32392ac2372ad2cc6804c1366e575cdfa0e02ad"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/DocumentFileType.java",
+    "sha256": "a7f1e6462e18a4127110a8d289bfea64f1aad1d2c661bca18555ad7b3aa6d80a"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/DocumentIndexMetadataRepository.java",
+    "sha256": "759ddc04f6acfdaf49f8c5f139d7f781c5eae8d063fef3a47975897c4477e28e"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/DocumentIndexStatusService.java",
+    "sha256": "3bd5d78bab2603f2f59ed91d4c60750b8c675f500d746220cee011539ce89d92"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/DocumentProcessingCoordinator.java",
+    "sha256": "37a9192776920753363a739c31f3da780cc3f1c9c6d041798e9d0ba0e0d13aa9"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/DocumentProcessingProperties.java",
+    "sha256": "4bde5a183b814f696ec82464a90ffa7255465a4a72faf6f36fad1b8cd6e57237"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/DocumentProcessingService.java",
+    "sha256": "33b38ce13e936d3b02db245da2d8cd4097655043035f59bbe2844325a1ae2a07"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/DocumentResponse.java",
+    "sha256": "849be79718dc988eed8430b8c9ec9e9a1530ce05da3a62014467750e4cc049e5"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/DocumentService.java",
+    "sha256": "c8e9922bfbaf2b65b3b91de386fb7b31028a2fcb0ecec14c2856595e41b7453e"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/DocumentStatus.java",
+    "sha256": "76f684927bb978040e6dc41537939c8bb47552daa79f2fe4dde67f1482b952cc"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/DocumentTaskConfiguration.java",
+    "sha256": "d65551bcb719f03ed76a1e6a2db30d12ee57f9259b3d543541e8e8c39f6b9149"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/DocumentVectorIndex.java",
+    "sha256": "cb9962cdff0797cbf6cd416f749a6e29237ca35bcdd5bd91a520f3c87c6d4f28"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/EmbeddingIndexCompatibility.java",
+    "sha256": "f0d0ed5a028502907bda3819d7c511e9adfa30b24a32cb8244cefeee74a5205c"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/EmbeddingIndexProfile.java",
+    "sha256": "5031cb4689d4631ad4346480ea949e8c3c5231e8a6e6e3323233efe09ffb9178"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/EmbeddingIndexProperties.java",
+    "sha256": "37cd5afab5a23b503c1cddd1f42e4a9828bf076d2106ebb7bdf6de35038c83b3"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/EmbeddingIndexResponse.java",
+    "sha256": "a765a45387161e389732debd0cb6b538eeeb57c5f966e35ac272436876ca101a"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/LocalFileStorageService.java",
+    "sha256": "e5fb1ce125d5044156edb09ae488a1a81e593d07aa02e1e8242a7f95f619ec8b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/package-info.java",
+    "sha256": "7d7764a942bec35a902c5abe3f46ad9be1407c98354e22eca49432a1b718140a"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/PendingDocumentRecoveryService.java",
+    "sha256": "c6fee6157ca2c41c45eaab473b3c5a5fa393fcf2647b31b4b2f2ca4742ad6fa2"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/processing/DocumentChunk.java",
+    "sha256": "b06d940bb38656e44ce680a15f76fc671e01b9363ab7c53f3c014f3a542671a5"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/processing/DocumentChunker.java",
+    "sha256": "b779b609a99186f259c03e80be4e4b47c14788fbea952883ea78443a98ba7c97"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/processing/DocumentChunkingProperties.java",
+    "sha256": "84ea57daa7fecf8987546a9f06806b49b543447a6f98228ec4efc03c7c77eb40"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/processing/DocumentParsingException.java",
+    "sha256": "14ffd8db3349d0567ead5f086a8009800b828b3b116e6519a8eaeb51a5955021"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/processing/ParsedDocumentPart.java",
+    "sha256": "8491f5ed351df93adfb44f3e0aaf1d07a5d22628f4896c5f3ec959907793f3cc"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/processing/SpringAiDocumentParser.java",
+    "sha256": "6a057765f8f2ac80654d32b436c708784d8e962f270284126a6a85766ce0c6f5"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/ProjectDocumentRegistrationService.java",
+    "sha256": "013ae5207ecc7a6a8fcb453389bd21308f3ad3eba6d6b8f974eae70a52b5eaaf"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/SourceDocumentEntity.java",
+    "sha256": "773e62affa4cc26cd8ba3375955d86daa2e1eea4838744319084a3be1e29c366"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/SourceDocumentMapper.java",
+    "sha256": "6acacb061f7bc64bc390269bba3b2fd2d7d98e7ade39f5a2baa3980bcd156c30"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/StorageException.java",
+    "sha256": "14e0ea1ebe7aba372e02c2f2d5f194fe370bed843905fe909b51c56522e9042c"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/StorageProperties.java",
+    "sha256": "cd009a564acf03b4590bdafa7beb80fee348fdbebadc0246963be61250bc31a2"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/StorageService.java",
+    "sha256": "dd40a2841b2e5c0fd80ede7afb27428d9db58f3097dd9d60f6bc1296e0193e75"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/document/StoredObject.java",
+    "sha256": "fb18a50941dcb98b7019cbed3b49336167764e4009b60d3b035ad321b9187cc6"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/feedback/AnswerFeedbackController.java",
+    "sha256": "61e6fc40f043e55649add558f4430b117aebff22b6d04d7fa6682bbdae8b11f0"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/feedback/AnswerFeedbackEntity.java",
+    "sha256": "abe30b5202d68d5fc5385e6ee2dcdfaf42ad75005991bc9c358c4b558ee149a3"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/feedback/AnswerFeedbackMapper.java",
+    "sha256": "2227fdd6aab4909550b671bc9b127edef313ee32a2da952bd52a03fb4eaf3d3a"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/feedback/AnswerFeedbackResponse.java",
+    "sha256": "b8e987852675938c491e494ad0f9c880170c82a9a0b9f4f319d29930723884ca"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/feedback/AnswerFeedbackService.java",
+    "sha256": "fdde181bd545aa2d967f210ccf7c6f5bf684df356942468828a3f124c71826b1"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/feedback/package-info.java",
+    "sha256": "dd2f8a1c71da52e2efe3f54605c09ddf47b6976d72b7b57b29960f98bbc8096e"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/DocumentStatusCounts.java",
+    "sha256": "740de995964cdd17291a062a8dd471efa0a056fc771f1396ecff2af2deb8f296"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/HealthCheckCompleteness.java",
+    "sha256": "fc9caf77d1e9d48f8925eeb01374b4771b532e74db7b800fa8aba90cd9d350ef"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/HealthIneligibilityReasonCode.java",
+    "sha256": "c5ae26d8b3b2909a0bf263140b5699e28e5105c4a993c78c0c8a62c1c04ad6ed"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/HealthIssueSeverity.java",
+    "sha256": "596cc73077c42e56a3e16c89b619270c938ee7a8bff926a10198965a6269f7bc"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/HealthRecommendedActionType.java",
+    "sha256": "fb3d8355b13a09e4a5f8389c85e11269913a41f65f587962b4f16ff9f9f244de"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/HealthReportActionProposalResponse.java",
+    "sha256": "06899343c27fdd67f272bd6ad82c19d31e7ed37b49ff7a318370991c6ae03fad"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/HealthReportActionProposalService.java",
+    "sha256": "9b812b916aec4d535b8f6fe6d2ad20e98d443b76535bbe6562bfe289ff322e46"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthAssessment.java",
+    "sha256": "97fdc1284f3b95667174bacd5a37725049dad8ac8bdae7d412e803c93b13efe6"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthDataPort.java",
+    "sha256": "4980f9081037b5242a9aaabe888c528b538798014e10428fcdbbcab8db412ce4"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthDocumentFact.java",
+    "sha256": "2aed9abe9d6c2c813530fee836d88173d0ffd7d8e4543561c6fc75210ba2bdea"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthEvaluator.java",
+    "sha256": "f9e139a689ab323ce61289de90a0403314b9f44fc0d3ef20ac0cf30c6a83db37"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthFacts.java",
+    "sha256": "00a983be63ba00a55a1a4c4b40da884f04a922bff6a4cbce7b9ab325530761ce"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthIssue.java",
+    "sha256": "ebd77ff70d74de374b255ccf8db5a85f6f025eb98e2b4f6b9952016569bfb05f"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthIssueEntity.java",
+    "sha256": "c8d9df070edbb6365ec27de3fd20498951377b27362f2b58a53ef396844113ef"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthIssueMapper.java",
+    "sha256": "cc42e984d25e7669c6c73a13693fa97aac020a81d2b60324346cf6bad46a0915"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthIssueResponse.java",
+    "sha256": "5d8cc2936133357de6d13fb5db00e0c0b82bbe1c1acb07605083cc98d42efead"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthIssueType.java",
+    "sha256": "41e5a2258f024ef6b24a1867eee8d61a88ac8937fd97e63e88c536052b292887"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthProperties.java",
+    "sha256": "b9633f9395f9b572284860e6fa6e3687746d7571455b63bd21011fe346bd4307"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthReportController.java",
+    "sha256": "6b75a0de99db34675f887bc10e54459a5736b154fd1ea89bc4c0a2c6c7b8b72a"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthReportEntity.java",
+    "sha256": "4b405eb4531b90481be99e37500cc47b502170f0dacd5936da611d438f004528"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthReportMapper.java",
+    "sha256": "7e7c6d6070b738b513c8cc25730f306f83af32bea7185bb3500571cab3bf9c01"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthReportResponse.java",
+    "sha256": "c90fa96b702b5cd11e95102e2f611122a100cdc2fe08ea9257d93b0baae4d6ca"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthReportService.java",
+    "sha256": "b0c4d0287b1bb2c96bb0973556a18e6dea57872f1ee45e5f6ac67a45c670e90b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthService.java",
+    "sha256": "ddb9ec1eb27815ae77a4ab06f647b4830632be0ff43304040e86396b4e7349e3"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthStatus.java",
+    "sha256": "90f3a6d296d999c200991500a56a976d9c8c1040362c9e9a360e5abeb86321a7"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/package-info.java",
+    "sha256": "182852d800a58a49959b56e0ec19c9c0aa984eb28d910c7da57a6569acb01d65"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/health/PostgresKnowledgeBaseHealthDataPort.java",
+    "sha256": "e38f952be30111c47a6f2a756993fadca728c8129365d63cfe3d57abfb724655"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/identity/AppUserEntity.java",
+    "sha256": "6a3eb5dbbb437ec54d3516159aa678b1859f0ed2bc121632c8ae17277775408e"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/identity/AppUserMapper.java",
+    "sha256": "7552a312e83d59005f79553274b07dce0789c3a7e5e62502ab591dbbdba310ab"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/identity/AppUserStatus.java",
+    "sha256": "04528daa19035d01b76870310e13664cc75ff70146d1da6540dd380577326039"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/identity/CurrentSubjectProvider.java",
+    "sha256": "075f5ce51cb0a5120b53ce35cd251c99af5f5f4ac7cc8c0eda33f5fc2f0c8f7f"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/identity/LocalSingleUserSubjectProvider.java",
+    "sha256": "e8f90c8df006dae796a6b3cf1b51a2dbd23a11770b06276d4dcb072110bcfe1c"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/identity/package-info.java",
+    "sha256": "5e1a99ac1df473f3ee7072e8df87a46b69cd6d60ae222bdeedbc0ff532d8ceb6"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/identity/UserSubject.java",
+    "sha256": "56a4866ad60c134f3cde2ae510a8b3c4baf2bd13fd751eba2bfa9a61bcb1feaa"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/knowledgebase/KnowledgeBaseController.java",
+    "sha256": "81fe28fca3f430a67a1fdcaf5089f029fc1c03b1582be6a1706a094adc67e53b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/knowledgebase/KnowledgeBaseCreateRequest.java",
+    "sha256": "8585b19eb17edcfd8a7b52741af7890e941c7d080ec651d84c8b022a4f77077c"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/knowledgebase/KnowledgeBaseEntity.java",
+    "sha256": "edcb3b4f6318af79ecef11beefd84165c2461db1e429bfed37eb172fa52f8cd6"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/knowledgebase/KnowledgeBaseMapper.java",
+    "sha256": "d366ab77bfc802f8007e523eb30533524bb008710d38928465aea0d896f89eae"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/knowledgebase/KnowledgeBaseResponse.java",
+    "sha256": "481a6bb03261f056a587014d8f4fe071e67d434df858ba61f7fee5354d2d4b35"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/knowledgebase/KnowledgeBaseService.java",
+    "sha256": "daedaa03a86396e4f680b57bf2728e6ad4be7b5541ab093e1249faf159d6c09b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/knowledgebase/KnowledgeBaseStatus.java",
+    "sha256": "7ea66cc21bbf7cd020ae4bd0e8414851fd37733260f5c94f076737bd4fd2c69f"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/knowledgebase/KnowledgeBaseUpdateRequest.java",
+    "sha256": "db58c509111adc190e34f52b7e0334bb01ad4a3d4e5d5fadee39f36f6d852d73"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/knowledgebase/package-info.java",
+    "sha256": "e0df9604e2270c502852756f15f36c1f8804f6b5ef1c03b3160cd355faf09071"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/MemoryContext.java",
+    "sha256": "62a0e21e7da90cb56c8144e8efcb77c370cd4338f99183b67afe1662d79ac6cd"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/MemoryContextItemResponse.java",
+    "sha256": "3aef1fb53bce23e1aefe9e4204621b340b61468c33b83b875431426faa034fe9"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/MemoryContextPersistenceService.java",
+    "sha256": "58ab73fe572e49b7f209934cea3e11a7ae681ca7af015d4c2b53e4201d4a0251"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/MemoryContextPreference.java",
+    "sha256": "9d20f499ec928fe45e0a38f1caf1801fec822c2925b762eefcf8b33da1cba1de"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/MemoryContextResponse.java",
+    "sha256": "c3a9d1ef35d7a4eb36b5b733c6a9ebd188ff4c115660253256d7285e6c5b7167"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/MemoryContextService.java",
+    "sha256": "58711769f7a48e922bfd22bf80d4344f88c3a75f752912451dd6ebd835587c84"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/MemoryMode.java",
+    "sha256": "26abcc2c47178e6ae983679d7c5fe262387ffea129daf850073b706f51c1bc6c"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/MessageMemoryContextEntity.java",
+    "sha256": "4dac19b9123c8317fba0bd540796331939c1cf56af99954ffbcc54ac5ae21d2a"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/MessageMemoryContextHistoryRow.java",
+    "sha256": "0ddcef21c3f70884f0f24ca49c5f556d85a962c4f2f1f0353c5f2936333e355f"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/MessageMemoryContextMapper.java",
+    "sha256": "3cd07d183d58961428d34907858b4be62f65ba2b9d14043117ba0c8768156729"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/package-info.java",
+    "sha256": "c9b6ab3f6d393d4b059f72f5d346dd2c302cd5c2315a788fea94829431ed5453"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryContent.java",
+    "sha256": "05158f5665fee4260f61301ef81620ea4e7abaf25adf51174c802cec5053c1e1"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryContextCandidate.java",
+    "sha256": "af28b875fbba50fc37036c064cf7b1582ccb765a71955d5571bf2d6507f2a838"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryController.java",
+    "sha256": "8748d5a3c2b4fb89c5eeccd05003718d291f1ca40ae8232b871eb5a0a4ef3867"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryCreationResult.java",
+    "sha256": "9cbf8c5e27547125a18eb558e07e4be0113402a91c665e38c901dadb5dc3fcee"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryDetailResponse.java",
+    "sha256": "1ea34f8726ff9308be1ab43e97ddc55e92c51b4a4ec254b8a1fef10a2be629ee"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryEntity.java",
+    "sha256": "b61281b489ee7d4e9af3b9b51d1461f80dcf1783b4d2ec109a0c7aea477a8fa4"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryMapper.java",
+    "sha256": "7d17c9da0da98829d9ba32e0b0be77c886a17f7ea4baa56d7b73fea11392f01a"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryResponse.java",
+    "sha256": "bec998143e05b6de947b13988a3724cab9d998c65ce060cd4602df474d924847"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryRevisionEntity.java",
+    "sha256": "22560ea29b9858a5d5546a7b89ea077ade03bb0e03694b62afaabb540089c10b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryRevisionMapper.java",
+    "sha256": "33dad2f3d43d0279080aa06721e8898ae2ead346ca8b03b4afd829b6bb884fee"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryRevisionSummaryResponse.java",
+    "sha256": "3179b6ae8e62f42deecce3a46491b9258c4ac3519ac55671d626dd683a2b8ed7"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryScope.java",
+    "sha256": "f695cf76d1d9219413d10e8cb3a67f67c8ffa6150b6bc378eacd032064cc22d0"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryService.java",
+    "sha256": "146e045f00b7e539a929550026dc83499ccccec8fd081b283f57dc1e3d297804"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemorySourceType.java",
+    "sha256": "c10164912cb2a69bd93670bdd55f2523bfc09c60cbecf610a0c057fe705e3c21"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryStatus.java",
+    "sha256": "e6375b7e1066e28c8e1c87de692f2846594fa774d76c4a94f3885c6b359adcdc"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryType.java",
+    "sha256": "0af86584456cfb8593c84e564a80d1b3c88d2ad949edca6cd396243f9fcf493b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/memory/UserMemoryUpdateRequest.java",
+    "sha256": "de1fb268e86b5ade2921a8971b0b9c7f5cd5be117a40033307e53ac21c67ec90"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/model/AnswerStatusDecoder.java",
+    "sha256": "2985bf115f95800060ffeac473116a5101dd64145ffc8d9f438f9a45faa1cb57"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/model/ChatModelChunk.java",
+    "sha256": "922f8f85960e0c6c7898352029b1cf2f64bdba8f84125cb1f97553fd6349faa8"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/model/ChatModelGateway.java",
+    "sha256": "57c5002d39f5a376bd6d6d491982bbc06363287444f0c52ab4041fd17a663819"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/model/ChatModelResult.java",
+    "sha256": "9a427bf48a8ba8bbaefa2d9cb479806a5680a42ac0d2a1f5089f30246fc60a33"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/model/DeterministicEmbeddingModel.java",
+    "sha256": "eace56f7699788bae1c42b13dd4d8944b421a13399e43623f71cb04b0331df45"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/model/package-info.java",
+    "sha256": "4db484dabbb6bfa2a37a8541eefdcd5003725a30608f7ecc111414580c2e4577"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/observability/AiCallContext.java",
+    "sha256": "16e7c1d8eaa4bba7c85386d966991f666a893d547bb72c781a6c1fd3d3b3128d"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/observability/AiCallLogger.java",
+    "sha256": "9d34f918d81145ce69574fbf83c96b559d2cb0036114d490ecee218c8f0f686f"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/observation/package-info.java",
+    "sha256": "f26957d6e78a5f00eda4daa30a572203dedb5a5485e9ef7250cc46af4e7bb6e4"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/GitHubProjectSourceReader.java",
+    "sha256": "e7d9592064b5c809924458b3c3f3adc7420a9e51e6d3305e623993f5e7140f30"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectDocumentSnapshot.java",
+    "sha256": "2344032414423e31c2ec46eea42e927a8062e216135125ac2b757df3f7547be7"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectImportMapper.java",
+    "sha256": "092cba9da1762ea37f4040c15a0e02c8ba2e20c54f018a386588ac0d2fe4f917"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectImportProposalService.java",
+    "sha256": "69094dc8a081d37f5559799e4b8671888479e628710205b3dcfb0f194cf148b4"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectImportWriter.java",
+    "sha256": "883542bfc94fecb8b9c7bc4679c34d9dbb8f1eb4d80d4082c0ee058403915bb3"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectPreviewEntity.java",
+    "sha256": "c9101bd313d90d254b53859e74c78edc5a261da7c83f180fdf5ee4f6fcea6587"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectPreviewMapper.java",
+    "sha256": "e9ea00c8bf1a66ea2a3f0d0dba928d3fcf0762db1d0fd8f0596fe52a38b3246a"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourceController.java",
+    "sha256": "c3aa92c920e4de5b936b67282444a6db37e412b5692c16f6b39c74cdda9f2ee4"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourceException.java",
+    "sha256": "160f67b775088e434c414082edb2ea0d79906835a24a049f4cc3a5c510871acb"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourceMcpClient.java",
+    "sha256": "638386ea78648c1e06dcf21aab36175b21666c536d71cd04b70cf00d04619bcc"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourceMcpServer.java",
+    "sha256": "9dfb5d346abd7472ca83fa81f88b689bf4f2859aa59ebdb55f19c6fd5d388fd8"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourceMcpTools.java",
+    "sha256": "ad24cea84170bc5417401d4befe112da43fc966145044efc7a9cd2b2f2539742"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourcePolicy.java",
+    "sha256": "390edd4daa034d5792fd158a206622a8142b94ee4dfc6fbb7a0a09aeed6330bc"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourcePort.java",
+    "sha256": "8ab486847b7f152f3339aa583471a31bdcae0d916ba0c526a1967c0eacd38d40"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourcePreviewService.java",
+    "sha256": "9b717b55c162d8b93d409e0d01cb92e7cacb03b0b8671af58a1cb457263dce58"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/DeterministicResearchPlanner.java",
+    "sha256": "ee697a143735737fe35d9ae62c1c3763dc482b116460041d989f24b02ebcf454"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/package-info.java",
+    "sha256": "bda0716fd8e6ce9311c7927e576942b17c6447068a09c6d6eab61f20845727e3"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchAnswerStatus.java",
+    "sha256": "dd7df39bcb7c1b8dd8c74364d0ddfc05db935ff5ca45211ff5e72379db4333d6"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchBudget.java",
+    "sha256": "f6c37ffa5c8813317751906fe435eabd409cd6dd78136ae4109bccdbcde8c50e"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchChatService.java",
+    "sha256": "4965090925a9f3eb7aded89905650ee04702358a9ba71cd9a35bc3c25b144d82"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchCitation.java",
+    "sha256": "45f9f377075311c5322dbc9127b7de3043f0bbe1b64441fb22e151d3a4aec90b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchDocumentEligibilityService.java",
+    "sha256": "03684e2f53d235a11bc7034be971acfd688c70fe7bbfc0757764d5dc1cead249"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchDocumentFact.java",
+    "sha256": "b9c770104accc771a990f939f87fc45db7b1cf59d92680cf4b9778757ceed105"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchDocumentMapper.java",
+    "sha256": "6ef83da65637234926b336223a69d39b9bd49f5e62b9a74b6acf895dbcf5dba3"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchEvidenceEntity.java",
+    "sha256": "8e070db67563619452ff7fbe4752552aefea4c80b7bc3a773a2606b1de397a08"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchEvidenceMapper.java",
+    "sha256": "d1d0793d5028c57ac50cec86a331196c06ab19ecefbc185af44801a5bd829402"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchExecutionResult.java",
+    "sha256": "38b18aecc5ec4e94b4251f7fe02e2a0fe9b02e8c09ae96e70995574f0481215f"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchExecutionStatus.java",
+    "sha256": "5966c8656ad9495d936da2322c911ddc5787ea72e0d8266f4dc302f25b6a037b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchExecutorService.java",
+    "sha256": "04a33432e318dcfe4558b156ba410066b2cc6e801b36f0f7427ff77332ecc2e2"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchJsonCodec.java",
+    "sha256": "2fa5860266871998d02aafcdfc2aac252c573dc7bb1b491562f5bf01e58421bd"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchPlan.java",
+    "sha256": "b2af2920af500279146c20d527ff490646520aaf344740c602c17293e824cce0"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchPlanStep.java",
+    "sha256": "00ecc71bfcfecad8d31937827046ca26731346d06137b8a9406983d67d21024d"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchPlanValidator.java",
+    "sha256": "20ed82226f0b45f0d1b6b0dcc7f24028671f13f3b42fd99ec0e4b21cd2930a05"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchQueryService.java",
+    "sha256": "7ddcc8fc3c6fc2fa9bd802e4c3427c542693068818ab5eb09c75c8594fcd9e5a"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchRequest.java",
+    "sha256": "8d96f91c9e2adfc8dcc2724db9f19d502c632e3f77d40716584eab9619cf2049"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchRunCommandService.java",
+    "sha256": "4382395f93c2b0afb8cdd5017b28af2363242fe91c4def99be2b4adc86d295d2"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchRunController.java",
+    "sha256": "1f178a38389f6fc1ea3345b75f588cc7ac40a32ffbe781bae7c86a807196b4dc"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchRunEntity.java",
+    "sha256": "9c82c1ad5309df3281c2caa3275a445699c30723143e9d98b6866bfa30c84cd8"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchRunMapper.java",
+    "sha256": "2f18170cded6099c5f1594d6ee5e98f0a37546e6175b1d415915e57447f3557f"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchRunRecoveryService.java",
+    "sha256": "cb2da19ca44ec4ba4f0ac4b54e77c9beb3de52d5ac5cf8379d46389031422fb3"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchRunResponse.java",
+    "sha256": "b37c8b021ad568e03ba5bc810b0275efb83d1b051a14eec872d64e64fc8fd248"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchRunSummaryResponse.java",
+    "sha256": "fdf4597e1d534ac92cc9a5ebe246a73d044f57a3369098de3d0a15cfa2ef079c"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchStart.java",
+    "sha256": "419428842fd74b72b018b09dba287dd0dc6b3373c0492319a125e9ae5de9295f"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchStartService.java",
+    "sha256": "d5e8aafef0c437fb975648b303a94b8dc88388008de01905f2efd9666640e1ca"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchStepEntity.java",
+    "sha256": "d31b620a3c47a0b7ac4f837ff021fe3a237c72a449c687880ea0a9676c9f16af"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchStepEvidenceEntity.java",
+    "sha256": "14bc7b3e1e426de67051c3952d170b98c70c8f67e22669984e9853889e3a2cad"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchStepEvidenceMapper.java",
+    "sha256": "702fe054dde00ab01caf217b1ffd0e9a003af593fc8d08c64caca248eebf484d"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchStepMapper.java",
+    "sha256": "2fceb0cb8ecf0ecdf3bb8e9d20fb83ddbded385ed0865760c18bf53cd63359ea"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchStepResponse.java",
+    "sha256": "6c9735c565b9003f6b0b44e76b8768e728dbc8d94cc9314f8540f2ba08d160a5"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchStepStatus.java",
+    "sha256": "c9362db1b6218e8eacba56b62a0e001579ffe789348fd8e52e418cd4f8d7a0f0"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchStreamingService.java",
+    "sha256": "05f6394a4e085dbfbd0ccc9fa3135a13330a6aea22a9329cfe207b9e80df7b5c"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchTaskConfiguration.java",
+    "sha256": "0df6feafcc6f190e7ab72ac46674bedc64d0244132f60967cdd340eb34416e5e"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchTaskType.java",
+    "sha256": "8cc1a331cfdf5de74274fafbd90b7774b39e2227beb464493c401c85a49bf9d5"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/research/ResearchUsageResponse.java",
+    "sha256": "1ae45487c0a99e687af0763e720685760afbd64d1401a125fb3c5fb5e2af2c1c"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreport/ReportSaveRequest.java",
+    "sha256": "831f695609f85793ff9723453c27b0747ddbfacd4227ebf34653ddc30ab5064f"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreport/ResearchReport.java",
+    "sha256": "7006e1e6693042871a315ac2218eac8ce4d5b09ca91f4b17dac4c0ed4b2e9f68"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreport/ResearchReportController.java",
+    "sha256": "207c4af4fc4de812effcc7f3e77952f3d0d382f91e42ac70d61f142747210eb1"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreport/ResearchReportMapper.java",
+    "sha256": "ea82e836aaf9d65fd37afb6f5ba527f813f6428d9104ebdbf1d7ce527230230a"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreport/ResearchReportProposalService.java",
+    "sha256": "ba2a847e29f35ecdd5b1018a2aaecfdbba7d60ca79018143ab93092d3a5dcd06"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreport/ResearchReportWriter.java",
+    "sha256": "dc797ded3b1c89b1699c79a67fe54308431c5f6bc406a23629ed39c79e80dfbc"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewController.java",
+    "sha256": "1665d8b8b3b6f7a221bdeb673f54f69409ce70ded08dc1c990d39b585c5e1dc5"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewData.java",
+    "sha256": "fcfa0d2e9d1157ab00aacd3c5c783207ccc2506326985761dd2cf8121ff65bb5"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewEntity.java",
+    "sha256": "b5fb044583efb4e5292b9663b6f9a493520d8e026817d4299743163ef96e53d6"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewMapper.java",
+    "sha256": "8d8486cff38124c205b2f4fc42a2a04d2ae234d67e328ea5fc543a70f2a3dc85"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewModelGateway.java",
+    "sha256": "1493a885f3f1fceac56c201a1584d1b5d0b3e58aef17396dd1eb5937160eff80"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewService.java",
+    "sha256": "c32ae167edfed9282187dfabda5410f3da4336dba8653356f5a65b2d4c458c28"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewSources.java",
+    "sha256": "ed4453ccd2d541d1a668fc71206a1946b727c0d4dca4c0fd7b98425be5360186"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewValidator.java",
+    "sha256": "6658d75534cbdcf81be6864722b713951573064e7db7d699eef3b6499d9f49ff"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewWorker.java",
+    "sha256": "f0d38984d8495b9b84c42b3b65ecefb6adb965de3f39aa43bf44688b95c420f6"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/retrieval/package-info.java",
+    "sha256": "a1c372b748519c21d761c841317e67ed9388e1376642795aa79c1bbc08b8ac84"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/retrieval/RetrievalController.java",
+    "sha256": "507200e9c8eb05245cf36813208f5c0485d8f336904de871adce934203d140ab"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/retrieval/RetrievalResultResponse.java",
+    "sha256": "8dd3811fdae6f07e9c2730cfbdb4c3ac64ec9bc182099ce68436c6ae518d045a"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/retrieval/RetrievalSearchRequest.java",
+    "sha256": "25bff359118c01c75aba7496d33ecd913238091e3f8f5e5a4bee0c9049f82c74"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/retrieval/RetrievalService.java",
+    "sha256": "9ddc706a0c07b5324fbd384950765efd4a01e4827e7417ffd7e8869e60dd756e"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskController.java",
+    "sha256": "6c0f53d456caadffe37b82ef5c39cca58c89b898a545a2c6c5676947b02c3114"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskEntity.java",
+    "sha256": "088ee83841af45d392c16696c11b5f1c38a2426644592342322e85c9d6e6bc2d"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskJson.java",
+    "sha256": "84074534eaa77fc85cfa31e0a79643333369c4083389c7455e4c895d3c1bbaba"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskMapper.java",
+    "sha256": "84bfce5e5c3f5cea149277b11e4c83944de8d6a9075e65acc323b30503694982"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskModelGateway.java",
+    "sha256": "9e60cc0ab472434151c1f94e38ecb5929581d7551a72f0b13b34da079acb1ef8"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskPlanValidator.java",
+    "sha256": "23bdf7620a1aebc2da066e613d2154265e185fe2e2b279f98d0fdcad0c9c93ff"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskRequests.java",
+    "sha256": "323db1e58ed8dbf1e8080752984d8c06e2b9490f54c751f4ffac68824ea64f48"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskService.java",
+    "sha256": "df4f88f162de0d61285a27495c48e2df96962edab6d951221a389788e1fe9bc3"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskSources.java",
+    "sha256": "e3d4c1ca46288fc9162fcdc0316cca4366c050074d88d261cf656eab0090f2ec"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskState.java",
+    "sha256": "7cbc0f8ffcd8b4e6679aa224001af8c580396283293e54208caf6a4a8643dea2"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskStatus.java",
+    "sha256": "b3db28cfa32f0bc280f063616f952df9394003237bb50fc06785e91c454ce2d0"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskWorker.java",
+    "sha256": "be4faece17ac54f26cfccddb7c899d67f3326ab355d16cb96cd1ff9b410164f9"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/ReleaseNotesClient.java",
+    "sha256": "147e3b0e2e49d205087987c50f6d48cc583d2284ca881ff91c7074fe3d42bef3"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeBudget.java",
+    "sha256": "1fc8db686b3768e9992b9bb243beacbe8491318c1e5c1afc056342a99d9c1be7"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeDocumentSnapshot.java",
+    "sha256": "b4317a80b504b32e7fac253e22d16957d1fd4cad97e81a55d8d31f6e878b0030"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeEvidence.java",
+    "sha256": "208af6b91eeb49e21955ebfb2089ce6379f88ea7f26297667ad43effe73da62c"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeExecutionMapper.java",
+    "sha256": "06199e97b3c312b35fdaa12618007c8376bc7a7df1688356216ff85a07200a47"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeExecutionState.java",
+    "sha256": "fceaf90eb3426b04f49f4e86cf743fcc9a0fe6ae94817ed33cbfdb13db04bd4b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeJson.java",
+    "sha256": "a091985b0e1ee32847f20c038f140de0c47458f0768293f25b04eb8256ee286e"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeQueryService.java",
+    "sha256": "eef6cfcbff8c383634cd471634c49c67fb693f64528b42ccade361c03455e071"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeQueueFullException.java",
+    "sha256": "0ca6b3e44fd2bcc5d093171cfd59865bf28c0cde2e3308344348d6872c362e5e"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeRecoveryService.java",
+    "sha256": "635f9e3832a67d3d72207ea993d9673834dc53b5e805e4b1d8bdec8139137034"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeResearchController.java",
+    "sha256": "980fd7d404af1308d6092bcb57261b5cda4db926b4de855d2c8b446c99ab1186"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeResearchExecutor.java",
+    "sha256": "d61c074b9721658ee12d0144086c0e5e4b54227e611e1062e692513db0a994e5"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeResearchModelGateway.java",
+    "sha256": "546c5268f97974586a8e1c85c4a1754fb10d9ba922286c9bcb80bcef4b3d5053"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeResearchStartService.java",
+    "sha256": "0f1f3c76bf6a8523cf6c9399445737f855fdfd7bb21e65799536b8b9bd534a41"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeRunEntity.java",
+    "sha256": "b582aa7901bd3eacbcb7dc5869778dd3cf68e19e9d784c8040c5211e11192d50"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeRunMapper.java",
+    "sha256": "3f81f305d66ccea4a36f4664dd1466e2b5947f5f549f3af1cecaf37ff53f9404"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeRunStateService.java",
+    "sha256": "f2765df30dde9a549c9fd440671274b683adb6353cda601430245bbdf42aeb4f"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeRunStatus.java",
+    "sha256": "99c018911898952e4c8253e73db8771839137905cc5ef8ae8aa7584cc7dc3ba1"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeRunWorker.java",
+    "sha256": "bfffac2eaca3b86d96e181da5e86671d1740651fe7216a5e93521f5b64f63f1b"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeStartRequest.java",
+    "sha256": "e0d9c664c3beac3d1682464ff1ff6c93ff7fb17e861f297eaa956017ab6b2cc3"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeToolArguments.java",
+    "sha256": "3055a4032d7b8d32897adeaeedde43fd52673096e8147c9a8e4ee2f44d2ce386"
+  },
+  {
+    "path": "backend/src/main/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeToolException.java",
+    "sha256": "a9e309506f2482ec8545f76d06ca8eb68a6c1bb68f45a4a783fc3896c4ad0595"
+  },
+  {
+    "path": "backend/src/main/resources/application-offline.yml",
+    "sha256": "0fd0f1fa7c09b12c024936743b2d75704de15933d3ff5db91cf2a811ef5341ad"
+  },
+  {
+    "path": "backend/src/main/resources/application.yml",
+    "sha256": "eae6ec51f23bf9e0862d52733e6478d120471e5550ddaa613b532bedccd8694b"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V1__create_vector_store.sql",
+    "sha256": "00f049e43aacd3c2eb4222c20c52b6deb52f3b2a31b50250e3e2248ebe77ce3c"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V10__create_action_request.sql",
+    "sha256": "ac3447a945af5e1c9335154a4cf7592c321d45dc255853678521d2259bc7579b"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V11__create_knowledge_base_health_reports.sql",
+    "sha256": "a13dd9c9e0c5f1038eab577d4fb898eb25a5ae3819649768db4c04865d922b79"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V12__add_knowledge_base_health_chat_route.sql",
+    "sha256": "3e797c87da2c42b04d49b9d02c8f17c775794ce7c747857676a648e3238fca7f"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V13__generalize_action_request_core.sql",
+    "sha256": "935e1afb332443ac17bc9acd91b433fb03aee88f627430bf8acf4c04768432c9"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V14__add_health_report_issue_action_route.sql",
+    "sha256": "01a73b9f439470e73e9ffeaa174f2fa0cbdccb2c4827f60a5f26b9f148f30087"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V15__create_document_comparison_research.sql",
+    "sha256": "1d37833bc5d969d6a1d25c92189d34efdb23429e958c91141432ebac54087c4a"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V16__create_explicit_user_memory.sql",
+    "sha256": "00f3b4051964833bfe9665efc3824cadd4d1a7928c07159742272ce2afdbb67b"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V17__add_create_user_memory_action.sql",
+    "sha256": "1f46cebdfc2d447faed77013ec7a97a113d8c5da1db19b12862be0733bbc8ce3"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V18__persist_research_memory_mode.sql",
+    "sha256": "85f6bd23420e62b12b8d84a6f6b780154155cca3dbae4455fcb15bca69276a09"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V19__persist_memory_context_summary.sql",
+    "sha256": "b792878c465fb484d7b695d7a3e4412be71866149071a7c2ecd1be294198578f"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V2__create_knowledge_base.sql",
+    "sha256": "071f0df1e1b5da61daf47b69e2ed930214012615767f187f35f39b2dec464f61"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V20__create_upgrade_research.sql",
+    "sha256": "a3e1397faeaef8a75edc494853f8cd1c52d43daf7d21991951ae3d932b220a87"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V21__add_confirmed_research_reports.sql",
+    "sha256": "0b7e9d29c2e7490401027489baf733d2f000b44d056efa5b233d2ea05fefbf8d"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V22__create_research_task_workspace.sql",
+    "sha256": "8b1318a6cd435b46caa9b1d2df47dcebd078b901f58c752822979d8320813b92"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V23__create_project_source_previews.sql",
+    "sha256": "ca0c2dcae574ed02d97ee32fb79205d2021d1fe4baa9b991837cd7d2b8c95e21"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V24__add_confirmed_project_import.sql",
+    "sha256": "f127589f805e4e5a5a191a8480243cfec023d61e9826547c65edfa83f8191540"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V25__track_project_import_staged_files.sql",
+    "sha256": "2d5eb449282aa207d224dd6cef73fff9bfe367574c539317502ab84bf727c1cb"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V26__add_project_preview_error_path.sql",
+    "sha256": "c307304c469ddfa92a7b31d574cfc12bbbb60b83a94611142e1dc6be4d0568c8"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V27__create_research_review.sql",
+    "sha256": "dc47644016d0d191a5c7b522cca3e7e4e7da79171aa6b3debac92f7c0988b1b3"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V28__persist_chat_refusal.sql",
+    "sha256": "5bdbbd95606cae28a97e06b466fc524e2efac7a99abc01578b5134597f8a6a56"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V3__create_source_document.sql",
+    "sha256": "cb8fe14c0f47280d4969561767874b98cfbd6f952066e0fbb43a2236e6e5dd60"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V4__add_logical_delete.sql",
+    "sha256": "0ca90188201bc577b76f452e6e95a2f8ab34a09a9f6bdf96ccfe84349f01247b"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V5__add_document_processing_attempts.sql",
+    "sha256": "31f0937d1978a5d42f1ed75c358c6b275005c6f0656066b3fddd70100a42633a"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V6__create_chat_tables.sql",
+    "sha256": "747064533897b4a90d10ee10f11361a02d36aa36e053359a62e9adcf26893f22"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V7__create_answer_feedback.sql",
+    "sha256": "b0d6f1583528cda25502f10a8aef2e67caaffdc3f7e91aa347807611dc241665"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V8__add_chat_message_capability_route.sql",
+    "sha256": "487c55ebae3ee12d2fd0fb395c848eab8210ec54baf2f2cd604f60b2fe6ce220"
+  },
+  {
+    "path": "backend/src/main/resources/db/migration/V9__track_document_embedding_index.sql",
+    "sha256": "552525db1843de428cf1b90ea792524d03fa47b888a298fc2fb341e657cb47c7"
+  },
+  {
+    "path": "backend/src/main/resources/prompts/.gitkeep",
+    "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "path": "backend/src/main/resources/prompts/rag-answer-system-v1.txt",
+    "sha256": "17e56c93fc1eecbb016a4e52273dd7da81dafe2884634c98a6e1d8e83c087bf6"
+  },
+  {
+    "path": "backend/src/main/resources/prompts/rag-answer-system-v2.txt",
+    "sha256": "6bdb6960a897be1367d0be0e78b42029e3c91fe16df12cc1a86f637ac7fd59fb"
+  },
+  {
+    "path": "backend/src/main/resources/prompts/rag-answer-system-v3.txt",
+    "sha256": "5db39318130ff41d230ecce8db87bc91b0279fce6ac2341f79dc2c7b1d5469f3"
+  },
+  {
+    "path": "backend/src/main/resources/prompts/research-review-v1.txt",
+    "sha256": "7c01d5ce9b2120f2d25e1c2193a24616d4277e8dd7b99eecef264f15f80e21cd"
+  },
+  {
+    "path": "backend/src/main/resources/prompts/task-workspace-answer-v1.txt",
+    "sha256": "30a0f9a8f19a76d1478490c368c4618db707abd0d1d7eaa577b6442f0b45cb41"
+  },
+  {
+    "path": "backend/src/main/resources/prompts/task-workspace-plan-v1.txt",
+    "sha256": "1b0f07ff0ab0a4f91ede372f4dd4586789f9b8c5d4212d4c51956384df2a5293"
+  },
+  {
+    "path": "backend/src/main/resources/prompts/upgrade-research-final-v1.txt",
+    "sha256": "126ca2f79fec82b71691405d7f96463d91cbe2bf2ae54230a3ff0d5f2564ccab"
+  },
+  {
+    "path": "backend/src/main/resources/prompts/upgrade-research-v1.txt",
+    "sha256": "f7438289d7ca47767288b38c1b6db85f34886242babcd53473f8792f1638a1ae"
+  },
+  {
+    "path": "backend/src/main/resources/prompts/upgrade-research-v2.txt",
+    "sha256": "2b1880807c80a7ae741f15346fd4b469418e56aa722215e02277569bfa813345"
+  },
+  {
+    "path": "backend/src/main/resources/prompts/upgrade-research-v3.txt",
+    "sha256": "f7c7a74387852c9fe2b95220c4ba343a761197e1b7d9472bfc8f50027481045d"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/action/ActionExecutorDispatcherTests.java",
+    "sha256": "36a21f1fb9e31ff77e4bc3079ba697fe3917960a85fb37aa4a64b2cc6a78ed44"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/action/ActionParametersCodecTests.java",
+    "sha256": "c7547490d273ff592f8270ef4d87f737065d31f3ce6b362e096220429c2c42fe"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/action/ActionRequestControllerTests.java",
+    "sha256": "75c8bbce39d3e49a74d28ce2066d393be2d64f951dc20fb743aa8c0582f51041"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/action/ActionRequestPersistenceTests.java",
+    "sha256": "e4946fb6146f218c7bc58ad0e22c51cf495770f1dd4b26e52ceeba294ac473f2"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/action/CreateKnowledgeBaseActionParametersTests.java",
+    "sha256": "f44877697ed4e4c06aa0026e869655d6b0c0c78baed49fc451e78d4e486ac101"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/action/CreateUserMemoryActionParametersTests.java",
+    "sha256": "46bbebe264394b934ceaf18adae80080af404c1c67881a083701c324804ace5b"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/action/CreateUserMemoryActionPersistenceTests.java",
+    "sha256": "60aefa74a6850ebd4ea452dbdeaae5b556af8c04d00b8df77e62e77244a7921d"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/action/DocumentActionParametersTests.java",
+    "sha256": "44bbfb04d5ecccba0917edc8fa19bbfd39d0161062132edb5655b0e2b26af4d5"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/action/ReindexDocumentActionExecutorTests.java",
+    "sha256": "6ab2f8c0a387270557c1034906e3070d7e5fa828a4413dadf0fa980a77588746"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/action/RetryDocumentProcessingActionExecutorTests.java",
+    "sha256": "ee5e1cf4c92d49e89f772cf6d12c9240328c425257f494ebd1e8d71f7f6b3a00"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/action/V2ActionSafetyEvaluationTests.java",
+    "sha256": "eb7a8d307efff9dae6807ad74e3062d60e5ceb2bf5a786dce436a3470cda9aa8"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/chat/CapabilityRouterTests.java",
+    "sha256": "f59d7ee29a98e525ca44c84d1a3977ac345bbac170665f644b98f3220627c2ba"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/chat/ChatApplicationServiceTests.java",
+    "sha256": "45477a61e252adff8b5eb56132794dc5f22fc5acfc09e7c3ddaf9dc745ef300d"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/chat/ChatControllerTests.java",
+    "sha256": "5f9e8fa029373e1eebde6b954d98c954b505001c63c08551d711682f47a01ef5"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/chat/ChatPersistenceServiceTests.java",
+    "sha256": "74f2c911b5b0a404ba0a38648bfd9889087e549ee5e6b3694219bfcc403aa30e"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/chat/ChatPreparationServiceTests.java",
+    "sha256": "c53f861e6b9c0c394fd1deb0661bd656e0b53f2af23ddf214ad6c9ed94ab3887"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/chat/ChatPromptMemoryTests.java",
+    "sha256": "86d7fcec4f71f0dcd1c3dc614807817883af635d27ead62ba5f683e46a968147"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/chat/ChatStreamingServiceTests.java",
+    "sha256": "dcd179ce764bc1d148feca53ec357b615e1e85dc872e053f1e666ddbbe3a9a8c"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/chat/ConversationControllerTests.java",
+    "sha256": "7ee0ed0c6e7a2a0b2bf7bc04e45689a382bf97ad3d184338b61e72e77dc908dc"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/chat/ConversationHistoryServiceTests.java",
+    "sha256": "6da86e54a5b62f5d03617c3b7d514e9d969e083134f9b183c0344654bab5c5f7"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/chat/CreateUserMemoryIntentPolicyTests.java",
+    "sha256": "4d37df08047defe620b89bf51b42dac730e2507d60bddaf8730cac0cad360e0a"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/chat/SimpleChatReplyPolicyTests.java",
+    "sha256": "082e8e2fa8bd4a3b40f1bd89ca8bd09ae0351cda44c0d82332b5d87721913acc"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/chat/V2RoutingActionEvaluationTests.java",
+    "sha256": "49b3791da3e841c74104a9e2687b21a5f99d1d87d7986f6e551e4f231669cab7"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/chat/V3HealthRoutingEvaluationTests.java",
+    "sha256": "2c782a71f87bebab7d7f47f1da5854d93c6fca349613db2d57bf50b645042083"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/chat/V5ProductionRoutingEvaluationTests.java",
+    "sha256": "ea1b7eb1529591322bb74ebd1c889d5662ee28cde47028df9e33c439425941f9"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/ContextPilotApplicationTests.java",
+    "sha256": "36eabaad5c51f816b9f0260188b7dac60ed0a8dbcb77587423c4cae020744803"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/DatabaseMigrationTests.java",
+    "sha256": "b9d65f282516c95acf82b3e48eb8b82b7d663bbf2aaaf206abea0f7cc5cb26ab"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/document/DocumentControllerTests.java",
+    "sha256": "498ce47702eb364bb9b84bc754a462fef7dde4091bc70a6c1c9e06cb375c1beb"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/document/DocumentIndexStatusServiceTests.java",
+    "sha256": "88ea9eaa32d2ae802d87b58bc68a5a7f77b4ded3ea1e85f5fdfa6354d9874ec2"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/document/DocumentProcessingCoordinatorTests.java",
+    "sha256": "e3c829cf91ac693ad15f2e9b60a5a0c280b82f1004c636680d69e32543a2626f"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/document/DocumentProcessingIntegrationTests.java",
+    "sha256": "12b4f14372b2ab8235714428e22bddea10cd9acb3865c59dbbbbb8c716893f5f"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/document/DocumentProcessingServiceTests.java",
+    "sha256": "1e41e61595685634fb511d4244062793d575977c51aa0df64e37207487b6dee0"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/document/DocumentServiceTests.java",
+    "sha256": "6e8da6b96149b88e17c0a37d27109a033be3bf2ab8e8946ac6b91d0a9bcd3c48"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/document/DocumentVectorIndexTests.java",
+    "sha256": "fa23e8d60542c03cc0bf49da962bca107cbae5e44ac72028f68337ebef7f094d"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/document/EmbeddingIndexProfileTests.java",
+    "sha256": "0875001ae8d445283bd83fe4de979b9e92ee9ae5b5d3757d8a67a64213debf20"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/document/LocalFileStorageServiceTests.java",
+    "sha256": "6908b2ccce12294811c4ed25fba474fe6973afe833e380498524b2290560a3df"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/document/PendingDocumentRecoveryServiceTests.java",
+    "sha256": "720a5c896ca5f368f8b578957cf8d788bc98540eab02f6503a9d3e56cc574790"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/document/processing/DocumentChunkerTests.java",
+    "sha256": "63ca5e92577d36de55d1e706295a43c07064e0564255bda7459a7735f243fcd6"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/document/processing/SpringAiDocumentParserTests.java",
+    "sha256": "bd9d8a82e873ae4b9850f370701af902443506e0dd3bc8704ff84be84a4a16f2"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/ChatRefusalDebugLiveTests.java",
+    "sha256": "c6fd3f9e4a198fcc819ad51e5ac6f95e3b9bbc06ae3975eae1086b3ab028efd4"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/CoreWorkspaceLiveTests.java",
+    "sha256": "1899f6bb7a09327e555d68ceeec231f563b82763f0f2765092e82b15e7f02631"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V2EnvironmentEvaluationTests.java",
+    "sha256": "03432e9b34555c0c174cb20248c6c255135d28e5fd6fe47ea045e16a76e5d635"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V2EvaluationAssets.java",
+    "sha256": "9ba92820ec95b2f6bc9806e06a31623b28482bfea35dae04b9b78da4a8077766"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V2EvaluationConfig.java",
+    "sha256": "dc5a1d733176c20987056e3ae8af7ad5e498ab8b49aff8a4981d1c634528c401"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V2EvaluationDataset.java",
+    "sha256": "f6f5b126d1d3ed286769740bd3e27e5ddb8d6ae3eeda67458876a1d525bc743f"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V3EnvironmentEvaluationTests.java",
+    "sha256": "55b90a58237a5948b9cc1b36dd6e0084ac889e405a1bb7286b2de1236d49e81b"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V3EvaluationAssets.java",
+    "sha256": "126a81a9a250badbddcfc755819a2190ce7c6551d787ca4cc7322532e91d497f"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V3EvaluationConfig.java",
+    "sha256": "dfad43fadef01b4ca016cf23193899d7238f154c5c34b719d3f0e915a91e2157"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V3EvaluationDataset.java",
+    "sha256": "11073c2c08b64aba51ffd3ae6c58fbf65e9d0973308e9a2cde554c7a957a8fa5"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V4DocumentComparisonEvaluationTests.java",
+    "sha256": "1470341c9b4a9cd9b5395ef21b240c9c961892ca623610a56d2880d8941579cf"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V4EvaluationAssets.java",
+    "sha256": "b014867f1d5f2ec7714adacaa97df51ea9bb2f926dfdc19e0cfb43e129b7e73c"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V4EvaluationConfig.java",
+    "sha256": "52718516af3bf3cee46c807cf7308786d9f2388116a0f9737c53b71e57cc732a"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V4EvaluationDataset.java",
+    "sha256": "f3eff8b6b5fa4d70ada0f93b0efab78bdfa98d6ad980a00683cccc4f00516ee8"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V4LiveModelEvaluationTests.java",
+    "sha256": "2d61c5e6dade56abeee710fcd26bc8cc2c373d9a575b8a3cc9afc36f4606a16a"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V4ResearchEvaluationHarness.java",
+    "sha256": "55e1a6e7d8b438adec164ec68fb41eec6c3819ffeabfdfbba430fa2a267639bc"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V5EvaluationAssets.java",
+    "sha256": "5dbc3ae6fc1380e17e5ec7be1923e18e3b00c540b2164cfd0045ed09d73f90b4"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V5EvaluationConfig.java",
+    "sha256": "0e958b84a2d6556e905246d7ba87fdc016026ab9e944e8f5d7ac5b5c979360f7"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V5EvaluationDataset.java",
+    "sha256": "39c93c741e672fa1372cbd998ee14ad935cbb7ab425a3b6a91c1aa49411d8ec5"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V5ExplicitMemoryEvaluationHarness.java",
+    "sha256": "5c9d699625ab73191b03a97b270ccbd62afb3d603077fb854e2d931dabeebf33"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V5ExplicitMemoryEvaluationTests.java",
+    "sha256": "2e3a03ef689641291a9004507a8d1a3cee97abf07413276bada3d4eb450db097"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V5LiveModelAcceptanceTests.java",
+    "sha256": "da93fb5587ae0a097690400686f4b197bfcaf9f8ed1b477984d23650b60856ff"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/evaluation/V6ToolProtocolProbeTests.java",
+    "sha256": "f3caec9462e8a543e9c6a78cb85cafee55af7f7396ec0f01e79762437e96e1ef"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/feedback/AnswerFeedbackControllerTests.java",
+    "sha256": "4f4b88f1813e4a632f9523b527969c7a349e5599c811bc543ab40fb43a6949e6"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/feedback/AnswerFeedbackPersistenceTests.java",
+    "sha256": "97feb4d6c037d2eba6aa5561d2555304526c3288e0d2959a668e2e1f6c8a9742"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/feedback/AnswerFeedbackServiceTests.java",
+    "sha256": "7c4493f762d3d6b585ad61dc7228f744f1cdd94ac88aa28f375a004f2bf6965d"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/health/HealthReportActionProposalPersistenceTests.java",
+    "sha256": "06b7e9e158178e32c68cd675ae515c23e422a856f9cf5af287581de9fe32e66b"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthEvaluatorTests.java",
+    "sha256": "255e87d127e5934e16e1a288d2cf0a6aa6a43fd3970c8f3679feabd301845020"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthReportControllerTests.java",
+    "sha256": "4a4d15f66edeffb134acb823b58e0ae73adaa87c998c26ba95f7d2a28d1f63ed"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/health/KnowledgeBaseHealthReportPersistenceTests.java",
+    "sha256": "84305ca302388c8e5fdc91cd4e66058c51e853ba25a93c0b2c77de82405e849a"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/health/PostgresKnowledgeBaseHealthDataPortTests.java",
+    "sha256": "cd35ebfc147e9a58e9eecce2cd803fdd9b33aea579f81356b2ef2ba2f6c13c96"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/health/V3HealthClassificationEvaluationTests.java",
+    "sha256": "8e1e2b4a4db043e24c2ec44f0f0274808ba3adc3a2b72a6ea15b32a151e6f822"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/identity/LocalSingleUserSubjectProviderTests.java",
+    "sha256": "f718b8012bbb40cd3a59524018dd18adca3c586c7a91a1b5b62b8aa07c5acc49"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/knowledgebase/KnowledgeBaseControllerTests.java",
+    "sha256": "5533cc6a291639b073fc050879ff63bbbd316ba2fa4d08d3335dc391349e891a"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/knowledgebase/KnowledgeBasePersistenceTests.java",
+    "sha256": "65965b56f37783fffffa3f3f8b752655e7cbb309329e1e5e2154836efccd3fc6"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/knowledgebase/KnowledgeBaseServiceTests.java",
+    "sha256": "31b4e2c876e8c8427e319e6d8cc5873ef792fdea63c738d022bd32a3da880ab6"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/memory/MemoryContextPersistenceTests.java",
+    "sha256": "e35314dbb51e56533f63f9b10dc4672ae74327f55845b295e9e2d23c6aecbde9"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/memory/MemoryContextServiceTests.java",
+    "sha256": "eff42ab177091af63ae2133042fb7d42a6536bacb87f7dd4918fb01b5796fbaa"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/memory/UserMemoryContentTests.java",
+    "sha256": "e65cb1db55bbfd4eb42c37b2f7f52c8a4484d6eb2e536eaac7338453b9f737c8"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/memory/UserMemoryControllerTests.java",
+    "sha256": "4db86dd51738cb0e6ce2139e95ecaf319c7fdf4972f74cf58d5f834cafec0aeb"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/memory/UserMemoryManagementPersistenceTests.java",
+    "sha256": "27816016d66844836f49f46103947b9ccabb91fd3199f88b3f8f5b4911f02616"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/memory/UserMemoryPersistenceTests.java",
+    "sha256": "40a0a1262db2739807db5281c566dbb99e5dc0d9adc34a76f2f699dd3b2dac44"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/model/AnswerStatusDecoderTests.java",
+    "sha256": "24cc3df8a4587bacc4e24df1b89ee4799f248cf38e2d9fc7e27400b07506afa8"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/model/ChatModelGatewayTests.java",
+    "sha256": "394914663c7f8c803a7325301fd2b45daf81935f917b2fba2ffd4f5ce97437b4"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/model/DeterministicEmbeddingModelTests.java",
+    "sha256": "e07320b0fc3a66ad72c4524ffad758ad0b74db4df488bb25d48b3eee953863f4"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/observability/AiCallLoggerTests.java",
+    "sha256": "122e054c0d748601d6dcd7c8a079dc2088992f43482727ae77c2fc39b4753859"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/projectsource/GitHubProjectSourceReaderTests.java",
+    "sha256": "aceb12a29f7da34fd6bbbd1cb75b67818c418c6aa49ac8dbe84eb247e086699c"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourceLiveTests.java",
+    "sha256": "be23c0ad8a1dd2c31be088a0fa206735acb184685f00bb47d647181de5b3f185"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourceMcpTests.java",
+    "sha256": "07abf9f766ddeb8c48bae786b7c7b979f0fcfa2d9d4d735e17f1b8a4dcbb6581"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourcePersistenceTests.java",
+    "sha256": "1d42208b51d1552819fa72e38449aaa3fba93a7b8597c8f36e7e732c319a2614"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/projectsource/ProjectSourcePolicyTests.java",
+    "sha256": "00e07eff2c7c5c6427b33d1a446204059269cf5cdc6b973c5d1213d4f556d572"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/research/DeterministicResearchPlannerTests.java",
+    "sha256": "c5b7bcb4cd77dc19218a4a795a0597dc517da8f49a84a4dc8db84754c92d2e28"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/research/ResearchDocumentEligibilityServiceTests.java",
+    "sha256": "7f05e7c7e94f06473dff99df31833516388b4b8adc085c59f1d855729e47be5a"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/research/ResearchExecutorServiceTests.java",
+    "sha256": "94bf27c464026d5dbbddd1bc7d7b6cd918f2668639b5f12b0718392f90643fb2"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/research/ResearchPlanValidatorTests.java",
+    "sha256": "60a543c9b0fa4b88d4062bf85d95879ae288e83f1178090fd9ef8f3204b30e37"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/research/ResearchStartPersistenceTests.java",
+    "sha256": "938ea4e0f7d346a45081de3b2739d6b90ad8b289e1ca06003df6b27589afcf17"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/research/ResearchStreamingServiceTests.java",
+    "sha256": "d34cb79f62c15435c0cd53f86c27ec2a66693d792ee211d7c6911c9a5c7e3066"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/researchreview/ReviewLiveTests.java",
+    "sha256": "dbe33d0576b8a24b6ba51d3b18d456e71d192fbc95bb3b3d701ad24b6bcb521b"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/researchreview/ReviewModelGatewayTests.java",
+    "sha256": "93b1c7b166e14fb67be073f2f94b064134835d67c970c63560c1af72497f39c6"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/researchreview/ReviewPersistenceTests.java",
+    "sha256": "d78c8a975bbbddafe5f0b5b7cdf816b665e53fed68c7640b155a91eec51a163d"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/researchreview/ReviewValidatorTests.java",
+    "sha256": "5813af3b140013cde825f5c5d19623e393881e26678b648a4b0678dcb9be518b"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/retrieval/RetrievalControllerTests.java",
+    "sha256": "6f53a170eac2aed76cf074d2a7bd1be27817f7e67a28b1949880f43627c8f8fd"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/retrieval/RetrievalServiceTests.java",
+    "sha256": "5bc3013e4e3d76e217d160a66ebd80e9e7fbcd82cc7f713dc9e1fc8736999977"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskModelGatewayTests.java",
+    "sha256": "19b833c3092d5c6bced5df73aa1146cfd2129dfd2d8c560a9ebb899c834edee1"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskPlanValidatorTests.java",
+    "sha256": "0fd5e800b645c2d5fdd5da89d839fa7cfa523a06e8701e9331628776bc1e79b9"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskWorkspaceLiveTests.java",
+    "sha256": "c88acf4c1eef0e5c9013d11c6fc15669a878fd3f23e347d69147e2b5301c79fe"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/taskworkspace/TaskWorkspacePersistenceTests.java",
+    "sha256": "fa7329e777ac24610e4563f2e33dcfe21e29bd3daf0df52ad0b423ebb61056fa"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeModelGatewayTests.java",
+    "sha256": "24853ea90d33bc3c995878c5db805269bc0d56d002d18dbc9737c8dbcc641f1c"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeReadToolsTests.java",
+    "sha256": "da17902a493f4a9f075ccbede9d05dd3a48a4c756e3caead7e2a50a9dcad25b9"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeResearchControllerTests.java",
+    "sha256": "b8e4e2dfeed7ec25035e2d474cc6564ec6397720a505d9f7ba6032e8a93c79b1"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeRunPersistenceTests.java",
+    "sha256": "4d4498bb40f529f39cd179e20fa43d6207b4adccf1cddea80c3baac1979d07ff"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeScopeDebugLiveTests.java",
+    "sha256": "892ae7839f5bcc82eb4b77a668dfaa1096f15f158997518a0aa5f530c1c96bed"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/upgraderesearch/V6FixtureEvaluationTests.java",
+    "sha256": "da7fb78a44fb8657b98facade017ce6fd049e0b59e756368d75b187e3ba7eadf"
+  },
+  {
+    "path": "backend/src/test/java/io/github/fanqiepi/contextpilot/upgraderesearch/V6LiveDebugTests.java",
+    "sha256": "97260fed7e48370543fde02f1cd82755da192680c386af70a45b826218370dce"
+  },
+  {
+    "path": "backend/start-project-source-mcp.ps1",
+    "sha256": "91b485889a30de1c85111c2fd2e7892a77779613ef2da1734e658bddbdbdb997"
+  },
+  {
+    "path": "data/uploads/.gitkeep",
+    "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "path": "deploy/postgres/init/001-enable-vector.sql",
+    "sha256": "9e9b2cfec47519f49ee73cb533c459e22f8ca54fe5ba1cbec59f3d5883fe191c"
+  },
+  {
+    "path": "docker-compose.yml",
+    "sha256": "8d4e96c3137a971c0b039f234c3a92bb73d654ec159bf7bb0ec735654385ebb1"
+  },
+  {
+    "path": "docs/api/api-design.md",
+    "sha256": "f9fddc1533d09f565808a25d44812fe1289e297c201499758271d2a9ccf284b5"
+  },
+  {
+    "path": "docs/architecture/decisions/0001-use-pgvector.md",
+    "sha256": "e9f5a5e47cea0e1b46180d861734ad394885f4eb69033f2d5b6856b44b0e97c2"
+  },
+  {
+    "path": "docs/architecture/decisions/0002-use-implicit-single-user-subject.md",
+    "sha256": "1f5a0fda3aa6c0b888433f924b2f63f3f1a56329750616615230a9a8c7da4c7a"
+  },
+  {
+    "path": "docs/architecture/project-source-integration-design.md",
+    "sha256": "9c20530479ede62d3dd11d08029f6a3470abfa276364fecd0f56e362074bd333"
+  },
+  {
+    "path": "docs/architecture/research-result-review-design.md",
+    "sha256": "0284875bec617773f577bf94e2deb308f1cd5ecc04afaf0c89cc9a71df1a8eaa"
+  },
+  {
+    "path": "docs/architecture/research-task-workspace-design.md",
+    "sha256": "855da4852ce7b1c44f8fa7f864898d5817d38da9d7d5a8975e27cdb06df2a774"
+  },
+  {
+    "path": "docs/architecture/technical-architecture.md",
+    "sha256": "b4abb3c5765985d4061b5eb504df3a23a07661418acf8dde3bd1232eb4f18a68"
+  },
+  {
+    "path": "docs/architecture/v3-knowledge-base-maintenance-design.md",
+    "sha256": "3a49cbc5fd4d29633fae0e54522ab39dbf66c57aa1691d21efc2613a78392c68"
+  },
+  {
+    "path": "docs/architecture/v4-knowledge-research-design.md",
+    "sha256": "99474ec18361fcbc7573d167c40397212010f14fa61b74650bb2dba2ef2c87bf"
+  },
+  {
+    "path": "docs/architecture/v5-explicit-memory-design.md",
+    "sha256": "96029e7d12710b78e40053f06b4c6161db46019422a3716440522972c8223dee"
+  },
+  {
+    "path": "docs/architecture/v6-upgrade-research-design.md",
+    "sha256": "f38f25a447ece09abfb7f4d5896cfecd55dd0aff8b1802dbbc814d3279e9c197"
+  },
+  {
+    "path": "docs/archive/2026-10-15-career-readiness-review.md",
+    "sha256": "35abcab320256d81abeba732c7c07d9637af845b5be44b2db4bcf95b5a859654"
+  },
+  {
+    "path": "docs/archive/README.md",
+    "sha256": "4be055d84f6d6fe4235e423e2e4a2169dccbf7191b3814e69b82965711832a61"
+  },
+  {
+    "path": "docs/data/data-model.md",
+    "sha256": "255f2202d052c0724175fe9c9534973368100c02d19084439867409a3f09110d"
+  },
+  {
+    "path": "docs/development/feature-inventory.md",
+    "sha256": "2ac8a2578e7dc8c12fde8f3a36b59907ccd9c3cac0baf8ea8da5061165ceddd0"
+  },
+  {
+    "path": "docs/development/local-development.md",
+    "sha256": "10139f52f7ec92f9ecf5413416b56e7e3208552b542ddd420a4c8411d5519868"
+  },
+  {
+    "path": "docs/development/project-context.md",
+    "sha256": "fc2876cc843c2102688709bec9c81e7644ac15b9d7f14b826700c9a0f0bcf22c"
+  },
+  {
+    "path": "docs/development/project-source-integration.md",
+    "sha256": "5f16de24e4daa24dbb6280db3269c68b2de062a081fa4d8079e4be4b371d204f"
+  },
+  {
+    "path": "docs/development/research-result-review.md",
+    "sha256": "2ffe104a3eca2b8c58de20d213f9de220532d04c4fae5d4695c00a2df37c9310"
+  },
+  {
+    "path": "docs/development/technical-retrospective.md",
+    "sha256": "57deaf44be3ed30504ccf094b6923cf103a8f1ddf9b6e489e66cb34c1219e05a"
+  },
+  {
+    "path": "docs/evaluation/closeout-engineering-regression.md",
+    "sha256": "ac7cb04501df7cf382931866ef37b093385a26498ebe2aede9ba0b9541b2b9ee"
+  },
+  {
+    "path": "docs/evaluation/core-workspace-first-run.md",
+    "sha256": "b39fb8e994bbdf2b539ec20bf5cb3845c408fe34ff756b44563a58e76d8696b1"
+  },
+  {
+    "path": "docs/evaluation/evaluation-plan.md",
+    "sha256": "b4824b411048c4b1049e5936742e3aa17b38b5d7b02cf4e579b77f1815d35b7d"
+  },
+  {
+    "path": "docs/evaluation/project-source-integration-verification.md",
+    "sha256": "aea6320712c23b6df155ff9967634d4bb77736e78e932d4d30efca6262e9c5df"
+  },
+  {
+    "path": "docs/evaluation/research-result-review-verification.md",
+    "sha256": "156179ed56deb4e5b058335dc24f978870ef5a4f27330e5fcfa1ea91fad244ed"
+  },
+  {
+    "path": "docs/evaluation/research-task-workspace-verification.md",
+    "sha256": "ffac484ae53ff708d838687da68228da10b9374906eb2e34ab4e105d5324a676"
+  },
+  {
+    "path": "docs/evaluation/upgrade-lifecycle-evidence.md",
+    "sha256": "1aad551da1643abd9fdc13093948495d9241128c6656a795e214e054a77e652f"
+  },
+  {
+    "path": "docs/evaluation/upgrade-scope-debug.md",
+    "sha256": "798fbeefd692e4ccd8f2ec3ed6b649cf56968649e320908764c9bfa29d9f8279"
+  },
+  {
+    "path": "docs/evaluation/v2-acceptance-report.md",
+    "sha256": "0c256340ffb1a94cbab6aa0e775fae8608c7d3b01c4fa82c7aae6a8e43cd058d"
+  },
+  {
+    "path": "docs/evaluation/v3-acceptance-report.md",
+    "sha256": "c10494cdef8862dc048b56a34b278d73a73d4a3aba8a2e4671f26f5323f45deb"
+  },
+  {
+    "path": "docs/evaluation/v4-implementation-acceptance-report.md",
+    "sha256": "c3b390f7f30aed74cd0b81833a43dc853c6d76723969251b8b7f52efdb47ab55"
+  },
+  {
+    "path": "docs/evaluation/v5-acceptance-report.md",
+    "sha256": "38bf3cd20abac2b73f1c16a0eea52e021f757e0389fc4b42dd54569a286d28e5"
+  },
+  {
+    "path": "docs/evaluation/v6-implementation-review.md",
+    "sha256": "0d03aa03347e94b85898593901614a6041ebdeac557e18995bbb15798b4568d9"
+  },
+  {
+    "path": "docs/README.md",
+    "sha256": "c68a63894a500dd24ff3abc66394c14a866c78a2746507e526ec137f0c8fa013"
+  },
+  {
+    "path": "docs/requirements/product-requirements.md",
+    "sha256": "cf19e9b9afded6f250176da737bd8b1c8523f2060eb6fb03378d3ca921b6941e"
+  },
+  {
+    "path": "evals/cases/research-review-v1.json",
+    "sha256": "ff36167608ebba5589d0b2aa11c33d37b21f5bf00a7e160db6875ae5b507f2fc"
+  },
+  {
+    "path": "evals/configs/.gitkeep",
+    "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "path": "evals/configs/core-baseline-v1.json",
+    "sha256": "5bf10744a2676a364d6c1fd4694d15c0ace947ee582cf190b7586cdb4a456392"
+  },
+  {
+    "path": "evals/configs/core-baseline-v1.lock.json",
+    "sha256": "63bea7bf819139ea08c698116a5a1ad6ddf56d47612219aaef020d6c67558d0a"
+  },
+  {
+    "path": "evals/configs/v2-routing-action-safety-v1.json",
+    "sha256": "afb97174f189fc9ca9414316401ae9d62706e7e0a67d8dbff3576923897719ac"
+  },
+  {
+    "path": "evals/configs/v3-health-maintenance-v1.json",
+    "sha256": "9ec772ee8d5ab4b6b1a235d4815bf02203a1147e1e36c417b8c2194a5a0f8233"
+  },
+  {
+    "path": "evals/configs/v4-document-comparison-v1.json",
+    "sha256": "535485a65856c0b1a3592cb2916defed8dce8aecaf2fb0aff8cc4d5af5c6de79"
+  },
+  {
+    "path": "evals/configs/v5-explicit-memory-v1.json",
+    "sha256": "fa80bc9c340c336f051390127493e3875b8908357c9f3f391897d3861341ef19"
+  },
+  {
+    "path": "evals/configs/v6-upgrade-research-v1.json",
+    "sha256": "320aadb056c937852ecc9dc1b79fd0e753bc3027a4ab85eed852acedb6b09ff1"
+  },
+  {
+    "path": "evals/corpora/core-debug-v1/solstice.md",
+    "sha256": "84d79704908472032e366698844ddcf3a6088dfcc62b8e03c36b170ecbd55959"
+  },
+  {
+    "path": "evals/corpora/core-workspace-v1/adversarial.md",
+    "sha256": "645280b3379d0d7be781113c02dfe535feab48b5d90447d59ace9357cfdfcdd8"
+  },
+  {
+    "path": "evals/corpora/core-workspace-v1/harbor.md",
+    "sha256": "12645e2ed78e8342aade89f50a69106ff3fa3c33648d450df89a0c57252f883c"
+  },
+  {
+    "path": "evals/corpora/core-workspace-v1/lumen.md",
+    "sha256": "2ee66e38c59e1995395d9062f41572b84c06edc8f0883d416f90a04a136d03f7"
+  },
+  {
+    "path": "evals/corpora/core-workspace-v1/mosaic.md",
+    "sha256": "def5b3de5694fb08994d0bb28057a5f539dacceba76746cfdad8024a0efa9a67"
+  },
+  {
+    "path": "evals/corpora/core-workspace-v1/shadow.md",
+    "sha256": "33e0b46e6877db24c98eb1c6ec79ae1c592ff9779b23ae85812c1fb495183e5d"
+  },
+  {
+    "path": "evals/corpora/v4-document-comparison-v1/atlas-platform.md",
+    "sha256": "8c0b4e238f0e8587bc9240943fdb3dd6d210678b48ceb11aa0717b8ccb971c1f"
+  },
+  {
+    "path": "evals/corpora/v4-document-comparison-v1/borealis-platform.md",
+    "sha256": "629d048782bfe0108748fb5cd09d2b5a2f0ca5926dba770d1f1db656e52e14c1"
+  },
+  {
+    "path": "evals/corpora/v4-document-comparison-v1/cedar-platform.md",
+    "sha256": "b693ff1ca8d7f08d39f1ae50d446ddceaccc09ef3127d3920a4722541bcbd202"
+  },
+  {
+    "path": "evals/corpora/v4-document-comparison-v1/delta-platform.md",
+    "sha256": "34d408dfd4b6e120d5d4e59dfd5dc0500fac73e45d9745fb8c04afd11ed25333"
+  },
+  {
+    "path": "evals/corpora/v4-document-comparison-v1/echo-platform.md",
+    "sha256": "9125c7dc5b67b86f915aacfae1bd497f1ecca688a27d8f437d42a85fe5ba5f38"
+  },
+  {
+    "path": "evals/corpora/v4-document-comparison-v1/quartz-injection.md",
+    "sha256": "cec391c40365393981513855e9dde0839c8a5c6cc423ee6e89d5b70c29d1a5e5"
+  },
+  {
+    "path": "evals/corpora/v4-document-comparison-v1/shadow-out-of-scope.md",
+    "sha256": "7ab630e009d14e084b40b4c6f5730590f64f7e1e983c8850e8c321549bf104ec"
+  },
+  {
+    "path": "evals/corpora/v5-explicit-memory-v1/workspace-guide.md",
+    "sha256": "2e4272be50fa99b5d3c38b4537d3dc28ae4d2a9faafe314519458bdb0e0f190e"
+  },
+  {
+    "path": "evals/corpora/v6-upgrade-debug-v1/legacy-worker.md",
+    "sha256": "470d0668b1749e438d9e85d80a05bb7ffdc2ce58ca1a90dab07e1e681048af08"
+  },
+  {
+    "path": "evals/corpora/v6-upgrade-debug-v1/release-debug.md",
+    "sha256": "c5755b09f4c4766f5835d4e6b9094ca8531c09c1a68c9937890563fce40c31e3"
+  },
+  {
+    "path": "evals/corpora/v6-upgrade-research-v1/legacy-client.md",
+    "sha256": "73ca2dee2c681a94d09587d83652ac3eae16d2f3d8668cd7ef3a06a5e58dd39b"
+  },
+  {
+    "path": "evals/corpora/v6-upgrade-research-v1/legacy-storage.md",
+    "sha256": "3d63dd74c4b7b91bea372c51c510655289d84bb1d78bb48c97bcc08d177c62d6"
+  },
+  {
+    "path": "evals/corpora/v6-upgrade-research-v1/release-fixture-2.md",
+    "sha256": "efb8ef682d63a7a3137154dc2f4b25058a4770a3fa1bbe28c72ca97ff3fa59bc"
+  },
+  {
+    "path": "evals/corpora/v6-upgrade-research-v1/release-fixture-3.md",
+    "sha256": "52be3da3cbd6593455555fb6342d5381d16ac9eddd12e182da4eaeff5b64ae5d"
+  },
+  {
+    "path": "evals/datasets/.gitkeep",
+    "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "path": "evals/datasets/core-debug-v1.jsonl",
+    "sha256": "2c3b46f0e11302084113ca6535c5b53634c3105b442f14f835331df27ee60216"
+  },
+  {
+    "path": "evals/datasets/core-workspace-v1.jsonl",
+    "sha256": "45746a46bc58879b486b6d61c0c32b0b0089e745f645ca08acb2cd1fd1afe033"
+  },
+  {
+    "path": "evals/datasets/v2-routing-action-safety-v1.json",
+    "sha256": "5ae5684b1e69f06f01dcaa45cec69f962cd61b0abb2f87c7bed08194a123a5d0"
+  },
+  {
+    "path": "evals/datasets/v3-health-maintenance-v1.json",
+    "sha256": "4af0506651f51a66c1dcae3e5d2745bf85e8b45ff91bad41010736ecd160a10e"
+  },
+  {
+    "path": "evals/datasets/v4-document-comparison-v1.json",
+    "sha256": "4035119d874d0a41df172d7c18e1453f6ee4919b2ba5ad90744885c679eb0e9d"
+  },
+  {
+    "path": "evals/datasets/v5-explicit-memory-v1.json",
+    "sha256": "4d7312bb4036fe327ba29349f10b26bff02a8cba3323217902dd940758f1747a"
+  },
+  {
+    "path": "evals/datasets/v5-live-memory-v1.json",
+    "sha256": "3a81d684c9a202cc8c08f683a429ce5f775ce9583836d2f5dd7b2f522aa06c6d"
+  },
+  {
+    "path": "evals/datasets/v6-upgrade-debug-v1.jsonl",
+    "sha256": "1cf3c7e707d638de28489066af4eae77e02a7e2d890c0ea881a131dd0c038de5"
+  },
+  {
+    "path": "evals/datasets/v6-upgrade-research-v1.jsonl",
+    "sha256": "aeecaa80cb7162bd3013b1dc9c011c6322a3441febaaa2ae8dc36d66225c2c7c"
+  },
+  {
+    "path": "evals/fixtures/documents/.gitkeep",
+    "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "path": "evals/README.md",
+    "sha256": "0a4af65e3cb7f22d6376763ca362f2fbd8b2d4d8690b1c5d5a9afe9f6350a4a0"
+  },
+  {
+    "path": "evals/reports/.gitkeep",
+    "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "path": "evals/reports/2026-08-14-v2-routing-action-safety-baseline.md",
+    "sha256": "924147cd2ee81c6726b1dadc40fca017166db6e999a036aad8784a188370f6fb"
+  },
+  {
+    "path": "evals/reports/2026-08-15-v3-health-maintenance-baseline.md",
+    "sha256": "474cdd4b7e16e489fd24f46a0924776a6ccb6a777cacd5aa65d9ac82bdc4978a"
+  },
+  {
+    "path": "evals/reports/2026-08-17-v4-document-comparison-slice1.md",
+    "sha256": "0e568ea8931d5433a0c48f16bf70bef58c150c9183715e95beb1abffb8efb23f"
+  },
+  {
+    "path": "evals/reports/2026-08-17-v4-live-model-summary.json",
+    "sha256": "68101d32b6ee46e49318d24e1d428722c166528bd82b6818d8afa3c175b4646c"
+  },
+  {
+    "path": "evals/reports/2026-08-24-v5-explicit-memory-slice1.md",
+    "sha256": "92df7b82bb8b82734f7dc8ecbd0e5fd76fd83ef094685dc7f0378d5f69ccdae4"
+  },
+  {
+    "path": "evals/reports/2026-08-24-v5-explicit-memory-slice2.md",
+    "sha256": "25450df3440c031c86a64746d8953096edd556de470e298416d0598dab22c70a"
+  },
+  {
+    "path": "evals/reports/2026-08-24-v5-explicit-memory-slice3.md",
+    "sha256": "90a0a947687173dc8e20cc9d07466378fa4f272b64bdf4098430e4364a2eeaa5"
+  },
+  {
+    "path": "evals/reports/2026-08-24-v5-explicit-memory-slice4.md",
+    "sha256": "4cec52a2cdcf27b65a411839bd936552b1e6572f1bff2b10cafd04b4ab2c77b8"
+  },
+  {
+    "path": "evals/reports/2026-08-24-v5-explicit-memory-slice5.md",
+    "sha256": "1cc76fd304c88cc2eeb579b31863f1379078418d4427ea58d1a0f35b36b8642e"
+  },
+  {
+    "path": "evals/reports/2026-08-24-v5-explicit-memory-slice6.md",
+    "sha256": "ea4657e26f27f64d7481c032214d6c8e138f64164102c8546e71cebb990f1309"
+  },
+  {
+    "path": "evals/reports/2026-10-15-v5-explicit-memory-slice7.md",
+    "sha256": "2648a7c395c51f3b5a8d1d32aeeded8b6e961d6cf9c501fcc8927a1954050c9f"
+  },
+  {
+    "path": "evals/reports/2026-10-15-v5-live-acceptance-results.json",
+    "sha256": "ec422ea57567e26cad81ad1c5d8ff7d43650bdbdfd4600c50fcc34d03eff9982"
+  },
+  {
+    "path": "evals/reports/2026-10-15-v5-live-before-grounding-fix.json",
+    "sha256": "42d38f8058b269551c986fcf6245ad25ec2e29df483b82583489d3330f81bc76"
+  },
+  {
+    "path": "evals/reports/2026-10-15-v6-fixture-evaluation.json",
+    "sha256": "e204c38711d7e27c1f220925e34dd3102daeb514492c0239ccaadd3f3c8b114b"
+  },
+  {
+    "path": "evals/reports/2026-10-15-v6-live-debug-attempt1.json",
+    "sha256": "be3c6a5a4e53e8077f62b43e25be947aa75cb1bcff92d18ba23db5a5fcec52d3"
+  },
+  {
+    "path": "evals/reports/2026-10-15-v6-live-debug-attempt2.json",
+    "sha256": "e3c9c0bc1453e18e0ff646c00e13be7ec29cb18a9711c731ba35067471ae209c"
+  },
+  {
+    "path": "evals/reports/2026-10-15-v6-live-debug-attempt3.json",
+    "sha256": "23db92dfda9b2f52d974d7b38c3599b4911b4d460925a646ab14a71b7a61b124"
+  },
+  {
+    "path": "evals/reports/2026-10-15-v6-live-debug-json-mode.json",
+    "sha256": "16138e02b42a24900a9fa268d4d5ab6299691c09b1fb4fddbb80999b93706bc1"
+  },
+  {
+    "path": "evals/reports/2026-10-15-v6-slice1.md",
+    "sha256": "4d4b0168332ed881015cfea3631c763d5f3c06b16aa76e119e117d11f0acd892"
+  },
+  {
+    "path": "evals/reports/2026-10-15-v6-tool-protocol-probe.json",
+    "sha256": "92df1a7ab68cfcb572a05195f86b26b90148740c43b08244f804502071b82085"
+  },
+  {
+    "path": "evals/reports/2026-10-16-task-workspace-live-summary.json",
+    "sha256": "ef1b40c3ec8abeeea3990d62dc2e7b43162c1fe12c17d19b9ad018ea5fc9900a"
+  },
+  {
+    "path": "evals/reports/2026-10-16-v6-local-validation.json",
+    "sha256": "1be447b5192ff7bdf981bc14fb2d28f44dcacaf8fb3c8ae286887d9b869e454a"
+  },
+  {
+    "path": "evals/reports/2026-10-19-closeout-package-cleanup.json",
+    "sha256": "b73a6bf287552728750aee1decdb3b53b28e17c38e4ceb2ff5bd710e0d97fc7f"
+  },
+  {
+    "path": "evals/reports/2026-10-19-closeout-package.json",
+    "sha256": "e3df8f39b46187efb411b25517231563f563a8c10a69cbe563066692832f95be"
+  },
+  {
+    "path": "evals/reports/2026-10-19-upgrade-closeout-engineering.json",
+    "sha256": "99db248960cf06df7a71639f5bf010c79334d142013f43ce097278315c3443b3"
+  },
+  {
+    "path": "evals/reports/2026-10-19-upgrade-lifecycle-direct.json",
+    "sha256": "5420cc1e4eb83fb13f0e8d3c74288e4c3a310bdb25c65f6b7d8fc4c50de52fe7"
+  },
+  {
+    "path": "evals/reports/assets/v5-slice7/desktop.jpg",
+    "sha256": "b2cd61fde28cc41fced36e8d7f80206fa84cc696120995a3b8f234d643ad63e2"
+  },
+  {
+    "path": "evals/reports/assets/v5-slice7/mobile-management.jpg",
+    "sha256": "9bcf50384e2c022a1a3a7b4d807cf660895bec652b0346d282b868e63016c03f"
+  },
+  {
+    "path": "evals/reports/project-source-code-manifest.json",
+    "sha256": "c41e17d7d688dc828e25df92f5611a0da6ce8601e16c0bc30ed2e21e39331222"
+  },
+  {
+    "path": "evals/reports/project-source-live-summary.json",
+    "sha256": "816df3df925653ef5cf115ba6caae4881f59b7a3a262a69059f0626c2acaeb54"
+  },
+  {
+    "path": "evals/reports/screenshots/2026-10-15-v6-desktop.png",
+    "sha256": "3368c116537226e4f4e2eea70bf5430a5da00962180b3deff68530ddb0930967"
+  },
+  {
+    "path": "evals/reports/screenshots/2026-10-15-v6-mobile.png",
+    "sha256": "2c0869d328dde86ae27341d3c3678b96f24c59b384288c998842a742c37a0976"
+  },
+  {
+    "path": "evals/reports/screenshots/2026-10-16-task-workspace-desktop.jpg",
+    "sha256": "9e12b527adf9793da1d99358e2650960a78b1228036ada0d566c138b21bc7986"
+  },
+  {
+    "path": "evals/reports/screenshots/project-source-import.png",
+    "sha256": "abb53239d1b858193f0522708c6c9dd5b100c6648285e051e41b7d5c6920780b"
+  },
+  {
+    "path": "evals/results/core-workspace-2026-10-19/core-review.md",
+    "sha256": "8a6fa42f4a07d630b59c2a969e2a3133b8a6b500cc4205bd136f8e20114721eb"
+  },
+  {
+    "path": "evals/results/core-workspace-2026-10-19/core-summary.json",
+    "sha256": "2df5e8bec9418c43f10217cd54105707728e2a1a198ea2bca1cf78bdaeabb44d"
+  },
+  {
+    "path": "evals/results/core-workspace-2026-10-19/raw-results.json",
+    "sha256": "bf3e1fbde38a1cad260e3a3f2989d3b3350a23837264bce6cb2a37efa0866d36"
+  },
+  {
+    "path": "evals/results/refusal-debug-2026-10-19/raw-results.json",
+    "sha256": "6987b9a9d7cc40de36a4344f2ad077317e89e4b6cc1a9b38a2747b692eb70932"
+  },
+  {
+    "path": "evals/results/research-review-2026-10-19/build-summary.json",
+    "sha256": "016082a6a0f77787946951a3da2dca3e47e1358cde3f0aee6b2ef12503867278"
+  },
+  {
+    "path": "evals/results/research-review-2026-10-19/final-live-results.json",
+    "sha256": "e02acc1d86587d0b90dd4ecf71d9108c39fa73d597bee46c53d9768829823d42"
+  },
+  {
+    "path": "evals/results/research-review-2026-10-19/live-results.json",
+    "sha256": "ac07f84981b012dcc5c43206b63d54ac98bf522b62461877ad5ec0a51816aa3e"
+  },
+  {
+    "path": "evals/results/research-review-2026-10-19/manifest.json",
+    "sha256": "1794d6319bf8f27db9a308db08744583e7de8777b8a0f1f435dc8f48146aa40c"
+  },
+  {
+    "path": "evals/results/research-review-2026-10-19/observations.md",
+    "sha256": "42eba18f8579afad71ea98038b9704a44733d54acfef17a53368583e3ea1d609"
+  },
+  {
+    "path": "evals/results/research-review-2026-10-19/page-flow.json",
+    "sha256": "17c5639a728d70c54fa5dc033cd564dc6d258fdb4394c25e824de0f62628fd5d"
+  },
+  {
+    "path": "evals/results/research-review-2026-10-19/review-page.png",
+    "sha256": "bf5dd0ec082fc78db00258645a6d95dacd08637bd6b0c443122962cb40bc454b"
+  },
+  {
+    "path": "evals/results/upgrade-closeout-debug-2026-10-19/fixed-evidence-error-diagnosis.json",
+    "sha256": "7411b22e927ef10d90f31c05672edeb512affe9cf6a18f93ae1e5c2a74e09e53"
+  },
+  {
+    "path": "evals/results/upgrade-closeout-debug-2026-10-19/fixed-evidence-explicit-final-v1.json",
+    "sha256": "43afa2c86a9271e563956d10e221f1f8594fd2a4c83e797fa2c21760fd23cc03"
+  },
+  {
+    "path": "evals/results/upgrade-closeout-debug-2026-10-19/fixed-evidence-invalid-history.json",
+    "sha256": "c82e0675dc1402734eec40cbc7b73ed33f071b9b3a72c6fc065b1e9c22774442"
+  },
+  {
+    "path": "evals/results/upgrade-closeout-debug-2026-10-19/fixed-evidence-protocol-diagnosis.json",
+    "sha256": "05b69b9f747c7f29a36bfc84bd6382b76e446d809c71d8321e5c5241e077b0e9"
+  },
+  {
+    "path": "evals/results/upgrade-closeout-debug-2026-10-19/fixed-evidence-v1-v3.json",
+    "sha256": "84593a9af3e86c36e610da8030420a9c62f4ddb279ba527b4fbbe4fa1146e1e4"
+  },
+  {
+    "path": "evals/results/upgrade-closeout-debug-2026-10-19/github-v1.json",
+    "sha256": "1da8d8948988583f2ccbb147af8049f8fb15c55573dabf57817fc782cefc43b0"
+  },
+  {
+    "path": "evals/results/upgrade-closeout-debug-2026-10-19/matrix-broad-v3.json",
+    "sha256": "f8134b75a7f2f2a9bc585c643dbf865a43a891898a921eb3d6141170dabb268b"
+  },
+  {
+    "path": "evals/results/upgrade-closeout-debug-2026-10-19/matrix-initial-broad-v3.json",
+    "sha256": "b5de581e48b4dd2039a4edd7a031209563977834945545cab0d299e947f794d0"
+  },
+  {
+    "path": "evals/results/upgrade-closeout-debug-2026-10-19/matrix-mechanism-v3.json",
+    "sha256": "9f8e69d5062664effae74cc1daf0ba3ac51c292205b05b9407181afeaac9e90a"
+  },
+  {
+    "path": "evals/results/upgrade-closeout-debug-2026-10-19/matrix-missing-v3.json",
+    "sha256": "b732484c323bc0ad2b51f1d0231b6be4baf920df1be4069108c1cc7a5b02b11a"
+  },
+  {
+    "path": "evals/results/upgrade-closeout-debug-2026-10-19/synthetic-v1.json",
+    "sha256": "f7f2af393272c2c5a1124609ecad1ce8390f31d1b60295ccda851828d614e49c"
+  },
+  {
+    "path": "evals/results/upgrade-closeout-debug-2026-10-19/synthetic-v2.json",
+    "sha256": "d72df14bd00fad7a0990693483473f4b82070551a0f16afed5804098f2f7bd56"
+  },
+  {
+    "path": "evals/results/upgrade-closeout-debug-2026-10-19/synthetic-v3.json",
+    "sha256": "7c690833467c4b0a1e34a1cbffafdb6c77f0d629f4e8e5c52a4a30b7f1a9b212"
+  },
+  {
+    "path": "evals/tools/baseline.mjs",
+    "sha256": "e2e708a1d39f492b8dc94741589b067782b545112a2dfd928014d9e9a23ffddb"
+  },
+  {
+    "path": "evals/tools/baseline.test.mjs",
+    "sha256": "0c4c848de9b699b94779219f8190bdd4a217d1c21b061f395859dd4a16e1a637"
+  },
+  {
+    "path": "evals/tools/core-report.mjs",
+    "sha256": "a54f438fa921cfb155b1ed5baffbfe0efc5f8521e92656a7caeea747857f03b6"
+  },
+  {
+    "path": "evals/tools/core-report.test.mjs",
+    "sha256": "b6db95bfcb0cc94e3c3daa7d5c1894791178d0f53d60ff420eb3b051402f03a6"
+  },
+  {
+    "path": "evals/tools/README.md",
+    "sha256": "50ac77a1ea8487399adda4937d5ffeafeda511be9f25e1f98824e1fedef4a145"
+  },
+  {
+    "path": "frontend/index.html",
+    "sha256": "e4a0af87e2007ba0ad9d2470bf88d459c4be7b5663d37bcf21ee425d40e49f08"
+  },
+  {
+    "path": "frontend/package-lock.json",
+    "sha256": "579637c4fd124144efeb467b3841d96df4fafa5d3909b28ba3b983e66fc4b0f4"
+  },
+  {
+    "path": "frontend/package.json",
+    "sha256": "381dff0dd5c89222be02ee8ad56794d230cb77e744ab62984c5af986c38e7937"
+  },
+  {
+    "path": "frontend/src/api/.gitkeep",
+    "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "path": "frontend/src/api/client.ts",
+    "sha256": "1d59a6e8738bf9db8d6af7228a9171f524aa7a01d91cbbfa8f9440cef3d755c0"
+  },
+  {
+    "path": "frontend/src/api/contextPilot.ts",
+    "sha256": "cfd854d7fb0a6350bd5177a1f1dbea5f13631fd77cc17e2024d1f798b36d095c"
+  },
+  {
+    "path": "frontend/src/api/projectSources.ts",
+    "sha256": "a1fcf543d37c9b780cd8af9450a455bbdafdacb6b36ba0211641be16b57f1939"
+  },
+  {
+    "path": "frontend/src/api/researchReviews.ts",
+    "sha256": "81c78086698d4860eb6d5c8c3fb5c9d011fd5e35129519f9452f32083207aeda"
+  },
+  {
+    "path": "frontend/src/api/researchTasks.ts",
+    "sha256": "134c51c2fccedfc8dc75531da789f69b9d24a4a3b4c58f20556e6179a916e3d6"
+  },
+  {
+    "path": "frontend/src/api/types.ts",
+    "sha256": "df672ac6e6e59d502ebd2701b536392355d52809c45860e2648a17fef5d1cb09"
+  },
+  {
+    "path": "frontend/src/api/upgradeResearch.ts",
+    "sha256": "be984ebf7118a9a30fdfdc290b20a5eaca92475e9a440bff9a1433fdd7c24314"
+  },
+  {
+    "path": "frontend/src/App.vue",
+    "sha256": "ec7843d8ff8b1507f3b2cce10e6f13da48dec10a92a96394f424222067744e0c"
+  },
+  {
+    "path": "frontend/src/components/.gitkeep",
+    "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "path": "frontend/src/components/ResearchReviewPanel.vue",
+    "sha256": "4e80ab7b99433ab266328b5ac147d1ae2fc14d6657980dd99ea9bcd691d98bdf"
+  },
+  {
+    "path": "frontend/src/composables/.gitkeep",
+    "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "path": "frontend/src/env.d.ts",
+    "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+  },
+  {
+    "path": "frontend/src/main.ts",
+    "sha256": "f5f9a1eb54a1eee5e6762f6821058b024c6bf78d8758030448cb854d2ccdaad7"
+  },
+  {
+    "path": "frontend/src/router/index.ts",
+    "sha256": "40139463cb966f1bd4aa7c4cac732af7004ebc15e8021d542d27d73d1d320559"
+  },
+  {
+    "path": "frontend/src/stores/.gitkeep",
+    "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "path": "frontend/src/styles/base.css",
+    "sha256": "88f54e2c38d537ed9b31e1eca9b40931fb798c1ad7765d67ab642de60b7ae3cb"
+  },
+  {
+    "path": "frontend/src/types/.gitkeep",
+    "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "path": "frontend/src/utils/.gitkeep",
+    "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "path": "frontend/src/utils/markdown.ts",
+    "sha256": "1dce3990b3dc149f981b772762248e883e009936cdcb69f1c13994d306bf6a4d"
+  },
+  {
+    "path": "frontend/src/utils/streamTextRenderer.ts",
+    "sha256": "505fb5ca049b18121d56a2a645bad860a297a033724ff6e1164cd3efc1def45b"
+  },
+  {
+    "path": "frontend/src/views/ChatView.vue",
+    "sha256": "23742b21f8d8309c944336d7bf657afa5e38cd4d09b9391b2c9e3e76fdf10602"
+  },
+  {
+    "path": "frontend/src/views/HomeView.vue",
+    "sha256": "49ae1e412b013012d10931ac2e709bb18638300aaebc0764fe3df4d63a3779df"
+  },
+  {
+    "path": "frontend/src/views/KnowledgeBaseView.vue",
+    "sha256": "f88f3a6532b16b9af7c115f1d3640e753942f30aab027caf71febb25f909ce90"
+  },
+  {
+    "path": "frontend/src/views/MemoryView.vue",
+    "sha256": "3305b626a22ea27a098d41aae179259453e35d73d06485d8442d44b390096d69"
+  },
+  {
+    "path": "frontend/src/views/ProjectSourcesView.vue",
+    "sha256": "fb20711686174b9d76c6e5b470aba7741d88623c918c22f2c3f80c1f47fb1116"
+  },
+  {
+    "path": "frontend/src/views/ResearchTasksView.vue",
+    "sha256": "bcf6806e5d5ac0756182b872b490b0f55e561707ea372837dff72285eecd3b17"
+  },
+  {
+    "path": "frontend/src/views/UpgradeResearchView.vue",
+    "sha256": "4db8c93a28d979c81ed563cb041941250c11c96e9cc2743eb5e91f0323772c4d"
+  },
+  {
+    "path": "frontend/tsconfig.app.json",
+    "sha256": "363e4f5c7fbf0543a5ed8f69b391a98d7e4cbf51c5d040e4674d670b2be0c547"
+  },
+  {
+    "path": "frontend/tsconfig.json",
+    "sha256": "770b4140bbb581e2dfd9ea9946ffc9c75a1d86ba7d2db5f77c83e37cbdf9d808"
+  },
+  {
+    "path": "frontend/tsconfig.node.json",
+    "sha256": "ff7440a65fecba12e327ff590499196f00f37d4a49e48bf6ba550ce58dc84882"
+  },
+  {
+    "path": "frontend/vite.config.ts",
+    "sha256": "f61b724ac88c8809c60ffae67e3804b452619c0251144584c6602abc4b152101"
+  },
+  {
+    "path": "README.md",
+    "sha256": "61c5bc14e1a9b19b01c06540cf8fcf764dcbaa72333e2e5a16d25cba8974ca1d"
+  }
+]

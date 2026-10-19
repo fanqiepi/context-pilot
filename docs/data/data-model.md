@@ -160,3 +160,7 @@ Flyway V17 已实施该扩展。`CREATE_USER_MEMORY` 参数只允许固定类型
 ## 研究成果审查（2026-10-19 已批准）
 
 新增 research_review，保存主体、任务版本与不可变输入快照、独立执行状态、结构化结果、usage、trace 和逻辑删除。幂等键、每快照三次上限与并发门禁由数据库事务保证。详细字段、预算、失败语义和验收合同见[研究成果审查设计](../architecture/research-result-review-design.md)。
+
+## 普通问答拒答持久化（2026-10-19）
+
+V28__persist_chat_refusal.sql 为 chat_message 增加可空 BOOLEAN refused。普通问答模型返回受限协议后，将该值与正文、引用和调用结果在同一事务保存；确定性无依据拒答为 true，确定性直接回答为 false。旧消息、用户消息及未明确分类的消息保留 null，不从旧正文推断或回填。消息生命周期仍使用 COMPLETED/FAILED 等既有状态，拒答是独立的回答语义。

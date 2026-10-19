@@ -346,6 +346,7 @@ export interface ConversationMessage {
   role: ChatMessageRole
   content: string
   status: ChatMessageStatus
+  refused?: boolean | null
   errorSummary: string | null
   traceId: string
   capabilityId: CapabilityId | null

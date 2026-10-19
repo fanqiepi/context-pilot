@@ -46,8 +46,9 @@ class ChatApplicationServiceTests {
                 chatModelGateway);
     }
 
-    @Test
-    void answersFromReliableEvidenceAndPersistsCitation(CapturedOutput output) {
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(booleans = {false, true})
+    void answersFromReliableEvidenceAndPersistsCitation(boolean refused, CapturedOutput output) {
         UUID knowledgeBaseId = UUID.randomUUID();
         PendingChatExchange exchange = exchange();
         UUID documentId = UUID.randomUUID();
@@ -67,7 +68,7 @@ class ChatApplicationServiceTests {
                 "deepseek-v4-flash",
                 30,
                 12,
-                42);
+                42, refused);
 
         when(preparationService.prepare(request, "trace-1")).thenReturn(new PreparedChat(
                 knowledgeRoute("trace-1"),
@@ -83,7 +84,7 @@ class ChatApplicationServiceTests {
 
         ChatAnswerResponse response = service.answer(request, "trace-1");
 
-        assertThat(response.refused()).isFalse();
+        assertThat(response.refused()).isEqualTo(refused);
         assertThat(response.answer()).isEqualTo(modelResult.content());
         assertThat(response.citations()).hasSize(1);
         assertThat(response.citations().getFirst().documentId()).isEqualTo(documentId);
@@ -120,7 +121,7 @@ class ChatApplicationServiceTests {
         assertThat(response.answer()).isEqualTo(ChatApplicationService.INSUFFICIENT_EVIDENCE_ANSWER);
         assertThat(response.citations()).isEmpty();
         assertThat(response.model()).isNull();
-        verify(persistenceService).completeWithoutModel(
+        verify(persistenceService).completeRefusalWithoutModel(
                 exchange.assistantMessageId(), ChatApplicationService.INSUFFICIENT_EVIDENCE_ANSWER);
         verify(chatModelGateway, never()).generate(anyString(), anyString());
     }
