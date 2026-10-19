@@ -298,3 +298,7 @@ message -> route -> action_required -> done(AWAITING_CONFIRMATION)
 ## 项目资料接入（首版已交付）
 
 2026-10-16 用户批准专用只读 MCP 接入固定公开项目资料、不可变预览及独立确认导入知识库。详细边界以 [项目资料接入 API 合同](../architecture/project-source-integration-design.md#api-和页面合同) 为准；首版工程与公开流程验证已通过，证据见 docs/evaluation/project-source-integration-verification.md；独立语义质量评估不包含在本次结论内。
+
+## 研究成果审查（2026-10-19 已批准）
+
+新增任务下 reviews 创建/分页、research-reviews 详情/取消/逻辑删除接口。客户端不提供证据或主体，revision 防止覆盖；补充继续复用用户主动 SUPPLEMENT。详细字段、预算、失败语义和验收合同见[研究成果审查设计](../architecture/research-result-review-design.md)。

@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-19",
+  "baseCommit": "3cfb0c07a431dc81a14b7b7a6cca5f5eb9beb255",
+  "workingTree": "uncommitted research result review implementation",
+  "files": {
+    "evals/cases/research-review-v1.json": "ff36167608ebba5589d0b2aa11c33d37b21f5bf00a7e160db6875ae5b507f2fc",
+    "backend/src/main/resources/prompts/research-review-v1.txt": "7c01d5ce9b2120f2d25e1c2193a24616d4277e8dd7b99eecef264f15f80e21cd"
+  },
+  "requestedModel": "deepseek-v4-flash",
+  "returnedModel": "deepseek-flash",
+  "note": "Public synthetic fixtures; manual inspection by coding assistant, no independent human acceptance or general accuracy claim.",
+  "finalImplementationSha256": {
+    "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewController.java": "1665d8b8b3b6f7a221bdeb673f54f69409ce70ded08dc1c990d39b585c5e1dc5",
+    "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewData.java": "fcfa0d2e9d1157ab00aacd3c5c783207ccc2506326985761dd2cf8121ff65bb5",
+    "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewEntity.java": "b5fb044583efb4e5292b9663b6f9a493520d8e026817d4299743163ef96e53d6",
+    "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewMapper.java": "8d8486cff38124c205b2f4fc42a2a04d2ae234d67e328ea5fc543a70f2a3dc85",
+    "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewModelGateway.java": "1493a885f3f1fceac56c201a1584d1b5d0b3e58aef17396dd1eb5937160eff80",
+    "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewService.java": "c32ae167edfed9282187dfabda5410f3da4336dba8653356f5a65b2d4c458c28",
+    "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewSources.java": "ed4453ccd2d541d1a668fc71206a1946b727c0d4dca4c0fd7b98425be5360186",
+    "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewValidator.java": "6658d75534cbdcf81be6864722b713951573064e7db7d699eef3b6499d9f49ff",
+    "backend/src/main/java/io/github/fanqiepi/contextpilot/researchreview/ReviewWorker.java": "f0d38984d8495b9b84c42b3b65ecefb6adb965de3f39aa43bf44688b95c420f6",
+    "backend/src/main/resources/db/migration/V27__create_research_review.sql": "dc47644016d0d191a5c7b522cca3e7e4e7da79171aa6b3debac92f7c0988b1b3",
+    "backend/src/main/resources/prompts/research-review-v1.txt": "7c01d5ce9b2120f2d25e1c2193a24616d4277e8dd7b99eecef264f15f80e21cd",
+    "backend/src/test/java/io/github/fanqiepi/contextpilot/researchreview/ReviewLiveTests.java": "dbe33d0576b8a24b6ba51d3b18d456e71d192fbc95bb3b3d701ad24b6bcb521b",
+    "backend/src/test/java/io/github/fanqiepi/contextpilot/researchreview/ReviewModelGatewayTests.java": "93b1c7b166e14fb67be073f2f94b064134835d67c970c63560c1af72497f39c6",
+    "backend/src/test/java/io/github/fanqiepi/contextpilot/researchreview/ReviewPersistenceTests.java": "3ffa93a9fedcd68a626b871f546f29d17e47f2ddbec2e80e8a9261df98b6c605",
+    "backend/src/test/java/io/github/fanqiepi/contextpilot/researchreview/ReviewValidatorTests.java": "5813af3b140013cde825f5c5d19623e393881e26678b648a4b0678dcb9be518b",
+    "evals/cases/research-review-v1.json": "ff36167608ebba5589d0b2aa11c33d37b21f5bf00a7e160db6875ae5b507f2fc",
+    "frontend/src/api/researchReviews.ts": "81c78086698d4860eb6d5c8c3fb5c9d011fd5e35129519f9452f32083207aeda",
+    "frontend/src/components/ResearchReviewPanel.vue": "4e80ab7b99433ab266328b5ac147d1ae2fc14d6657980dd99ea9bcd691d98bdf",
+    "frontend/src/views/ResearchTasksView.vue": "bcf6806e5d5ac0756182b872b490b0f55e561707ea372837dff72285eecd3b17"
+  },
+  "batches": {
+    "initial": "live-results.json (initial default HTTP transport)",
+    "final": "final-live-results.json (explicit JDK HTTP transport, 10s connect / 90s read)"
+  },
+  "finalFocusedTests": {
+    "tests": 19,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "providerCalls": 8
+  }
+}

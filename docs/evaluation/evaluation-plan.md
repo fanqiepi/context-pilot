@@ -166,3 +166,7 @@ Slice 7 如果不能证明当前生产注入保持上述收益，或发现 groun
 ## 项目资料接入（首版已交付）
 
 2026-10-16 用户批准专用只读 MCP 接入固定公开项目资料、不可变预览及独立确认导入知识库。详细边界以 [项目资料接入验证合同](../architecture/project-source-integration-design.md#必要验证和交付) 为准；首版工程与公开流程验证已通过，证据见 docs/evaluation/project-source-integration-verification.md；独立语义质量评估不包含在本次结论内。
+
+## 研究成果审查（2026-10-19 已批准）
+
+冻结结构、安全、并发、生命周期和公开模型四类案例；真实 PostgreSQL 验证事务和恢复，单独记录真实模型流程与人工语义观察，不以模型自评替代验收。详细字段、预算、失败语义和验收合同见[研究成果审查设计](../architecture/research-result-review-design.md)。

@@ -156,3 +156,7 @@ Flyway V17 已实施该扩展。`CREATE_USER_MEMORY` 参数只允许固定类型
 ## 项目资料接入（首版已交付）
 
 2026-10-16 用户批准专用只读 MCP 接入固定公开项目资料、不可变预览及独立确认导入知识库。详细边界以 [项目资料接入数据合同](../architecture/project-source-integration-design.md#数据合同) 为准；首版工程与公开流程验证已通过，证据见 docs/evaluation/project-source-integration-verification.md；独立语义质量评估不包含在本次结论内。
+
+## 研究成果审查（2026-10-19 已批准）
+
+新增 research_review，保存主体、任务版本与不可变输入快照、独立执行状态、结构化结果、usage、trace 和逻辑删除。幂等键、每快照三次上限与并发门禁由数据库事务保证。详细字段、预算、失败语义和验收合同见[研究成果审查设计](../architecture/research-result-review-design.md)。

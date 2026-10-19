@@ -119,3 +119,7 @@ V6 若需写入，应单列为进行中：**“实现基于 Spring AI 原生工�
 ## 项目资料接入首版
 
 固定 Spring AI 公开仓库的版本化 TXT/Markdown 经专用只读 MCP 预览，用户独立确认后整批导入知识库；来源可追溯到 commit、路径、内容哈希和获取时间，处理成功后进入研究工作台。已通过工程回归、公开真实流程和代表页面验证；独立语义质量未作百分比声明。见[验证记录](../evaluation/project-source-integration-verification.md)和[运行指南](project-source-integration.md)。不支持通用 MCP 工具、任意仓库或外部写操作。
+
+## 研究成果审查（2026-10-19）
+
+用户已批准[研究成果审查合同](../architecture/research-result-review-design.md)。首版实现工作台已完成结果的不可变审查快照、固定一次模型审查、证据对照、历史、取消与用户编辑补充闭环；无多 Agent、自动修订或自动保存。验证进度见[验证记录](../evaluation/research-result-review-verification.md)，当前不宣称独立语义质量验收。

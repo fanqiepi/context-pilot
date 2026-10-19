@@ -117,3 +117,7 @@ The user requested implementation along the discussed technical roadmap on 2026-
 ## Project source integration authorization
 
 On 2026-10-16 the user explicitly approved docs/architecture/project-source-integration-design.md (按这个方案开发). Implement the full Project Source Integration contract: a dedicated read-only MCP client/server for the fixed public spring-projects/spring-ai repository, immutable TXT/Markdown previews, and the user-initiated, independently confirmed IMPORT_PROJECT_DOCUMENTS action. This is a scoped exception to the earlier MCP exclusion. Preserve all existing baselines and all other exclusions. Implementation checkpoints do not require repeated authorization.
+
+## Research result review authorization
+
+On 2026-10-19 the user explicitly approved docs/architecture/research-result-review-design.md (确认完毕，可以开始任务). Implement evidence review for completed task-workspace snapshots, one bounded independent model call, persistent review history and user-edited supplement handoff. No multi-agent runtime, additional tools, automatic revisions or report saving. Preserve existing contracts; implementation checkpoints do not require repeated approval.

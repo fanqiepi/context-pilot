@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import ResearchReviewPanel from '@/components/ResearchReviewPanel.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { listKnowledgeBases, listDocuments } from '@/api/contextPilot'
 import { errorMessage } from '@/api/client'
@@ -164,6 +165,7 @@ onUnmounted(() => { disposed = true; ++selection; clearTimeout(timer) })
             <section v-if="displayed.evidence.length"><h3>引用依据</h3><details v-for="e in displayed.evidence" :key="e.id"><summary>[{{ e.id }}] {{ e.filename }} <span v-if="e.page">· 第 {{ e.page }} 页</span></summary><p class="excerpt">{{ e.text }}</p></details></section>
             <section v-if="displayed.calls.length"><h3>模型调用</h3><p v-for="(call, i) in displayed.calls" :key="i" class="helper">{{ call.phase === 'PLANNING' ? '计划' : '综合' }} · {{ call.status }} · {{ call.model ?? '模型信息待返回' }} · {{ call.totalTokens ?? '未知' }} tokens</p></section>
           </template>
+          <ResearchReviewPanel :key="selected.id" :task="selected" :historical="!!historical" @supplement="supplement = $event" />
           <section v-if="canSupplement" class="supplement"><h3>补充条件，继续研究</h3><el-input v-model="supplement" aria-label="补充条件" type="textarea" :rows="3" :maxlength="2000" show-word-limit placeholder="回答澄清问题，或补充新的约束。系统会保留历史，生成新一轮计划。" /><el-button type="primary" :disabled="busy || !supplement.trim()" @click="command('SUPPLEMENT')">补充并重新规划</el-button></section>
           <section v-if="events.length"><h3>任务历史</h3><p v-if="historyTruncated" class="helper">仅展示最近 100 个检查点。</p><div class="history"><button v-for="event in events" :key="event.id" @click="showSnapshot(event)">#{{ event.revision }} · {{ event.kind }} · {{ new Date(event.createdAt).toLocaleString() }}</button></div></section>
           <p class="trace">追踪编号：{{ selected.state.traceId }}</p>

@@ -139,3 +139,7 @@ V5 详细合同见 [V5 显式记忆的个人助手详细设计](v5-explicit-memo
 ## 项目资料接入（首版已交付）
 
 2026-10-16 用户批准专用只读 MCP 接入固定公开项目资料、不可变预览及独立确认导入知识库。详细边界以 [项目资料接入设计](project-source-integration-design.md) 为准；首版工程与公开流程验证已通过，证据见 docs/evaluation/project-source-integration-verification.md；独立语义质量评估不包含在本次结论内。
+
+## 研究成果审查（2026-10-19 已批准）
+
+新增 researchreview 模块，固定快照校验、引用检查、一次模型审查、结构校验和持久化；有界执行器、执行令牌和重启失败收敛，不改变原任务结果。详细字段、预算、失败语义和验收合同见[研究成果审查设计](../architecture/research-result-review-design.md)。

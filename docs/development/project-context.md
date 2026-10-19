@@ -16,7 +16,8 @@
 | 升级影响研究 | 首版已实现但质量验收未通过；新建研究默认关闭，本地显式开启 | [设计](../architecture/v6-upgrade-research-design.md)、[实现记录](../evaluation/v6-implementation-review.md) |
 | 研究任务工作台 | 已实现有限规划、检查点与补充继续；工程和公开样例验证见记录 | [设计](../architecture/research-task-workspace-design.md)、[验证](../evaluation/research-task-workspace-verification.md) |
 | 项目资料接入 | 首版已交付，工程与公开流程验证通过 | [设计](../architecture/project-source-integration-design.md)、[验证](../evaluation/project-source-integration-verification.md) |
-| 研究审查、检索优化 | 后续候选 | [唯一详细路线](../requirements/product-requirements.md) |
+| 研究成果审查 | 首版已实现，工程与公开流程验证通过 | [设计](../architecture/research-result-review-design.md)、[验证](../evaluation/research-result-review-verification.md) |
+| 检索优化 | 后续候选 | [唯一详细路线](../requirements/product-requirements.md) |
 
 统一 50 项核心任务已冻结，完整执行、V6 最终验收及展示交付尚未完成。待办和功能状态在[功能清单](feature-inventory.md)维护；测试次数及实际成绩以验收报告为准，不在本文重复登记。
 
