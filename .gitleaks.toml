@@ -1,0 +1,17 @@
+title = "ContextPilot secret scanning"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+
+  [[rules.allowlists]]
+  description = "Verified Java source SHA-256 fingerprints in public evaluation JSON; not API credentials"
+  condition = "AND"
+  paths = ['''^evals/results/[^\r\n]+\.json$''']
+  regexTarget = "line"
+  regexes = [
+    '''^\s*"src/main/java/io/github/fanqiepi/contextpilot/common/ApiErrorResponse\.java"\s*:\s*"7cd8c0535d84a9c2d7254115a2f11b1efe23d92599cbeaf8e62d7fbf92618596",?\s*$''',
+    '''^\s*"src/main/java/io/github/fanqiepi/contextpilot/common/openapi/OpenApiConfiguration\.java"\s*:\s*"21f5e6c21c10edc7c6650fdb1764886cc09ac121d629df27dce7a8a95446cb60",?\s*$''',
+  ]
