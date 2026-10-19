@@ -1,0 +1,73 @@
+{
+  "mode": "DEBUG_STRUCTURAL_OBSERVATIONS_NOT_HUMAN_SCORING",
+  "rows": [
+    {
+      "file": "fixed-evidence-envelope-v3.json",
+      "case": "BROAD",
+      "status": "OBSERVED",
+      "jsonValid": true,
+      "exactFields": true,
+      "answerCharacters": 585,
+      "missingEvidence": [
+        "问题中要求的旧客户端在空优先级映射为 normal 后是否仍保持 FIFO 调度顺序缺少依据；所选材料只说明两级优先队列和默认映射，未说明同级队列的排序规则 [L1][R1]。"
+      ],
+      "latencyMs": 10670
+    },
+    {
+      "file": "fixed-evidence-envelope-v3.json",
+      "case": "MECHANISM",
+      "status": "OBSERVED",
+      "jsonValid": true,
+      "exactFields": true,
+      "answerCharacters": 591,
+      "missingEvidence": [],
+      "latencyMs": 6423
+    },
+    {
+      "file": "fixed-evidence-envelope-v3.json",
+      "case": "MISSING",
+      "status": "OBSERVED",
+      "jsonValid": true,
+      "exactFields": true,
+      "answerCharacters": 633,
+      "missingEvidence": [
+        "问题中要求的故障后恢复时间缺少所选发布记录中的依据。"
+      ],
+      "latencyMs": 5283
+    },
+    {
+      "file": "fixed-evidence-history-control-v3.json",
+      "case": "BROAD",
+      "status": "OBSERVED",
+      "jsonValid": true,
+      "exactFields": true,
+      "answerCharacters": 691,
+      "missingEvidence": [
+        "问题中要求的旧客户端兼容性缺少新优先队列在空优先级映射为 normal 后是否保持旧 FIFO 处理顺序的依据。"
+      ],
+      "latencyMs": 5124
+    },
+    {
+      "file": "fixed-evidence-history-control-v3.json",
+      "case": "MECHANISM",
+      "status": "OBSERVED",
+      "jsonValid": true,
+      "exactFields": true,
+      "answerCharacters": 797,
+      "missingEvidence": [],
+      "latencyMs": 4408
+    },
+    {
+      "file": "fixed-evidence-history-control-v3.json",
+      "case": "MISSING",
+      "status": "OBSERVED",
+      "jsonValid": true,
+      "exactFields": true,
+      "answerCharacters": 816,
+      "missingEvidence": [
+        "问题中要求的故障后承诺恢复时间缺少所选发布记录中的恢复时间指标或承诺依据。"
+      ],
+      "latencyMs": 7693
+    }
+  ]
+}

@@ -33,6 +33,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         "spring.ai.vectorstore.type=none",
         "contextpilot.document.processing.enabled=false"
 })
+@org.springframework.test.annotation.DirtiesContext(classMode = org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS)
 @Testcontainers(disabledWithoutDocker = true)
 class ResearchStartPersistenceTests {
     private static final DockerImageName PGVECTOR_IMAGE = DockerImageName

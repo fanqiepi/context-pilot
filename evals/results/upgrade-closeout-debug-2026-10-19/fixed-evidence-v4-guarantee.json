@@ -1,0 +1,49 @@
+{
+  "mode" : "MODEL_FIXED_EVIDENCE_DEBUG_NOT_PRODUCTION_ACCEPTANCE",
+  "startedAt" : "2026-10-19T17:00:36.278710100+08:00",
+  "humanReview" : "NOT_REVIEWED",
+  "evidenceEnvelope" : false,
+  "stageInstruction" : true,
+  "explicitFinalInstruction" : false,
+  "evidence" : [ {
+    "sourceId" : "L1",
+    "untrusted" : true,
+    "sourceType" : "LOCAL",
+    "documentId" : "5a32235b-c37b-4e73-a293-10b60418bc31",
+    "excerpt" : "# 调试旧方案（公开合成）\n\n## scheduling\n旧工作进程按 FIFO 调度，不支持任务优先级。\n",
+    "chunkId" : "debug-fixed-1",
+    "truncated" : false
+  }, {
+    "sourceType" : "RELEASE",
+    "untrusted" : true,
+    "truncated" : false,
+    "tag" : "debug-release",
+    "sourceId" : "R1",
+    "excerpt" : "# 调试发布记录（公开合成，非真实发布）\n\n## scheduling\n调试新版引入两级优先队列，空优先级映射为 normal；不改变任务结果格式。\n"
+  } ],
+  "harnessSha256" : "49ca5094dad513fcb2c9c523215b238375c98f40e6443cb2e78b919350242372",
+  "results" : [ {
+    "prompt" : "upgrade-research-v4",
+    "debugCase" : "GUARANTEE",
+    "question" : "请说明已知兼容机制，并明确确认新版 normal 队列是否保证旧客户端任务仍按原 FIFO 顺序执行。缺少保证依据时列为资料缺口，不推测保序。",
+    "promptSha256" : "256046c76e9ab097b80f7fe62178380fc7cd7443475eefcef999849d41a0365f",
+    "rawAnswer" : "{\"answer\":\"## 结论\\n\\n**不能确认新版 normal 队列仍保证旧客户端任务按原 FIFO 顺序执行。** 现有证据只能说明兼容接入机制，没有说明排序保证。\\n\\n已知兼容机制包括：\\n\\n1. 新版引入两级优先队列；旧客户端未提供优先级时，空优先级映射为 normal，使无优先级任务有明确的入队类别。[R1]\\n2. 新版“不改变任务结果格式”，这是结果格式层面的兼容信息。[R1]\\n3. 旧方案中的旧工作进程原本按 FIFO 调度，且不支持任务优先级。[L1]\\n\\n但发布记录仅说明空优先级映射为 normal，并未承诺 normal 队列内部按 FIFO 出队，也未承诺旧客户端任务保持原有顺序。[R1] 因此，可以说明“空优先级映射”和“结果格式不变”这两项机制，但不能把 FIFO 保序列为已确认兼容保证。\\n\\n## 升级影响\\n\\n- 调度模型由旧方案的单一 FIFO、无优先级，变为新版的两级优先队列。[L1][R1]\\n- 对未设置优先级的旧客户端，其任务会被归入 normal，但该类别内部及与其他优先级任务之间的实际排序影响，材料未说明。[R1]\\n- 已有证据仅涉及结果格式不变，不涉及执行先后顺序不变。[R1]\\n\\n## 迁移清单\\n\\n建议核对：旧客户端是否存在未设置优先级的任务，并确认其按空优先级映射进入 normal。[R1] 这只是依据发布记录给出的核对项，不代表已经执行迁移。\\n\\n## 验证清单\\n\\n建议验证（尚未执行）：\\n\\n- 构造多个未设置优先级的旧客户端任务，观察 normal 队列的实际出队顺序是否与入队顺序一致。\\n- 核对 normal 队列的实现文档或配置，确认其排序规则。\\n- 单独验证任务结果格式仍符合旧客户端预期。[R1]\\n\\n## 资料缺口\\n\\n发布记录没有给出 normal 队列的排序规则，也没有给出“旧客户端任务保序”的兼容承诺或验收标准；因此该保序问题目前不能下结论。[R1]\\n\\n## 范围说明\\n\\n材料没有承诺 normal 队列保持 FIFO；这不表示已经验证顺序会改变。未选中的中间版本不在本次覆盖范围内。\",\"missingEvidence\":[\"发布记录未说明 normal 队列内部的出队排序规则，无法确认其是否为 FIFO。[R1]\",\"发布记录未提供旧客户端任务在 normal 队列中保持原有执行顺序的明确兼容承诺或验收标准。[R1]\"]}",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 1155,
+      "completionTokens" : 1419,
+      "totalTokens" : 2574,
+      "nativeUsage" : {
+        "completion_tokens" : 1419,
+        "prompt_tokens" : 1155,
+        "total_tokens" : 2574,
+        "prompt_tokens_details" : {
+          "cached_tokens" : 512
+        }
+      }
+    },
+    "status" : "OBSERVED",
+    "latencyMs" : 9045
+  } ],
+  "finishedAt" : "2026-10-19T17:00:45.564548600+08:00"
+}

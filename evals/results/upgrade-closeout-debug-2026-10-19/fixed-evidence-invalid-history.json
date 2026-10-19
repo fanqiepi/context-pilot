@@ -1,0 +1,72 @@
+{
+  "mode" : "MODEL_FIXED_EVIDENCE_DEBUG_NOT_PRODUCTION_ACCEPTANCE",
+  "startedAt" : "2026-10-19T16:28:19.202807+08:00",
+  "humanReview" : "NOT_REVIEWED",
+  "evidence" : [ {
+    "chunkId" : "debug-fixed-1",
+    "excerpt" : "# 调试旧方案（公开合成）\n\n## scheduling\n旧工作进程按 FIFO 调度，不支持任务优先级。\n",
+    "documentId" : "5a32235b-c37b-4e73-a293-10b60418bc31",
+    "sourceType" : "LOCAL",
+    "untrusted" : true,
+    "sourceId" : "L1",
+    "truncated" : false
+  }, {
+    "sourceId" : "R1",
+    "tag" : "debug-release",
+    "truncated" : false,
+    "untrusted" : true,
+    "sourceType" : "RELEASE",
+    "excerpt" : "# 调试发布记录（公开合成，非真实发布）\n\n## scheduling\n调试新版引入两级优先队列，空优先级映射为 normal；不改变任务结果格式。\n"
+  } ],
+  "harnessSha256" : "2f11d0c3fbe428285bc21e75ffe5da6e6361b5db4ec30a0648e8812550becacf",
+  "results" : [ {
+    "prompt" : "upgrade-research-v1",
+    "debugCase" : "BROAD",
+    "question" : "新调度方案如何兼容旧客户端？",
+    "promptSha256" : "f7438289d7ca47767288b38c1b6db85f34886242babcd53473f8792f1638a1ae",
+    "status" : "FAILED",
+    "errorType" : "ExecutionException",
+    "latencyMs" : 930
+  }, {
+    "prompt" : "upgrade-research-v1",
+    "debugCase" : "MECHANISM",
+    "question" : "请根据旧方案和所选发布记录，只回答两个兼容机制：旧客户端不传优先级时如何处理，以及任务结果格式是否变化。不要求完整部署方案或保证所有旧行为不变。",
+    "promptSha256" : "f7438289d7ca47767288b38c1b6db85f34886242babcd53473f8792f1638a1ae",
+    "status" : "FAILED",
+    "errorType" : "ExecutionException",
+    "latencyMs" : 314
+  }, {
+    "prompt" : "upgrade-research-v1",
+    "debugCase" : "MISSING",
+    "question" : "请根据旧方案和所选发布记录，说明优先级缺省与结果格式的兼容变化，并给出新版在故障后承诺的恢复时间。没有恢复时间依据时明确列为缺口，不推测数值。",
+    "promptSha256" : "f7438289d7ca47767288b38c1b6db85f34886242babcd53473f8792f1638a1ae",
+    "status" : "FAILED",
+    "errorType" : "ExecutionException",
+    "latencyMs" : 137
+  }, {
+    "prompt" : "upgrade-research-v3",
+    "debugCase" : "BROAD",
+    "question" : "新调度方案如何兼容旧客户端？",
+    "promptSha256" : "f7c7a74387852c9fe2b95220c4ba343a761197e1b7d9472bfc8f50027481045d",
+    "status" : "FAILED",
+    "errorType" : "ExecutionException",
+    "latencyMs" : 320
+  }, {
+    "prompt" : "upgrade-research-v3",
+    "debugCase" : "MECHANISM",
+    "question" : "请根据旧方案和所选发布记录，只回答两个兼容机制：旧客户端不传优先级时如何处理，以及任务结果格式是否变化。不要求完整部署方案或保证所有旧行为不变。",
+    "promptSha256" : "f7c7a74387852c9fe2b95220c4ba343a761197e1b7d9472bfc8f50027481045d",
+    "status" : "FAILED",
+    "errorType" : "ExecutionException",
+    "latencyMs" : 99
+  }, {
+    "prompt" : "upgrade-research-v3",
+    "debugCase" : "MISSING",
+    "question" : "请根据旧方案和所选发布记录，说明优先级缺省与结果格式的兼容变化，并给出新版在故障后承诺的恢复时间。没有恢复时间依据时明确列为缺口，不推测数值。",
+    "promptSha256" : "f7c7a74387852c9fe2b95220c4ba343a761197e1b7d9472bfc8f50027481045d",
+    "status" : "FAILED",
+    "errorType" : "ExecutionException",
+    "latencyMs" : 82
+  } ],
+  "finishedAt" : "2026-10-19T16:28:21.395889600+08:00"
+}

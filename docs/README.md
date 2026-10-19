@@ -1,4 +1,9 @@
-# ContextPilot 文档导航
+# 研序 文档导航
+
+- [研究任务工作台设计](architecture/research-task-workspace-design.md)：有限规划、澄清、执行与检查点恢复。
+- [研究任务工作台验证](evaluation/research-task-workspace-verification.md)：工程回归、真实模型与页面证据及质量边界。
+- [项目资料接入设计](architecture/project-source-integration-design.md)：已授权的固定项目资料读取与确认导入合同。
+- [研究成果审查设计](architecture/research-result-review-design.md)：已批准功能的范围、数据/API、失败语义和验证合同。
 
 按用途查阅；当前状态看功能清单，未来范围看产品需求，验收结论看版本报告。
 
@@ -9,6 +14,7 @@
 | [项目首页](../README.md) | 项目介绍与启动入口 |
 | [项目背景](development/project-context.md) | 新会话必读：当前状态和开发边界 |
 | [功能清单与简历素材](development/feature-inventory.md) | 固定编号的能力清单、证据、待办及对外表述 |
+| [一页技术复盘](development/technical-retrospective.md) | 核心取舍、收尾发现与可核查的成果边界 |
 | [本地开发](development/local-development.md) | 环境、配置、启动、验证和日志排查 |
 | [仓库规则](../AGENTS.md) | 开发约定、授权范围与安全要求 |
 
@@ -28,6 +34,10 @@
 - [评估执行入口](../evals/README.md)：数据、语料、运行方式和逐次报告；[统一基线工具](../evals/tools/README.md)。
 - 已验收：[V2](evaluation/v2-acceptance-report.md)、[V3](evaluation/v3-acceptance-report.md)、[V4 第一阶段](evaluation/v4-implementation-acceptance-report.md)、[V5 第一阶段](evaluation/v5-acceptance-report.md)。
 - 未通过验收：[V6 实现验证与剩余问题](evaluation/v6-implementation-review.md)。
+- [升级研究生命周期证据映射](evaluation/upgrade-lifecycle-evidence.md)：22 项合同对应的测试、复现方式与尚未补齐的直接证据。
+- [统一核心任务首次实跑](evaluation/core-workspace-first-run.md)：50 项原始观测、待人工复核材料与状态差异。
+- [升级研究范围调试](evaluation/upgrade-scope-debug.md)：独立资料上的失败对照与尚未采用的 Prompt 候选。
+- [收尾工程回归](evaluation/closeout-engineering-regression.md)：状态修复后的全量打包、测试退出修复与条件跳过范围。
 
 ## 历史档案
 
@@ -45,3 +55,9 @@
 | `archive/` | 带日期的历史规划或审阅快照 |
 
 概览文档用摘要和链接引用详细合同，不重复复制版本过程或测试数字。修改行为时同步其所属设计及功能清单；历史证据不改写为当前结果。接口字段需核对 OpenAPI，已实施数据库结构需核对 Flyway；出现冲突应记录并明确处理，不能静默选择。根目录被 Git 忽略的早期本地规划笔记不属于正式文档，也不是构建或开发前提。
+
+- [项目资料接入运行指南](development/project-source-integration.md)：启动、确认导入与公开研究演示。
+- [项目资料接入验证](evaluation/project-source-integration-verification.md)：首版工程与公开流程证据。
+
+- [研究成果审查运行指南](development/research-result-review.md)：启动、审查与补充继续。
+- [研究成果审查验证](evaluation/research-result-review-verification.md)：工程、公开模型与页面证据及限制。

@@ -43,6 +43,7 @@ public class ActionParametersCodec {
             throw new IllegalStateException("Persisted action parameters must not be blank");
         }
         Class<? extends ActionParameters> parameterType = switch (actionType) {
+            case IMPORT_PROJECT_DOCUMENTS -> ImportProjectDocumentsActionParameters.class;
             case CREATE_KNOWLEDGE_BASE -> CreateKnowledgeBaseActionParameters.class;
             case RETRY_DOCUMENT_PROCESSING -> RetryDocumentProcessingActionParameters.class;
             case REINDEX_DOCUMENT -> ReindexDocumentActionParameters.class;

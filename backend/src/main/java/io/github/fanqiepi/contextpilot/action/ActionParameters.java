@@ -7,7 +7,8 @@ public sealed interface ActionParameters permits
         RetryDocumentProcessingActionParameters,
         ReindexDocumentActionParameters,
         CreateUserMemoryActionParameters,
-        SaveResearchReportActionParameters {
+        SaveResearchReportActionParameters,
+        ImportProjectDocumentsActionParameters {
 
     @JsonIgnore
     ActionType actionType();

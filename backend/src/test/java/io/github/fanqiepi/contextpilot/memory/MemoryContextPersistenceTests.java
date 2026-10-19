@@ -37,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "spring.ai.model.embedding=none",
         "spring.ai.vectorstore.type=none"
 })
+@org.springframework.test.annotation.DirtiesContext(classMode = org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS)
 @Testcontainers(disabledWithoutDocker = true)
 @Transactional
 class MemoryContextPersistenceTests {
@@ -66,6 +67,29 @@ class MemoryContextPersistenceTests {
     @Autowired private MessageMemoryContextMapper messageMemoryContextMapper;
     @Autowired private ConversationHistoryService conversationHistoryService;
     @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired private io.github.fanqiepi.contextpilot.chat.ChatPersistenceService chatPersistenceService;
+
+    @Test
+    void preservesUnknownHistoryAndPersistsExplicitRefusalDisposition() {
+        Exchange historical = createExchange();
+        assertThat(chatMessageMapper.selectById(historical.assistantMessageId()).getRefused()).isNull();
+        for (boolean refused : new boolean[]{false, true}) {
+            Exchange exchange = createExchange();
+            UUID call = chatPersistenceService.beginModelCall(exchange.assistantMessageId(),
+                    "TEST", "fixture", "v3", "trace-refusal");
+            chatPersistenceService.completeSuccess(exchange.assistantMessageId(), call, "Solstice fixture",
+                    List.of(), new io.github.fanqiepi.contextpilot.model.ChatModelResult(
+                            "Solstice fixture", "fixture", 1, 1, 2, refused), 1);
+            assertThat(chatMessageMapper.selectById(exchange.assistantMessageId()).getRefused()).isEqualTo(refused);
+            assertThat(conversationHistoryService.messages(exchange.conversationId()).stream()
+                    .filter(message -> message.id().equals(exchange.assistantMessageId())).findFirst().orElseThrow().refused())
+                    .isEqualTo(refused);
+        }
+        Exchange deterministic = createExchange();
+        chatPersistenceService.completeRefusalWithoutModel(deterministic.assistantMessageId(), "Insufficient evidence");
+        assertThat(chatMessageMapper.selectById(deterministic.assistantMessageId()).getRefused()).isTrue();
+        assertThat(chatMessageMapper.selectById(historical.assistantMessageId()).getRefused()).isNull();
+    }
 
     @Test
     void recordsOnlyTheStableActiveContextWithinBothBudgets() {

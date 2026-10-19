@@ -1,0 +1,38 @@
+
+> contextpilot-frontend@0.0.1 build
+> vue-tsc -b && vite build
+
+vite v8.1.5 building client environment for production...
+[2K
+transforming...✓ 1687 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                      0.84 kB │ gzip:   0.45 kB
+dist/assets/ProjectSourcesView-DxyJCaik.css          1.04 kB │ gzip:   0.49 kB
+dist/assets/UpgradeResearchView-DPqv2kau.css         2.39 kB │ gzip:   0.77 kB
+dist/assets/MemoryView-_IOSAHCm.css                  2.95 kB │ gzip:   0.83 kB
+dist/assets/KnowledgeBaseView-Q9s5Y9g8.css           3.62 kB │ gzip:   1.08 kB
+dist/assets/ResearchTasksView-DU3LQvv-.css           4.04 kB │ gzip:   1.08 kB
+dist/assets/ChatView-BATA92o_.css                   17.13 kB │ gzip:   3.57 kB
+dist/assets/index-C5MQ8R4F.css                     360.93 kB │ gzip:  49.09 kB
+dist/assets/projectSources-Dm_9f5pX.js               0.83 kB │ gzip:   0.32 kB
+dist/assets/ProjectSourcesView-2Hf-lY0D.js           8.00 kB │ gzip:   3.55 kB
+dist/assets/MemoryView-B0ajV97A.js                   8.59 kB │ gzip:   3.56 kB
+dist/assets/KnowledgeBaseView-C4zj3HOQ.js           11.39 kB │ gzip:   4.68 kB
+dist/assets/UpgradeResearchView-CRNbkweN.js         13.45 kB │ gzip:   5.51 kB
+dist/assets/ResearchTasksView-CCdkqfJk.js           19.18 kB │ gzip:   6.87 kB
+dist/assets/vue-router-BzW3Y3Zl.js                  24.77 kB │ gzip:   9.58 kB
+dist/assets/ChatView-BegmyFV0.js                    25.79 kB │ gzip:   9.28 kB
+dist/assets/_plugin-vue_export-helper-CIqqS2XS.js   55.77 kB │ gzip:  20.76 kB
+dist/assets/message-box-lYuC-8eN.js                 59.99 kB │ gzip:  21.02 kB
+dist/assets/message-D8bE26EI.js                     68.34 kB │ gzip:  24.18 kB
+dist/assets/markdown-DuLtxEPF.js                    71.60 kB │ gzip:  24.08 kB
+dist/assets/runtime-dom.esm-bundler-CBHs0A95.js     82.79 kB │ gzip:  32.31 kB
+dist/assets/index-Z9Dgejlg.js                      769.22 kB │ gzip: 243.31 kB
+
+✓ built in 871ms
+[plugin builtin:vite-reporter]
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

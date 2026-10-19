@@ -1,0 +1,15 @@
+[ERROR] COMPILATION ERROR : 
+[ERROR] /F:/development/project/ContextPilot/backend/src/test/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeFreshAcceptanceLiveTests.java:[26,2] �Ҳ�������
+  ����: �� DirtiesContext
+[ERROR] /F:/development/project/ContextPilot/backend/src/test/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeFreshAcceptanceLiveTests.java:[26,41] �����DirtiesContext������
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.15.0:testCompile (default-testCompile) on project contextpilot-backend: Compilation failure: Compilation failure: 
+[ERROR] /F:/development/project/ContextPilot/backend/src/test/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeFreshAcceptanceLiveTests.java:[26,2] �Ҳ�������
+[ERROR]   ����: �� DirtiesContext
+[ERROR] /F:/development/project/ContextPilot/backend/src/test/java/io/github/fanqiepi/contextpilot/upgraderesearch/UpgradeFreshAcceptanceLiveTests.java:[26,41] �����DirtiesContext������
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

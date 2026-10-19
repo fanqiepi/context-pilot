@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 class SimpleChatReplyPolicy {
 
     static final String IDENTITY_REPLY =
-            "我是 ContextPilot，一个基于所选知识库回答问题的资料助手。"
+            "我是 研序，一个基于所选知识库回答问题的资料助手。"
                     + "我可以帮助你检索文档、总结内容，并提供可核对的引用。";
     static final String GREETING_REPLY =
-            "你好，我是 ContextPilot。你可以选择一个知识库，向我询问其中的内容。";
+            "你好，我是 研序。你可以选择一个知识库，向我询问其中的内容。";
     static final String CAPABILITY_REPLY =
             "我可以基于当前选择的知识库回答问题、总结资料并提供引用。"
                     + "知识库之外的事实性问题我不会直接回答。";

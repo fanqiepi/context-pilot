@@ -15,6 +15,7 @@ import {
   uploadDocument,
 } from '@/api/contextPilot'
 import { errorMessage } from '@/api/client'
+import { documentOrigin, type ProjectOrigin } from '@/api/projectSources'
 import type {
   DocumentStatus,
   EmbeddingIndexCompatibility,
@@ -24,6 +25,15 @@ import type {
 } from '@/api/types'
 
 const router = useRouter()
+const originVisible = ref(false)
+const originLoading = ref(false)
+const origin = ref<ProjectOrigin | null>(null)
+async function showOrigin(document: SourceDocument) {
+  origin.value = null; originVisible.value = true; originLoading.value = true
+  try { origin.value = await documentOrigin(document.id) }
+  catch (error) { originVisible.value = false; ElMessage.error(errorMessage(error)) }
+  finally { originLoading.value = false }
+}
 const knowledgeBases = ref<KnowledgeBase[]>([])
 const activeKnowledgeBaseId = ref('')
 const documents = ref<SourceDocument[]>([])
@@ -414,6 +424,7 @@ function formatDate(value: string): string {
                   </p>
                 </div>
                 <div class="document-actions">
+                  <ElButton text @click="showOrigin(document)">来源</ElButton>
                   <ElButton
                     v-if="document.status === 'FAILED'"
                     text
@@ -467,7 +478,7 @@ function formatDate(value: string): string {
             v-model="knowledgeForm.name"
             maxlength="100"
             show-word-limit
-            placeholder="例如：ContextPilot 项目资料"
+            placeholder="例如：研序 项目资料"
           />
         </ElFormItem>
         <ElFormItem label="描述">
@@ -487,6 +498,16 @@ function formatDate(value: string): string {
           保存
         </ElButton>
       </template>
+    </ElDialog>
+    <ElDialog v-model="originVisible" title="文档来源" width="min(640px, 92vw)">
+      <p v-if="originLoading">正在读取来源…</p>
+      <div v-else-if="origin" style="overflow-wrap: anywhere; line-height: 1.8">
+        <p>公开仓库：{{ origin.repository }}</p><p>提交：{{ origin.commit }}</p>
+        <p>路径：{{ origin.path }}</p><p>SHA-256：{{ origin.sha256 }}</p>
+        <p>获取时间：{{ new Date(origin.fetchedAt).toLocaleString() }}</p>
+        <a :href="`https://github.com/spring-projects/spring-ai/blob/${encodeURIComponent(origin.commit)}/${origin.path.split('/').map(encodeURIComponent).join('/')}`" target="_blank" rel="noopener noreferrer">查看该提交的原文件</a>
+      </div>
+      <p v-else>此文档由本地上传，未关联外部项目来源。</p>
     </ElDialog>
   </section>
 </template>

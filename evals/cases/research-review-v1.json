@@ -1,0 +1,12 @@
+{
+  "version": "research-review-v1",
+  "frozenAt": "2026-10-19",
+  "scope": "Public synthetic evidence. Representative review behavior, not a general accuracy benchmark.",
+  "cases": [
+    {"id":"RR-SUPPORTED","goal":"说明工作进程的调度顺序。","answer":"工作进程按先进先出（FIFO）顺序处理任务。[E1]","evidence":"Public demo worker: jobs are processed in first-in-first-out (FIFO) order. Priority scheduling is not supported.","expected":"SUPPORTED"},
+    {"id":"RR-PARTIAL","goal":"说明调度方式和重试次数。","answer":"工作进程按 FIFO 调度并最多重试三次。[E1]","evidence":"Public demo worker: jobs are processed in first-in-first-out (FIFO) order. This document does not specify retry behavior.","expected":"PARTIAL"},
+    {"id":"RR-UNSUPPORTED","goal":"说明系统的峰值吞吐。","answer":"系统每秒可处理一万项任务。[E1]","evidence":"Public demo worker: jobs are processed in first-in-first-out (FIFO) order. No performance measurements are available.","expected":"UNSUPPORTED"},
+    {"id":"RR-CONTRADICTED","goal":"说明是否支持任务优先级。","answer":"工作进程支持优先级调度。[E1]","evidence":"Public demo worker: jobs are processed in first-in-first-out (FIFO) order. Priority scheduling is not supported.","expected":"CONTRADICTED"}
+  ],
+  "manualRubric": "Compare each claim with the supplied evidence. For the partial case, either a PARTIAL combined claim or separate supported FIFO and unsupported retry claims is acceptable. Record false positives, omissions and unsupported explanations separately. Never use reviewer self-ratings as independent acceptance."
+}

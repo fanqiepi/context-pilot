@@ -1,0 +1,84 @@
+{
+  "mode" : "MODEL_FIXED_EVIDENCE_DEBUG_NOT_PRODUCTION_ACCEPTANCE",
+  "startedAt" : "2026-10-19T16:30:02.152387800+08:00",
+  "humanReview" : "NOT_REVIEWED",
+  "evidence" : [ {
+    "untrusted" : true,
+    "sourceType" : "LOCAL",
+    "documentId" : "5a32235b-c37b-4e73-a293-10b60418bc31",
+    "excerpt" : "# 调试旧方案（公开合成）\n\n## scheduling\n旧工作进程按 FIFO 调度，不支持任务优先级。\n",
+    "chunkId" : "debug-fixed-1",
+    "truncated" : false,
+    "sourceId" : "L1"
+  }, {
+    "untrusted" : true,
+    "truncated" : false,
+    "tag" : "debug-release",
+    "sourceId" : "R1",
+    "excerpt" : "# 调试发布记录（公开合成，非真实发布）\n\n## scheduling\n调试新版引入两级优先队列，空优先级映射为 normal；不改变任务结果格式。\n",
+    "sourceType" : "RELEASE"
+  } ],
+  "harnessSha256" : "deb9049df0d3164aec740199f6f809ea66bd0a61b00210f14426669cfa8d3e88",
+  "results" : [ {
+    "prompt" : "upgrade-research-v1",
+    "debugCase" : "BROAD",
+    "question" : "新调度方案如何兼容旧客户端？",
+    "promptSha256" : "f7438289d7ca47767288b38c1b6db85f34886242babcd53473f8792f1638a1ae",
+    "status" : "FAILED",
+    "errorType" : "ExecutionException",
+    "rootErrorType" : "org.springframework.ai.retry.NonTransientAiException",
+    "rootErrorLocation" : "org.springframework.ai.retry.RetryUtils$1.handleError(RetryUtils.java:90)",
+    "latencyMs" : 1359
+  }, {
+    "prompt" : "upgrade-research-v1",
+    "debugCase" : "MECHANISM",
+    "question" : "请根据旧方案和所选发布记录，只回答两个兼容机制：旧客户端不传优先级时如何处理，以及任务结果格式是否变化。不要求完整部署方案或保证所有旧行为不变。",
+    "promptSha256" : "f7438289d7ca47767288b38c1b6db85f34886242babcd53473f8792f1638a1ae",
+    "status" : "FAILED",
+    "errorType" : "ExecutionException",
+    "rootErrorType" : "org.springframework.ai.retry.NonTransientAiException",
+    "rootErrorLocation" : "org.springframework.ai.retry.RetryUtils$1.handleError(RetryUtils.java:90)",
+    "latencyMs" : 321
+  }, {
+    "prompt" : "upgrade-research-v1",
+    "debugCase" : "MISSING",
+    "question" : "请根据旧方案和所选发布记录，说明优先级缺省与结果格式的兼容变化，并给出新版在故障后承诺的恢复时间。没有恢复时间依据时明确列为缺口，不推测数值。",
+    "promptSha256" : "f7438289d7ca47767288b38c1b6db85f34886242babcd53473f8792f1638a1ae",
+    "status" : "FAILED",
+    "errorType" : "ExecutionException",
+    "rootErrorType" : "org.springframework.ai.retry.NonTransientAiException",
+    "rootErrorLocation" : "org.springframework.ai.retry.RetryUtils$1.handleError(RetryUtils.java:90)",
+    "latencyMs" : 96
+  }, {
+    "prompt" : "upgrade-research-v3",
+    "debugCase" : "BROAD",
+    "question" : "新调度方案如何兼容旧客户端？",
+    "promptSha256" : "f7c7a74387852c9fe2b95220c4ba343a761197e1b7d9472bfc8f50027481045d",
+    "status" : "FAILED",
+    "errorType" : "ExecutionException",
+    "rootErrorType" : "org.springframework.ai.retry.NonTransientAiException",
+    "rootErrorLocation" : "org.springframework.ai.retry.RetryUtils$1.handleError(RetryUtils.java:90)",
+    "latencyMs" : 85
+  }, {
+    "prompt" : "upgrade-research-v3",
+    "debugCase" : "MECHANISM",
+    "question" : "请根据旧方案和所选发布记录，只回答两个兼容机制：旧客户端不传优先级时如何处理，以及任务结果格式是否变化。不要求完整部署方案或保证所有旧行为不变。",
+    "promptSha256" : "f7c7a74387852c9fe2b95220c4ba343a761197e1b7d9472bfc8f50027481045d",
+    "status" : "FAILED",
+    "errorType" : "ExecutionException",
+    "rootErrorType" : "org.springframework.ai.retry.NonTransientAiException",
+    "rootErrorLocation" : "org.springframework.ai.retry.RetryUtils$1.handleError(RetryUtils.java:90)",
+    "latencyMs" : 93
+  }, {
+    "prompt" : "upgrade-research-v3",
+    "debugCase" : "MISSING",
+    "question" : "请根据旧方案和所选发布记录，说明优先级缺省与结果格式的兼容变化，并给出新版在故障后承诺的恢复时间。没有恢复时间依据时明确列为缺口，不推测数值。",
+    "promptSha256" : "f7c7a74387852c9fe2b95220c4ba343a761197e1b7d9472bfc8f50027481045d",
+    "status" : "FAILED",
+    "errorType" : "ExecutionException",
+    "rootErrorType" : "org.springframework.ai.retry.NonTransientAiException",
+    "rootErrorLocation" : "org.springframework.ai.retry.RetryUtils$1.handleError(RetryUtils.java:90)",
+    "latencyMs" : 403
+  } ],
+  "finishedAt" : "2026-10-19T16:30:04.833046400+08:00"
+}

@@ -1,0 +1,79 @@
+{
+  "mode": "PUBLIC_DEBUG_NOT_FINAL_ACCEPTANCE",
+  "startedAt": "2026-10-16T16:29:00.675077+08:00",
+  "finishedAt": "2026-10-16T16:29:14.684200200+08:00",
+  "status": "ENGINEERING_PASSED_REQUIRES_ANSWER_REVIEW",
+  "rounds": [
+    {
+      "round": 1,
+      "status": "COMPLETED",
+      "answer": "根据所选文档 legacy-worker.md 的 scheduling 段落：旧工作进程采用 FIFO（先进先出）调度方式，且不支持任务优先级 [E1]。\n\n证据范围说明：该段落未进一步说明队列长度、抢占行为或优先级实现细节，因此这些方面资料不足。",
+      "evidence": [
+        {
+          "id": "E1",
+          "documentId": "810fd6e6-5c39-4521-bfa8-2b0870860aa6",
+          "filename": "legacy-worker.md",
+          "chunkId": "877a84ca-9d33-3004-82e1-18a0e04c7fa5",
+          "page": null,
+          "text": "旧工作进程按 FIFO 调度，不支持任务优先级。"
+        }
+      ],
+      "calls": [
+        {
+          "phase": "PLANNING",
+          "status": "SUCCEEDED",
+          "model": "deepseek-flash",
+          "inputTokens": 368,
+          "outputTokens": 213,
+          "totalTokens": 581,
+          "latencyMs": 2703
+        },
+        {
+          "phase": "SYNTHESIS",
+          "status": "SUCCEEDED",
+          "model": "deepseek-flash",
+          "inputTokens": 340,
+          "outputTokens": 138,
+          "totalTokens": 478,
+          "latencyMs": 1687
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "status": "COMPLETED",
+      "answer": "旧工作进程按 FIFO 调度，且不支持任务优先级 [E1]。",
+      "evidence": [
+        {
+          "id": "E1",
+          "documentId": "810fd6e6-5c39-4521-bfa8-2b0870860aa6",
+          "filename": "legacy-worker.md",
+          "chunkId": "877a84ca-9d33-3004-82e1-18a0e04c7fa5",
+          "page": null,
+          "text": "旧工作进程按 FIFO 调度，不支持任务优先级。"
+        }
+      ],
+      "calls": [
+        {
+          "phase": "PLANNING",
+          "status": "SUCCEEDED",
+          "model": "deepseek-flash",
+          "inputTokens": 386,
+          "outputTokens": 380,
+          "totalTokens": 766,
+          "latencyMs": 2706
+        },
+        {
+          "phase": "SYNTHESIS",
+          "status": "SUCCEEDED",
+          "model": "deepseek-flash",
+          "inputTokens": 358,
+          "outputTokens": 77,
+          "totalTokens": 435,
+          "latencyMs": 1314
+        }
+      ]
+    }
+  ],
+  "manualReview": "Both answers correctly state FIFO and no task priority with E1 support. The first answer adds unnecessary scope caveats; the supplemented round follows the one-sentence constraint. This is a public debug observation, not an independent semantic evaluation."
+}

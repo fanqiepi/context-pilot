@@ -1,0 +1,97 @@
+{
+  "dataset": "core-workspace-v1.jsonl",
+  "mode": "LIVE_END_TO_END_WITH_DECLARED_FAULT_INJECTION",
+  "startedAt": "2026-10-19T15:46:46.603942300+08:00",
+  "finishedAt": "2026-10-19T15:48:22.408267300+08:00",
+  "tasks": 50,
+  "executed": 50,
+  "notRun": 0,
+  "collectionFailures": [],
+  "terminalMatches": 38,
+  "terminalMismatch": [
+    {
+      "caseId": "CORE-021",
+      "expected": "SUCCEEDED",
+      "actual": "PARTIAL"
+    },
+    {
+      "caseId": "CORE-024",
+      "expected": "PARTIAL",
+      "actual": "SUCCEEDED"
+    },
+    {
+      "caseId": "CORE-027",
+      "expected": "PARTIAL",
+      "actual": "SUCCEEDED"
+    },
+    {
+      "caseId": "CORE-028",
+      "expected": "PARTIAL",
+      "actual": "SUCCEEDED"
+    },
+    {
+      "caseId": "CORE-029",
+      "expected": "REFUSED",
+      "actual": "COMPLETED"
+    },
+    {
+      "caseId": "CORE-030",
+      "expected": "REFUSED",
+      "actual": "COMPLETED"
+    },
+    {
+      "caseId": "CORE-031",
+      "expected": "REFUSED",
+      "actual": "COMPLETED"
+    },
+    {
+      "caseId": "CORE-033",
+      "expected": "REFUSED",
+      "actual": "COMPLETED"
+    },
+    {
+      "caseId": "CORE-034",
+      "expected": "REFUSED",
+      "actual": "COMPLETED"
+    },
+    {
+      "caseId": "CORE-038",
+      "expected": "REFUSED",
+      "actual": "COMPLETED"
+    },
+    {
+      "caseId": "CORE-041",
+      "expected": "REFUSED",
+      "actual": "COMPLETED"
+    },
+    {
+      "caseId": "CORE-044",
+      "expected": "REFUSED",
+      "actual": "COMPLETED"
+    }
+  ],
+  "semanticReview": "NOT_REVIEWED",
+  "semanticSuccessRate": null,
+  "latency": {
+    "samples": 50,
+    "missing": 0,
+    "p50Ms": 1430,
+    "p95Ms": 6479
+  },
+  "usage": {
+    "answerModelCalls": 44,
+    "unknownUsage": 0,
+    "promptTokens": 19448,
+    "completionTokens": 9943,
+    "embeddingUsage": "NOT_COLLECTED",
+    "monetaryEstimate": null
+  },
+  "limitations": [
+    "Terminal matches are observations, not semantic passes.",
+    "Fault-injected recovery cases remain separately identified in raw results.",
+    "No retrieval ranking or first-token metrics were captured.",
+    "Latency includes service execution and evidence collection; setupMs is separate.",
+    "Provider calls without returned usage are not zero usage."
+  ],
+  "rawSha256": "bf3e1fbde38a1cad260e3a3f2989d3b3350a23837264bce6cb2a37efa0866d36"
+}

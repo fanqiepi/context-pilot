@@ -10,7 +10,7 @@
 
 ## 单用户访问边界
 
-ContextPilot 当前没有登录、认证、角色或多用户隔离，只适合本机或可信网络。V5 Slices 2-4 已引入服务端稳定的隐式用户 `LOCAL_OWNER`、`CurrentSubjectProvider` 和 `/memories` 管理入口，用于让经确认的显式记忆跨会话保持归属并可由用户纠正、启停或逻辑删除；它不会验证访问者身份，所有能访问实例的人都会共享同一用户和记忆。
+研序 当前没有登录、认证、角色或多用户隔离，只适合本机或可信网络。V5 Slices 2-4 已引入服务端稳定的隐式用户 `LOCAL_OWNER`、`CurrentSubjectProvider` 和 `/memories` 管理入口，用于让经确认的显式记忆跨会话保持归属并可由用户纠正、启停或逻辑删除；它不会验证访问者身份，所有能访问实例的人都会共享同一用户和记忆。
 
 客户端不得提交或覆盖用户 ID。不要仅依赖隐式用户把当前应用暴露到公网；如需让不受信任的人访问，必须先单独设计并实现登录、完整资源所有权迁移和服务端授权过滤。
 
@@ -117,6 +117,12 @@ Unix 使用 `./mvnw`。付费模型测试的启用条件见[评估入口](../../
 
 真实调试测试使用独立 Testcontainers 数据库和公开调试文档；须事先配置本地 `local-secrets`，从 `backend/` 执行 `./mvnw.cmd -Dtest=V6LiveDebugTests -Dcontextpilot.evaluation.v6-debug=true test`。结果保存在 `target/v6-live-debug.json`，包含公开调试回答；这是调试证据，不进入最终任务成绩。普通 `test`/`package` 跳过付费调试。最终语义评测与生产验收尚未完成，不能凭一次调试通过宣称 V6 已验收。
 
+## 研究任务工作台运行
+
+在真实模型、pgvector 与文档处理配置基础上，设置 `$env:TASK_WORKSPACE_ENABLED='true'` 后启动后端，访问前端 `/research-tasks`。默认关闭该入口对应 API；开启后 Flyway 自动创建任务与事件表。先生成计划，再点击“按计划开始研究”；澄清或补充会保留旧轮次检查点，暂停后可继续尚未完成的步骤。
+
+普通 `mvnw.cmd package` 包含离线和真实 PostgreSQL 工程验证，不调用付费模型。公开样例真实验证命令为 `./mvnw.cmd -Dtest=TaskWorkspaceLiveTests -Dcontextpilot.evaluation.task-live=true test`，需要 local-secrets 与 Docker，输出 `backend/target/task-workspace-live.json`。结果是调试证据，不作为独立语义成绩。当前轮次结果与数据库检查点通过 API 获取，页面不依赖浏览器本地状态恢复。更多约束见[工作台设计](../architecture/research-task-workspace-design.md)。
+
 ## AI 调用日志
 
 后端默认以 `INFO` 级别记录安全的结构化 AI 调用生命周期，统一使用 `ai.call.started`、`ai.call.succeeded`、`ai.call.failed` 和 `ai.call.cancelled` 事件。覆盖普通聊天、SSE 聊天、V4 研究综合和文档 Embedding 入库；单次检索查询 Embedding 生命周期降为 `DEBUG`，避免多文档研究在 `INFO` 产生逐调用噪声。日志字段包括：
@@ -138,3 +144,7 @@ ai.call.failed operation=CHAT_STREAM provider=DEEPSEEK model=deepseek-v4-flash t
 ```
 
 后端默认监听 `18080`，Knife4j 接口文档位于 `http://localhost:18080/doc.html`，原始 OpenAPI JSON 位于 `http://localhost:18080/v3/api-docs`。如需使用其他端口，可设置 `SERVER_PORT`；修改后还应同步调整前端开发代理目标。
+
+## 项目资料接入
+
+独立 MCP 服务、功能开关、确认导入、公开研究演示与恢复说明见 [项目资料接入运行指南](project-source-integration.md)。

@@ -1,0 +1,8 @@
+{
+  "frozenAt": "2026-10-19T17:27:11.1437832+08:00",
+  "code": "601da27",
+  "status": "FROZEN_BEFORE_FIRST_RUN",
+  "sha256": "ad4bd34746ff4a1a4bdc4dc2d657c0611f0d568ead0b09f20b96b7eb8582186c",
+  "dataset": "evals/datasets/upgrade-representative-live-v1.json",
+  "humanReview": "DEFERRED_BY_USER"
+}

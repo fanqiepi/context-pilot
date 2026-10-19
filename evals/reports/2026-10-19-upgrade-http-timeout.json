@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-19",
+  "change": "Upgrade model HTTP read timeout aligned to existing 60-second model budget",
+  "gatewaySha256": "38b339642ad215f308cc9bfe860e5fdabd8c5a8acd33f1fb19d9a26a0ef30217",
+  "tests": 3,
+  "failures": 0,
+  "errors": 0,
+  "localDelayedResponseSeconds": 11,
+  "liveMissingResponseMilliseconds": 14126,
+  "productionPrompt": "upgrade-research-v1",
+  "candidatePrompt": "upgrade-research-v4",
+  "candidateAdopted": false,
+  "historicalFailuresResolved": false
+}

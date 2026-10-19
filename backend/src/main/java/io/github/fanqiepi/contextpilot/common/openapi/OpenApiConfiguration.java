@@ -11,7 +11,7 @@ public class OpenApiConfiguration {
     @Bean
     OpenAPI contextPilotOpenApi() {
         return new OpenAPI().info(new Info()
-                .title("ContextPilot API")
+                .title("研序 API")
                 .description("知识库、知识问答与受控业务操作接口")
                 .version("0.0.1"));
     }

@@ -27,7 +27,8 @@ public record ConversationMessageResponse(
         boolean helpful,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt,
-        MemoryContextResponse memoryContext) {
+        MemoryContextResponse memoryContext,
+        Boolean refused) {
 
     public ConversationMessageResponse(
             UUID id,
@@ -49,7 +50,7 @@ public record ConversationMessageResponse(
             OffsetDateTime updatedAt) {
         this(id, conversationId, role, content, status, errorSummary, traceId,
                 capabilityId, capabilityVersion, capabilityMatchReason, healthReport,
-                actionRequest, researchRun, citations, helpful, createdAt, updatedAt, null);
+                actionRequest, researchRun, citations, helpful, createdAt, updatedAt, null, null);
     }
 
     public ConversationMessageResponse(
@@ -71,7 +72,7 @@ public record ConversationMessageResponse(
             OffsetDateTime updatedAt) {
         this(id, conversationId, role, content, status, errorSummary, traceId, capabilityId,
                 capabilityVersion, capabilityMatchReason, healthReport, actionRequest, null,
-                citations, helpful, createdAt, updatedAt, null);
+                citations, helpful, createdAt, updatedAt, null, null);
     }
 
     public static ConversationMessageResponse from(
@@ -100,7 +101,10 @@ public record ConversationMessageResponse(
                 helpful,
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
-                memoryContext);
+                memoryContext,
+                researchRun != null && researchRun.answerStatus() != null
+                        ? Boolean.valueOf(researchRun.answerStatus() == io.github.fanqiepi.contextpilot.research.ResearchAnswerStatus.REFUSED)
+                        : entity.getRefused());
     }
 
     public static ConversationMessageResponse from(

@@ -101,7 +101,7 @@ public class ChatApplicationService {
                     null);
         }
         if (prepared.refused()) {
-            persistenceService.completeWithoutModel(
+            persistenceService.completeRefusalWithoutModel(
                     exchange.assistantMessageId(), INSUFFICIENT_EVIDENCE_ANSWER);
             return new ChatAnswerResponse(
                     exchange.conversationId(),
@@ -167,7 +167,7 @@ public class ChatApplicationService {
                 exchange.userMessageId(),
                 exchange.assistantMessageId(),
                 result.content(),
-                false,
+                result.refused(),
                 citations,
                 result.model(),
                 new ChatUsageResponse(

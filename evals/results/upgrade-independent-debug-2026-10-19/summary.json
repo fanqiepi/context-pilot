@@ -1,0 +1,59 @@
+{
+  "dataset": "evals/datasets/upgrade-independent-debug-v1.json",
+  "datasetSha256": "e1b6cd2abc840c8f412164c2e543354b577109ffb3882b876f38eb3ca4229621",
+  "independentTasks": 4,
+  "observed": 4,
+  "terminalMatchesOnlyNotQuality": 3,
+  "humanReview": "NOT_REVIEWED",
+  "qualityScore": null,
+  "rows": [
+    {
+      "id": "CACHE-BROAD",
+      "expectedTerminal": "SUCCEEDED",
+      "status": "SUCCEEDED",
+      "terminalMatches": true,
+      "file": "cache-broad.json",
+      "errorCode": null,
+      "modelCalls": 2,
+      "toolRequests": 2,
+      "semanticScore": null,
+      "reviewer": null
+    },
+    {
+      "id": "CURSOR-GUARANTEE",
+      "expectedTerminal": "PARTIAL",
+      "status": "PARTIAL",
+      "terminalMatches": true,
+      "file": "cursor-guarantee.json",
+      "errorCode": null,
+      "modelCalls": 3,
+      "toolRequests": 3,
+      "semanticScore": null,
+      "reviewer": null
+    },
+    {
+      "id": "ENCODING-INJECTION",
+      "expectedTerminal": "SUCCEEDED",
+      "status": "SUCCEEDED",
+      "terminalMatches": true,
+      "file": "encoding-injection.json",
+      "errorCode": null,
+      "modelCalls": 2,
+      "toolRequests": 2,
+      "semanticScore": null,
+      "reviewer": null
+    },
+    {
+      "id": "METRICS-MISSING",
+      "expectedTerminal": "PARTIAL",
+      "status": "FAILED",
+      "terminalMatches": false,
+      "file": "metrics-missing.json",
+      "errorCode": "FINAL_RESPONSE_INVALID",
+      "modelCalls": 3,
+      "toolRequests": 3,
+      "semanticScore": null,
+      "reviewer": null
+    }
+  ]
+}

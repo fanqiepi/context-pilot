@@ -1,0 +1,378 @@
+{
+  "mode": "PUBLIC_LOCAL_PAGE_VERIFICATION",
+  "task": {
+    "id": "7678195b-3f45-463a-85e8-a1d066ca028f",
+    "knowledgeBaseId": "4e9c44df-c102-41a9-9c24-9af0000a898a",
+    "status": "COMPLETED",
+    "revision": 28,
+    "state": {
+      "activations": 2,
+      "answer": "根据 scheduling 段落，旧工作进程按 FIFO 调度，不支持任务优先级[E1]；资料未说明重试次数，存在证据缺口，不能推断默认值。",
+      "calls": [
+        {
+          "phase": "PLANNING",
+          "status": "SUCCEEDED",
+          "model": "deepseek-flash",
+          "inputTokens": 408,
+          "outputTokens": 565,
+          "totalTokens": 973,
+          "latencyMs": 3614
+        },
+        {
+          "phase": "SYNTHESIS",
+          "status": "SUCCEEDED",
+          "model": "deepseek-flash",
+          "inputTokens": 379,
+          "outputTokens": 184,
+          "totalTokens": 563,
+          "latencyMs": 1514
+        }
+      ],
+      "completed": [
+        {
+          "index": 0,
+          "hits": 1,
+          "status": "COMPLETED"
+        },
+        {
+          "index": 1,
+          "hits": 1,
+          "status": "COMPLETED"
+        }
+      ],
+      "deadline": "2026-10-19T07:17:39.3028269Z",
+      "errorCode": null,
+      "evidence": [
+        {
+          "id": "E1",
+          "documentId": "bb54bf9d-efa8-4645-8e75-16b8df04a4d3",
+          "filename": "legacy-worker.md",
+          "chunkId": "abe380c7-8807-3cd5-9ccd-c7f841d3fdf7",
+          "page": null,
+          "text": "旧工作进程按 FIFO 调度，不支持任务优先级。"
+        }
+      ],
+      "goal": "研究成果审查公开演示：只根据 scheduling 段落说明调度方式与优先级支持情况。",
+      "phase": "RUNNING",
+      "plan": {
+        "questions": [],
+        "steps": [
+          {
+            "title": "定位 scheduling 段落并核实调度方式与优先级支持",
+            "tool": "SEARCH_DOCUMENTS",
+            "query": "在 legacy-worker.md 的 scheduling 段落中查找调度方式（scheduling mode）与优先级（priority）支持情况，仅提取该段落明确说明的结论。",
+            "documentIds": [
+              "bb54bf9d-efa8-4645-8e75-16b8df04a4d3"
+            ]
+          },
+          {
+            "title": "核查 scheduling 段落是否说明重试次数",
+            "tool": "SEARCH_DOCUMENTS",
+            "query": "在 legacy-worker.md 的 scheduling 段落中查找重试次数（retry count / retries）说明；若未提及，标记为证据缺口，不推断默认值。",
+            "documentIds": [
+              "bb54bf9d-efa8-4645-8e75-16b8df04a4d3"
+            ]
+          }
+        ]
+      },
+      "round": 3,
+      "sources": [
+        {
+          "id": "bb54bf9d-efa8-4645-8e75-16b8df04a4d3",
+          "filename": "legacy-worker.md",
+          "sha256": "470d0668b1749e438d9e85d80a05bb7ffdc2ce58ca1a90dab07e1e681048af08",
+          "profileId": "v4_eval_dashscope_qwen3_7_1024_v1",
+          "indexedAt": "2026-10-16T08:30:48.268365Z"
+        }
+      ],
+      "supplements": [
+        "保留调度方式和优先级结论；补充说明重试次数，资料未说明时明确指出证据缺口。只使用所选资料。",
+        "保留已有调度与优先级结论，用一句话明确资料未说明重试次数，不推断默认值。"
+      ],
+      "traceId": "32509b65-2760-4872-813f-3bd0a88a8476"
+    },
+    "createdAt": "2026-10-19T07:05:10.795496Z",
+    "updatedAt": "2026-10-19T07:14:41.227769Z"
+  },
+  "reviews": [
+    {
+      "id": "eb70285e-a3d2-44f4-9050-9755d7664555",
+      "taskId": "7678195b-3f45-463a-85e8-a1d066ca028f",
+      "taskRevision": 18,
+      "round": 2,
+      "status": "COMPLETED",
+      "revision": 3,
+      "overallVerdict": "NEEDS_MORE_EVIDENCE",
+      "errorCode": null,
+      "freshness": "HISTORICAL",
+      "snapshot": {
+        "taskId": "7678195b-3f45-463a-85e8-a1d066ca028f",
+        "taskRevision": 18,
+        "round": 2,
+        "knowledgeBaseId": "4e9c44df-c102-41a9-9c24-9af0000a898a",
+        "goal": "研究成果审查公开演示：只根据 scheduling 段落说明调度方式与优先级支持情况。",
+        "supplements": [
+          "保留调度方式和优先级结论；补充说明重试次数，资料未说明时明确指出证据缺口。只使用所选资料。"
+        ],
+        "answer": "调度方式：旧工作进程采用 FIFO（先进先出）调度 [E1]。\n\n优先级支持情况：不支持任务优先级 [E1]。\n\n重试次数：现有证据仅覆盖调度方式与优先级两点，未提及重试次数或任何重试策略配置，因此无法给出重试次数的结论，此处为证据缺口；如需该结论，需补充说明重试行为的资料 [E1]。\n\n说明：以上结论仅依据本轮提供的 scheduling 相关证据 [E1]，未涉及其他段落或未选资料；除上述两点的结论外，其余内容均为资料不足，不作推断。",
+        "sources": [
+          {
+            "id": "bb54bf9d-efa8-4645-8e75-16b8df04a4d3",
+            "filename": "legacy-worker.md",
+            "sha256": "470d0668b1749e438d9e85d80a05bb7ffdc2ce58ca1a90dab07e1e681048af08",
+            "profileId": "v4_eval_dashscope_qwen3_7_1024_v1",
+            "indexedAt": "2026-10-16T08:30:48.268365Z"
+          }
+        ],
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": "bb54bf9d-efa8-4645-8e75-16b8df04a4d3",
+            "filename": "legacy-worker.md",
+            "chunkId": "abe380c7-8807-3cd5-9ccd-c7f841d3fdf7",
+            "page": null,
+            "text": "旧工作进程按 FIFO 调度，不支持任务优先级。"
+          }
+        ]
+      },
+      "result": {
+        "claims": [
+          {
+            "claim": "旧工作进程采用 FIFO（先进先出）调度 [E1]。",
+            "verdict": "PARTIAL",
+            "evidenceIds": [
+              "E1"
+            ],
+            "explanation": "E1写明“旧工作进程按 FIFO 调度”，核心的 FIFO 调度有直接支持；但证据未明确写出“先进先出”这一展开表述。"
+          },
+          {
+            "claim": "不支持任务优先级 [E1]。",
+            "verdict": "SUPPORTED",
+            "evidenceIds": [
+              "E1"
+            ],
+            "explanation": "E1原文明确称“不支持任务优先级”，与答案一致。"
+          },
+          {
+            "claim": "现有证据仅覆盖调度方式与优先级两点，未提及重试次数或任何重试策略配置，因此无法给出重试次数的结论，此处为证据缺口；如需该结论，需补充说明重试行为的资料 [E1]。",
+            "verdict": "SUPPORTED",
+            "evidenceIds": [
+              "E1"
+            ],
+            "explanation": "所给唯一证据 E1 只说明 FIFO 调度和不支持优先级，未出现重试次数、重试策略或退避配置，故答案将其标为证据缺口是恰当的。"
+          }
+        ],
+        "gaps": [
+          "重试次数、重试策略或退避配置在提供的证据中缺失，无法核实具体重试行为。",
+          "证据仅有一句调度描述，无法核实 scheduling 段落全文是否还包含其他相关上下文。"
+        ],
+        "suggestedSupplement": "建议补充 legacy-worker 文档中 scheduling 段落关于重试次数、重试策略/退避配置的原文；若原文确实没有相关内容，请在结论中明确记录“资料未说明重试次数”这一证据缺口，而不推断默认重试行为。"
+      },
+      "usage": {
+        "phase": "REVIEW",
+        "status": "SUCCEEDED",
+        "model": "deepseek-flash",
+        "inputTokens": 912,
+        "outputTokens": 3538,
+        "totalTokens": 4450,
+        "latencyMs": 16499
+      },
+      "traceId": "b841e0ac-b367-4ae2-bffc-b21b5572c228",
+      "promptVersion": "research-review-v1",
+      "createdAt": "2026-10-19T07:12:58.217578Z"
+    },
+    {
+      "id": "b05a6144-0e92-40cd-b955-5395c387d58b",
+      "taskId": "7678195b-3f45-463a-85e8-a1d066ca028f",
+      "taskRevision": 8,
+      "round": 1,
+      "status": "COMPLETED",
+      "revision": 3,
+      "overallVerdict": "NO_ISSUES_FOUND",
+      "errorCode": null,
+      "freshness": "HISTORICAL",
+      "snapshot": {
+        "taskId": "7678195b-3f45-463a-85e8-a1d066ca028f",
+        "taskRevision": 8,
+        "round": 1,
+        "knowledgeBaseId": "4e9c44df-c102-41a9-9c24-9af0000a898a",
+        "goal": "研究成果审查公开演示：只根据 scheduling 段落说明调度方式与优先级支持情况。",
+        "supplements": [],
+        "answer": "根据 scheduling 段落，旧工作进程采用 FIFO（先进先出）调度 [E1]；该段落明确说明其不支持任务优先级 [E1]。因此，调度方式为 FIFO，优先级支持情况为不支持 [E1]。现有证据仅覆盖这一项，未提供其他调度方式或优先级机制的说明。",
+        "sources": [
+          {
+            "id": "bb54bf9d-efa8-4645-8e75-16b8df04a4d3",
+            "filename": "legacy-worker.md",
+            "sha256": "470d0668b1749e438d9e85d80a05bb7ffdc2ce58ca1a90dab07e1e681048af08",
+            "profileId": "v4_eval_dashscope_qwen3_7_1024_v1",
+            "indexedAt": "2026-10-16T08:30:48.268365Z"
+          }
+        ],
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": "bb54bf9d-efa8-4645-8e75-16b8df04a4d3",
+            "filename": "legacy-worker.md",
+            "chunkId": "abe380c7-8807-3cd5-9ccd-c7f841d3fdf7",
+            "page": null,
+            "text": "旧工作进程按 FIFO 调度，不支持任务优先级。"
+          }
+        ]
+      },
+      "result": {
+        "claims": [
+          {
+            "claim": "旧工作进程采用 FIFO（先进先出）调度 [E1]",
+            "verdict": "SUPPORTED",
+            "evidenceIds": [
+              "E1"
+            ],
+            "explanation": "E1 明确写明“旧工作进程按 FIFO 调度”。"
+          },
+          {
+            "claim": "该段落明确说明其不支持任务优先级 [E1]",
+            "verdict": "SUPPORTED",
+            "evidenceIds": [
+              "E1"
+            ],
+            "explanation": "E1 明确写明“不支持任务优先级”。"
+          },
+          {
+            "claim": "因此，调度方式为 FIFO，优先级支持情况为不支持 [E1]。",
+            "verdict": "SUPPORTED",
+            "evidenceIds": [
+              "E1"
+            ],
+            "explanation": "E1 同时支持 FIFO 调度和不支持任务优先级两项结论。"
+          },
+          {
+            "claim": "现有证据仅覆盖这一项，未提供其他调度方式或优先级机制的说明。",
+            "verdict": "SUPPORTED",
+            "evidenceIds": [
+              "E1"
+            ],
+            "explanation": "输入证据只有 E1，且其内容仅涉及 FIFO 调度与不支持任务优先级。"
+          }
+        ],
+        "gaps": [],
+        "suggestedSupplement": ""
+      },
+      "usage": {
+        "phase": "REVIEW",
+        "status": "SUCCEEDED",
+        "model": "deepseek-flash",
+        "inputTokens": 820,
+        "outputTokens": 771,
+        "totalTokens": 1591,
+        "latencyMs": 4418
+      },
+      "traceId": "6052f405-25ab-4bf4-9963-376676dbc507",
+      "promptVersion": "research-review-v1",
+      "createdAt": "2026-10-19T07:10:20.394974Z"
+    },
+    {
+      "id": "0c34c4e2-6816-4747-aef4-c42fe9377297",
+      "taskId": "7678195b-3f45-463a-85e8-a1d066ca028f",
+      "taskRevision": 8,
+      "round": 1,
+      "status": "FAILED",
+      "revision": 3,
+      "overallVerdict": null,
+      "errorCode": "REVIEW_EXECUTION_FAILED",
+      "freshness": "HISTORICAL",
+      "snapshot": {
+        "taskId": "7678195b-3f45-463a-85e8-a1d066ca028f",
+        "taskRevision": 8,
+        "round": 1,
+        "knowledgeBaseId": "4e9c44df-c102-41a9-9c24-9af0000a898a",
+        "goal": "研究成果审查公开演示：只根据 scheduling 段落说明调度方式与优先级支持情况。",
+        "supplements": [],
+        "answer": "根据 scheduling 段落，旧工作进程采用 FIFO（先进先出）调度 [E1]；该段落明确说明其不支持任务优先级 [E1]。因此，调度方式为 FIFO，优先级支持情况为不支持 [E1]。现有证据仅覆盖这一项，未提供其他调度方式或优先级机制的说明。",
+        "sources": [
+          {
+            "id": "bb54bf9d-efa8-4645-8e75-16b8df04a4d3",
+            "filename": "legacy-worker.md",
+            "sha256": "470d0668b1749e438d9e85d80a05bb7ffdc2ce58ca1a90dab07e1e681048af08",
+            "profileId": "v4_eval_dashscope_qwen3_7_1024_v1",
+            "indexedAt": "2026-10-16T08:30:48.268365Z"
+          }
+        ],
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": "bb54bf9d-efa8-4645-8e75-16b8df04a4d3",
+            "filename": "legacy-worker.md",
+            "chunkId": "abe380c7-8807-3cd5-9ccd-c7f841d3fdf7",
+            "page": null,
+            "text": "旧工作进程按 FIFO 调度，不支持任务优先级。"
+          }
+        ]
+      },
+      "result": null,
+      "usage": {
+        "phase": "REVIEW",
+        "status": "FAILED",
+        "model": null,
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "latencyMs": 11154
+      },
+      "traceId": "8cb96bed-1996-4bda-bc77-5e5befcfc8fc",
+      "promptVersion": "research-review-v1",
+      "createdAt": "2026-10-19T07:08:32.645683Z"
+    },
+    {
+      "id": "58150e02-5f38-4d76-bdd5-3741edc1503f",
+      "taskId": "7678195b-3f45-463a-85e8-a1d066ca028f",
+      "taskRevision": 8,
+      "round": 1,
+      "status": "FAILED",
+      "revision": 3,
+      "overallVerdict": null,
+      "errorCode": "REVIEW_EXECUTION_FAILED",
+      "freshness": "HISTORICAL",
+      "snapshot": {
+        "taskId": "7678195b-3f45-463a-85e8-a1d066ca028f",
+        "taskRevision": 8,
+        "round": 1,
+        "knowledgeBaseId": "4e9c44df-c102-41a9-9c24-9af0000a898a",
+        "goal": "研究成果审查公开演示：只根据 scheduling 段落说明调度方式与优先级支持情况。",
+        "supplements": [],
+        "answer": "根据 scheduling 段落，旧工作进程采用 FIFO（先进先出）调度 [E1]；该段落明确说明其不支持任务优先级 [E1]。因此，调度方式为 FIFO，优先级支持情况为不支持 [E1]。现有证据仅覆盖这一项，未提供其他调度方式或优先级机制的说明。",
+        "sources": [
+          {
+            "id": "bb54bf9d-efa8-4645-8e75-16b8df04a4d3",
+            "filename": "legacy-worker.md",
+            "sha256": "470d0668b1749e438d9e85d80a05bb7ffdc2ce58ca1a90dab07e1e681048af08",
+            "profileId": "v4_eval_dashscope_qwen3_7_1024_v1",
+            "indexedAt": "2026-10-16T08:30:48.268365Z"
+          }
+        ],
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": "bb54bf9d-efa8-4645-8e75-16b8df04a4d3",
+            "filename": "legacy-worker.md",
+            "chunkId": "abe380c7-8807-3cd5-9ccd-c7f841d3fdf7",
+            "page": null,
+            "text": "旧工作进程按 FIFO 调度，不支持任务优先级。"
+          }
+        ]
+      },
+      "result": null,
+      "usage": {
+        "phase": "REVIEW",
+        "status": "FAILED",
+        "model": null,
+        "inputTokens": null,
+        "outputTokens": null,
+        "totalTokens": null,
+        "latencyMs": 10180
+      },
+      "traceId": "b50d0595-163f-4238-85d9-1fd37bfd8e63",
+      "promptVersion": "research-review-v1",
+      "createdAt": "2026-10-19T07:06:16.371027Z"
+    }
+  ]
+}

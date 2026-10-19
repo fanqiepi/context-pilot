@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-19",
+  "scope": "same-machine isolated source snapshot, fresh Maven repository/npm cache and PostgreSQL volume",
+  "sourceFiles": 649,
+  "backendBuild": "PASSED (-DskipTests)",
+  "frontendBuild": "PASSED (includes typecheck)",
+  "offlineSmoke": "PASSED",
+  "flywayMigrations": 28,
+  "modelCalls": 0,
+  "temporaryRuntimeResources": "REMOVED",
+  "fullTestsRerun": false,
+  "uiRecording": false,
+  "dependencyAudit": "21 affected nodes; unresolved",
+  "logs": {
+    "frontend-build.log": "2f86856fa0bff8cefe71b9852c78b76d4eea405cc8dd434706825ed4ea4ed82f",
+    "backend-build.log": "985127c7508ce0b76a2b5cc97fa0c6b38360aac75702b0ff4f312cf5671145cc",
+    "frontend-install.log": "150b4b61fec69fff6baa952f42a0f7f10e01790892ab32d2be33286536d5ae0d",
+    "backend-runtime.log": "845c33db3714202c0cc01a0627b57114956308d68a44765168595594e9ce8112"
+  }
+}

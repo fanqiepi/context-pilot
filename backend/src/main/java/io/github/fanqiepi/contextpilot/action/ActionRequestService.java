@@ -242,7 +242,7 @@ public class ActionRequestService {
             completeFailure(id, exception.getMessage());
             return response(requireEntity(id));
         } catch (RuntimeException exception) {
-            if (current.getActionType() == ActionType.SAVE_RESEARCH_REPORT) {
+            if (current.getActionType() == ActionType.SAVE_RESEARCH_REPORT || current.getActionType() == ActionType.IMPORT_PROJECT_DOCUMENTS) {
                 // Roll back the report INSERT and execution claim together; never commit a partial save.
                 throw exception;
             }
@@ -326,6 +326,7 @@ public class ActionRequestService {
 
     private String internalFailureSummary(ActionType actionType) {
         return switch (actionType) {
+            case IMPORT_PROJECT_DOCUMENTS -> "导入项目资料失败，请稍后重试";
             case CREATE_KNOWLEDGE_BASE -> CREATE_KNOWLEDGE_BASE_FAILURE_SUMMARY;
             case RETRY_DOCUMENT_PROCESSING -> "提交文档重试任务失败，请稍后重试";
             case REINDEX_DOCUMENT -> "提交索引重建任务失败，请稍后重试";

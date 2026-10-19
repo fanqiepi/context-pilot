@@ -1,4 +1,4 @@
-# ContextPilot 数据模型
+# 研序 数据模型
 
 ## V6 目标结构（已批准，实施状态以迁移为准）
 
@@ -148,3 +148,19 @@ V5 详细语义见 [V5 显式记忆详细设计](../architecture/v5-explicit-mem
 ### `action_request` 扩展
 
 Flyway V17 已实施该扩展。`CREATE_USER_MEMORY` 参数只允许固定类型、全局作用域、1-300 字符规范化内容和可选过期时间。确认成功后通过 `result_resource_id` 关联真实记忆；未确认、拒绝、过期或失败均不得产生记忆。既有 V2/V3 Action 历史保持兼容。
+
+## 研究任务工作台
+
+新增 research_task 与 research_task_event，分别记录当前任务检查点和 revision 对应历史；归属来自 LOCAL_OWNER，创建幂等键唯一，状态变更持行锁并校验 revision，JSON 检查点保存限定计划、证据及步骤完成状态。逻辑删除不物理清除历史。具体约束以新增 Flyway 迁移与[设计](../architecture/research-task-workspace-design.md)为准。
+
+## 项目资料接入（首版已交付）
+
+2026-10-16 用户批准专用只读 MCP 接入固定公开项目资料、不可变预览及独立确认导入知识库。详细边界以 [项目资料接入数据合同](../architecture/project-source-integration-design.md#数据合同) 为准；首版工程与公开流程验证已通过，证据见 docs/evaluation/project-source-integration-verification.md；独立语义质量评估不包含在本次结论内。
+
+## 研究成果审查（2026-10-19 已批准）
+
+新增 research_review，保存主体、任务版本与不可变输入快照、独立执行状态、结构化结果、usage、trace 和逻辑删除。幂等键、每快照三次上限与并发门禁由数据库事务保证。详细字段、预算、失败语义和验收合同见[研究成果审查设计](../architecture/research-result-review-design.md)。
+
+## 普通问答拒答持久化（2026-10-19）
+
+V28__persist_chat_refusal.sql 为 chat_message 增加可空 BOOLEAN refused。普通问答模型返回受限协议后，将该值与正文、引用和调用结果在同一事务保存；确定性无依据拒答为 true，确定性直接回答为 false。旧消息、用户消息及未明确分类的消息保留 null，不从旧正文推断或回填。消息生命周期仍使用 COMPLETED/FAILED 等既有状态，拒答是独立的回答语义。

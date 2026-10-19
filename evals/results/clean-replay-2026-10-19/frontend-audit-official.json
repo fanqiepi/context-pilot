@@ -1,0 +1,646 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@element-plus/icons-vue": {
+      "name": "@element-plus/icons-vue",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "vue"
+      ],
+      "effects": [],
+      "range": "",
+      "nodes": [
+        "node_modules/@element-plus/icons-vue"
+      ],
+      "fixAvailable": true
+    },
+    "@vitejs/plugin-vue": {
+      "name": "@vitejs/plugin-vue",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "vite",
+        "vue"
+      ],
+      "effects": [],
+      "range": "",
+      "nodes": [
+        "node_modules/@vitejs/plugin-vue"
+      ],
+      "fixAvailable": false
+    },
+    "@vue/compiler-core": {
+      "name": "@vue/compiler-core",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "source-map-js"
+      ],
+      "effects": [
+        "@vue/compiler-dom"
+      ],
+      "range": "",
+      "nodes": [
+        "node_modules/@vue/compiler-core"
+      ],
+      "fixAvailable": false
+    },
+    "@vue/compiler-dom": {
+      "name": "@vue/compiler-dom",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@vue/compiler-core"
+      ],
+      "effects": [
+        "@vue/compiler-ssr",
+        "@vue/language-core"
+      ],
+      "range": "",
+      "nodes": [
+        "node_modules/@vue/compiler-dom"
+      ],
+      "fixAvailable": false
+    },
+    "@vue/compiler-sfc": {
+      "name": "@vue/compiler-sfc",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@vue/compiler-core",
+        "@vue/compiler-dom",
+        "@vue/compiler-ssr",
+        "postcss",
+        "source-map-js"
+      ],
+      "effects": [],
+      "range": "",
+      "nodes": [
+        "node_modules/@vue/compiler-sfc"
+      ],
+      "fixAvailable": true
+    },
+    "@vue/compiler-ssr": {
+      "name": "@vue/compiler-ssr",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@vue/compiler-dom"
+      ],
+      "effects": [
+        "@vue/server-renderer"
+      ],
+      "range": "",
+      "nodes": [
+        "node_modules/@vue/compiler-ssr"
+      ],
+      "fixAvailable": false
+    },
+    "@vue/language-core": {
+      "name": "@vue/language-core",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@vue/compiler-dom"
+      ],
+      "effects": [
+        "vue-tsc"
+      ],
+      "range": "",
+      "nodes": [
+        "node_modules/@vue/language-core"
+      ],
+      "fixAvailable": false
+    },
+    "@vue/server-renderer": {
+      "name": "@vue/server-renderer",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@vue/compiler-ssr",
+        {
+          "source": 1241259,
+          "name": "@vue/server-renderer",
+          "dependency": "@vue/server-renderer",
+          "title": "@vue/server-renderer: XSS via missing CR in attribute-name blacklist",
+          "url": "https://github.com/advisories/GHSA-g2v6-rqmx-r4w6",
+          "severity": "high",
+          "cwe": [
+            "CWE-79",
+            "CWE-116"
+          ],
+          "cvss": {
+            "score": 7.2,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:L/A:N"
+          },
+          "range": "<3.5.42"
+        }
+      ],
+      "effects": [
+        "vue"
+      ],
+      "range": "",
+      "nodes": [
+        "node_modules/@vue/server-renderer"
+      ],
+      "fixAvailable": false
+    },
+    "@vueuse/core": {
+      "name": "@vueuse/core",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@vueuse/shared",
+        "vue"
+      ],
+      "effects": [],
+      "range": "",
+      "nodes": [
+        "node_modules/@vueuse/core"
+      ],
+      "fixAvailable": true
+    },
+    "@vueuse/shared": {
+      "name": "@vueuse/shared",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "vue"
+      ],
+      "effects": [],
+      "range": "",
+      "nodes": [
+        "node_modules/@vueuse/shared"
+      ],
+      "fixAvailable": true
+    },
+    "axios": {
+      "name": "axios",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        {
+          "source": 1240600,
+          "name": "axios",
+          "dependency": "axios",
+          "title": "Axios: Prototype pollution gadget in fetch adapter can alter outbound requests",
+          "url": "https://github.com/advisories/GHSA-vh66-26gq-q6x8",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=1.7.0 <1.20.0"
+        },
+        {
+          "source": 1240601,
+          "name": "axios",
+          "dependency": "axios",
+          "title": "Axios: Prototype-Pollution Gadget in the Default Instance Allows Inherited Object.prototype.method to Override HTTP Method",
+          "url": "https://github.com/advisories/GHSA-9fr6-4gfg-395g",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=1.0.0 <1.20.0"
+        },
+        {
+          "source": 1240603,
+          "name": "axios",
+          "dependency": "axios",
+          "title": "Axios: ReDoS in fromDataURI data: URL parser freezes the Node event loop (DoS)",
+          "url": "https://github.com/advisories/GHSA-c29m-xwm3-cm6r",
+          "severity": "high",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=1.16.1 <1.20.0"
+        },
+        {
+          "source": 1240604,
+          "name": "axios",
+          "dependency": "axios",
+          "title": "Axios: ReDoS (O(N²)) in shouldBypassProxy host normalization, reachable via untrusted redirect Location",
+          "url": "https://github.com/advisories/GHSA-mghh-pgcx-3jjj",
+          "severity": "high",
+          "cwe": [
+            "CWE-400",
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=1.15.0 <1.20.0"
+        },
+        {
+          "source": 1240605,
+          "name": "axios",
+          "dependency": "axios",
+          "title": "Axios: Prototype Pollution Gadget in axios toFormData Options",
+          "url": "https://github.com/advisories/GHSA-x97p-jq2g-jp4f",
+          "severity": "high",
+          "cwe": [
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=1.15.1 <1.20.0"
+        },
+        {
+          "source": 1240607,
+          "name": "axios",
+          "dependency": "axios",
+          "title": "Axios: HTTP/2 adapter bypasses configured DNS lookup and proxy controls",
+          "url": "https://github.com/advisories/GHSA-3pq3-5fj3-cg6v",
+          "severity": "high",
+          "cwe": [
+            "CWE-918"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=1.13.0 <1.20.0"
+        },
+        {
+          "source": 1240608,
+          "name": "axios",
+          "dependency": "axios",
+          "title": "Axios: Denial of Service via Unhandled 'error' Event in HTTP/2 ClientHttp2Session Initialization",
+          "url": "https://github.com/advisories/GHSA-542g-h47m-68v8",
+          "severity": "high",
+          "cwe": [
+            "CWE-400"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=1.13.0 <1.20.0"
+        },
+        {
+          "source": 1240626,
+          "name": "axios",
+          "dependency": "axios",
+          "title": "Axios: Header Injection via Inherited headers After Minimal Interceptor",
+          "url": "https://github.com/advisories/GHSA-j8rh-479h-cp32",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-74",
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=1.0.0 <1.20.0"
+        },
+        {
+          "source": 1240627,
+          "name": "axios",
+          "dependency": "axios",
+          "title": "Axios: Fetch Adapter Header Injection via Inherited FormData getHeaders",
+          "url": "https://github.com/advisories/GHSA-4hqw-qxg8-jxx2",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-74",
+            "CWE-693",
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=1.12.0 <1.20.0"
+        },
+        {
+          "source": 1240628,
+          "name": "axios",
+          "dependency": "axios",
+          "title": "Axios: Node HTTP adapter prototype-pollution gadget allows request socket hijack via inherited createConnection",
+          "url": "https://github.com/advisories/GHSA-m8m8-qj5v-23w3",
+          "severity": "high",
+          "cwe": [
+            "CWE-441",
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=1.15.2 <1.20.0"
+        },
+        {
+          "source": 1240629,
+          "name": "axios",
+          "dependency": "axios",
+          "title": "Axios: CIDR-form NO_PROXY entries are ignored, causing proxy exclusion bypass for internal IP ranges",
+          "url": "https://github.com/advisories/GHSA-44g4-m2mj-wpvx",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-693"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=1.15.0 <1.20.0"
+        },
+        {
+          "source": 1240634,
+          "name": "axios",
+          "dependency": "axios",
+          "title": "Axios: maxRedirects: 0 is not enforced by the fetch adapter, allowing redirect-based SSRF",
+          "url": "https://github.com/advisories/GHSA-r4gj-5m52-g5wh",
+          "severity": "high",
+          "cwe": [
+            "CWE-441",
+            "CWE-601"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=1.17.0 <1.20.0"
+        }
+      ],
+      "effects": [],
+      "range": "",
+      "nodes": [
+        "node_modules/axios"
+      ],
+      "fixAvailable": false
+    },
+    "dompurify": {
+      "name": "dompurify",
+      "severity": "low",
+      "isDirect": true,
+      "via": [
+        {
+          "source": 1240621,
+          "name": "dompurify",
+          "dependency": "dompurify",
+          "title": "DOMPurify: IN_PLACE: node-removing afterSanitize hook leaves detached subtree event handlers armed, causing DOM XSS",
+          "url": "https://github.com/advisories/GHSA-p98j-92pf-mc4p",
+          "severity": "low",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=3.4.13 <=3.4.15"
+        },
+        {
+          "source": 1241204,
+          "name": "dompurify",
+          "dependency": "dompurify",
+          "title": "DOMPurify: IN_PLACE returns a force-removed rawtext root whose text carries attacker markup — pure HTML reparse executes",
+          "url": "https://github.com/advisories/GHSA-6688-9rhm-gjv2",
+          "severity": "low",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=3.4.15"
+        }
+      ],
+      "effects": [],
+      "range": "",
+      "nodes": [
+        "node_modules/dompurify"
+      ],
+      "fixAvailable": false
+    },
+    "element-plus": {
+      "name": "element-plus",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@element-plus/icons-vue",
+        "@vueuse/core",
+        "vue"
+      ],
+      "effects": [],
+      "range": "",
+      "nodes": [
+        "node_modules/element-plus"
+      ],
+      "fixAvailable": false
+    },
+    "nanoid": {
+      "name": "nanoid",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1139427,
+          "name": "nanoid",
+          "dependency": "nanoid",
+          "title": "nanoid: custom generators can loop indefinitely when size is zero",
+          "url": "https://github.com/advisories/GHSA-2v37-7h3g-55p8",
+          "severity": "high",
+          "cwe": [
+            "CWE-835"
+          ],
+          "cvss": {
+            "score": 5.9,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<3.3.18"
+        }
+      ],
+      "effects": [
+        "postcss"
+      ],
+      "range": "",
+      "nodes": [
+        "node_modules/nanoid"
+      ],
+      "fixAvailable": false
+    },
+    "pinia": {
+      "name": "pinia",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "vue"
+      ],
+      "effects": [],
+      "range": "",
+      "nodes": [
+        "node_modules/pinia"
+      ],
+      "fixAvailable": false
+    },
+    "postcss": {
+      "name": "postcss",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1130709,
+          "name": "postcss",
+          "dependency": "postcss",
+          "title": "PostCSS: incomplete fix of GHSA-6g55-p6wh-862q — attacker-controlled sourceMappingURL reads arbitrary .map files when `from` is unset",
+          "url": "https://github.com/advisories/GHSA-fxqj-rqcc-2cmp",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-22",
+            "CWE-200"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=8.5.22"
+        },
+        "nanoid",
+        "source-map-js"
+      ],
+      "effects": [
+        "@vue/compiler-sfc",
+        "vite"
+      ],
+      "range": "",
+      "nodes": [
+        "node_modules/postcss"
+      ],
+      "fixAvailable": false
+    },
+    "source-map-js": {
+      "name": "source-map-js",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1241209,
+          "name": "source-map-js",
+          "dependency": "source-map-js",
+          "title": "source-map-js allows event-loop denial of service through indexed source-map section offsets",
+          "url": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+          "severity": "high",
+          "cwe": [
+            "CWE-1284"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=1.0.0 <1.2.2"
+        }
+      ],
+      "effects": [
+        "@vue/compiler-core"
+      ],
+      "range": "",
+      "nodes": [
+        "node_modules/source-map-js"
+      ],
+      "fixAvailable": false
+    },
+    "vite": {
+      "name": "vite",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "postcss"
+      ],
+      "effects": [],
+      "range": "",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": false
+    },
+    "vue": {
+      "name": "vue",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@vue/compiler-dom",
+        "@vue/compiler-sfc",
+        "@vue/server-renderer"
+      ],
+      "effects": [
+        "@element-plus/icons-vue",
+        "@vitejs/plugin-vue",
+        "@vueuse/core",
+        "@vueuse/shared",
+        "element-plus",
+        "pinia",
+        "vue-router"
+      ],
+      "range": "",
+      "nodes": [
+        "node_modules/vue"
+      ],
+      "fixAvailable": false
+    },
+    "vue-router": {
+      "name": "vue-router",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "vue"
+      ],
+      "effects": [],
+      "range": "",
+      "nodes": [
+        "node_modules/vue-router"
+      ],
+      "fixAvailable": false
+    },
+    "vue-tsc": {
+      "name": "vue-tsc",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@vue/language-core"
+      ],
+      "effects": [],
+      "range": "",
+      "nodes": [
+        "node_modules/vue-tsc"
+      ],
+      "fixAvailable": false
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 1,
+      "moderate": 1,
+      "high": 19,
+      "critical": 0,
+      "total": 21
+    },
+    "dependencies": {
+      "prod": 80,
+      "dev": 55,
+      "optional": 35,
+      "peer": 7,
+      "peerOptional": 0,
+      "total": 141
+    }
+  }
+}

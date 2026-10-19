@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-19",
+  "evidenceMode": "ENGINEERING",
+  "codeBase": "134b47c2e6ef61690b3bfba80461e4fa9d3e7ce3",
+  "uncommittedChanges": true,
+  "command": "mvnw.cmd -q -Dtest=Upgrade*Tests,ResearchReport*Tests test",
+  "database": "Testcontainers PostgreSQL 17 / pgvector, Flyway V27",
+  "providerCalls": 0,
+  "suites": [
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeModelGatewayTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeReadToolsTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeResearchControllerTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeRunPersistenceTests",
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "assetValidation": "ASSETS_VERIFIED_NOT_TASK_ACCEPTANCE",
+  "baselineToolTests": 7,
+  "semanticAcceptance": "NOT_EVALUATED",
+  "implementationTestSha256": "f37f7c62efe91add0a7f24f8b73d0b07525e510e683bd5a781058bbe8ff5cc71"
+}

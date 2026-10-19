@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-19",
+  "command": "mvnw.cmd -q -Dtest=Upgrade*Tests,ResearchReport*Tests test",
+  "exitCode": 0,
+  "tests": 44.0,
+  "failures": 0.0,
+  "errors": 0.0,
+  "skipped": 2.0,
+  "suites": [
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeModelGatewayTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeReadToolsTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeResearchControllerTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeRunPersistenceTests",
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeScopeDebugLiveTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2
+    }
+  ]
+}

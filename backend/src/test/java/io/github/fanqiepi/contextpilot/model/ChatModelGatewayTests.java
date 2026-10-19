@@ -23,6 +23,38 @@ class ChatModelGatewayTests {
     @Mock private ObjectProvider<ChatModel> chatModelProvider;
     @Mock private ChatModel chatModel;
 
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"ANSWERED", "REFUSED"})
+    void decodesDispositionInOneCall(String status) {
+        ChatResponse response = response(status + "\nSolstice answer.");
+        when(chatModelProvider.getIfAvailable()).thenReturn(chatModel);
+        when(chatModel.call(any(Prompt.class))).thenReturn(response);
+        ChatModelResult result = new ChatModelGateway(chatModelProvider, "test")
+                .generate(AnswerStatusDecoder.PROTOCOL, "Independent fixture");
+        assertThat(result.content()).isEqualTo("Solstice answer.");
+        assertThat(result.refused()).isEqualTo(status.equals("REFUSED"));
+        verify(chatModel).call(any(Prompt.class));
+    }
+
+    @Test
+    void streamHidesSplitHeaderAndKeepsDisposition() {
+        when(chatModelProvider.getIfAvailable()).thenReturn(chatModel);
+        var providerChunks = reactor.core.publisher.Flux.just(
+                response("REF"), response("USED\r"), response("\nNo evidence."));
+        when(chatModel.stream(any(Prompt.class))).thenReturn(providerChunks);
+        var chunks = new ChatModelGateway(chatModelProvider, "test")
+                .stream(AnswerStatusDecoder.PROTOCOL, "Independent fixture").collectList().block();
+        assertThat(chunks).extracting(ChatModelChunk::content).containsExactly("", "", "No evidence.");
+        assertThat(chunks.getLast().refused()).isTrue();
+        verify(chatModel).stream(any(Prompt.class));
+    }
+
+    private ChatResponse response(String text) {
+        ChatResponse response = mock(ChatResponse.class, Answers.RETURNS_DEEP_STUBS);
+        when(response.getResult().getOutput().getText()).thenReturn(text);
+        return response;
+    }
+
     @Test
     void appliesResearchSpecificMaximumOutputTokensToThePrompt() {
         ChatResponse response = mock(ChatResponse.class, Answers.RETURNS_DEEP_STUBS);

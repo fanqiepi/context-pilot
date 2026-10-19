@@ -5,5 +5,9 @@ public record ChatModelResult(
         String model,
         Integer promptTokens,
         Integer completionTokens,
-        Integer totalTokens) {
+        Integer totalTokens,
+        boolean refused) {
+    public ChatModelResult(String content, String model, Integer promptTokens, Integer completionTokens, Integer totalTokens) {
+        this(content, model, promptTokens, completionTokens, totalTokens, false);
+    }
 }

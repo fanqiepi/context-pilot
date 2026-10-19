@@ -107,7 +107,7 @@ public class ChatStreamingService {
                     event("done", new ChatStreamPayload.Done("COMPLETED", traceId)));
         }
         if (prepared.refused()) {
-            persistenceService.completeWithoutModel(
+            persistenceService.completeRefusalWithoutModel(
                     exchange.assistantMessageId(),
                     ChatApplicationService.INSUFFICIENT_EVIDENCE_ANSWER);
             return Flux.just(
@@ -162,7 +162,7 @@ public class ChatStreamingService {
                     result.completionTokens(),
                     result.totalTokens(),
                     latencyMs)));
-            events.add(event("done", new ChatStreamPayload.Done("COMPLETED", traceId)));
+            events.add(event("done", new ChatStreamPayload.Done(result.refused() ? "REFUSED" : "COMPLETED", traceId)));
             return Flux.fromIterable(events);
         });
 
@@ -221,6 +221,7 @@ public class ChatStreamingService {
         private Integer promptTokens;
         private Integer completionTokens;
         private Integer totalTokens;
+        private boolean refused;
         private boolean terminal;
 
         private StreamLifecycle(
@@ -233,6 +234,7 @@ public class ChatStreamingService {
         }
 
         synchronized void accept(ChatModelChunk chunk) {
+            if (chunk.refused() != null) refused = chunk.refused();
             if (chunk.content() != null) {
                 answer.append(chunk.content());
             }
@@ -262,7 +264,8 @@ public class ChatStreamingService {
                     model,
                     promptTokens,
                     completionTokens,
-                    totalTokens);
+                    totalTokens,
+                    refused);
         }
 
         synchronized void complete(ChatModelResult result, long latencyMs) {

@@ -1,0 +1,805 @@
+{
+  "command": "mvnw.cmd -q package",
+  "processExitCode": 0,
+  "startedAt": "2026-10-19T16:16:40.3107635+08:00",
+  "recordedAt": "2026-10-19T16:20:55.0082335+08:00",
+  "tests": 528.0,
+  "failures": 0.0,
+  "errors": 0.0,
+  "skipped": 13.0,
+  "caveat": "Surefire reported forced fork JVM shutdown 30 seconds after System.exit(0); stale closed-container Hikari warnings observed. Package exited 0, but teardown is not clean.",
+  "suites": [
+    {
+      "name": "io.github.fanqiepi.contextpilot.action.ActionExecutorDispatcherTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.39
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.action.ActionParametersCodecTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.521
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.action.ActionRequestControllerTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 1.179
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.action.ActionRequestPersistenceTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 10.269
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.action.CreateKnowledgeBaseActionParametersTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.004
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.action.CreateUserMemoryActionParametersTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.006
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.action.CreateUserMemoryActionPersistenceTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.725
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.action.DocumentActionParametersTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.003
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.action.ReindexDocumentActionExecutorTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.089
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.action.RetryDocumentProcessingActionExecutorTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.006
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.action.V2ActionSafetyEvaluationTests",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.703
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.chat.CapabilityRouterTests",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.01
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.chat.ChatApplicationServiceTests",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.32
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.chat.ChatControllerTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.325
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.chat.ChatPersistenceServiceTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.478
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.chat.ChatPreparationServiceTests",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.38
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.chat.ChatPromptMemoryTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.003
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.chat.ChatStreamingServiceTests",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.188
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.chat.ConversationControllerTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.109
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.chat.ConversationHistoryServiceTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.236
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.chat.CreateUserMemoryIntentPolicyTests",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.017
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.chat.SimpleChatReplyPolicyTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.006
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.chat.V2RoutingActionEvaluationTests",
+      "tests": 37,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.258
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.chat.V3HealthRoutingEvaluationTests",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.077
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.chat.V5ProductionRoutingEvaluationTests",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.062
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.ContextPilotApplicationTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 4.017
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.DatabaseMigrationTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 2.591
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.document.DocumentControllerTests",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.091
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.document.DocumentIndexStatusServiceTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.007
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.document.DocumentProcessingCoordinatorTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.16
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.document.DocumentProcessingIntegrationTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 4.234
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.document.DocumentProcessingServiceTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.316
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.document.DocumentServiceTests",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.234
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.document.DocumentVectorIndexTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.185
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.document.EmbeddingIndexProfileTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.document.LocalFileStorageServiceTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.109
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.document.PendingDocumentRecoveryServiceTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.005
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.document.processing.DocumentChunkerTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.01
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.document.processing.SpringAiDocumentParserTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.601
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.evaluation.ChatRefusalDebugLiveTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 0.0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.evaluation.CoreWorkspaceLiveTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 0.0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.evaluation.V2EnvironmentEvaluationTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 0.008
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.evaluation.V3EnvironmentEvaluationTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 0.002
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.evaluation.V4DocumentComparisonEvaluationTests",
+      "tests": 35,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.115
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.evaluation.V4LiveModelEvaluationTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 0.0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.evaluation.V5ExplicitMemoryEvaluationTests",
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.068
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.evaluation.V5LiveModelAcceptanceTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 0.0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.evaluation.V6ToolProtocolProbeTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 0.0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackControllerTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.113
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackPersistenceTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.36
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.feedback.AnswerFeedbackServiceTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.012
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.health.HealthReportActionProposalPersistenceTests",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.922
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthEvaluatorTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.006
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportControllerTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.124
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.health.KnowledgeBaseHealthReportPersistenceTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.265
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.health.PostgresKnowledgeBaseHealthDataPortTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.306
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.health.V3HealthClassificationEvaluationTests",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.036
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.identity.LocalSingleUserSubjectProviderTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.003
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseControllerTests",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.062
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBasePersistenceTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.059
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseServiceTests",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.015
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.memory.MemoryContextPersistenceTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.325
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.memory.MemoryContextServiceTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.077
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.memory.UserMemoryContentTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.006
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.memory.UserMemoryControllerTests",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.138
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.memory.UserMemoryManagementPersistenceTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 5.373
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.memory.UserMemoryPersistenceTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.046
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.model.AnswerStatusDecoderTests",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.015
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.model.ChatModelGatewayTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.491
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.model.DeterministicEmbeddingModelTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.008
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.observability.AiCallLoggerTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.001
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.projectsource.GitHubProjectSourceReaderTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.22
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.projectsource.ProjectSourceLiveTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 0.0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.projectsource.ProjectSourceMcpTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.975
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.projectsource.ProjectSourcePersistenceTests",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 7.441
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.projectsource.ProjectSourcePolicyTests",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.014
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.research.DeterministicResearchPlannerTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.009
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.research.ResearchDocumentEligibilityServiceTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.103
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.research.ResearchExecutorServiceTests",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.625
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.research.ResearchPlanValidatorTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.002
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.research.ResearchStartPersistenceTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 4.046
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.research.ResearchStreamingServiceTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.186
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.researchreview.ReviewLiveTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 0.0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.researchreview.ReviewModelGatewayTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.014
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.researchreview.ReviewPersistenceTests",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 4.779
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.researchreview.ReviewValidatorTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.008
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.retrieval.RetrievalControllerTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.031
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.retrieval.RetrievalServiceTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.079
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.taskworkspace.TaskModelGatewayTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.004
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.taskworkspace.TaskPlanValidatorTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.007
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.taskworkspace.TaskWorkspaceLiveTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 0.0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.taskworkspace.TaskWorkspacePersistenceTests",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 4.218
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeModelGatewayTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.013
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeReadToolsTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.76
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeResearchControllerTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.407
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeRunPersistenceTests",
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 65.861
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.UpgradeScopeDebugLiveTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 0.0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.V6FixtureEvaluationTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 0.0
+    },
+    {
+      "name": "io.github.fanqiepi.contextpilot.upgraderesearch.V6LiveDebugTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 0.0
+    }
+  ]
+}

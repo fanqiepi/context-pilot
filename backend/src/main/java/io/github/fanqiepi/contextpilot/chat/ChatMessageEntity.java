@@ -17,6 +17,10 @@ public class ChatMessageEntity {
     private ChatMessageRole role;
     private String content;
     private ChatMessageStatus status;
+    private Boolean refused;
+
+    public Boolean getRefused() { return refused; }
+    public void setRefused(Boolean refused) { this.refused = refused; }
     private String errorSummary;
     private String traceId;
     private CapabilityId capabilityId;

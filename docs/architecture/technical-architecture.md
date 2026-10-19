@@ -1,4 +1,4 @@
-# ContextPilot 技术架构
+# 研序 技术架构
 
 > 本文维护模块职责和编排机制；逐项功能及版本状态见[功能清单](../development/feature-inventory.md)，运行配置见[本地开发](../development/local-development.md)。
 
@@ -131,3 +131,19 @@ V5 详细合同见 [V5 显式记忆的个人助手详细设计](v5-explicit-memo
 ## 版本化资产
 
 提示词位于 `backend/src/main/resources/prompts/`，数据库迁移位于 `backend/src/main/resources/db/migration/`，评估数据位于 `evals/`，重要技术决策记录为 ADR。
+
+## 研究任务工作台模块
+
+新增独立 taskworkspace 模块：控制器 → 带事务的任务状态服务 → 有界执行器 → 计划模型／限定文档检索／综合模型。任务检查点和事件同事务持久化，执行令牌阻止过期结果写回；不改变既有聊天路由、比对或升级研究。详细合同见[研究任务工作台](research-task-workspace-design.md)。
+
+## 项目资料接入（首版已交付）
+
+2026-10-16 用户批准专用只读 MCP 接入固定公开项目资料、不可变预览及独立确认导入知识库。详细边界以 [项目资料接入设计](project-source-integration-design.md) 为准；首版工程与公开流程验证已通过，证据见 docs/evaluation/project-source-integration-verification.md；独立语义质量评估不包含在本次结论内。
+
+## 研究成果审查（2026-10-19 已批准）
+
+新增 researchreview 模块，固定快照校验、引用检查、一次模型审查、结构校验和持久化；有界执行器、执行令牌和重启失败收敛，不改变原任务结果。详细字段、预算、失败语义和验收合同见[研究成果审查设计](../architecture/research-result-review-design.md)。
+
+## 普通问答回答状态协议（2026-10-19）
+
+根据用户批准的状态语义修正，普通 RAG 使用 rag-answer-system-v3：同一次模型输出的第一行必须是 ANSWERED 或 REFUSED，之后为正常正文。ChatModelGateway 仅对带固定系统协议标识的普通 RAG 启用有界首行解析，支持跨流式分片；首行只用于回答状态，不进入正文、引用或工具决策。无效协议或空正文安全失败，不追加分类调用，不以正文关键词推断。其他研究模型路径不启用该协议。现有检索、引用、确认、路由和预算保持既有合同。该结构校验只证明格式合法，语义是否正确仍须独立真实模型评估。

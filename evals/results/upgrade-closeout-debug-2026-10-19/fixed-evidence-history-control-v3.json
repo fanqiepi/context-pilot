@@ -1,0 +1,93 @@
+{
+  "mode" : "MODEL_FIXED_EVIDENCE_DEBUG_NOT_PRODUCTION_ACCEPTANCE",
+  "startedAt" : "2026-10-19T16:55:51.056587900+08:00",
+  "humanReview" : "NOT_REVIEWED",
+  "evidenceEnvelope" : false,
+  "stageInstruction" : true,
+  "explicitFinalInstruction" : false,
+  "evidence" : [ {
+    "excerpt" : "# 调试旧方案（公开合成）\n\n## scheduling\n旧工作进程按 FIFO 调度，不支持任务优先级。\n",
+    "documentId" : "5a32235b-c37b-4e73-a293-10b60418bc31",
+    "sourceType" : "LOCAL",
+    "untrusted" : true,
+    "sourceId" : "L1",
+    "truncated" : false,
+    "chunkId" : "debug-fixed-1"
+  }, {
+    "truncated" : false,
+    "untrusted" : true,
+    "sourceType" : "RELEASE",
+    "excerpt" : "# 调试发布记录（公开合成，非真实发布）\n\n## scheduling\n调试新版引入两级优先队列，空优先级映射为 normal；不改变任务结果格式。\n",
+    "sourceId" : "R1",
+    "tag" : "debug-release"
+  } ],
+  "harnessSha256" : "f496a4b6a9371f3006dc2b367463f2f36530100b4186407c5247fb965522f563",
+  "results" : [ {
+    "prompt" : "upgrade-research-v3",
+    "debugCase" : "BROAD",
+    "question" : "新调度方案如何兼容旧客户端？",
+    "promptSha256" : "f7c7a74387852c9fe2b95220c4ba343a761197e1b7d9472bfc8f50027481045d",
+    "rawAnswer" : "{\"answer\":\"## 结论\\n所选证据只表明新调度方案有两点对旧客户端友好的处理，但不足以完整证明旧客户端行为不变。\\n\\n- **未提供优先级时落到 normal**：发布记录称新方案引入两级优先队列，空优先级映射为 normal [R1]。因此，旧客户端不传优先级时，不会因缺少该字段而无法入队。\\n- **任务结果格式不变**：发布记录明确本次调度变化不改变任务结果格式 [R1]，因此旧客户端对结果格式的解析不受这一变化影响。\\n- **旧方案背景**：旧工作进程按 FIFO 调度，且不支持任务优先级 [L1]。新方案新增优先级能力 [R1]，但证据未说明 ordered/同级任务是否仍保持原 FIFO 次序。\\n\\n## 升级影响\\n对不传优先级的旧客户端，按发布记录应使用 normal 优先级，且结果格式保持兼容 [R1]；旧方案本身无优先级概念 [L1]。\\n\\n## 迁移清单\\n- 当前问题不要求实际迁移步骤；对旧客户端可保持不发送优先级，使其走 normal 默认映射 [R1]（建议验证）。\\n- 不建议依据现有证据改动旧客户端的结果解析；发布记录称结果格式未变 [R1]。\\n\\n## 验证清单（建议验证，尚未执行）\\n- 验证不携带优先级的旧客户端请求是否确实以 normal 优先级被受理，并核对返回结果格式与旧方案一致 [R1]。\\n- 验证多个同级 normal 请求的处理顺序是否仍符合旧客户端依赖的 FIFO 预期；现有证据未覆盖此点 [L1][R1]。\\n\\n## 资料缺口\\n见 missingEvidence；所选证据未提供同级任务顺序保持的说明，不能据此推断旧 FIFO 行为完全不变。\",\"missingEvidence\":[\"问题中要求的旧客户端兼容性缺少新优先队列在空优先级映射为 normal 后是否保持旧 FIFO 处理顺序的依据。\"]}",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 1383,
+      "completionTokens" : 691,
+      "totalTokens" : 2074,
+      "nativeUsage" : {
+        "completion_tokens" : 691,
+        "prompt_tokens" : 1383,
+        "total_tokens" : 2074,
+        "prompt_tokens_details" : {
+          "cached_tokens" : 768
+        }
+      }
+    },
+    "status" : "OBSERVED",
+    "latencyMs" : 5124
+  }, {
+    "prompt" : "upgrade-research-v3",
+    "debugCase" : "MECHANISM",
+    "question" : "请根据旧方案和所选发布记录，只回答两个兼容机制：旧客户端不传优先级时如何处理，以及任务结果格式是否变化。不要求完整部署方案或保证所有旧行为不变。",
+    "promptSha256" : "f7c7a74387852c9fe2b95220c4ba343a761197e1b7d9472bfc8f50027481045d",
+    "rawAnswer" : "{\"answer\":\"## 结论\\n\\n所选的旧方案与发布记录只支持回答以下两个兼容机制：\\n\\n1. **旧客户端不传优先级时**：旧方案中，工作进程按 FIFO 调度，且不支持任务优先级 [L1]；所选发布记录说明，空优先级会映射为 `normal` [R1]。因此，按发布记录描述的机制，旧客户端省略优先级时不会因缺少该字段而被拒绝，而会获得默认的 `normal` 优先级。该证据只说明空值映射，不能据此证明所有旧客户端的 FIFO 行为、时延或公平性均保持不变。\\n2. **任务结果格式是否变化**：所选发布记录明确说明“不改变任务结果格式” [R1]。因此，按该记录，任务结果的格式保持兼容；但未提供字段级格式定义或实际兼容测试结果。\\n\\n## 升级影响\\n\\n- 不传优先级字段的旧客户端可继续按省略该字段的方式工作，发布侧将其按 `normal` 处理 [R1]。\\n- 依赖任务结果格式的消费方无需因该发布记录所述变化调整解析逻辑 [R1]。\\n- 旧方案原本没有优先级能力 [L1]；新发布引入两级优先队列 [R1]，但当前问题不要求完整部署方案，也不要求保证所有旧行为不变。\\n\\n## 迁移清单\\n\\n- 针对上述两个兼容机制，不要求旧客户端为“不传优先级”强行改造；可按原有方式省略优先级 [L1][R1]。\\n- 若客户端希望明确表达优先级，可在确认新端支持后再发送具体优先级；这属于建议，不是所选证据已经验证的步骤。\\n- 结果消费方无需依据该发布记录修改结果格式解析 [R1]。\\n\\n## 验证清单\\n\\n建议验证以下与当前问题直接相关的场景：\\n\\n- 模拟旧客户端不发送优先级，确认实际按 `normal` 处理 [R1]。\\n- 对同一类任务比较升级前后的结果结构，确认结果格式未变化 [R1]。\\n- 仅建议验证上述两点，不将未执行的测试描述为已验证。\\n\\n## 资料缺口\\n\\n当前问题的所选证据充分；未执行实际迁移或测试。\",\"missingEvidence\":[]}",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 1417,
+      "completionTokens" : 766,
+      "totalTokens" : 2183,
+      "nativeUsage" : {
+        "completion_tokens" : 766,
+        "prompt_tokens" : 1417,
+        "total_tokens" : 2183,
+        "prompt_tokens_details" : {
+          "cached_tokens" : 768
+        }
+      }
+    },
+    "status" : "OBSERVED",
+    "latencyMs" : 4408
+  }, {
+    "prompt" : "upgrade-research-v3",
+    "debugCase" : "MISSING",
+    "question" : "请根据旧方案和所选发布记录，说明优先级缺省与结果格式的兼容变化，并给出新版在故障后承诺的恢复时间。没有恢复时间依据时明确列为缺口，不推测数值。",
+    "promptSha256" : "f7c7a74387852c9fe2b95220c4ba343a761197e1b7d9472bfc8f50027481045d",
+    "rawAnswer" : "{\"answer\":\"### 直接结论\\n- **优先级缺省**：旧方案按 FIFO 调度，且不支持任务优先级 [L1]；调试新版引入两级优先队列，空优先级映射为 `normal` [R1]。因此，未设置或空优先级的兼容预期是归入 `normal`；不能据此认为旧版已具备两级优先级语义。\\n- **结果格式**：所选发布明确“不改变任务结果格式” [R1]，因此按该发布记录，结果格式与旧方案保持兼容，无需因这项变化调整结果解析。\\n- **故障后恢复时间**：所选发布记录未给出任何故障后的恢复时间承诺或指标，无法提供具体数值；不推测，列为资料缺口。\\n\\n### 升级影响\\n1. 调度从 FIFO 变为两级优先队列；原先没有优先级概念的任务需要按空优先级映射规则处理 [L1][R1]。\\n2. 结果格式未变，现有结果消费逻辑不受该发布所述变化影响 [R1]。\\n3. 故障恢复时间没有发布依据，不能形成时间承诺或兼容性结论 [R1]。\\n\\n### 迁移清单\\n- 检查发送任务时未设置或设置为空优先级的调用，并按新版规则确认其归入 `normal` [R1]。\\n- 保留现有结果格式解析逻辑；依据所选发布，不需要为该变化改造结果解析 [R1]。\\n- 恢复时间相关迁移或运维时限：当前证据未提供承诺值，无法制定具体时限 [R1]。\\n\\n### 验证清单（建议验证，尚未执行）\\n- 验证空优先级及未提供优先级的任务均按 `normal` 处理 [R1]。\\n- 验证两级优先队列的实际调度行为符合新版说明 [R1]。\\n- 对旧方案与新版的同一任务结果做格式回归比对，确认结果格式未改变 [L1][R1]。\\n- 故障恢复时间：没有发布承诺，无法设置基于承诺值的验证项；需先补充该依据。\\n\\n### 资料缺口\\n- 问题中要求的故障后承诺恢复时间缺少所选发布记录中的恢复时间指标或承诺依据。\\n\\n本次仅覆盖所选文档和 `debug-release` 发布记录；未执行实际迁移或测试。\",\"missingEvidence\":[\"问题中要求的故障后承诺恢复时间缺少所选发布记录中的恢复时间指标或承诺依据。\"]}",
+    "model" : "deepseek-flash",
+    "usage" : {
+      "promptTokens" : 1419,
+      "completionTokens" : 1355,
+      "totalTokens" : 2774,
+      "nativeUsage" : {
+        "completion_tokens" : 1355,
+        "prompt_tokens" : 1419,
+        "total_tokens" : 2774,
+        "prompt_tokens_details" : {
+          "cached_tokens" : 768
+        }
+      }
+    },
+    "status" : "OBSERVED",
+    "latencyMs" : 7693
+  } ],
+  "finishedAt" : "2026-10-19T16:56:08.538944500+08:00"
+}

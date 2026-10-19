@@ -61,6 +61,7 @@ import static org.mockito.Mockito.when;
         "contextpilot.document.processing.enabled=true",
         "contextpilot.document.processing.max-attempts=3"
 })
+@org.springframework.test.annotation.DirtiesContext(classMode = org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS)
 @Testcontainers(disabledWithoutDocker = true)
 class HealthReportActionProposalPersistenceTests {
 

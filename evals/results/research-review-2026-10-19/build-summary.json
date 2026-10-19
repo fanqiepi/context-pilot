@@ -1,0 +1,9 @@
+{
+  "command": ".\\mvnw.cmd -q package",
+  "date": "2026-10-19",
+  "tests": 493.0,
+  "failures": 0.0,
+  "errors": 0.0,
+  "skipped": 10.0,
+  "suites": 94
+}

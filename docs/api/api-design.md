@@ -91,7 +91,7 @@ V4 详细方案见 [V4 知识研究助手详细设计](../architecture/v4-knowle
 - `409 RESEARCH_DOCUMENT_NOT_ELIGIBLE`：任一文档状态或索引不满足启动资格；
 - `409 RESEARCH_RUN_NOT_CANCELLABLE`：运行已进入非取消终态；
 - `RESEARCH_PLAN_INVALID`、`RESEARCH_TIMEOUT`、`RESEARCH_DEPENDENCY_UNAVAILABLE` 和 `RESEARCH_RUN_INTERRUPTED`：作为运行失败码持久化，并通过同步响应或 SSE 安全摘要返回。
-- `RESEARCH_PARTIAL_RETRIEVAL`、`RESEARCH_EVIDENCE_BUDGET_REACHED`、`RESEARCH_ANSWER_BUDGET_REACHED` 和 `RESEARCH_UNSUPPORTED_CONTENT_REMOVED`：作为部分完成原因持久化；运行查询与历史摘要返回 `errorCode/errorSummary`，前端据此展示对应原因，不使用笼统的降级说明。
+- `RESEARCH_PARTIAL_RETRIEVAL`、`RESEARCH_EVIDENCE_BUDGET_REACHED`、`RESEARCH_ANSWER_BUDGET_REACHED`、`RESEARCH_UNSUPPORTED_CONTENT_REMOVED` 和 `RESEARCH_EVIDENCE_GAP`：作为部分完成原因持久化；运行查询与历史摘要返回 `errorCode/errorSummary`，前端据此展示对应原因，不使用笼统的降级说明。`RESEARCH_EVIDENCE_GAP` 为 2026-10-19 批准的状态对齐：有有效结论，同时保留了严格匹配所选文件名的规范无证据声明，运行返回 PARTIAL，SSE done 返回 PARTIAL；没有任何有效结论仍按既有拒答规则处理。
 
 SSE 顺序固定为：
 
@@ -290,3 +290,19 @@ message -> route -> action_required -> done(AWAITING_CONFIRMATION)
 确认和拒绝接口不接受客户端覆盖 `actionType`、参数、会话、消息或 trace ID。执行参数完全来自服务端已校验并持久化的提案。状态冲突返回 `409`，提案不存在或已逻辑删除返回 `404`。
 
 `CREATE_KNOWLEDGE_BASE` 提案只包含规范化后的 `name` 和可选 `description`。确认成功后调用现有知识库领域服务；名称冲突沿用 `KNOWLEDGE_BASE_NAME_CONFLICT` 语义。执行错误保存并返回安全摘要，不暴露堆栈、SQL 或内部类名。
+
+## 研究任务工作台 API
+
+新增 /api/research-tasks 的创建、分页列表、详情、逻辑删除、commands 与 events 接口。命令采用 START、PAUSE、RESUME、CANCEL、SUPPLEMENT 静态枚举及 expectedRevision；不接受 ownerId。细节见[设计](../architecture/research-task-workspace-design.md)。
+
+## 项目资料接入（首版已交付）
+
+2026-10-16 用户批准专用只读 MCP 接入固定公开项目资料、不可变预览及独立确认导入知识库。详细边界以 [项目资料接入 API 合同](../architecture/project-source-integration-design.md#api-和页面合同) 为准；首版工程与公开流程验证已通过，证据见 docs/evaluation/project-source-integration-verification.md；独立语义质量评估不包含在本次结论内。
+
+## 研究成果审查（2026-10-19 已批准）
+
+新增任务下 reviews 创建/分页、research-reviews 详情/取消/逻辑删除接口。客户端不提供证据或主体，revision 防止覆盖；补充继续复用用户主动 SUPPLEMENT。详细字段、预算、失败语义和验收合同见[研究成果审查设计](../architecture/research-result-review-design.md)。
+
+## 普通问答拒答状态修正（2026-10-19）
+
+普通 RAG 即使检索到了相关片段，模型仍可在同一次回答中明确声明无法回答当前问题；服务端解析受限状态协议，非流式返回 refused=true，SSE 返回 done(REFUSED)。内部状态首行不会进入正文、delta 或历史。协议缺失、非法或正文为空时失败，不默认为成功、不额外重试分类。会话历史新增可空 refused：新普通回答保存明确布尔值，历史未知记录为 null；研究比对优先使用既有 researchRun.answerStatus。数据库消息完成状态与回答是否拒答是两个维度，拒答仍为已完成消息。
