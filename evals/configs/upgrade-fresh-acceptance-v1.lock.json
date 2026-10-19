@@ -1,0 +1,11 @@
+{
+  "frozenAt": "2026-10-19T17:21:22.6117653+08:00",
+  "code": "601da27",
+  "status": "FROZEN_BEFORE_FIRST_RUN",
+  "humanReview": "NOT_REVIEWED",
+  "sha256": {
+    "evals/datasets/upgrade-fresh-acceptance-v1.json": "b826e514545246642556ad379784a08f1a515d0c42547edcac09f70074941813",
+    "backend/src/main/resources/prompts/upgrade-research-v6.txt": "efab577645f102e2921783a3ab77baa7b45729e2c42b0eaa1adfaafde6f311d3",
+    "evals/configs/v6-upgrade-research-v1.json": "320aadb056c937852ecc9dc1b79fd0e753bc3027a4ab85eed852acedb6b09ff1"
+  }
+}
