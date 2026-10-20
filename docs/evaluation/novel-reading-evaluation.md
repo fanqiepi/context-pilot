@@ -4,7 +4,7 @@
 
 ## 资产冻结
 
-确认合同后准备 `evals/corpora/reading/`、`evals/datasets/reading/`、`evals/configs/reading/` 与对应报告（当前尚未创建）：
+2026-10-20 已创建 `reading-acceptance-v1` 的语料、题集、配置与冻结清单，执行入口见[阅读验收工具](../../evals/tools/reading-README.md)，实际证据见[本轮验证](reading-experience-verification.md)。下列资产已经具备；真实运行与人工语义复核尚未执行：
 
 - 一部自创十二章故事，含同章后半揭密、同名人物、未揭别名、错误推断诱因与正文注入；为每个边界标注已知/未知事实和正确拒答条件。
 - 自创第二版本改动关键身份/结局，明确旧版本引用不等于新版事实；标注书籍/版本/段落 ID、文本 hash。
@@ -12,7 +12,9 @@
 - 确定性自生成长篇文本用于容量与定位压力测试，不作为语义自然度/真实读者分布证据。
 - 调试与最终 TEST 的故事片段/问题按来源和近重复隔离；同一问题重复运行仅作稳定性样本，不算新的独立问题。最终 TEST 的参考证据与评分先冻结再采集。
 
-每个 case 记录 caseId、split、book/version/hash、boundary、input、taskType/mode、expectedFacts、forbiddenFacts、expectedEvidence、expectedOutcome、tags。冻结 manifest 包含源代码指纹、模型与 profile、Prompt 版本、预算配置、时间和评分规则；改变 Prompt/检索/语料须新版本，保留原失败。
+每个 case 记录 caseId、split、book/version/hash、boundary、input、taskType/mode、expectedFacts、forbiddenFacts、expectedEvidence、expectedOutcome、tags。冻结 manifest 包含源代码指纹、模型与 profile、Prompt 版本、预算配置、时间和评分规则；改变 Prompt/检索/语料须新版本，保留原失败。逻辑段 ID 需映射真实导入 UUID 并按 hash 核验；生产 BookParser 的离线测试核对章/段顺序，不能把逻辑 ID 当当前数据库数据。
+
+工具模板保留所有 NOT_RUN；报告拒绝缺题、重复题、错版/越界参考和与观测哈希不匹配的人工评分。事实/引用 pooled 与 macro、每题召回、固定分母可用率/拒答、分模式时延与未知 usage 分开记录，不自动宣告满足门槛。人工参考由本轮编制并检查结构，独立语义复核仍待实际评估时完成。
 
 ## 工程门禁（离线、不访问付费服务）
 

@@ -13,6 +13,7 @@
 | [阅读业务合同](architecture/novel-reading-design.md) | `reading-contract-v1-draft1` 已获批准；页面/范围/编排/失败语义，实施状态另列 |
 | [阅读数据](data/novel-reading-data-model.md) / [阅读 API](api/novel-reading-api.md) / [阅读评估](evaluation/novel-reading-evaluation.md) | 已批准合同的字段、接口与验证方法；数值预算和门槛引用唯一新路线 |
 | [基础阅读验证记录](evaluation/reading-library-verification.md) | 首个大功能点的实际工程证据、范围与限制 |
+| [续读体验验证](evaluation/reading-experience-verification.md) / [演示与试用脚本](development/reading-demo.md) | 冻结评测准备、离线容量/页面证据及尚未完成的真实验收 |
 
 工作规则见 [AGENTS.md](../AGENTS.md)。详细合同已批准；每个会话只完成一个大功能点，验证后提醒用户提交 PR，下一窗口再继续。不要把未实施的 AI 规划写成已交付。
 

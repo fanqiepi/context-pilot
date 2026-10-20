@@ -1,0 +1,42 @@
+{
+  "recordedOn": "2026-10-20",
+  "baseCommit": "42686ca54e73d652cb1ae2c5b59f3996093269ca",
+  "mode": "OFFLINE_ENGINEERING",
+  "checks": {
+    "backend": {
+      "tests": 47,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 2
+    },
+    "browserFixture": {
+      "tests": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    "reportTool": {
+      "tests": 16,
+      "failed": 0
+    },
+    "frontend": "BUILD_AND_TYPECHECK_PASSED",
+    "links": "NO_BROKEN_LOCAL_LINKS",
+    "gitleaks": "NO_LEAKS_IN_CHANGED_AND_UNTRACKED_FILES",
+    "diff": "CHECK_PASSED"
+  },
+  "notRunTemplate": {
+    "plannedRows": 108,
+    "reviewStatus": "INCOMPLETE",
+    "acceptance": "NOT_DETERMINED",
+    "allFactRatesNull": true
+  },
+  "realGenerationCalls": 0,
+  "realEmbeddingCalls": 0,
+  "readerParticipants": 0,
+  "semanticAcceptance": "NOT_PERFORMED",
+  "limitations": [
+    "No live provider adapter/protocol/pricing verification.",
+    "No paid authorization.",
+    "No full cold/hot browser performance or reader trial.",
+    "No recorded demo video."
+  ]
+}

@@ -4,6 +4,8 @@
 
 业务语义见[设计](../architecture/novel-reading-design.md)，容量和门槛见[唯一路线](../development/novel-reading-roadmap.md)，接口见[API](../api/novel-reading-api.md)。
 
+2026-10-20 续读体验准备轮：没有新增迁移或业务表，源码仍到 V31。评测 JSON 的书籍/版本/段落逻辑 ID 仅用于固定资产，执行时必须映射真实导入 UUID 并核验 hash；它们不是数据库记录，不能跨版本复用。见[验证记录](../evaluation/reading-experience-verification.md)。
+
 当前实现：[V29](../../backend/src/main/resources/db/migration/V29__create_reading_library.sql) 包含基础阅读九张表；[V30](../../backend/src/main/resources/db/migration/V30__create_reading_tasks.sql) 新增 `reading_task/reading_index_job/reading_job_command/reading_ai_call/reading_task_event/reading_task_evidence/reading_index_segment/reading_vector_store/reading_spend_ledger`。本轮 [V31](../../backend/src/main/resources/db/migration/V31__create_reading_note_proposals.sql) 新增 `reading_note_proposal`，并扩展 `reading_note` 为 MANUAL/EXCERPT/AI_RECAP/AI_CHARACTER，增加来源任务、提案、冻结引用和编辑标记。摘录编辑不修改原锚点。迁移仅在隔离测试数据库验证，未迁移用户现有本地数据库。
 
 范围功能本身沿用 V29。`ReadingScopeService` 快照仅在服务端构造；状态 SSE 从当前提交行重建。笔记/书签保留原 `required_boundary`，回退只改变可见性；重新到达足够边界后可重新查看历史记录，旧 epoch 的在途发布仍然失效。

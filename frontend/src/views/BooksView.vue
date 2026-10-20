@@ -35,6 +35,6 @@ onMounted(load)
     </div>
     <el-empty v-if="!loading && !books.length" description="导入一本 UTF-8 TXT 或 Markdown 小说，开始阅读。" />
     <el-pagination v-if="total > 20" v-model:current-page="page" :total="total" :page-size="20" layout="prev, pager, next" @current-change="load" />
-    <p class="reading-footnote">基础阅读无需 AI。前情回顾与人物查证将在后续功能点中提供。</p>
+    <p class="reading-footnote">基础阅读无需 AI。阅读助手已接入已读范围与笔记确认流程，真实 AI 调用尚未开放。</p>
   </section>
 </template>

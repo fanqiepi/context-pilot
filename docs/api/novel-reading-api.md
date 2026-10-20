@@ -4,6 +4,8 @@
 
 业务语义见[设计](../architecture/novel-reading-design.md)，字段约束见[数据](../data/novel-reading-data-model.md)，数值限制见[新路线](../development/novel-reading-roadmap.md)。
 
+2026-10-20 续读体验准备轮：未新增或变更业务 API。评测工具仅本地读取固定文件、验证和汇总；没有模型执行 HTTP 入口，也不放开真实调用。数据集任务类型沿用 `RECAP/CHARACTER_LOOKUP`、人物模式沿用 `DIRECT/MULTI_QUERY`，参考答案和禁用事实不得作为应用请求内容。见[验证记录](../evaluation/reading-experience-verification.md)。
+
 当前实现范围：基础阅读、范围/预览、`ReadingTaskController` 的索引/任务与证据引用，以及本轮 `ReadingNoteProposalController` 的独立笔记提案与确认。真实供应商适配尚未开放，生产创建 AI 任务返回 `LIVE_AI_NOT_AUTHORIZED`；笔记保存本身不调用模型。正文增加 `atParagraphId` 用于恢复位置及书签/摘录定位，与 cursor 互斥并严格校验版本和章节关系；不会修改已读边界。预览目录当前返回数组，总数从预览 `chapterCount` 取得，默认 size=50；普通目录返回分页对象，默认 size=50。同位置新建重复书签返回 409 `BOOKMARK_EXISTS`；原幂等键重放返回原书签，已删除键返回 410。摘录编辑保留原锚点，并返回 `userEdited`/`originalExcerpt`，页面明确区分编辑内容与原选文。
 
 ## 通用协议

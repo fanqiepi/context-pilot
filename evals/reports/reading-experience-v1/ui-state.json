@@ -1,0 +1,47 @@
+{
+  "mode": "OFFLINE_FIXTURE",
+  "state": {
+    "versionId": "7f76138c-6f7f-4b60-8c8d-33888dcf9e76",
+    "resumePosition": {
+      "paragraphId": "c4caf2bc-a5c4-30d5-8d84-c2d8a3a11efa",
+      "chapterId": "aaea4668-d595-308e-b71e-77a7ace3c452",
+      "paragraphOrdinal": 1,
+      "offset": 0
+    },
+    "resumeRevision": 1,
+    "readBoundary": 2,
+    "scopeRevision": 1,
+    "visibilityEpoch": 0,
+    "dataAsOf": "2026-10-20T19:19:27.725474+08:00"
+  },
+  "notes": {
+    "items": [
+      {
+        "id": "e8df7a64-8158-4775-b01c-a0cda9984de6",
+        "versionId": "7f76138c-6f7f-4b60-8c8d-33888dcf9e76",
+        "visibility": "VISIBLE",
+        "kind": "AI_RECAP",
+        "title": "续读体验验证",
+        "body": "林舟来到渡口。",
+        "anchorParagraphId": null,
+        "chapterId": null,
+        "anchorStart": null,
+        "anchorEnd": null,
+        "revision": 0,
+        "createdAt": "2026-10-20T11:16:43.62302Z",
+        "userEdited": true,
+        "originalExcerpt": null,
+        "sourceTaskId": "84b430ae-8824-4686-8864-cbd28b492c88",
+        "retainedEvidenceIds": [
+          "E1"
+        ],
+        "requiredBoundary": 2
+      }
+    ],
+    "page": 1,
+    "size": 20,
+    "total": 1
+  },
+  "viewport": "390x844",
+  "flow": "desktop proposal confirmation; mobile citation; explicit continue; shelf resume; reload"
+}

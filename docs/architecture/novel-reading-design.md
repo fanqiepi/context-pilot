@@ -4,6 +4,8 @@
 
 本文定义业务与架构合同；实施顺序、容量/调用预算和完成门槛唯一维护在[新路线](../development/novel-reading-roadmap.md)。配套：[数据草案](../data/novel-reading-data-model.md)、[API 草案](../api/novel-reading-api.md)、[评估方案](../evaluation/novel-reading-evaluation.md)。确认这一组合同后连续实施；付费实验仍须单独授权。
 
+最新核对（2026-10-20）：笔记确认已提交 `42686ca`。用户随后要求下一能力，本轮增加冻结评测/人工报告工具及离线续读展示证据，未改变生产业务架构、供应商适配或合同范围。见[本轮验证](../evaluation/reading-experience-verification.md)。下列“批准时”和各轮实现核对保留为历史快照，不代表全部当前状态。
+
 ## 合同批准时的代码与 Git 核对（历史快照）
 
 2026-10-20 本轮读取工作树代码和配置，未启动服务、连接数据库或调用供应商：

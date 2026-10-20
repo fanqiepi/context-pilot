@@ -20,7 +20,7 @@
 | 留下阅读记录 | 手写笔记、摘录、经确认保存的 AI 回顾 | AI 保存需持久提案、独立确认、原子幂等；不写入回答偏好 |
 | 单用户使用 | 本机或可信网络内的 Web 应用 | LOCAL_OWNER 是归属而非认证，不提供公开多用户服务 |
 
-上述为新路线的产品范围。用户已批准 `reading-contract-v1-draft1` 的[业务/页面合同](../architecture/novel-reading-design.md)、[数据](../data/novel-reading-data-model.md)、[API](../api/novel-reading-api.md)、[评估方法](../evaluation/novel-reading-evaluation.md)。基础阅读、范围及阅读任务离线链路已实现；用户再次要求下一能力后，本轮实施“确认保存回顾笔记”：编辑、持久预览、独立确认、管理与出处保留。真实 AI 适配与语义验收尚未开放；具体预算与门槛只在[新路线](../development/novel-reading-roadmap.md)维护。每轮完成一个大功能点后提醒用户提交 PR，付费实验单独授权。
+上述为新路线的产品范围。用户已批准 `reading-contract-v1-draft1` 的[业务/页面合同](../architecture/novel-reading-design.md)、[数据](../data/novel-reading-data-model.md)、[API](../api/novel-reading-api.md)、[评估方法](../evaluation/novel-reading-evaluation.md)。基础阅读、范围、阅读任务和确认保存笔记的离线链路已实现；用户再次要求下一能力后，本轮准备固定评测资产、离线体验证据和展示材料，不新增产品范围。真实 AI 适配、语义与真实读者体验验收尚未完成；具体预算与门槛只在[新路线](../development/novel-reading-roadmap.md)维护。每轮推进一个大功能点后提醒用户提交 PR，付费实验单独授权。
 
 合同具体化：首次导入不自动花费 embedding 费用；基础阅读独立可用，回顾直接读取范围内正文，人物查证使用用户主动建立的已读索引。笔记/历史/引用在边界回退后统一隐藏较后内容。首版不复用跨任务生成答案、不构建全书人物表，复杂查证由用户主动选择。既有工作区保留直接入口，新阅读页面使用独立路由，技术标识与当前展示名称保持不变。
 
