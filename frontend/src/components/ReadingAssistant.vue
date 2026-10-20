@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { onUnmounted, ref, watch } from 'vue'
 import { ElMessageBox } from 'element-plus'
+import ReadingNoteProposal from '@/components/ReadingNoteProposal.vue'
 import { errorMessage } from '@/api/client'
 import { readingGet, readingPost, readingDelete, type ReadingState, type ReadingSource } from '@/api/reading'
 
 const props = defineProps<{ versionId: string; state?: ReadingState; ready: boolean; open: boolean }>()
-const emit = defineEmits<{ continue: [source: ReadingSource]; close: [] }>()
+const emit = defineEmits<{ continue: [source: ReadingSource]; close: []; saved: [] }>()
 type Task = {
   id: string; type?: string; status: string; revision: number; visibility: string; errorCode?: string
   question?: string; message?: string; currentScopeRevision?: number; visibilityEpoch?: number
@@ -57,6 +58,7 @@ async function load() {
 }
 async function select(task: Task) {
   events?.close(); sources.value = []; preview.value = false
+  current.value = undefined
   const g = generation, request = ++selection
   try {
     const t = await readingGet<Task>(`/tasks/${task.id}`)
@@ -200,6 +202,7 @@ onUnmounted(clear)
           <p v-if="current.question">{{ current.question }}</p>
           <p v-if="current.errorCode">{{ errors[current.errorCode] || current.errorCode }}</p><p v-if="current.message">{{ current.message }}</p>
           <p v-for="(fact, n) in current.validatedResult?.facts" :key="n">{{ fact.text }} <el-button v-for="id in fact.evidenceIds" :key="id" text @click="citation(id)">[{{ id }}] 原文</el-button></p>
+          <ReadingNoteProposal v-if="state && ['COMPLETED', 'PARTIAL'].includes(current.status) && current.validatedResult?.facts.length" :key="current.id" :task-id="current.id" :task-type="current.type || 'RECAP'" :facts="current.validatedResult.facts" :state="state" @saved="emit('saved')" />
           <p v-if="current.budget">已预留生成 {{ current.budget.modelCalls }} 次、embedding {{ current.budget.embeddingCalls }} 次；累计执行 {{ (current.budget.activeMillis / 1000).toFixed(1) }} 秒。未知 usage 不按零费用记账。</p>
           <template v-if="!terminal(current)"><el-button v-if="current.status === 'PAUSED'" @click="command(current, 'RESUME')">恢复任务</el-button><el-button v-else @click="command(current, 'PAUSE')">暂停</el-button><el-button @click="command(current, 'CANCEL')">取消任务</el-button></template>
         </template>

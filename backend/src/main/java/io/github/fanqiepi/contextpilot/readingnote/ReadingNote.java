@@ -15,6 +15,10 @@ public class ReadingNote {
     public String kind;
     public String title;
     public String body;
+    public UUID sourceTaskId;
+    public UUID sourceProposalId;
+    public String citationsJson="[]";
+    public boolean userEdited;
     public UUID anchorParagraphId;
     public Integer anchorStart;
     public Integer anchorEnd;

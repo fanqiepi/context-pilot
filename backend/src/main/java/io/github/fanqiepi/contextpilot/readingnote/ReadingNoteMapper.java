@@ -8,13 +8,13 @@ import org.apache.ibatis.annotations.*;
 public interface ReadingNoteMapper extends BaseMapper<ReadingNote> {
     @Insert("""
         INSERT INTO reading_note(id,owner_id,book_id,version_id,client_request_id,request_hash,kind,title,body,
-          anchor_paragraph_id,anchor_start,anchor_end,required_boundary)
+          anchor_paragraph_id,anchor_start,anchor_end,required_boundary,source_task_id,source_proposal_id,citations_json,user_edited)
         VALUES(#{id},#{ownerId},#{bookId},#{versionId},#{clientRequestId},#{requestHash},#{kind},#{title},#{body},
-          #{anchorParagraphId},#{anchorStart},#{anchorEnd},#{requiredBoundary})
+          #{anchorParagraphId},#{anchorStart},#{anchorEnd},#{requiredBoundary},#{sourceTaskId},#{sourceProposalId},CAST(#{citationsJson} AS jsonb),#{userEdited})
         """)
     @Options(timeout=3)
     int create(ReadingNote note);
-    @Update("UPDATE reading_note SET title=#{title},body=#{body},required_boundary=#{requiredBoundary},revision=#{revision},updated_at=CURRENT_TIMESTAMP WHERE id=#{id} AND deleted=0")
+    @Update("UPDATE reading_note SET title=#{title},body=#{body},required_boundary=#{requiredBoundary},citations_json=CAST(#{citationsJson} AS jsonb),user_edited=#{userEdited},revision=#{revision},updated_at=CURRENT_TIMESTAMP WHERE id=#{id} AND deleted=0")
     @Options(timeout=3)
     int save(ReadingNote note);
     @Update("UPDATE reading_note SET deleted=1,revision=revision+1,updated_at=CURRENT_TIMESTAMP WHERE id=#{id} AND deleted=0")
@@ -26,6 +26,9 @@ public interface ReadingNoteMapper extends BaseMapper<ReadingNote> {
     @Select("SELECT * FROM reading_note WHERE id=#{id} AND owner_id=#{owner}")
     @Options(timeout=3)
     ReadingNote owned(@Param("owner") UUID owner,@Param("id") UUID id);
+    @Select("SELECT * FROM reading_note WHERE owner_id=#{owner} AND source_task_id=#{task}")
+    @Options(timeout=3)
+    ReadingNote byTask(@Param("owner") UUID owner,@Param("task") UUID task);
     @Select("SELECT * FROM reading_note WHERE owner_id=#{owner} AND version_id=#{version} AND deleted=0 ORDER BY created_at DESC,id LIMIT #{limit} OFFSET #{offset}")
     @Options(timeout=3)
     List<ReadingNote> list(@Param("owner") UUID owner,@Param("version") UUID version,@Param("limit") int limit,@Param("offset") long offset);

@@ -58,6 +58,9 @@ class ContextPilotApplicationTests {
     private ReadingNoteMapper readingNoteMapper;
 
     @MockitoBean
+    private io.github.fanqiepi.contextpilot.readingnote.ReadingNoteProposalMapper readingNoteProposalMapper;
+
+    @MockitoBean
     private io.github.fanqiepi.contextpilot.projectsource.ProjectPreviewMapper projectPreviewMapper;
     @MockitoBean
     private io.github.fanqiepi.contextpilot.projectsource.ProjectImportMapper projectImportMapper;

@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@RestControllerAdvice(assignableTypes={ReadingController.class,io.github.fanqiepi.contextpilot.readingtask.ReadingTaskController.class})
+@RestControllerAdvice(assignableTypes={ReadingController.class,io.github.fanqiepi.contextpilot.readingtask.ReadingTaskController.class,
+        io.github.fanqiepi.contextpilot.readingnote.ReadingNoteProposalController.class})
 public class ReadingHttpAdvice implements ResponseBodyAdvice<Object> {
     @ExceptionHandler(ReadingException.class)
     public ResponseEntity<?> reading(ReadingException error,HttpServletRequest request) {
@@ -22,7 +23,7 @@ public class ReadingHttpAdvice implements ResponseBodyAdvice<Object> {
         body.put("code",error.code());body.put("message",error.getMessage());
         body.put("requestId",request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE)==null?UUID.randomUUID().toString():request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE));
         if(error.currentRevision()!=null)body.put("currentRevision",error.currentRevision());
-        return ResponseEntity.status(error.status()).contentType(MediaType.APPLICATION_JSON).body(body);
+        return ResponseEntity.status(error.status()).cacheControl(CacheControl.noStore()).contentType(MediaType.APPLICATION_JSON).body(body);
     }
     @ExceptionHandler({org.springframework.web.bind.MissingServletRequestParameterException.class,
             org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class,

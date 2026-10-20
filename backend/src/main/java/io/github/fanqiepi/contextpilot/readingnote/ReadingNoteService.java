@@ -11,11 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReadingNoteService {
     public record Create(UUID clientRequestId,String kind,String title,String body,UUID anchorParagraphId,
                          Integer anchorStart,Integer anchorEnd,Long expectedScopeRevision) {}
-    public record Edit(Long expectedRevision,Long expectedScopeRevision,String title,String body) {}
+    public record Edit(Long expectedRevision,Long expectedScopeRevision,String title,String body,List<String> retainedEvidenceIds) {
+        public Edit(Long expectedRevision,Long expectedScopeRevision,String title,String body) {
+            this(expectedRevision,expectedScopeRevision,title,body,null);
+        }
+    }
     public record BookmarkCreate(UUID clientRequestId,UUID paragraphId,Integer offset,String label) {}
     public record NoteView(UUID id,UUID versionId,String visibility,String kind,String title,String body,UUID anchorParagraphId,
                            UUID chapterId,Integer anchorStart,Integer anchorEnd,long revision,OffsetDateTime createdAt,
-                           boolean userEdited,String originalExcerpt) {}
+                           boolean userEdited,String originalExcerpt,UUID sourceTaskId,List<String> retainedEvidenceIds,int requiredBoundary) {}
     public record BookmarkView(UUID id,UUID paragraphId,UUID chapterId,int offset,String label,String visibility,long revision) {}
     private final ReadingStateService states;
     private final BookMapper books;
@@ -42,6 +46,16 @@ public class ReadingNoteService {
             ReadingScopeService.requireVisible(scope,note.versionId,note.requiredBoundary);
             if(note.anchorParagraphId==null) throw ReadingException.missing();
             return scopes.source(scope,note.anchorParagraphId,note.anchorStart,note.anchorEnd,note.requiredBoundary);
+        });
+    }
+    public Object citation(UUID id,String key) {
+        var first=requireNote(id,false);
+        return scopes.current(first.versionId,scope->{
+            var note=requireNote(id,false);
+            ReadingScopeService.requireVisible(scope,note.versionId,note.requiredBoundary);
+            var evidence=ReadingNoteEvidence.read(note.citationsJson).stream().filter(e->e.id().equals(key)).findFirst().orElseThrow(ReadingException::missing);
+            return Map.of("evidenceId",key,"sources",ReadingNoteEvidence.sources(evidence,scopes,scope,note.requiredBoundary),
+                    "scopeRevision",scope.scopeRevision(),"visibilityEpoch",scope.visibilityEpoch());
         });
     }
     @Transactional(timeout=5)
@@ -83,6 +97,9 @@ public class ReadingNoteService {
         if(note.requiredBoundary>state.boundaryOrdinal) throw ReadingException.conflict("SCOPE_HIDDEN","笔记超出当前已读范围");
         note.title=ReadingText.bounded(request.title(),0,120,"标题");
         String body=ReadingText.bounded(request.body(),1,5000,"笔记");
+        if(request.retainedEvidenceIds()!=null)
+            note.citationsJson=ReadingText.json(ReadingNoteEvidence.retain(ReadingNoteEvidence.read(note.citationsJson),request.retainedEvidenceIds()));
+        note.userEdited=note.sourceTaskId!=null || note.userEdited;
         note.body=body;note.requiredBoundary=Math.max(note.requiredBoundary,state.boundaryOrdinal);note.revision++;
         note.updatedAt=OffsetDateTime.now();notes.save(note);
         return view(note,state.boundaryOrdinal);
@@ -130,12 +147,13 @@ public class ReadingNoteService {
         states.version(owner,note.versionId);return note;
     }
     private NoteView view(ReadingNote note,int boundary) {
-        if(note.requiredBoundary>boundary) return new NoteView(note.id,note.versionId,"HIDDEN_BY_SCOPE",null,null,null,null,null,null,null,note.revision,null,false,null);
+        if(note.requiredBoundary>boundary) return new NoteView(note.id,note.versionId,"HIDDEN_BY_SCOPE",null,null,null,null,null,null,null,note.revision,null,false,null,null,List.of(),0);
         var anchor=note.anchorParagraphId==null?null:states.paragraph(note.versionId,note.anchorParagraphId);
         UUID chapter=anchor==null?null:anchor.chapterId();
         String original=anchor!=null && "EXCERPT".equals(note.kind)?ReadingText.slice(anchor.text(),note.anchorStart,note.anchorEnd).strip():null;
         return new NoteView(note.id,note.versionId,"VISIBLE",note.kind,note.title,note.body,note.anchorParagraphId,chapter,
-                note.anchorStart,note.anchorEnd,note.revision,note.createdAt,original!=null && !original.equals(note.body),original);
+                note.anchorStart,note.anchorEnd,note.revision,note.createdAt,note.userEdited || original!=null && !original.equals(note.body),original,
+                note.sourceTaskId,ReadingNoteEvidence.ids(note.citationsJson),note.requiredBoundary);
     }
     private NoteView view(ReadingNote note,ReadingScopeService.Snapshot scope) {
         return view(note,ReadingScopeService.visible(scope,note.versionId,note.requiredBoundary)?scope.boundaryOrdinal():-1);

@@ -4,7 +4,7 @@
 
 业务语义见[设计](../architecture/novel-reading-design.md)，字段约束见[数据](../data/novel-reading-data-model.md)，数值限制见[新路线](../development/novel-reading-roadmap.md)。
 
-当前实现范围：基础阅读、范围/预览，以及本轮 `ReadingTaskController` 的索引、任务、命令、任务 SSE 和证据引用。AI 笔记提案仍是后续合同；真实供应商适配尚未开放，生产创建返回 `LIVE_AI_NOT_AUTHORIZED`，不会调用现有供应商。正文增加 `atParagraphId` 用于恢复位置及书签/摘录定位，与 cursor 互斥并严格校验版本和章节关系；不会修改已读边界。预览目录当前返回数组，总数从预览 `chapterCount` 取得，默认 size=50；普通目录返回分页对象，默认 size=50。同位置新建重复书签返回 409 `BOOKMARK_EXISTS`；原幂等键重放返回原书签，已删除键返回 410。摘录编辑保留原锚点，并返回 `userEdited`/`originalExcerpt`，页面明确区分编辑内容与原选文。
+当前实现范围：基础阅读、范围/预览、`ReadingTaskController` 的索引/任务与证据引用，以及本轮 `ReadingNoteProposalController` 的独立笔记提案与确认。真实供应商适配尚未开放，生产创建 AI 任务返回 `LIVE_AI_NOT_AUTHORIZED`；笔记保存本身不调用模型。正文增加 `atParagraphId` 用于恢复位置及书签/摘录定位，与 cursor 互斥并严格校验版本和章节关系；不会修改已读边界。预览目录当前返回数组，总数从预览 `chapterCount` 取得，默认 size=50；普通目录返回分页对象，默认 size=50。同位置新建重复书签返回 409 `BOOKMARK_EXISTS`；原幂等键重放返回原书签，已删除键返回 410。摘录编辑保留原锚点，并返回 `userEdited`/`originalExcerpt`，页面明确区分编辑内容与原选文。
 
 ## 通用协议
 
@@ -114,13 +114,19 @@ SSE 事件 `snapshot -> progress* -> result? -> done`；result 仅来自已持�
 | `GET /versions/{id}/notes` | 分页 | 200 受范围约束的笔记列表 |
 | `GET /notes/{id}` | 当前范围重验 | 200 详情或隐藏占位 |
 | `POST /versions/{id}/notes` | clientRequestId、kind=`MANUAL/EXCERPT`、title/body、anchor?、expectedScopeRevision | 201；摘录必须匹配源选区；不接受 AI kind/sourceTaskId |
-| `PATCH /notes/{id}` | expectedRevision、expectedScopeRevision、title/body；引用只可保留/删减 | 200；scope 标签只提高不降低；AI 标记 userEdited=true |
+| `PATCH /notes/{id}` | expectedRevision、expectedScopeRevision、title/body、retainedEvidenceIds?；省略引用表示保留，传入时只能为当前引用子集 | 200；scope 标签只提高不降低；AI 标记 userEdited=true |
 | `DELETE /notes/{id}` | expectedRevision | 204 逻辑删除 |
 | `POST /tasks/{id}/note-proposals` | clientRequestId、title/body、retainedEvidenceIds、expectedScopeRevision、supersedesProposalId? | 201 不可变提案、contentHash、expiresAt；只有用户主动保存才创建 |
 | `GET /note-proposals/{id}` | 无 | 200 当前可见的最终预览和状态 |
+| `GET /tasks/{id}/note-proposal` | 无；刷新后读取该任务最新提案，不创建新提案 | 200 `{proposal: 当前受限预览或 null}` |
+| `GET /notes/{id}/citations/{evidenceId}` | 无扩展 query；使用笔记自身冻结来源，任务移除后仍可读 | 200 `{evidenceId,sources,scopeRevision,visibilityEpoch}`；范围外 409 |
 | `POST /note-proposals/{id}/confirm` | contentHash（必须与预览一致） | 200 当前状态/resultNoteId；不可夹带新 body 或替换引用 |
 | `POST /note-proposals/{id}/reject` | 无 | 200 REJECTED；已成功返回 409 |
 
 确认过期返回 410 `PROPOSAL_EXPIRED` 并持久化 EXPIRED；业务校验失败返回 409 及 FAILED 状态；当前范围不可见不给正文。数据库提交异常返回 503 `SAVE_RETRYABLE`，事务回滚，不假称失败状态已经提交。确认重复请求无需产生新 clientRequestId，提案 ID 就是副作用幂等键。
 
 如果同任务已保存，返回既有 noteId；已删除则返回 `NOTE_ALREADY_SAVED_REMOVED`，不因新提案再插入。用户编辑已保存笔记走 PATCH；普通手写笔记不受这项 AI 来源唯一性限制。
+
+实现映射：创建同 key 重放及同任务已有笔记返回 200 原提案视图（其中 `resultNoteId` 指向既有笔记），首次返回 201。提案视图包含 `id/status/revision/visibility`，可见时另含 `taskId/versionId/kind/title/body/retainedEvidenceIds/requiredBoundary/contentHash/expiresAt/resultNoteId/resultNoteRemoved/userEdited/errorCode/scopeRevision/visibilityEpoch/dataAsOf`；范围外不返回这些内容字段。笔记视图增加 `sourceTaskId/retainedEvidenceIds/requiredBoundary`；隐藏笔记不返回来源及正文。
+
+确认预览 hash 不符持久化 `FAILED/PREVIEW_CHANGED`；范围回退（即使随后再次前进）持久化 `FAILED/SCOPE_CHANGED`；来源任务移除为 `FAILED/SOURCE_REMOVED`。这些确认业务错误返回 409 的安全提案状态与 `code/message`；过期为 410/EXPIRED。过期状态在读取/操作时惰性落库；已保存后重复确认返回既有成功，笔记逻辑删除后则返回 410 `NOTE_ALREADY_SAVED_REMOVED`。失败/过期/拒绝不可复活，用户可创建新提案；待确认提案必须显式带 `supersedesProposalId` 才能原子替代。首次编辑与提案的范围均取任务整个输入范围和当前 B 的较大值。提案引用从任务结果可引用的证据中删减，不能传入原文或新定位。
