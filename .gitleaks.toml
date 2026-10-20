@@ -15,3 +15,12 @@ id = "generic-api-key"
     '''^\s*"src/main/java/io/github/fanqiepi/contextpilot/common/ApiErrorResponse\.java"\s*:\s*"7cd8c0535d84a9c2d7254115a2f11b1efe23d92599cbeaf8e62d7fbf92618596",?\s*$''',
     '''^\s*"src/main/java/io/github/fanqiepi/contextpilot/common/openapi/OpenApiConfiguration\.java"\s*:\s*"21f5e6c21c10edc7c6650fdb1764886cc09ac121d629df27dce7a8a95446cb60",?\s*$''',
   ]
+
+  [[rules.allowlists]]
+  description = "Verified token estimate method label, not an authentication token"
+  condition = "AND"
+  paths = ['''^backend/src/main/java/io/github/fanqiepi/contextpilot/readingtask/ReadingTaskService\.java$''']
+  regexTarget = "line"
+  regexes = [
+    '''^\s*usage\.put\("calls",calls\);usage\.put\("tokenEstimateMethod","UTF8_BYTES_UPPER_BOUND"\);v\.put\("usage",usage\);\s*$''',
+  ]

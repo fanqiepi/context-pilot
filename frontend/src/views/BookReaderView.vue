@@ -3,6 +3,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { onBeforeRouteLeave, RouterLink, useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import { errorMessage } from '@/api/client'
+import ReadingAssistant from '@/components/ReadingAssistant.vue'
 import { readingGet, readingPost, readingPut, readingPatch, readingDelete, type Book, type Version, type Chapter, type Paragraph, type Position, type ReadingState, type ReadingSource, type Note, type Bookmark, type Page } from '@/api/reading'
 
 const route = useRoute(), bookId = String(route.params.bookId)
@@ -12,6 +13,7 @@ const paragraphs = ref<Paragraph[]>([]), nextCursor = ref<string | null>(null), 
 const notes = ref<Note[]>([]), bookmarks = ref<Bookmark[]>([]), notesPage = ref(1), notesTotal = ref(0), bookmarkPage = ref(1), bookmarkTotal = ref(0)
 const loading = ref(false), error = ref(''), saving = ref(false), saveStatus = ref(''), conflict = ref(false)
 const directory = ref(false), records = ref(route.path.endsWith('/notes')), settings = ref(false)
+const assistant = ref(false)
 const selected = ref<Paragraph>(), pending = ref<Position | null>(null)
 const font = ref(20), lineHeight = ref(1.9), dark = ref(false)
 const noteDialog = ref(false), noteTitle = ref(''), noteBody = ref(''), noteKind = ref('MANUAL'), editingNote = ref<Note | null>(null)
@@ -129,7 +131,7 @@ function selectedOffset(paragraph: Paragraph) {
   return Math.min(paragraph.codePointCount, Array.from(range.toString()).length)
 }
 function onScroll() {
-  if (navigating || loading.value || conflict.value || disposed || sourceDialog.value || records.value || directory.value || noteDialog.value) return
+  if (navigating || loading.value || conflict.value || disposed || sourceDialog.value || records.value || directory.value || noteDialog.value || assistant.value) return
   const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-paragraph]'))
   const node = nodes.find(n => { const r = n.getBoundingClientRect(); return r.bottom > 140 && r.top < window.innerHeight })
   const paragraph = paragraphs.value.find(p => p.id === node?.dataset.paragraph)
@@ -322,7 +324,7 @@ onUnmounted(() => { disposed = true; events?.close(); clearTimeout(saveTimer); c
   <section class="reading-reader" :class="{ 'reading-dark': dark }">
     <header class="reading-toolbar">
       <RouterLink to="/books">← 书架</RouterLink><h1>{{ book?.title || '阅读' }}</h1>
-      <el-button @click="directory = true">目录</el-button><el-button @click="records = true">书签与笔记</el-button><el-button @click="settings = true">阅读设置</el-button>
+      <el-button @click="directory = true">目录</el-button><el-button @click="assistant = true">阅读助手</el-button><el-button @click="records = true">书签与笔记</el-button><el-button @click="settings = true">阅读设置</el-button>
     </header>
     <el-alert v-if="error" :title="error" type="error" show-icon @close="error = ''" />
     <div class="reading-status"><span>{{ saveStatus }}</span><el-button v-if="pending && !conflict" text :loading="saving" @click="flush">立即保存</el-button><span>已读边界：{{ state?.readBoundary || 0 }} 段</span></div>
@@ -340,6 +342,9 @@ onUnmounted(() => { disposed = true; events?.close(); clearTimeout(saveTimer); c
       <el-button v-if="nextCursor" :loading="loading" @click="loadMore">加载本章后续段落</el-button>
       <p v-else class="reading-chapter-end">本章正文已加载完 <template v-if="paragraphs.length && paragraphs[paragraphs.length - 1]!.paragraphOrdinal > (state?.readBoundary || 0)">· <button @click="markRead(paragraphs[paragraphs.length - 1]!)">读完本章</button></template> · <button @click="directory = true">选择下一章</button></p>
     </article>
+    <el-drawer v-model="assistant" title="回顾前情与人物查证" size="min(94vw, 560px)">
+      <ReadingAssistant :version-id="versionId" :state="state" :ready="scopeReady" :open="assistant" @continue="s => { assistant = false; void openChapter(s.chapterId, s.paragraphId, s.startOffset) }" @close="assistant = false" />
+    </el-drawer>
     <el-drawer v-model="directory" title="目录与版本" direction="ltr" size="min(90vw, 380px)">
       <el-select :model-value="versionId" @change="switchVersion"><el-option v-for="(v, index) in versions" :key="v.id" :value="v.id" :label="`版本 ${versions.length - index} · ${v.chapterCount} 章`" /></el-select>
       <p>版本之间的进度独立。未读章仅显示序号。</p><RouterLink :to="{ path: '/books/import', query: { book: bookId } }">导入本书新版本</RouterLink>

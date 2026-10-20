@@ -33,7 +33,7 @@
 
 使用固定模型/embedding 替身，真实 PostgreSQL 迁移与事务集成测试；离线 embedding 只能测工程过滤和持久化，不能用它声称检索语义有效。新增页面执行 typecheck/build 与桌面/窄屏人工流程；后端先最小相关测试，涉及共享基础设施再补对应回归。
 
-范围功能已有独立[工程验证记录](reading-scope-verification.md)：使用真实 PostgreSQL 验证同章/跨书/版本过滤、完整笔记依赖、回退 epoch、发布与边界锁串行、故障回滚和安全 SSE 快照；页面验证临时预览、显式续读、回退隐藏和窄屏布局。尚无阅读 AI 任务，因此 executionId/任务状态/索引候选/模型先验与语义泄露测试仍待下一能力，不能把当前范围门禁推导成阅读 AI 已通过。
+范围功能已有独立[工程验证记录](reading-scope-verification.md)。本轮[任务工程验证](reading-task-verification.md)补齐 executionId/任务状态、索引候选过滤、累计次数/时间、未知调用、费用预留/结算和迟到回写，用固定模型与 embedding 替身检查工程合同。模型先验、事实/引用语义与防剧透验收仍未执行；不能把范围或终态测试推导成阅读 AI 语义已通过。
 
 ## 语义 TEST 分层与评分
 

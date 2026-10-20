@@ -4,9 +4,15 @@
 
 业务语义见[设计](../architecture/novel-reading-design.md)，容量和门槛见[唯一路线](../development/novel-reading-roadmap.md)，接口见[API](../api/novel-reading-api.md)。
 
-当前实现：新增 [V29](../../backend/src/main/resources/db/migration/V29__create_reading_library.sql)，包含 `reading_book`、`book_import`、`book_version`、`book_chapter`、`book_paragraph`、`reading_state`、`reading_state_command`、`reading_bookmark`、`reading_note` 九张表。笔记仅 MANUAL/EXCERPT；索引、任务和 AI 提案表尚未创建。摘录编辑不修改原锚点，返回的 `originalExcerpt` 与 `userEdited` 由不可变原文比较生成。迁移仅在隔离测试数据库验证，未迁移用户现有本地数据库。
+当前实现：[V29](../../backend/src/main/resources/db/migration/V29__create_reading_library.sql) 包含基础阅读九张表；本轮 [V30](../../backend/src/main/resources/db/migration/V30__create_reading_tasks.sql) 新增 `reading_task/reading_index_job/reading_job_command/reading_ai_call/reading_task_event/reading_task_evidence/reading_index_segment/reading_vector_store/reading_spend_ledger`。笔记仍仅 MANUAL/EXCERPT，AI 提案表尚未创建。摘录编辑不修改原锚点。迁移仅在隔离测试数据库验证，未迁移用户现有本地数据库。
 
-范围功能沿用上述表，不新增迁移或正文缓存。`ReadingScopeService` 快照仅在服务端构造；当前范围与命令日志已经持久保存 `scopeRevision/visibilityEpoch`，状态 SSE 从当前提交行重建，不建立保存正文的事件表。笔记/书签保留原 `required_boundary`，回退只改变可见性，不删除记录；重新到达足够边界后可重新查看历史笔记，旧 epoch 的在途发布仍然失效。未来 `reading_task_event` 等目标表仍未实现。
+范围功能本身沿用 V29。`ReadingScopeService` 快照仅在服务端构造；状态 SSE 从当前提交行重建。笔记/书签保留原 `required_boundary`，回退只改变可见性；重新到达足够边界后可重新查看历史记录，旧 epoch 的在途发布仍然失效。
+
+V30 的具体实现映射：任务与索引分别有独立关系表，共用有限的 Java 持久化形状；范围/input/checkpoint/累计调用计数及结构化结果存于 `payload_json`，关键资源外键、幂等键、status/type/revision/执行令牌/时间和 required_boundary 为关系列。证据 source_json 保存原文选区列表，text_hash 校验聚合证据；原文选区另外在每次持久化/引用读取时回查不可变段落。`reading_task_event` 只保存状态/revision，不保存正文。
+
+索引 generation 是所属索引作业 ID；完整段落批次的 segment 和 vector 在范围/令牌事务中一起写入 READY，不暴露半批。已完成的局部片段即使作业后来暂停、失败或回退仍可按当前 B 使用；迟到结果无法进入 READY。连续就绪逐段检查全部预期偏移存在且有向量，不以最大段序或简单字数和代替完整性。当前没有重建/profile 切换接口，也没有把新 generation 自动替换旧 profile。
+
+费用账本只由可信运维授权流程预置，没有创建/增额 HTTP 接口；目前生产不存在授权。`reading_ai_call` 关联授权、预留金额、输入/输出单价及结算金额，事务内预留后才发送请求；未知 usage 保留预留，实际 usage 结算幂等。若实际费用超过保守预留，冻结该授权，不释放预留以继续调用。离线测试使用明确的假计价数据，不是供应商报价。
 
 ## 通用规则
 
@@ -74,4 +80,4 @@ scope_json 保存服务端 scope 快照与 schemaVersion；checkpoint_json 仅�
 
 CAS 更新失败返回 409 与当前 revision。删除书籍使全部版本不可访问，取消其活动作业；版本和笔记逻辑删除不复用旧键。索引物理清理只针对派生向量的独立维护，不物理删除正文、笔记或上传原文件。
 
-迁移检查覆盖从空库创建、现有 V28 升级、外键/唯一/CHECK、逻辑删除重放、并发确认与故障回滚。具体 DDL 与迁移文件在确认后实施；本草案没有执行任何迁移。
+迁移检查覆盖从空库创建、现有 V28 升级、外键/唯一/CHECK、逻辑删除重放、并发确认与故障回滚。批准时本草案没有执行迁移；后续 V29/V30 的具体实现与隔离迁移验证见文件开头和对应工程记录。

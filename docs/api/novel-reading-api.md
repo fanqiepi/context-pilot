@@ -4,7 +4,7 @@
 
 业务语义见[设计](../architecture/novel-reading-design.md)，字段约束见[数据](../data/novel-reading-data-model.md)，数值限制见[新路线](../development/novel-reading-roadmap.md)。
 
-当前实现范围：导入/书籍/版本/正文、state 与两个位置 PUT、书签、手写/摘录笔记，以及 `state/events`、受限段落预览和笔记出处。索引、任务及其证据引用、AI 笔记提案均未实现。下表未实现部分是批准的后续合同，不是现有接口。正文增加 `atParagraphId` 用于恢复位置及书签/摘录定位，与 cursor 互斥并严格校验版本和章节关系；不会修改已读边界。预览目录当前返回数组，总数从预览 `chapterCount` 取得，默认 size=50；普通目录返回分页对象，默认 size=50。同位置新建重复书签返回 409 `BOOKMARK_EXISTS`；原幂等键重放返回原书签，已删除键返回 410。摘录编辑保留原锚点，并返回 `userEdited`/`originalExcerpt`，页面明确区分编辑内容与原选文。
+当前实现范围：基础阅读、范围/预览，以及本轮 `ReadingTaskController` 的索引、任务、命令、任务 SSE 和证据引用。AI 笔记提案仍是后续合同；真实供应商适配尚未开放，生产创建返回 `LIVE_AI_NOT_AUTHORIZED`，不会调用现有供应商。正文增加 `atParagraphId` 用于恢复位置及书签/摘录定位，与 cursor 互斥并严格校验版本和章节关系；不会修改已读边界。预览目录当前返回数组，总数从预览 `chapterCount` 取得，默认 size=50；普通目录返回分页对象，默认 size=50。同位置新建重复书签返回 409 `BOOKMARK_EXISTS`；原幂等键重放返回原书签，已删除键返回 410。摘录编辑保留原锚点，并返回 `userEdited`/`originalExcerpt`，页面明确区分编辑内容与原选文。
 
 ## 通用协议
 
@@ -60,9 +60,17 @@
 | `GET /versions/{id}/paragraphs/{paragraph}/preview` | 单个完整已读段落；拒绝 query 参数（包括 revealTitle/上下文范围），无续读写入 |
 | `GET /notes/{id}/source` | 按笔记完整输入依赖及不可变锚点校验；返回原选区，无续读写入；无出处返回 404 |
 
-两者返回 `versionId/chapterId/chapterOrdinal/chapterTitle/paragraphId/paragraphOrdinal/startOffset/endOffset/text/textHash/requiredBoundary/scopeRevision/visibilityEpoch/dataAsOf`；`textHash` 是原段落 hash，offset 使用 code point。未完全已读章 `chapterTitle=null`；若返回真实章标题，输出 `requiredBoundary` 同时包含章末依赖。越界 409 `SCOPE_HIDDEN`，跨版本/不存在/已删除 404，均 `no-store`。这些基础出处不伪装为尚未实施的任务 `evidenceId` 引用。后续任务引用必须另外核对任务归属、完整输入范围和冻结证据。
+两者返回 `versionId/chapterId/chapterOrdinal/chapterTitle/paragraphId/paragraphOrdinal/startOffset/endOffset/text/textHash/requiredBoundary/scopeRevision/visibilityEpoch/dataAsOf`；`textHash` 是原段落 hash，offset 使用 code point。未完全已读章 `chapterTitle=null`；若返回真实章标题，输出 `requiredBoundary` 同时包含章末依赖。越界 409 `SCOPE_HIDDEN`，跨版本/不存在/已删除 404，均 `no-store`。这些基础出处与本轮任务 `evidenceId` 引用分别处理。任务引用另外核对任务归属、完整输入范围和冻结证据。
 
 ## 索引与阅读任务
+
+本轮接口由离线替身验证。`GET index` 返回 `profile/readyBoundary/requestedBoundary/ready/liveAllowed/activeJob/dataAsOf`，activeJob 用于刷新后恢复作业控制；estimate 返回下一完整段落前缀的 `fromBoundary/targetBoundary/requestedBoundary/segments/characters/batches/estimateHash/liveAllowed/estimatedCost/reason`，未核实真实计价时 estimatedCost 为 null，不能按零元展示。边界变化或已完成索引变化会改变 estimateHash。
+
+任务列表返回 `items/page/size`。可见任务包含 `currentScopeRevision/visibilityEpoch` 供页面丢弃旧响应；coverage 的 requestedRange 是 `[起始段序,冻结边界]`，另含 evidenceRanges（实际证据段序）、targetBoundary、completedParagraph 和 completeness。budget 提供累计执行时间、次数和完整输入计量；usage.calls 保存每次调用状态、供应商 usage 与预留/结算金额，未知项保持 null。内部 owner、executionId、原始模型响应和完整 checkpoint 不输出。
+
+聚合回顾证据可能包含多个段落，因此引用响应为 `{evidenceId,sources:[ReadingSource...],scopeRevision,visibilityEpoch}`；每个 source 沿用基础预览定位，整体按任务完整输入边界隐藏。任务引用拒绝任何额外 query 参数，模型不能提交替代原文。任务软删除后幂等重放返回 410 `TASK_REMOVED`。
+
+任务 SSE 总是重新构造当前 snapshot（包含当前校验过且可见的结果），再发送 progress/result/done；不按 Last-Event-ID 重放旧正文，也不承诺恢复每条历史进度事件。发送与边界写入使用同一范围锁；已经开始发送的响应无法撤回。新连接恢复当前状态已满足首版状态展示，不把安全事件表作为正文缓存。
 
 | 方法与路径 | 输入 | 成功响应 |
 | --- | --- | --- |
@@ -95,7 +103,7 @@
 
 task 视图固定包含 `id,type,status,revision,scope,coverage,budget,usage,errorCode,traceId,visibility,dataAsOf`。coverage 含 requestedRange/evidenceRanges/completeness（`FULL_WINDOW/SEARCH_MATCHES/PARTIAL/NONE`）；人物命中不能称全已读事实穷尽。usage 未知字段为 null 且 `usageStatus=UNKNOWN`，不能填零。
 
-SSE 事件 `snapshot -> progress* -> result? -> done`；result 仅来自已持久化且当前可见的结构化结果，绝不发送模型原始 token。事件 id 为 taskId/revision，Last-Event-ID 只决定重放位置，不能跳过当前范围/状态校验；旧事件里的结果正文不直接重放。发送前与边界收缩使用同一发布序列，已开始发送的响应不能宣称可撤回。
+SSE 事件 `snapshot -> progress* -> result? -> done`；result 仅来自已持久化且当前可见的结构化结果，绝不发送模型原始 token。事件 id 为 taskId/revision，本轮重连从当前受限快照恢复，不使用 Last-Event-ID 重放旧结果。发送前与边界收缩使用同一发布序列，已开始发送的响应不能宣称可撤回。
 
 入队满返回 429 `QUEUE_FULL`，不创建会自动运行的隐性后台重试。数据库已创建但尚未可靠派发时收敛到 PAUSED 并供显式恢复。模型调用未启用/未获授权返回 409 `LIVE_AI_NOT_AUTHORIZED`；索引不足 409 `INDEX_NOT_READY`；范围未设置 409 `READ_BOUNDARY_REQUIRED`。其他终态失败码按架构设计返回，技术失败不混为拒答。
 
