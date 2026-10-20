@@ -1,6 +1,7 @@
 package io.github.fanqiepi.contextpilot;
 
 import io.github.fanqiepi.contextpilot.action.ActionRequestMapper;
+import io.github.fanqiepi.contextpilot.book.BookMapper;
 import io.github.fanqiepi.contextpilot.chat.ChatMessageMapper;
 import io.github.fanqiepi.contextpilot.chat.ConversationMapper;
 import io.github.fanqiepi.contextpilot.chat.MessageCitationMapper;
@@ -16,6 +17,9 @@ import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseMapper;
 import io.github.fanqiepi.contextpilot.identity.AppUserMapper;
 import io.github.fanqiepi.contextpilot.memory.UserMemoryMapper;
 import io.github.fanqiepi.contextpilot.memory.UserMemoryRevisionMapper;
+import io.github.fanqiepi.contextpilot.readingnote.ReadingBookmarkMapper;
+import io.github.fanqiepi.contextpilot.readingnote.ReadingNoteMapper;
+import io.github.fanqiepi.contextpilot.readingstate.ReadingStateMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,6 +41,19 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 + "org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration"
 })
 class ContextPilotApplicationTests {
+    // This smoke test excludes database auto-configuration; keep services real and mock persistence.
+    @MockitoBean
+    private BookMapper bookMapper;
+
+    @MockitoBean
+    private ReadingStateMapper readingStateMapper;
+
+    @MockitoBean
+    private ReadingBookmarkMapper readingBookmarkMapper;
+
+    @MockitoBean
+    private ReadingNoteMapper readingNoteMapper;
+
     @MockitoBean
     private io.github.fanqiepi.contextpilot.projectsource.ProjectPreviewMapper projectPreviewMapper;
     @MockitoBean
@@ -114,6 +131,10 @@ class ContextPilotApplicationTests {
         mockMvc.perform(get("/v3/api-docs"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.info.title").value("研序 API"))
+                .andExpect(jsonPath("$.paths['/api/reading/imports']").exists())
+                .andExpect(jsonPath("$.paths['/api/reading/books']").exists())
+                .andExpect(jsonPath("$.paths['/api/reading/versions/{id}/state']").exists())
+                .andExpect(jsonPath("$.paths['/api/reading/versions/{id}/notes']").exists())
                 .andExpect(jsonPath("$.paths['/api/knowledge-bases']").exists())
                 .andExpect(jsonPath("$.paths['/api/project-source-previews']").exists())
                 .andExpect(jsonPath("$.paths['/api/knowledge-bases/{id}']").exists())

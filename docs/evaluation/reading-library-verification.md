@@ -40,3 +40,11 @@
 - 索引、回顾、人物查证、AI 笔记提案未实现；真实模型/embedding 调用为零，付费实验为零。
 - 旧研究功能未扩展，未重跑无关真实模型验收；既有语义失败及暂停状态保留。前端旧页面随整体构建检查，迁移回归保留旧数据。
 - 本轮结束提醒用户提交 PR，用户开新窗口后再进入下一功能点，不继续实现全部路线。
+
+## PR 启动回归修复
+
+用户提交 PR 后，CI 的 `ContextPilotApplicationTests` 启动失败。本地复现的首个异常为 `BookImportService` 缺少 `BookMapper`；`ApplicationContext failure threshold` 是随后跳过重复加载的提示。该测试关闭数据库自动配置、使用 Mapper mock，但新增阅读模块未同步补齐测试依赖。首次交付的 15 项相关测试没有覆盖这项启动回归，不能据此声称完整后端测试通过。
+
+修复仅补齐 Book、ReadingState、ReadingBookmark、ReadingNote 四个 Mapper 的 `@MockitoBean`，保留真实领域服务和 Controller；增加阅读导入、书架、状态、笔记的 OpenAPI 路径断言。没有跳过启动测试或调整生产配置。
+
+2026-10-20 修复后使用 JDK 21 执行与 CI 同参数的 `.\mvnw.cmd --batch-mode --no-transfer-progress test`：**547 项，失败 0、错误 0、跳过 17，BUILD SUCCESS**，耗时 3 分 18 秒。启动与 OpenAPI 两项均通过；未启用任何真实模型实验 profile。完整本地日志保存在 gitignored `backend/target/reading-ci-regression.log`。这是 Windows 本地全套后端回归结果，远程 Linux CI 仍需推送修复后重新确认。
