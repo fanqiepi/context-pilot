@@ -1,48 +1,42 @@
 # 研序 项目背景
 
-> 每次开始新的开发对话时先读本文，再核对代码、配置和 Git 状态。工作规则见 [AGENTS.md](../../AGENTS.md)。
+> 新会话先读本文，再读 [AGENTS.md](../../AGENTS.md)、[新开发路线](novel-reading-roadmap.md)和[当前交接](continuation-handoff.md)，并核对代码、配置和 Git 状态。更新：2026-10-20。
 
-## 定位与状态
+## 当前方向
 
-任务和目标使用具体功能名称；下表版本号只用于关联历史合同与验收证据，新目标不再按版本号命名。2026-10-16 用户确认项目展示名称为“研序”，简历标题为“研序｜技术研究 Agent”。原名称 ContextPilot 继续用于既有仓库、包名、配置及历史证据等技术标识；版本化 Prompt 中的原内部身份标识不随展示名称变更。
+当前代码的展示名称仍为 **研序｜技术研究 Agent**，技术标识仍为 ContextPilot。已有单用户知识工作区具备 RAG、受控动作和有限研究任务框架；小说阅读首个功能点“导入并持续阅读”已实现，阅读 AI 尚未实施。
 
-研序 是基于 Spring AI 的单用户知识工作助手，通过有依据的问答、可追溯研究和经确认的业务操作练习 AI 应用工程。
+用户已认可转向长篇小说阅读应用，以“中断后快速接着读”为首个核心场景：按已读进度回顾剧情、查证人物、跳转原文，并选择保存笔记。2026-10-20 用户批准具体阅读合同，随后要求**每个会话只完成一个大功能点，验证后提醒提交 PR，再开新窗口继续**。新名称待定。
 
-| 功能 | 当前结论 | 详情 |
+**[长篇小说阅读应用开发路线](novel-reading-roadmap.md)是唯一当前开发路线；旧研究路线及转向初稿已弃用。** 既有能力与验收事实保留，未完成收尾仍暂停，不默认恢复升级研究调优、录屏或检索优化。产品目标和参考见[产品需求](../requirements/product-requirements.md)，实施顺序、复用、预算和验收条件只在新路线维护。
+
+已批准[业务合同包](../architecture/novel-reading-design.md) `reading-contract-v1-draft1`。首个功能点提供 TXT/Markdown 导入、目录预览、不可变版本、书架、阅读器、续读位置、书签和手写/摘录笔记；为笔记可见性提供最小显式边界命令。后续完整范围事件/引用预览、最近三章回顾、人物查证和 AI 笔记提案尚未实施。真实模型与 embedding 未调用，付费实验仍需独立授权。
+
+## 已有能力与证据
+
+| 能力 | 当前结论 | 详情 |
 | --- | --- | --- |
-| 知识问答、受控动作、知识库维护 | 已完成 | [功能清单](feature-inventory.md)、[维护验收](../evaluation/v3-acceptance-report.md) |
-| 多文档比对 | 已验收 | [比对验收](../evaluation/v4-implementation-acceptance-report.md) |
-| 回答偏好记忆 | 2026-10-15 已验收 | [记忆验收](../evaluation/v5-acceptance-report.md) |
-| 升级影响研究 | 首版已实现但质量验收未通过；新建研究默认关闭，本地显式开启 | [设计](../architecture/v6-upgrade-research-design.md)、[实现记录](../evaluation/v6-implementation-review.md) |
-| 研究任务工作台 | 已实现有限规划、检查点与补充继续；工程和公开样例验证见记录 | [设计](../architecture/research-task-workspace-design.md)、[验证](../evaluation/research-task-workspace-verification.md) |
-| 项目资料接入 | 首版已交付，工程与公开流程验证通过 | [设计](../architecture/project-source-integration-design.md)、[验证](../evaluation/project-source-integration-verification.md) |
-| 研究成果审查 | 首版已实现，工程与公开流程验证通过 | [设计](../architecture/research-result-review-design.md)、[验证](../evaluation/research-result-review-verification.md) |
-| 检索优化 | 后续候选 | [唯一详细路线](../requirements/product-requirements.md) |
+| 知识问答、受控动作、知识库维护、多文档比对、回答偏好 | V1–V5 已验收；后续改动仍需相关回归 | [功能清单](feature-inventory.md) |
+| 升级影响研究 | 已实现但最终质量验收未通过，默认关闭；专项收尾暂停 | [最新独立采集](../evaluation/upgrade-closeout-independent-results.md) |
+| 研究工作台、项目资料接入、成果审查 | 首版有工程与代表流程证据；不宣称全面语义验收，冻结旧场景扩展 | [功能清单](feature-inventory.md) |
+| 导入并持续阅读 | 首个功能点已实现，离线工程证据与限制单独记录；等待用户提交 PR | [验证记录](../evaluation/reading-library-verification.md) |
+| 阅读范围与阅读 Agent | 合同已批准；最小边界基础已随阅读实现，完整范围/引用与 AI 尚未交付 | [新开发路线](novel-reading-roadmap.md)、[业务合同](../architecture/novel-reading-design.md) |
 
-统一 50 项核心任务已冻结并于 2026-10-19 完成首次实跑；拒答／部分完成状态已修正，普通问答已完成独立资料调试，人工语义评分和最终独立验收仍待完成。升级研究正在独立调试结果范围问题，最终验收及展示交付尚未完成。待办和功能状态在[功能清单](feature-inventory.md)维护；测试次数及实际成绩以验收报告为准，不在本文重复登记。
+统一 50 项核心任务已有首次实跑；升级研究新 DEBUG、新 TEST 与 8×2 代表运行也已采集。语义复核暂缓、录屏未完成，终态匹配不是任务质量成绩。最新事实与缺口集中在功能清单，历史失败、Prompt、评估输入和原始结果不删除、不改写。
 
-2026-10-16 用户调整开发优先级：先推进有独立用户价值的大功能、形成整体架构和业务主线，再集中完善非阻断细节与优化。用户随后要求按技术路线开始开发，首项为研究任务工作台；其他候选不自动授权。保留必要安全／回归验证及升级影响研究的待验收状态，具体规则以[产品需求](../requirements/product-requirements.md)为准。
+## 必须保留的边界
 
-## 开发边界
+- 单用户 `LOCAL_OWNER` 仅提供归属，不是认证；客户端不能指定用户 ID，部署限本机或可信网络。首版规划不含账号，公开部署需另行确认认证与完整资源授权。
+- 既有聊天路由保持 `SIMPLE_CHAT`、`KNOWLEDGE_QA`、`BUSINESS_ACTION`；简单交互只使用确定性白名单。
+- 保留知识库隔离、证据/引用校验、拒答、逻辑删除、SSE、历史、trace，以及强类型动作的持久提案、独立确认和原子幂等执行。
+- V4 确定性编排、V5 呈现偏好、升级研究工具循环、任务工作台规划及专用 MCP 分别遵守既有合同；例外不扩展为通用 Agent 权限。
+- 新小说业务不能直接把文档当章节、偏好当进度；检索/摘要/缓存/历史结果均需设计阅读范围约束，“不剧透”仍须验证。
 
-- 保持 V1–V5 已验收行为：知识库隔离、证据与引用校验、拒答、SSE、历史、逻辑删除、trace 和原子幂等确认。
-- 顶层路由保持 `SIMPLE_CHAT`、`KNOWLEDGE_QA`、`BUSINESS_ACTION`。简单交互仅使用确定性白名单；其余默认安全回落到知识问答。
-- 业务动作使用静态分派和强类型参数；先持久化提案，再由独立请求确认。模型不能确认或直接访问 SQL、Shell、任意文件或 URL。
-- V4 保持确定性维度与逐文档编排：一次模型综合、90 秒硬超时、1800 字正文上限，不发送请求级 `max_tokens`。
-- V5 只保存经确认的全局回答偏好，最多注入 10 条／2000 字符，仅影响呈现；禁止自动提取、改变证据或控制工具。
-- `LOCAL_OWNER` 只提供持久归属，不是认证边界；客户端不能指定用户 ID，部署限本机或可信网络。
-- 2026-10-15 已整体批准 V6 Slices 1–7，切片不是重复授权门。唯一工具循环例外为独立 `UPGRADE_IMPACT`、三个静态只读工具和固定 Spring AI 公开仓库；`SAVE_RESEARCH_REPORT` 仅由用户发起提案并独立确认。
-- 通用 MCP、多 Agent、工作流引擎、混合检索／Rerank、自动记忆、登录与多租户仍未授权；专用只读 MCP 已在项目资料接入合同中批准；具体范围以已批准版本合同为准。
-- 研究任务工作台另行授权有限模型计划与应用执行：仅检索用户选定文档，计划整体校验，执行令牌阻止过期结果写回；不扩展升级研究允许列表，不自动执行业务动作。合同见[工作台设计](../architecture/research-task-workspace-design.md)。
+## 技术与入口
 
-## 技术与工作入口
+Java 21 / Spring Boot 4.1.x / Spring AI 2.0.x / MyBatis-Plus / Flyway；Vue 3 / TypeScript / Vite / Element Plus；PostgreSQL + pgvector。生成默认 DeepSeek `deepseek-v4-flash`，DashScope `qwen3.7-text-embedding` 为 1024 维。维护模块化单体、有界后台任务及 SSE，不提前搭建通用平台。
 
-后端为 Java 21 / Spring Boot 4.1.x / Spring AI 2.0.x / MyBatis-Plus / Flyway；前端为 Vue 3 / TypeScript / Vite / Element Plus。存储使用 PostgreSQL 17 + pgvector（HNSW、余弦距离）；生成默认 DeepSeek `deepseek-v4-flash`，Embedding 为 DashScope `qwen3.7-text-embedding`、1024 维。
-
-日常集成分支为 `develop`，不得直接提交 `main`。按业务能力组织模块，保留已有未提交修改；密钥、上传资料和敏感评估数据不得提交。
-
-- [文档导航](../README.md)：按用途定位文档及历史档案。
-- [技术架构](../architecture/technical-architecture.md)：模块职责、数据流和版本编排。
-- [本地开发](local-development.md)：环境、配置、启动与验证命令。
-- [收尾交接](closeout-handoff.md)：2026-10-19 当前工作树、最近修正与未完成验收项；继续工作前核对最新证据。
-- [评估入口](../../evals/README.md)：冻结资产、运行方式和证据边界。
+- [文档导航](../README.md)：当前规划、实现参考与历史档案分开查阅。
+- [技术架构](../architecture/technical-architecture.md)、[数据模型](../data/data-model.md)、[API](../api/api-design.md)：既有实现合同，不代表新业务已落地。
+- [本地开发](local-development.md)：启动、配置与验证；日常分支 `develop`，不得直接提交 `main`。
+- [评估入口](../../evals/README.md)：按改动范围验证，不自动重跑付费模型采集。
