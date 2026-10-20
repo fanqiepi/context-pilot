@@ -37,6 +37,7 @@ class ReadingLibraryPersistenceTests {
     @Autowired JdbcTemplate jdbc;
     @Autowired WebApplicationContext web;
     @Autowired StorageService storage;
+    @Autowired ReadingScopeService scopes;
 
     record Fixture(BookImportService.Registered registered,BookImportService.Confirmation result,List<BookRows.Paragraph> paragraphs) {}
     private BookImportService.Registered preview(String text,UUID target) {
@@ -199,5 +200,159 @@ class ReadingLibraryPersistenceTests {
         notes.deleteBookmark(saved.id(),0);
         assertThatThrownBy(()->notes.bookmark(f.result().versionId(),request)).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.status()).isEqualTo(410));
         assertThat(notes.bookmark(f.result().versionId(),new ReadingNoteService.BookmarkCreate(UUID.randomUUID(),p.id(),0,"重新保留")).id()).isNotEqualTo(saved.id());
+    }
+
+    @Test void scopedSourcesExcludeSameChapterFutureAndNeverMoveResume() {
+        var f=fixture();UUID version=f.result().versionId();var first=f.paragraphs().getFirst();var later=f.paragraphs().getLast();
+        assertThatThrownBy(()->scopes.preview(version,first.id())).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.code()).isEqualTo("SCOPE_HIDDEN"));
+        states.resume(version,new ReadingStateService.Resume(UUID.randomUUID(),0L,later.id(),2));
+        states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),0L,first.id(),true));
+        var source=scopes.preview(version,first.id());
+        assertThat(source.text()).isEqualTo(first.text());
+        assertThat(source.chapterTitle()).isNull();
+        assertThat(source.requiredBoundary()).isEqualTo(1);
+        assertThat(mapper.scopedParagraph(states.owner(),f.result().bookId(),version,later.id(),1)).isNull();
+        assertThatThrownBy(()->scopes.preview(version,later.id())).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.code()).isEqualTo("SCOPE_HIDDEN"));
+        var state=states.get(version);
+        assertThat(state.resumeRevision()).isEqualTo(1);
+        assertThat(state.resumePosition().paragraphId()).isEqualTo(later.id());
+        assertThat(state.resumePosition().offset()).isEqualTo(2);
+        assertThat(state.readBoundary()).isEqualTo(1);
+        states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),1L,later.id(),true));
+        var titled=scopes.preview(version,first.id());
+        assertThat(titled.chapterTitle()).isEqualTo("第一章 开始");
+        assertThat(titled.requiredBoundary()).isEqualTo(2); // A visible title depends on the complete chapter.
+    }
+
+    @Test void scopeRejectsOtherBooksVersionsOwnersAndDeletedSources() {
+        var f=fixture();var other=fixture();UUID version=f.result().versionId();
+        states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),0L,f.paragraphs().getLast().id(),true));
+        assertThatThrownBy(()->scopes.preview(version,other.paragraphs().getFirst().id())).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.status()).isEqualTo(404));
+        var next=preview("第一章 新版\n不同结局"+UUID.randomUUID(),f.result().bookId());
+        var nextVersion=imports.confirm(next.row().id,imports.preview(next.row().id).previewHash()).versionId();
+        assertThatThrownBy(()->scopes.preview(nextVersion,f.paragraphs().getFirst().id())).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.status()).isEqualTo(404));
+        var frozen=scopes.capture(version);
+        var forged=new ReadingScopeService.Snapshot(UUID.randomUUID(),frozen.bookId(),version,1,frozen.scopeRevision(),frozen.visibilityEpoch(),frozen.dataAsOf());
+        assertThatThrownBy(()->scopes.publish(forged,s->"must not publish")).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.status()).isEqualTo(404));
+        assertThat(mapper.scopedParagraph(UUID.randomUUID(),frozen.bookId(),version,f.paragraphs().getFirst().id(),2)).isNull();
+        var book=books.get(f.result().bookId());books.delete(book.id(),book.revision());
+        assertThatThrownBy(()->scopes.capture(version)).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.status()).isEqualTo(404));
+        assertThatThrownBy(()->scopes.publish(frozen,s->"must not publish")).isInstanceOf(ReadingException.class);
+    }
+
+    @Test void noteSourceUsesEntireDependencyAndUnicodeOffsetsAfterRollback() {
+        var f=fixture();UUID version=f.result().versionId();var p=f.paragraphs().getLast();
+        var lastChapter=books.chapters(version,1,50).items().getLast();
+        var finalParagraph=books.paragraphs(version,lastChapter.id(),null,100,false).paragraphs().getLast();
+        states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),0L,finalParagraph.id(),true));
+        var note=notes.create(version,new ReadingNoteService.Create(UUID.randomUUID(),"EXCERPT","后期理解","😀",p.id(),1,2,1L));
+        assertThat(notes.source(note.id()).text()).isEqualTo("😀");
+        assertThat(notes.source(note.id()).requiredBoundary()).isEqualTo(3);
+        states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),1L,p.id(),true));
+        assertThat(scopes.preview(version,p.id()).text()).isEqualTo(p.text());
+        assertThatThrownBy(()->notes.source(note.id())).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.code()).isEqualTo("SCOPE_HIDDEN"));
+        var hidden=notes.get(note.id());
+        assertThat(hidden.title()).isNull();assertThat(hidden.body()).isNull();assertThat(hidden.originalExcerpt()).isNull();assertThat(hidden.anchorParagraphId()).isNull();
+        states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),2L,finalParagraph.id(),true));
+        assertThat(notes.source(note.id()).text()).isEqualTo("😀");
+        notes.delete(note.id(),0);
+        assertThatThrownBy(()->notes.source(note.id())).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.status()).isEqualTo(404));
+    }
+
+    @Test void frozenScopeDoesNotExpandAndRollbackThenAdvanceNeverRevivesPublication() {
+        var f=fixture();UUID version=f.result().versionId();
+        states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),0L,f.paragraphs().getFirst().id(),true));
+        var frozen=scopes.capture(version);
+        states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),1L,f.paragraphs().getLast().id(),true));
+        assertThat(scopes.publish(frozen,ReadingScopeService.Snapshot::boundaryOrdinal)).isEqualTo(1);
+        states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),2L,null,true));
+        states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),3L,f.paragraphs().getLast().id(),true));
+        assertThatThrownBy(()->scopes.publish(frozen,s->"late result")).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.code()).isEqualTo("SCOPE_CHANGED"));
+    }
+
+    @Test void publicationAndRollbackSerializeAndFailedPublicationRollsBack() throws Exception {
+        var f=fixture();UUID version=f.result().versionId();
+        states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),0L,f.paragraphs().getLast().id(),true));
+        var frozen=scopes.capture(version);
+        var note=notes.create(version,new ReadingNoteService.Create(UUID.randomUUID(),"MANUAL","记录","原内容",null,null,null,1L));
+        assertThatThrownBy(()->scopes.publish(frozen,s -> {
+            jdbc.update("UPDATE reading_note SET body=? WHERE id=?","不可提交",note.id());
+            throw new IllegalStateException("injected");
+        })).isInstanceOf(IllegalStateException.class);
+        assertThat(notes.get(note.id()).body()).isEqualTo("原内容");
+        var entered=new CountDownLatch(1);var release=new CountDownLatch(1);var rollbackStarted=new CountDownLatch(1);
+        try(var pool=Executors.newFixedThreadPool(2)) {
+            var publication=pool.submit(()->scopes.publish(frozen,s -> {
+                entered.countDown();
+                try { if(!release.await(2,TimeUnit.SECONDS))throw new IllegalStateException("test deadline"); }
+                catch(InterruptedException error) { Thread.currentThread().interrupt();throw new IllegalStateException(error); }
+                jdbc.update("UPDATE reading_note SET body=? WHERE id=?","已提交内容",note.id());
+                return true;
+            }));
+            assertThat(entered.await(2,TimeUnit.SECONDS)).isTrue();
+            var rollback=pool.submit(()-> { rollbackStarted.countDown();return states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),1L,null,true)); });
+            assertThat(rollbackStarted.await(2,TimeUnit.SECONDS)).isTrue();
+            try { assertThatThrownBy(()->rollback.get(100,TimeUnit.MILLISECONDS)).isInstanceOf(TimeoutException.class); }
+            finally { release.countDown(); }
+            assertThat(publication.get(3,TimeUnit.SECONDS)).isTrue();
+            assertThat(rollback.get(3,TimeUnit.SECONDS).state().readBoundary()).isZero();
+        } finally { release.countDown(); }
+        assertThat(notes.get(note.id()).body()).isNull();
+        assertThatThrownBy(()->scopes.publish(frozen,s->true)).isInstanceOf(ReadingException.class);
+    }
+
+    @Test void sourceHttpRejectsRangeOverridesAndStateStreamReplaysOnlyCurrentMetadata() throws Exception {
+        var f=fixture();UUID version=f.result().versionId();var p=f.paragraphs().getFirst();
+        var mvc=org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup(web).build();
+        states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),0L,p.id(),true));
+        String endpoint="/api/reading/versions/"+version;
+        mvc.perform(get(endpoint+"/paragraphs/"+p.id()+"/preview")).andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control","no-store")).andExpect(jsonPath("$.text").value(p.text())).andExpect(jsonPath("$.chapterTitle").isEmpty());
+        mvc.perform(get(endpoint+"/paragraphs/"+p.id()+"/preview").param("revealTitle","true")).andExpect(status().isBadRequest());
+        mvc.perform(get("/api/reading/versions/"+UUID.randomUUID()+"/state/events").accept("text/event-stream"))
+                .andExpect(status().isNotFound()).andExpect(content().contentTypeCompatibleWith("application/json"));
+        states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),1L,null,true));
+        var stream=mvc.perform(get(endpoint+"/state/events").header("Last-Event-ID",version+"/1"))
+                .andExpect(request().asyncStarted()).andExpect(header().string("Cache-Control","no-store")).andReturn();
+        try {
+            awaitStream(stream,"event:snapshot");
+            String initial=stream.getResponse().getContentAsString(StandardCharsets.UTF_8);
+            assertThat(initial).contains("\"readBoundary\":0","\"scopeRevision\":2","\"visibilityEpoch\":1").doesNotContain(p.text(),"textHash","ownerId");
+            states.boundary(version,new ReadingStateService.Boundary(UUID.randomUUID(),2L,p.id(),true));
+            awaitStream(stream,"event:scope_changed");
+            assertThat(stream.getResponse().getContentAsString(StandardCharsets.UTF_8)).contains("\"scopeRevision\":3").doesNotContain(p.text());
+        } finally {
+            var context=(org.springframework.mock.web.MockAsyncContext)stream.getRequest().getAsyncContext();
+            for(var listener:context.getListeners()) listener.onTimeout(new jakarta.servlet.AsyncEvent(context));
+        }
+    }
+    private static void awaitStream(org.springframework.test.web.servlet.MvcResult result,String expected) throws Exception {
+        long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);
+        String content;
+        do {
+            content=result.getResponse().getContentAsString(StandardCharsets.UTF_8).replace("\r\n","\n");
+            int eventStart=content.indexOf(expected);
+            if(eventStart>=0 && content.indexOf("\n\n",eventStart)>=0)return;
+            Thread.sleep(25);
+        } while(System.nanoTime()<deadline);
+        fail("No complete SSE frame for %s; received: %s",expected,content);
+    }
+
+    @Test void stateStreamsHaveBoundedSubscriptionsAndReleaseDisconnectedSlots() throws Exception {
+        var f=fixture();var mvc=org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup(web).build();
+        String path="/api/reading/versions/"+f.result().versionId()+"/state/events";
+        var streams=new ArrayList<org.springframework.test.web.servlet.MvcResult>();
+        try {
+            for(int i=0;i<16;i++) streams.add(mvc.perform(get(path).accept("text/event-stream")).andExpect(request().asyncStarted()).andReturn());
+            mvc.perform(get(path).accept("text/event-stream")).andExpect(status().isTooManyRequests()).andExpect(jsonPath("$.code").value("STREAM_LIMIT"));
+            var context=(org.springframework.mock.web.MockAsyncContext)streams.removeFirst().getRequest().getAsyncContext();
+            for(var listener:context.getListeners())listener.onTimeout(new jakarta.servlet.AsyncEvent(context));
+            streams.add(mvc.perform(get(path).accept("text/event-stream")).andExpect(request().asyncStarted()).andReturn());
+        } finally {
+            for(var stream:streams) {
+                var context=(org.springframework.mock.web.MockAsyncContext)stream.getRequest().getAsyncContext();
+                for(var listener:context.getListeners())listener.onTimeout(new jakarta.servlet.AsyncEvent(context));
+            }
+        }
     }
 }

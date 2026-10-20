@@ -21,16 +21,28 @@ public class ReadingNoteService {
     private final BookMapper books;
     private final ReadingNoteMapper notes;
     private final ReadingBookmarkMapper bookmarks;
-    public ReadingNoteService(ReadingStateService states,BookMapper books,ReadingNoteMapper notes,ReadingBookmarkMapper bookmarks) {
+    private final ReadingScopeService scopes;
+    public ReadingNoteService(ReadingStateService states,BookMapper books,ReadingNoteMapper notes,ReadingBookmarkMapper bookmarks,ReadingScopeService scopes) {
         this.states=states;this.books=books;this.notes=notes;this.bookmarks=bookmarks;
+        this.scopes=scopes;
     }
     public BookService.Page<NoteView> list(UUID version,int page,int size) {
-        BookService.page(page,size,50);UUID owner=states.owner();states.version(owner,version);
-        int boundary=states.boundary(owner,version);
-        return new BookService.Page<>(notes.list(owner,version,size,(long)(page-1)*size).stream().map(n->view(n,boundary)).toList(),page,size,notes.count(owner,version));
+        BookService.page(page,size,50);
+        return scopes.current(version,scope -> new BookService.Page<>(notes.list(scope.ownerId(),version,size,(long)(page-1)*size)
+                .stream().map(n->view(n,scope)).toList(),page,size,notes.count(scope.ownerId(),version)));
     }
     public NoteView get(UUID id) {
-        var note=requireNote(id,false);return view(note,states.boundary(note.ownerId,note.versionId));
+        var note=requireNote(id,false);
+        return scopes.current(note.versionId,scope -> view(requireNote(id,false),scope));
+    }
+    public ReadingScopeService.Source source(UUID id) {
+        var original=requireNote(id,false);
+        return scopes.current(original.versionId,scope -> {
+            var note=requireNote(id,false);
+            ReadingScopeService.requireVisible(scope,note.versionId,note.requiredBoundary);
+            if(note.anchorParagraphId==null) throw ReadingException.missing();
+            return scopes.source(scope,note.anchorParagraphId,note.anchorStart,note.anchorEnd,note.requiredBoundary);
+        });
     }
     @Transactional(timeout=5)
     public NoteView create(UUID versionId,Create request) {
@@ -82,9 +94,9 @@ public class ReadingNoteService {
         ReadingStateService.revision(note.revision,revision);notes.remove(id);
     }
     public BookService.Page<BookmarkView> bookmarks(UUID version,int page,int size) {
-        BookService.page(page,size,50);UUID owner=states.owner();states.version(owner,version);int boundary=states.boundary(owner,version);
-        return new BookService.Page<>(bookmarks.list(owner,version,size,(long)(page-1)*size).stream().map(b->bookmarkView(b,boundary)).toList(),
-                page,size,bookmarks.count(owner,version));
+        BookService.page(page,size,50);
+        return scopes.current(version,scope -> new BookService.Page<>(bookmarks.list(scope.ownerId(),version,size,(long)(page-1)*size)
+                .stream().map(b->bookmarkView(b,scope.boundaryOrdinal())).toList(),page,size,bookmarks.count(scope.ownerId(),version)));
     }
     @Transactional(timeout=5)
     public BookmarkView bookmark(UUID versionId,BookmarkCreate request) {
@@ -124,6 +136,9 @@ public class ReadingNoteService {
         String original=anchor!=null && "EXCERPT".equals(note.kind)?ReadingText.slice(anchor.text(),note.anchorStart,note.anchorEnd).strip():null;
         return new NoteView(note.id,note.versionId,"VISIBLE",note.kind,note.title,note.body,note.anchorParagraphId,chapter,
                 note.anchorStart,note.anchorEnd,note.revision,note.createdAt,original!=null && !original.equals(note.body),original);
+    }
+    private NoteView view(ReadingNote note,ReadingScopeService.Snapshot scope) {
+        return view(note,ReadingScopeService.visible(scope,note.versionId,note.requiredBoundary)?scope.boundaryOrdinal():-1);
     }
     private BookmarkView bookmarkView(ReadingBookmark bookmark,int boundary) {
         return new BookmarkView(bookmark.id,bookmark.paragraphId,states.paragraph(bookmark.versionId,bookmark.paragraphId).chapterId(),

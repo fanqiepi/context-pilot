@@ -4,7 +4,7 @@
 
 业务语义见[设计](../architecture/novel-reading-design.md)，字段约束见[数据](../data/novel-reading-data-model.md)，数值限制见[新路线](../development/novel-reading-roadmap.md)。
 
-当前实现范围：导入/书籍/版本/正文、state 与两个位置 PUT、书签、手写/摘录笔记。`state/events`、索引、任务、引用、AI 笔记提案均未实现。下表未实现部分是批准的后续合同，不是现有接口。正文增加 `atParagraphId` 用于恢复位置及书签/摘录定位，与 cursor 互斥并严格校验版本和章节关系；不会修改已读边界。预览目录当前返回数组，总数从预览 `chapterCount` 取得，默认 size=50；普通目录返回分页对象，默认 size=50。同位置新建重复书签返回 409 `BOOKMARK_EXISTS`；原幂等键重放返回原书签，已删除键返回 410。摘录编辑保留原锚点，并返回 `userEdited`/`originalExcerpt`，页面明确区分编辑内容与原选文。
+当前实现范围：导入/书籍/版本/正文、state 与两个位置 PUT、书签、手写/摘录笔记，以及 `state/events`、受限段落预览和笔记出处。索引、任务及其证据引用、AI 笔记提案均未实现。下表未实现部分是批准的后续合同，不是现有接口。正文增加 `atParagraphId` 用于恢复位置及书签/摘录定位，与 cursor 互斥并严格校验版本和章节关系；不会修改已读边界。预览目录当前返回数组，总数从预览 `chapterCount` 取得，默认 size=50；普通目录返回分页对象，默认 size=50。同位置新建重复书签返回 409 `BOOKMARK_EXISTS`；原幂等键重放返回原书签，已删除键返回 410。摘录编辑保留原锚点，并返回 `userEdited`/`originalExcerpt`，页面明确区分编辑内容与原选文。
 
 ## 通用协议
 
@@ -50,6 +50,17 @@
 | `DELETE /bookmarks/{id}` | expectedRevision | 204 逻辑删除 |
 
 两个位置 PUT 均须幂等与 CAS。相同 clientRequestId 的重放在检查 CAS 前匹配原请求，防止“写入成功但响应丢失”被误判为新修改。自动保存冲突停止覆盖，显示“另一个页面已更新”，刷新后由用户选择继续此处或采用已存位置。不能静默自动重试旧 CAS。
+
+状态 SSE 已实现：首次/重连总是发送当前 `snapshot`，后续 `scope_changed`；id 为 `versionId/scopeRevision`，载荷仅 `versionId/readBoundary/scopeRevision/visibilityEpoch/dataAsOf`。`Last-Event-ID` 不控制历史正文重放；服务端只发送当前提交快照，因此回退再前进的中间变化可合并，但 epoch 不丢失。连接返回 `Cache-Control: no-store`、`X-Accel-Buffering: no`；超过路线规定的订阅上限返回 429 `STREAM_LIMIT`，资源不可访问则关闭连接。客户端收到变化或重连后重取受限记录。
+
+### 已实现的原文预览
+
+| 方法与路径 | 行为 |
+| --- | --- |
+| `GET /versions/{id}/paragraphs/{paragraph}/preview` | 单个完整已读段落；拒绝 query 参数（包括 revealTitle/上下文范围），无续读写入 |
+| `GET /notes/{id}/source` | 按笔记完整输入依赖及不可变锚点校验；返回原选区，无续读写入；无出处返回 404 |
+
+两者返回 `versionId/chapterId/chapterOrdinal/chapterTitle/paragraphId/paragraphOrdinal/startOffset/endOffset/text/textHash/requiredBoundary/scopeRevision/visibilityEpoch/dataAsOf`；`textHash` 是原段落 hash，offset 使用 code point。未完全已读章 `chapterTitle=null`；若返回真实章标题，输出 `requiredBoundary` 同时包含章末依赖。越界 409 `SCOPE_HIDDEN`，跨版本/不存在/已删除 404，均 `no-store`。这些基础出处不伪装为尚未实施的任务 `evidenceId` 引用。后续任务引用必须另外核对任务归属、完整输入范围和冻结证据。
 
 ## 索引与阅读任务
 

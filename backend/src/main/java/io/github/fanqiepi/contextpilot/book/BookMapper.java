@@ -125,4 +125,18 @@ public interface BookMapper extends BaseMapper<BookImportEntity> {
     @Select("SELECT "+PARAGRAPH_COLUMNS+" FROM book_paragraph WHERE id=#{id} AND version_id=#{version} AND deleted=0")
     @Options(timeout=3)
     BookRows.Paragraph paragraph(@Param("version") UUID version, @Param("id") UUID id);
+
+    @Select("""
+        SELECT p.id,p.version_id,p.chapter_id,p.paragraph_ordinal,p.chapter_paragraph_ordinal,p.text,p.code_point_count,p.text_hash
+        FROM book_paragraph p JOIN book_version v ON v.id=p.version_id JOIN reading_book b ON b.id=v.book_id
+        WHERE p.id=#{id} AND p.version_id=#{version} AND v.book_id=#{book} AND v.owner_id=#{owner}
+          AND b.owner_id=#{owner} AND p.paragraph_ordinal<=#{boundary}
+          AND p.deleted=0 AND v.deleted=0 AND b.deleted=0 AND v.status='READY'
+        """)
+    @Options(timeout=3)
+    BookRows.Paragraph scopedParagraph(@Param("owner") UUID owner,@Param("book") UUID book,@Param("version") UUID version,
+                                      @Param("id") UUID id,@Param("boundary") int boundary);
+    @Select("SELECT paragraph_ordinal FROM book_paragraph WHERE version_id=#{version} AND id=#{id} AND deleted=0")
+    @Options(timeout=3)
+    Integer paragraphOrdinal(@Param("version") UUID version,@Param("id") UUID id);
 }
