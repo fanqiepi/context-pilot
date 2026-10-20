@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.*;
 import io.github.fanqiepi.contextpilot.readingstate.ReadingStateService;
+import io.github.fanqiepi.contextpilot.readingstate.ReadingScopeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +16,8 @@ public class BookService {
     public record Edit(Long expectedRevision,String title,String sourceDescription) {}
     private final BookMapper mapper;
     private final ReadingStateService states;
-    public BookService(BookMapper mapper,ReadingStateService states) { this.mapper=mapper;this.states=states; }
+    private final ReadingScopeService scopes;
+    public BookService(BookMapper mapper,ReadingStateService states,ReadingScopeService scopes) { this.mapper=mapper;this.states=states;this.scopes=scopes; }
     public Page<BookRows.Book> list(int page,int size) {
         page(page,size,50); UUID owner=states.owner();
         return new Page<>(mapper.books(owner,size,(long)(page-1)*size),page,size,mapper.bookCount(owner));
@@ -44,14 +46,20 @@ public class BookService {
         mapper.removeBook(id);
     }
     public Page<Chapter> chapters(UUID versionId,int page,int size) {
+        return scopes.current(versionId,scope -> chapterPage(versionId,page,size,scope.boundaryOrdinal()));
+    }
+    private Page<Chapter> chapterPage(UUID versionId,int page,int size,int boundary) {
         page(page,size,100);UUID owner=states.owner();
-        var version=states.version(owner,versionId);int boundary=states.boundary(owner,versionId);
+        var version=states.version(owner,versionId);
         var items=mapper.chapterPage(versionId,size,(long)(page-1)*size).stream()
                 .map(c -> new Chapter(c.id(),c.chapterOrdinal(),c.lastParagraphOrdinal()<=boundary?c.title():null,
                         c.lastParagraphOrdinal()>boundary,c.firstParagraphOrdinal(),c.lastParagraphOrdinal())).toList();
         return new Page<>(items,page,size,version.chapterCount());
     }
     public Paragraphs paragraphs(UUID version,UUID chapter,String cursor,int limit,boolean revealTitle) {
+        return scopes.current(version,scope -> paragraphPage(version,chapter,cursor,limit,revealTitle,scope.boundaryOrdinal()));
+    }
+    private Paragraphs paragraphPage(UUID version,UUID chapter,String cursor,int limit,boolean revealTitle,int boundary) {
         ReadingText.require(limit>=1 && limit<=100,"正文每页最多 100 段");
         UUID owner=states.owner();states.version(owner,version);
         var c=mapper.chapter(version,chapter);if(c==null) throw ReadingException.missing();
@@ -72,7 +80,6 @@ public class BookService {
         }
         int last=items.isEmpty()?after:items.getLast().paragraphOrdinal();
         String next=last<c.lastParagraphOrdinal()?cursor(version,chapter,last):null;
-        int boundary=states.boundary(owner,version);
         return new Paragraphs(version,chapter,revealTitle || c.lastParagraphOrdinal()<=boundary?c.title():null,List.copyOf(items),next,OffsetDateTime.now());
     }
     public static String cursor(UUID version,UUID chapter,int after) {

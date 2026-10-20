@@ -22,7 +22,7 @@ public class ReadingHttpAdvice implements ResponseBodyAdvice<Object> {
         body.put("code",error.code());body.put("message",error.getMessage());
         body.put("requestId",request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE)==null?UUID.randomUUID().toString():request.getAttribute(RequestIdFilter.REQUEST_ID_ATTRIBUTE));
         if(error.currentRevision()!=null)body.put("currentRevision",error.currentRevision());
-        return ResponseEntity.status(error.status()).body(body);
+        return ResponseEntity.status(error.status()).contentType(MediaType.APPLICATION_JSON).body(body);
     }
     @ExceptionHandler({org.springframework.web.bind.MissingServletRequestParameterException.class,
             org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class,

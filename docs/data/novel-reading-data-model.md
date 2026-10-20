@@ -6,6 +6,8 @@
 
 当前实现：新增 [V29](../../backend/src/main/resources/db/migration/V29__create_reading_library.sql)，包含 `reading_book`、`book_import`、`book_version`、`book_chapter`、`book_paragraph`、`reading_state`、`reading_state_command`、`reading_bookmark`、`reading_note` 九张表。笔记仅 MANUAL/EXCERPT；索引、任务和 AI 提案表尚未创建。摘录编辑不修改原锚点，返回的 `originalExcerpt` 与 `userEdited` 由不可变原文比较生成。迁移仅在隔离测试数据库验证，未迁移用户现有本地数据库。
 
+范围功能沿用上述表，不新增迁移或正文缓存。`ReadingScopeService` 快照仅在服务端构造；当前范围与命令日志已经持久保存 `scopeRevision/visibilityEpoch`，状态 SSE 从当前提交行重建，不建立保存正文的事件表。笔记/书签保留原 `required_boundary`，回退只改变可见性，不删除记录；重新到达足够边界后可重新查看历史笔记，旧 epoch 的在途发布仍然失效。未来 `reading_task_event` 等目标表仍未实现。
+
 ## 通用规则
 
 - UUID 主键；所有业务表含 `created_at/updated_at`（TIMESTAMPTZ）与 `deleted SMALLINT CHECK IN (0,1)`；可变实体另有非负 `revision BIGINT`。不可变正文允许生命周期字段变化，内容不原地覆盖。

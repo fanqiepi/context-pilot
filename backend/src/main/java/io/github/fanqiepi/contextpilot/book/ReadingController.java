@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.util.UUID;
 import io.github.fanqiepi.contextpilot.document.StorageService;
 import io.github.fanqiepi.contextpilot.readingstate.ReadingStateService;
+import io.github.fanqiepi.contextpilot.readingstate.ReadingScopeService;
+import io.github.fanqiepi.contextpilot.readingstate.ReadingScopeEvents;
 import io.github.fanqiepi.contextpilot.readingnote.ReadingNoteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +20,12 @@ public class ReadingController {
     private final ReadingStateService states;
     private final ReadingNoteService notes;
     private final StorageService storage;
+    private final ReadingScopeService scopes;
+    private final ReadingScopeEvents scopeEvents;
     public ReadingController(BookImportService imports,BookImportWorker worker,BookService books,ReadingStateService states,
-                             ReadingNoteService notes,StorageService storage) {
+                             ReadingNoteService notes,StorageService storage,ReadingScopeService scopes,ReadingScopeEvents scopeEvents) {
         this.imports=imports;this.worker=worker;this.books=books;this.states=states;this.notes=notes;this.storage=storage;
+        this.scopes=scopes;this.scopeEvents=scopeEvents;
     }
     @PostMapping("/imports")
     public ResponseEntity<?> upload(@RequestParam MultipartFile file,@RequestParam UUID clientRequestId,@RequestParam String title,
@@ -73,6 +78,19 @@ public class ReadingController {
         return books.paragraphs(id,chapter,cursor,limit,revealTitle);
     }
     @GetMapping("/versions/{id}/state") public Object state(@PathVariable UUID id) { return states.get(id); }
+    @GetMapping(value="/versions/{id}/state/events",produces="text/event-stream")
+    public org.springframework.web.servlet.mvc.method.annotation.SseEmitter stateEvents(@PathVariable UUID id,
+            jakarta.servlet.http.HttpServletResponse response) {
+        response.setHeader("Cache-Control","no-store");
+        response.setHeader("X-Accel-Buffering","no");
+        return scopeEvents.subscribe(id);
+    }
+    @GetMapping("/versions/{id}/paragraphs/{paragraph}/preview")
+    public Object preview(@PathVariable UUID id,@PathVariable UUID paragraph,jakarta.servlet.http.HttpServletRequest request) {
+        ReadingText.require(request.getParameterMap().isEmpty(),"原文预览不接受扩展范围或显示标题参数");
+        return scopes.preview(id,paragraph);
+    }
+    @GetMapping("/notes/{id}/source") public Object noteSource(@PathVariable UUID id) { return notes.source(id); }
     @PutMapping("/versions/{id}/resume-position") public Object resume(@PathVariable UUID id,@RequestBody String body) { return states.resume(id,ReadingText.read(body,ReadingStateService.Resume.class)); }
     @PutMapping("/versions/{id}/read-boundary") public Object boundary(@PathVariable UUID id,@RequestBody String body) { return states.boundary(id,ReadingText.read(body,ReadingStateService.Boundary.class)); }
     @GetMapping("/versions/{id}/notes") public Object notes(@PathVariable UUID id,@RequestParam(defaultValue="1")int page,@RequestParam(defaultValue="20")int size) { return notes.list(id,page,size); }
