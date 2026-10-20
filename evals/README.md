@@ -1,5 +1,9 @@
 # ContextPilot evaluation assets
 
+## 阅读方向的当前评估入口
+
+当前路线使用 [reading-acceptance-v1 工具](tools/reading-README.md)、[评估合同](../docs/evaluation/novel-reading-evaluation.md)与[离线验证记录](../docs/evaluation/reading-experience-verification.md)。已准备语料、固定题目、冻结/人工评分工具；真实付费批次未授权、未执行，旧研究命令不构成阅读调用授权。
+
 > 2026-10-20：以下是既有合同的复现入口，不是当前待执行任务。旧研究专项收尾已暂停；按实际代码改动执行必要回归，不默认重跑付费采集。最新采集与缺口见[功能清单](../docs/development/feature-inventory.md)，当前开发安排只见[新开发路线](../docs/development/novel-reading-roadmap.md)。
 
 ## 统一 50 项核心实跑

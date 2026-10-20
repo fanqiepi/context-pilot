@@ -141,7 +141,7 @@ class ReadingLibraryPersistenceTests {
         mvc.perform(post("/api/reading/imports/"+id+"/confirm").contentType("application/json").content(ReadingText.json(new ReadingController.Confirm(preview.previewHash()))))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.versionId").isNotEmpty());
     }
-    @Test void fiveMillionCharactersRemainPagedAndPreserveTheLastLocation() {
+    @Test void fiveMillionCharactersRemainPagedAndPreserveTheLastLocation() throws Exception {
         var text=new StringBuilder(5_020_000);
         for(int chapter=1;chapter<=1000;chapter++) {
             text.append("第").append(chapter).append("章 测试\n");
@@ -161,15 +161,59 @@ class ReadingLibraryPersistenceTests {
         var last=rows.paragraphs().getLast();
         states.resume(result.versionId(),new ReadingStateService.Resume(UUID.randomUUID(),0L,last.id(),500));
         assertThat(states.get(result.versionId()).resumePosition().paragraphOrdinal()).isEqualTo(10000);
-        long[] timings=new long[30];
+        long[] timings=new long[30],writeTimings=new long[30];
         for(int i=0;i<30;i++) {
             long start=System.nanoTime();books.paragraphs(result.versionId(),lastChapter.id(),null,100,false);
             timings[i]=TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start);
+            var state=states.get(result.versionId());
+            start=System.nanoTime();
+            var saved=states.resume(result.versionId(),new ReadingStateService.Resume(UUID.randomUUID(),state.resumeRevision(),last.id(),i));
+            writeTimings[i]=TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start);
+            assertThat(saved.state().readBoundary()).isZero();
+            assertThat(states.get(result.versionId()).resumePosition().offset()).isEqualTo(i);
         }
-        Arrays.sort(timings);
-        System.out.printf("READING_CAPACITY characters=5000000 chapters=1000 parseMs=%d confirmMs=%d paragraphP95Ms=%d%n",parsedMs,confirmedMs,timings[28]);
+        var sortedReads=timings.clone();var sortedWrites=writeTimings.clone();
+        Arrays.sort(sortedReads);Arrays.sort(sortedWrites);
+        var evidence=new LinkedHashMap<String,Object>();
+        evidence.put("recordedAt",java.time.Instant.now().toString());
+        evidence.put("mode","OFFLINE_ENGINEERING");
+        evidence.put("fixture",Map.of("characters",5_000_000,"chapters",1000,"paragraphs",10000,"fileSha256",ReadingText.hash(text.toString())));
+        evidence.put("environment",Map.of("os",System.getProperty("os.name"),"osVersion",System.getProperty("os.version"),
+                "java",System.getProperty("java.version"),"processors",Runtime.getRuntime().availableProcessors(),
+                "maxHeapBytes",Runtime.getRuntime().maxMemory(),"postgres",jdbc.queryForObject("select version()",String.class)));
+        evidence.put("parsePreviewMs",parsedMs);evidence.put("confirmMs",confirmedMs);
+        evidence.put("paragraphSamplesMs",timings);evidence.put("positionWriteSamplesMs",writeTimings);
+        evidence.put("paragraphP95Ms",sortedReads[28]);evidence.put("positionWriteP95Ms",sortedWrites[28]);
+        evidence.put("limitations",List.of("Warm application/DB service calls, not HTTP or browser timings.",
+                "New import once; no cold process or OS cache eviction.","Reader feedback and semantic quality not measured."));
+        java.nio.file.Files.writeString(java.nio.file.Path.of("target/reading-capacity-evidence.json"),ReadingText.json(evidence));
+        System.out.printf("READING_CAPACITY characters=5000000 chapters=1000 parseMs=%d confirmMs=%d paragraphP95Ms=%d positionWriteP95Ms=%d%n",
+                parsedMs,confirmedMs,sortedReads[28],sortedWrites[28]);
         assertThat(parsedMs).isLessThan(120000);assertThat(confirmedMs).isLessThan(120000);
-        assertThat(timings[28]).isLessThanOrEqualTo(500);
+        assertThat(sortedReads[28]).isLessThanOrEqualTo(500);assertThat(sortedWrites[28]).isLessThanOrEqualTo(500);
+    }
+    @Test void frozenReadingCorporaMatchProductionParserAndVersionLocalLocations() throws Exception {
+        var root=java.nio.file.Path.of("..");
+        var dataset=tools.jackson.databind.json.JsonMapper.builder().build().readTree(
+                java.nio.file.Files.readString(root.resolve("evals/datasets/reading/acceptance-v1.json")));
+        for(var corpus:dataset.get("corpora")) {
+            byte[] bytes=java.nio.file.Files.readAllBytes(root.resolve(corpus.get("file").asText()));
+            assertThat(ReadingText.hash(bytes)).isEqualTo(corpus.get("sha256").asText());
+            var parsed=parser.parse(bytes,BookParser.Rule.valueOf(corpus.get("parserId").asText()),null);
+            assertThat(parsed.chapters()).hasSize(corpus.get("chapterCount").asInt());
+            assertThat(parsed.paragraphCount()).isEqualTo(corpus.get("paragraphs").size());
+            int ordinal=0,chapter=0;
+            for(var ch:parsed.chapters()) {
+                chapter++;
+                for(var text:ch.paragraphs()) {
+                    var expected=corpus.get("paragraphs").get(ordinal++);
+                    assertThat(text).isEqualTo(expected.get("text").asText());
+                    assertThat(ReadingText.hash(text)).isEqualTo(expected.get("sha256").asText());
+                    assertThat(ordinal).isEqualTo(expected.get("ordinal").asInt());
+                    assertThat(chapter).isEqualTo(expected.get("chapter").asInt());
+                }
+            }
+        }
     }
     @Test void duplicateFilesReuseVersionAndReparseInvalidatesPriorPreview() {
         String text="第一章 开始\n"+UUID.randomUUID()+"\n第二章 结尾\n正文";
