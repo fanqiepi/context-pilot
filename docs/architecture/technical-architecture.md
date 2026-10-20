@@ -2,9 +2,13 @@
 
 > 本文维护模块职责和编排机制；逐项功能及版本状态见[功能清单](../development/feature-inventory.md)，运行配置见[本地开发](../development/local-development.md)。
 
+> 2026-10-20：本文保留既有技术研究实现合同。小说阅读方案及旧路线弃用见[新开发路线](../development/novel-reading-roadmap.md)；基础阅读已新增 `book`、`readingstate`、`readingnote` 模块，阅读 Agent 尚未实施。
+
+> [阅读业务合同](novel-reading-design.md) `reading-contract-v1-draft1` 已获用户确认。首个功能点采用专用 MyBatis Mapper、V29、StorageService 与独立有界解析队列；只实现导入/正文/状态/用户笔记，不接模型和旧研究任务。完整范围、索引、任务与提案仍是后续合同，本文以下既有实现合同不变。
+
 ## 架构形式
 
-系统采用 Vue 前端与 Spring Boot 后端分离的模块化单体，后端使用 Java 21、Spring Boot 4.1.x 和 Spring AI 2.0.x。业务编排由显式 Java 服务和持久化状态迁移实现；V6 在独立模块内使用受限原生工具调用，不引入微服务、消息队列、MCP 或工作流框架。
+系统采用 Vue 前端与 Spring Boot 后端分离的模块化单体，后端使用 Java 21、Spring Boot 4.1.x 和 Spring AI 2.0.x。业务编排由显式 Java 服务和持久化状态迁移实现；V6 在独立模块内使用受限原生工具调用。项目资料接入另行引入专用只读 MCP；不引入通用工具发现、微服务、消息队列或工作流框架。
 
 前端使用 Vue 3、TypeScript、Vue Router 和 Element Plus。`/library` 承载知识库、文档上传与处理状态管理，`/chat` 承载知识库选择、会话历史、流式问答和单向“有用”反馈。普通 HTTP 请求统一通过 Axios 访问 `/api`，SSE 使用 `@microsoft/fetch-event-source` 解析具名事件；聊天页对突发到达的 `delta` 使用短缓冲渐进渲染，并在缓冲区清空后再展示引用和完成状态。开发服务器将 `/api` 和 `/actuator` 代理到后端。模型密钥不进入浏览器；助手回答使用 `marked` 解析 Markdown，并在 `v-html` 展示前通过 `DOMPurify` 清洗，禁止脚本、样式、表单、嵌入内容和远程媒体标签。用户消息继续按纯文本展示，模型输出和文档内容中的原始 HTML 均不受信任。
 
@@ -24,6 +28,9 @@
 - `memory`（V5）：全局回答偏好的持久化、版本、管理、固定预算选择和消息上下文关联；不承载事实型记忆、任务状态或自动提取。
 - `research`：V4 确定性多文档比对、运行状态与证据账本。
 - `upgraderesearch` / `researchreport`：V6 受限工具循环、来源与调用审计、经确认的报告保存。
+- `taskworkspace`：选定文档内有限计划、验证执行、检查点与补充轮次。
+- `projectsource`：固定 Spring AI 仓库的只读 MCP 预览与确认导入。
+- `researchreview`：已完成任务快照的固定一次证据审查与补充交接。
 - `common`：少量跨模块配置、错误类型和基础约定，不承载业务实现。
 
 模块按业务能力组织，简单功能不强制创建空的 controller/service/mapper 层。`chat` 可以编排检索与模型调用，供应商专用配置不得散落到业务模块。
@@ -118,7 +125,7 @@ V5 详细合同见 [V5 显式记忆的个人助手详细设计](v5-explicit-memo
 
 保存由用户发起 `SAVE_RESEARCH_REPORT` 提案，模型不能创建或确认提案。独立确认调用报告领域服务，报告写入与动作成功标记同事务提交。数据、接口和保存幂等语义见 V6 设计及 Flyway V20/V21。
 
-首版 API、页面和执行链路已实现，验收未通过，新建运行默认关闭；已知问题及证据见[实现记录](../evaluation/v6-implementation-review.md)。MCP、检索优化及其他未来范围只在[产品需求](../requirements/product-requirements.md)维护。
+首版 API、页面和执行链路已实现，验收未通过，新建运行默认关闭；已知问题及证据见[实现记录](../evaluation/v6-implementation-review.md)。后续安排只按[新开发路线](../development/novel-reading-roadmap.md)，MCP 泛化与检索优化不在默认排期。
 
 ## 基础设施职责
 

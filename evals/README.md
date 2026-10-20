@@ -1,5 +1,7 @@
 # ContextPilot evaluation assets
 
+> 2026-10-20：以下是既有合同的复现入口，不是当前待执行任务。旧研究专项收尾已暂停；按实际代码改动执行必要回归，不默认重跑付费采集。最新采集与缺口见[功能清单](../docs/development/feature-inventory.md)，当前开发安排只见[新开发路线](../docs/development/novel-reading-roadmap.md)。
+
 ## 统一 50 项核心实跑
 
 先在仓库根目录运行 `node evals/tools/baseline.mjs validate`。使用 JDK 21，在 `backend/` 显式执行：
@@ -32,7 +34,7 @@ V6 已有受限执行、确认保存、页面及工程测试，首轮冻结专�
 .\mvnw.cmd '-Dtest=V6FixtureEvaluationTests' '-Dcontextpilot.evaluation.v6-fixture=true' test
 ```
 
-两者需要本机 `local-secrets` 配置与 Docker，使用独立数据库和公开资料。前者是可变 GitHub 来源的真实调试；后者使用真实模型/检索与合成 release fixtures 收集冻结结果。结果文件分别是 `backend/target/v6-live-debug.json`、`backend/target/v6-fixture-evaluation.json`。**结果采集成功不代表语义验收通过**；人工事实/引用评分、统一核心基线及 16 次最终生产验收仍须完成。已观察的 TEST 输入不能继续作为调参后的独立泛化证明。
+两者需要本机 `local-secrets` 配置与 Docker，使用独立数据库和公开资料。前者是可变 GitHub 来源的真实调试；后者使用真实模型/检索与合成 release fixtures 收集冻结结果。结果文件分别是 `backend/target/v6-live-debug.json`、`backend/target/v6-fixture-evaluation.json`。**结果采集成功不代表语义验收通过**；核心首次运行及新的 16 次代表运行已采集，人工事实/引用评分与最终质量验收仍未完成，见[最新独立结果](../docs/evaluation/upgrade-closeout-independent-results.md)。已观察的 TEST 输入不能继续作为调参后的独立泛化证明。
 
 ## Run the V2 routing and action-safety evaluation
 

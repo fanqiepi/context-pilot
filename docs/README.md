@@ -1,63 +1,42 @@
 # 研序 文档导航
 
-- [研究任务工作台设计](architecture/research-task-workspace-design.md)：有限规划、澄清、执行与检查点恢复。
-- [研究任务工作台验证](evaluation/research-task-workspace-verification.md)：工程回归、真实模型与页面证据及质量边界。
-- [项目资料接入设计](architecture/project-source-integration-design.md)：已授权的固定项目资料读取与确认导入合同。
-- [研究成果审查设计](architecture/research-result-review-design.md)：已批准功能的范围、数据/API、失败语义和验证合同。
+更新：2026-10-20。当前进入小说阅读产品设计；新路线已建立，旧研究路线及转向初稿已弃用。按下面顺序阅读，历史过程不再充当当前待办。
 
-按用途查阅；当前状态看功能清单，未来范围看产品需求，验收结论看版本报告。
+## 当前工作入口
 
-## 入门与日常开发
-
-| 文档 | 用途 |
+| 文档 | 唯一职责 |
 | --- | --- |
-| [项目首页](../README.md) | 项目介绍与启动入口 |
-| [项目背景](development/project-context.md) | 新会话必读：当前状态和开发边界 |
-| [功能清单与简历素材](development/feature-inventory.md) | 固定编号的能力清单、证据、待办及对外表述 |
-| [一页技术复盘](development/technical-retrospective.md) | 核心取舍、收尾发现与可核查的成果边界 |
-| [本地开发](development/local-development.md) | 环境、配置、启动、验证和日志排查 |
-| [仓库规则](../AGENTS.md) | 开发约定、授权范围与安全要求 |
+| [项目背景](development/project-context.md) | 新会话入口：当前方向、实现状态摘要与边界 |
+| [长篇小说阅读应用开发路线](development/novel-reading-roadmap.md) | 唯一开发路线：实施顺序、依赖、复用、预算、验收与旧路线处置 |
+| [产品需求](requirements/product-requirements.md) | 目标用户、需求与范围、产品参考；不维护第二份路线 |
+| [小说阅读开发交接](development/continuation-handoff.md) | 下一次从哪里继续，以及可直接复制的新窗口提示 |
+| [阅读业务合同](architecture/novel-reading-design.md) | `reading-contract-v1-draft1` 已获批准；页面/范围/编排/失败语义，实施状态另列 |
+| [阅读数据](data/novel-reading-data-model.md) / [阅读 API](api/novel-reading-api.md) / [阅读评估](evaluation/novel-reading-evaluation.md) | 已批准合同的字段、接口与验证方法；数值预算和门槛引用唯一新路线 |
+| [基础阅读验证记录](evaluation/reading-library-verification.md) | 首个大功能点的实际工程证据、范围与限制 |
 
-## 需求与设计
+工作规则见 [AGENTS.md](../AGENTS.md)。详细合同已批准；每个会话只完成一个大功能点，验证后提醒用户提交 PR，下一窗口再继续。不要把未实施的 AI 规划写成已交付。
 
-| 分类 | 文档 |
+## 既有实现：按需查阅
+
+| 用途 | 入口 |
 | --- | --- |
-| 产品需求 | [产品定位与大版本路线](requirements/product-requirements.md)（唯一详细路线） |
-| 总体架构 | [技术架构与数据流](architecture/technical-architecture.md) |
-| 版本设计 | [V3 知识库维护](architecture/v3-knowledge-base-maintenance-design.md)、[V4 多文档比对](architecture/v4-knowledge-research-design.md)、[V5 显式记忆](architecture/v5-explicit-memory-design.md)、[V6 受控升级研究](architecture/v6-upgrade-research-design.md) |
-| 架构决策 | [ADR 0001：PostgreSQL / pgvector](architecture/decisions/0001-use-pgvector.md)、[ADR 0002：隐式单用户主体](architecture/decisions/0002-use-implicit-single-user-subject.md) |
-| 数据与接口 | [数据模型](data/data-model.md)、[REST / SSE / 操作确认](api/api-design.md) |
+| 当前能力、验收事实及质量缺口 | [功能清单](development/feature-inventory.md) |
+| 运行与排错 | [本地开发](development/local-development.md)、[项目资料接入](development/project-source-integration.md)、[成果审查](development/research-result-review.md) |
+| 总体设计 | [技术架构](architecture/technical-architecture.md)、[数据模型](data/data-model.md)、[API / SSE](api/api-design.md) |
+| 已验收能力合同 | [知识库维护](architecture/v3-knowledge-base-maintenance-design.md)、[多文档比对](architecture/v4-knowledge-research-design.md)、[显式偏好](architecture/v5-explicit-memory-design.md) |
+| 研究能力合同（旧场景冻结） | [升级研究](architecture/v6-upgrade-research-design.md)、[任务工作台](architecture/research-task-workspace-design.md)、[项目接入](architecture/project-source-integration-design.md)、[成果审查](architecture/research-result-review-design.md) |
+| 重要取舍 | [pgvector 决策](architecture/decisions/0001-use-pgvector.md)、[隐式主体决策](architecture/decisions/0002-use-implicit-single-user-subject.md)、[技术复盘](development/technical-retrospective.md) |
 
 ## 评估与验收
 
-- [评估计划](evaluation/evaluation-plan.md)：指标、数据划分和验收口径。
-- [评估执行入口](../evals/README.md)：数据、语料、运行方式和逐次报告；[统一基线工具](../evals/tools/README.md)。
-- 已验收：[V2](evaluation/v2-acceptance-report.md)、[V3](evaluation/v3-acceptance-report.md)、[V4 第一阶段](evaluation/v4-implementation-acceptance-report.md)、[V5 第一阶段](evaluation/v5-acceptance-report.md)。
-- 未通过验收：[V6 实现验证与剩余问题](evaluation/v6-implementation-review.md)。
-- [升级研究生命周期证据映射](evaluation/upgrade-lifecycle-evidence.md)：22 项合同对应的测试、复现方式与尚未补齐的直接证据。
-- [统一核心任务首次实跑](evaluation/core-workspace-first-run.md)：50 项原始观测、待人工复核材料与状态差异。
-- [升级研究范围调试](evaluation/upgrade-scope-debug.md)：独立资料上的失败对照与尚未采用的 Prompt 候选。
-- [收尾工程回归](evaluation/closeout-engineering-regression.md)：状态修复后的全量打包、测试退出修复与条件跳过范围。
+- [评估计划](evaluation/evaluation-plan.md)定义既有合同的评价方法；[执行入口](../evals/README.md)提供可复现资产。相关代码变更仍需必要回归，旧专项收尾暂停不代表通过。
+- 已验收：[V2](evaluation/v2-acceptance-report.md)、[V3](evaluation/v3-acceptance-report.md)、[V4](evaluation/v4-implementation-acceptance-report.md)、[V5](evaluation/v5-acceptance-report.md)。
+- 首版工程/代表流程：[工作台](evaluation/research-task-workspace-verification.md)、[项目接入](evaluation/project-source-integration-verification.md)、[成果审查](evaluation/research-result-review-verification.md)。
+- 尚未完成质量验收：[升级研究初次结果](evaluation/v6-implementation-review.md)、[最新独立采集](evaluation/upgrade-closeout-independent-results.md)、[核心任务首次实跑](evaluation/core-workspace-first-run.md)。
+- 专项过程按需查阅：[生命周期证据](evaluation/upgrade-lifecycle-evidence.md)、[范围调试](evaluation/upgrade-scope-debug.md)、[工程回归](evaluation/closeout-engineering-regression.md)、[干净工作区复跑](evaluation/clean-workspace-replay.md)、[依赖检查](evaluation/frontend-dependency-closeout.md)、[密钥扫描误报](evaluation/secret-scan-false-positive.md)。
 
-## 历史档案
+## 历史档案与维护
 
-[档案索引](archive/README.md)收录已被后续决定取代的评估快照，保留原结论及日期，不作为当前任务清单。版本验收报告和 ADR 继续保留在各自目录，便于追溯。
+[档案索引](archive/README.md)保存旧研究路线、旧收尾交接和早期职业评估；[旧录制脚本](development/closeout-demo-script.md)仅供恢复时参考。历史设计、验收报告、ADR 和原始数据保留路径，不为减少文件数量而破坏证据链。
 
-## 维护分工
-
-| 位置 | 只维护这些内容 |
-| --- | --- |
-| `requirements/` | 场景、范围、版本路线与进入／退出条件 |
-| `architecture/`、`data/`、`api/` | 实现合同、决策、数据和接口语义 |
-| `development/` | 当前背景、功能索引和操作指南 |
-| `evaluation/` | 验收口径、版本结论和未关闭问题 |
-| `../evals/` | 可执行评估资产、原始结果及逐次证据 |
-| `archive/` | 带日期的历史规划或审阅快照 |
-
-概览文档用摘要和链接引用详细合同，不重复复制版本过程或测试数字。修改行为时同步其所属设计及功能清单；历史证据不改写为当前结果。接口字段需核对 OpenAPI，已实施数据库结构需核对 Flyway；出现冲突应记录并明确处理，不能静默选择。根目录被 Git 忽略的早期本地规划笔记不属于正式文档，也不是构建或开发前提。
-
-- [项目资料接入运行指南](development/project-source-integration.md)：启动、确认导入与公开研究演示。
-- [项目资料接入验证](evaluation/project-source-integration-verification.md)：首版工程与公开流程证据。
-
-- [研究成果审查运行指南](development/research-result-review.md)：启动、审查与补充继续。
-- [研究成果审查验证](evaluation/research-result-review-verification.md)：工程、公开模型与页面证据及限制。
+需求只维护在 `requirements/`，开发顺序只维护在 `development/novel-reading-roadmap.md`；实现合同在 `architecture/`、`data/`、`api/`；操作指南和当前索引在 `development/`；结论在 `evaluation/`，可执行资产及原始结果在 `evals/`。概览用链接引用，不复制执行日志或测试数字。数据库结构核对 Flyway，接口核对代码/OpenAPI；未跟踪的本地笔记不是开发前提。

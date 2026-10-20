@@ -1,8 +1,12 @@
 # 研序 数据模型
 
-## V6 目标结构（已批准，实施状态以迁移为准）
+> 2026-10-20：本文保留既有研究产品的数据合同，已实施结构以 Flyway 为准。阅读基础新增 V29：书籍、导入、版本、章节、段落、阅读状态、状态命令、书签与用户笔记九张表。
 
-[V6 详细设计第 5–6 节](../architecture/v6-upgrade-research-design.md)定义拟新增的 `upgrade_research_run`、`upgrade_research_tool_call`、`upgrade_research_source`、`upgrade_research_model_call`、`research_report` 和 `research_report_save_request`。运行请求、保存请求、报告分别以主体/clientRequestId、主体/clientRequestId、runId/sourceActionId 去重；逻辑删除不释放这些幂等键。
+> [阅读数据合同](novel-reading-data-model.md)已批准；首个功能点在隔离测试数据库验证，未迁移用户现有应用数据库。阅读索引、AI 任务与笔记提案表尚未创建，不能把合同中的全部表当作已实施。
+
+## 升级研究结构（历史标识 V6）
+
+[V6 详细设计第 5–6 节](../architecture/v6-upgrade-research-design.md)定义 `upgrade_research_run`、`upgrade_research_tool_call`、`upgrade_research_source`、`upgrade_research_model_call`、`research_report` 和 `research_report_save_request`。运行请求、保存请求、报告分别以主体/clientRequestId、主体/clientRequestId、runId/sourceActionId 去重；逻辑删除不释放这些幂等键。
 
 V20 创建升级研究运行、调用审计与来源表；V21 扩展 `action_request` 的 `SAVE_RESEARCH_REPORT`、`upgrade_run_id`、参数和结果约束，增加 `UPGRADE_REPORT_SAVE_SELECTED` 消息匹配原因，并创建报告及保存请求表。结果外键按动作类型通过生成列分别引用记忆和报告，保留 V5 完整性约束。报告插入与提案成功同事务提交；真实 PostgreSQL 测试覆盖并发确认、失败回滚和删除后重放。
 

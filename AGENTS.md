@@ -1,123 +1,78 @@
 # ContextPilot repository guidance
 
-- The user-facing project name is 研序, confirmed on 2026-10-16; use 研序｜技术研究 Agent for the project title. ContextPilot remains the legacy technical identifier for repository/package/configuration names and historical evidence. Do not rename those identifiers as part of display branding.
+## Session startup and current direction
 
-## Required session startup
+- At the beginning of each conversation, read `docs/development/project-context.md`, this file, and `docs/development/novel-reading-roadmap.md` before planning repository work; then read the current handoff and verify mutable details against code, configuration and Git.
+- The current implementation retains the user-facing title **研序｜技术研究 Agent** (confirmed 2026-10-16). ContextPilot remains the repository/package/configuration identifier. The novel-reading product name is undecided; do not rename code or claim the new product is delivered.
+- On 2026-10-20 the user explicitly required a new novel-reading development roadmap and retirement of the old roadmap. Follow `docs/development/novel-reading-roadmap.md` as the sole active development roadmap. Its first scenario is resuming interrupted reading through progress-scoped recaps, character lookup, source navigation and optional note saving.
+- Stop expanding the old technical-research product. Pause unfinished upgrade-research tuning/final acceptance and old demo recording; preserve existing functionality, failed evidence and truthful status. Hybrid retrieval, reranking, generic MCP, multi-agent and workflow engines are not the default next tasks. Do not automatically resume historical handoffs or paid experiments.
+- The roadmap replacement initially authorized documentation only. The user subsequently approved `reading-contract-v1-draft1` on 2026-10-20 and limited each conversation to one major capability followed by a PR reminder. “Import and continue reading” is implemented; verify its handoff and Git before proceeding in a new conversation. The approved baseline is single-user Web, UTF-8 TXT/Markdown, separate resume position and explicitly confirmed paragraph-level contiguous read boundary, recent-three-chapter recaps, character lookup and confirmed note saving. Paid experiments still require separate authorization. Existing safety and relevant regression gates remain mandatory.
+- On 2026-10-20 the user explicitly approved `reading-contract-v1-draft1` with “确认可行”. The approved package is in `docs/architecture/novel-reading-design.md`, `docs/data/novel-reading-data-model.md`, `docs/api/novel-reading-api.md` and `docs/evaluation/novel-reading-evaluation.md`; numeric budgets and gates remain solely in the active roadmap. Implement continuously within this scope without repeated slice approvals; paid experiments still require separate authorization. Approval is not implementation or acceptance evidence.
+- The user's later 2026-10-20 instruction overrides continuous delivery across major capabilities: complete only ONE major roadmap capability per chat, run its relevant checks, then stop and remind the user to submit a PR. The user will open a new chat for the next capability. Do not implement the entire roadmap in one chat or automatically create a PR without a request. Current capability: “导入并持续阅读”.
 
-- At the beginning of every new conversation, read `docs/development/project-context.md` before inspecting, planning, or changing the repository.
-- Use that document as the versioned project overview, then verify any changeable details against the current code and configuration.
+## Sources of truth and roadmap governance
 
-## Project context
+- `AGENTS.md` defines working rules; `docs/development/project-context.md` is the short startup overview; **`docs/development/novel-reading-roadmap.md` is the only active development roadmap**, owning implementation order, dependencies, reuse decisions, budgets and completion gates. `docs/requirements/product-requirements.md` owns user goals and product scope, not a second roadmap.
+- The technical-research roadmap and the transitional reading-direction draft under `docs/archive/` are retired. Their next steps and historical approvals must not drive current work. Retirement does not delete existing capabilities, waive regression gates or convert paused/failed acceptance into success.
+- `docs/development/feature-inventory.md` indexes implementation and acceptance status; `docs/development/continuation-handoff.md` defines the next discussion. `docs/archive/` contains superseded plans, not active instructions.
+- Architecture/data/API documents retain existing implementation contracts. Verify database facts against Flyway and interface facts against code/OpenAPI. Report conflicts rather than silently choosing a source; update after the decision is confirmed.
+- Name goals by user capabilities, not V-number phases. Preserve historical filenames, API versions, migrations and evidence IDs. Local untracked planning notes are not build or development prerequisites.
+- Before implementing a new major capability, obtain approval of its concrete scope and synchronize requirements, architecture, data, API, evaluation and these rules. A candidate is not authorization; once approved, implementation checkpoints do not require repeated approval.
+- The 2026-10-20 direction supersedes the 2026-10-16 priority to keep adding research capabilities. Do not require all unrelated old quality debt to be closed before designing the new product. Do not silently waive old acceptance thresholds to reuse or advertise unfinished capabilities.
 
-- ContextPilot is a learning-oriented, controllable, and evaluable personal knowledge-work assistant built with Spring AI. Its user-facing product carrier is a single-user knowledge workspace; its engineering purpose is to explore modern agent capabilities through coherent, testable scenarios rather than by accumulating frameworks.
-- V1, the functional RAG baseline, is complete. It covers document ingestion, retrieval-augmented generation, citations, streaming responses, conversation history, call records, positive-only helpful feedback, fixed capability routing, and embedding-index governance.
-- The roadmap advances by named user capabilities. Specify an approved capability in detail; candidates define scenarios and boundaries and are not implementation authorization. Historical V1–V6 identifiers remain for evidence traceability, not as names for new goals.
-- V2 is complete. It adds the persisted, confirmable `CREATE_KNOWLEDGE_BASE` business action while preserving the modular monolith and existing RAG behavior.
-- V3 is complete. Its approved detailed design and completion record are at `docs/architecture/v3-knowledge-base-maintenance-design.md` and `docs/evaluation/v3-acceptance-report.md`; preserve the V1/V2/V3 baselines in subsequent maintenance.
-- V4's first-phase `DOCUMENT_COMPARISON` is complete and fully accepted. Slice 1 evidence demonstrates a need for scoped multi-step retrieval but does not justify a model Planner, so the production baseline uses versioned deterministic dimension detection and per-document orchestration. Slices 2-7, local engineering gates, and the 2026-08-21 DeepSeek/DashScope production end-to-end runs are complete. The 2026-08-24 release decision approves no request-level `max_tokens` for the DeepSeek Synthesizer while retaining one model call, a 90-second hard timeout, a 1800-character final-answer limit, and usage recording. Preserve the implementation and independently verifiable slices documented in `docs/architecture/v4-knowledge-research-design.md`. Do not introduce production agents, model planning, LangGraph or other workflow engines, MCP integration, microservices, message queues, multi-tenancy, plugin systems, dynamic tools, or model-generated SQL under the current scope.
-- V5's first-phase explicit-memory scope and Slices 1-7 are complete and accepted on 2026-10-15; see `docs/evaluation/v5-acceptance-report.md`. The first phase only stores user-confirmed global response preferences, uses a stable server-side `LOCAL_OWNER` through `CurrentSubjectProvider`, and does not implement login or claim authentication. Chat creation must use the strongly typed, confirmable `CREATE_USER_MEMORY` action; ordinary chat, documents, and model output must never be promoted automatically. Memory injection is limited to active response preferences, at most 10 records and 2000 characters, and may affect presentation only—not routing, evidence, citations, refusal, research plans, budgets, or tools. Full requirements are in `docs/architecture/v5-explicit-memory-design.md` and the identity decision is in ADR 0002.
+## Existing capability contracts
 
-## Completed V1-V5 baselines
+| Capability | Preserved contract and status |
+| --- | --- |
+| V1 knowledge QA | Completed RAG baseline: ingestion, isolation, grounded answers, citations/refusal, SSE/history, trace/call records, positive-only helpful feedback, fixed routing and embedding-index governance |
+| V2 confirmed actions | Completed `CREATE_KNOWLEDGE_BASE` proposal/confirmation state machine; explicit Java services, not a generic runtime; evidence in `docs/evaluation/v2-acceptance-report.md` |
+| V3 maintenance | Completed health reports, `RETRY_DOCUMENT_PROCESSING` and `REINDEX_DOCUMENT`; preserve `docs/architecture/v3-knowledge-base-maintenance-design.md` and its acceptance report |
+| V4 comparison | First-phase `DOCUMENT_COMPARISON` fully accepted: deterministic versioned dimensions and per-document orchestration, one synthesis call, 90-second hard timeout, 1800-character final answer, usage recording and no request-level `max_tokens`; preserve design and slice evidence |
+| V5 response preferences | Slices 1–7 accepted 2026-10-15. Confirmed `GLOBAL/RESPONSE_PREFERENCE` only, `CREATE_USER_MEMORY`, stable server-side subject, versioned management and bounded injection; preserve `docs/architecture/v5-explicit-memory-design.md`, acceptance report and ADR 0002 |
+| Upgrade research (V6) | Approved 2026-10-15, implemented but final quality acceptance not passed; default off, unfinished closeout now paused. Preserve `docs/architecture/v6-upgrade-research-design.md` and latest `docs/evaluation/upgrade-closeout-independent-results.md` |
+| Research Task Workspace | Approved 2026-10-16; bounded model plans, validated selected-document search, persistent checkpoints, clarification/supplement, pause/resume/cancel and grounded synthesis. Preserve `docs/architecture/research-task-workspace-design.md` |
+| Project Source Integration | Approved 2026-10-16; dedicated read-only MCP client/server for fixed public `spring-projects/spring-ai`, immutable TXT/Markdown previews and independently confirmed `IMPORT_PROJECT_DOCUMENTS`. Preserve `docs/architecture/project-source-integration-design.md` |
+| Research Result Review | Approved 2026-10-19; immutable completed-task snapshot review, one bounded independent model call, persistent history and user-edited supplement handoff. No multi-agent runtime, new tools, automatic revisions or report saving. Preserve `docs/architecture/research-result-review-design.md` |
 
-- Treat V1, V2, V3, and the V4 first phase as completed baselines, not as unfinished MVP delivery. Maintenance must preserve their documented behavior and acceptance evidence.
-- V3 was completed through the ordered, independently verifiable slices in the approved design. V4 Slice 1 and the complete first-phase production implementation (Slices 2-7) are complete with reviewable evidence under the fixed deterministic orchestration contract. Preserve the implementation, verification gates, and approved DeepSeek compatibility budget; there is no remaining V4 implementation, provider-testing, or release-decision slice.
-- V5 Slices 1-7 are implementation checkpoints under one approved first-phase contract, not repeated authorization gates. Slices 1-6 are complete: the fixed evaluation contract, implicit subject/persistence, confirmable `CREATE_USER_MEMORY` creation flow, versioned management API/page, bounded production injection, SSE transparency, history recovery and safe degradation are implemented without weakening the fixed safety contract. Slice 7 is complete: the frozen evaluation, real PostgreSQL checks, full regression, 16 live production answer comparisons, page checks and final report passed on 2026-10-15. Preserve the evidence in `docs/evaluation/v5-acceptance-report.md`.
-- The implicit `LOCAL_OWNER` is a persistent ownership subject, not a login session or security boundary. Do not accept an owner/user ID from clients. Until authentication and complete resource authorization are separately approved, describe and deploy the product only as a single-user application for localhost or trusted networks.
+The last three capabilities have first-implementation engineering/representative-flow evidence, not blanket independent semantic acceptance. Their old scenario expansion is frozen. The new DEBUG, 24-item TEST and 8×2 representative upgrade runs were already collected on 2026-10-19; do not schedule them as missing. Semantic review remains deferred by the user and recording incomplete. Terminal-state matches and collector tests are not quality scores. Preserve raw failures, prompts and frozen assets.
 
-- Route each chat request to one of three explicit, versioned capabilities: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, or `BUSINESS_ACTION`.
-- Keep `SIMPLE_CHAT` narrow: identity, greeting, capability description, thanks, and farewell continue to use deterministic replies. Do not silently turn it into unrestricted open-domain model answering.
-- Preserve the current grounded RAG path for `KNOWLEDGE_QA`, including knowledge-base isolation, evidence validation, citations, refusal behavior, SSE, persistence, and trace IDs.
-- Implemented business actions are the statically dispatched, strongly typed `CREATE_KNOWLEDGE_BASE`, `RETRY_DOCUMENT_PROCESSING`, and `REINDEX_DOCUMENT`; preserve their existing service boundaries and V2/V3 confirmation semantics.
-- V5 is authorized to add the statically dispatched, strongly typed `CREATE_USER_MEMORY` action. It may only create a validated global `RESPONSE_PREFERENCE` for the current implicit subject after a persisted proposal is confirmed; update, enable/disable, expiry, and logical deletion belong to dedicated user-operated memory management APIs and must never be model-triggered.
-- A business request must produce a validated, persisted action proposal first. The real action must not execute until the user explicitly confirms it through a separate request.
-- Persist an auditable action state machine such as `PENDING_CONFIRMATION -> EXECUTING -> SUCCEEDED/FAILED`, with `REJECTED` and `EXPIRED` terminal alternatives. Confirmation must be atomic and idempotent so repeated requests cannot execute the action twice.
-- Route matching should start with deterministic rules and default safely to `KNOWLEDGE_QA`; do not add an extra model classification call until measured ambiguity justifies it.
-- Keep the implementation specific to the approved capability and action. A generic Skill registry, generic `ToolExecutionGateway`, arbitrary reflection, arbitrary HTTP/file/shell access, and autonomous tool loops remain out of scope.
+## Execution, identity and safety boundaries
 
-## Roadmap governance
-
-- On 2026-10-16 the user changed development priorities: advance additional coherent major user capabilities and establish the overall architecture first, then consolidate non-blocking details, quality optimization and final evaluation. Do not automatically prioritize V7 retrieval optimization next or require all V6 quality debt to be closed before discussing the next capability. Preserve necessary safety/regression checks and truthful acceptance status. This priority change does not authorize unspecified features; the single detailed roadmap and scope approval remain in `docs/requirements/product-requirements.md`.
-
-- On 2026-10-15 the user explicitly approved implementation of `docs/architecture/v6-upgrade-research-design.md` ("允许，继续执行任务"). V6 Slices 1-7 are authorized as one contract, not repeated approval gates. This is the scoped upgrade-research exception to earlier restrictions on production model tool loops and new actions (the later Research Task Workspace exception is documented below): isolated UPGRADE_IMPACT, three statically dispatched read tools, the fixed public Spring AI repository, and user-initiated SAVE_RESEARCH_REPORT proposals with independent confirmation. Preserve V1-V5 and all other exclusions. The unified core evaluation baseline remains a Slice 1 prerequisite. Budgets are approved initial limits, not measured performance claims.
-
-- Use `docs/requirements/product-requirements.md` as the single detailed roadmap. As requested on 2026-10-16, name tasks and goals by concrete capabilities (for example, Research Task Workspace or Project Source Integration), not V6/V7 or another phase numbering scheme. Preserve historical filenames, migrations, API versions and evidence IDs unless a separate migration is needed.
-- Describe knowledge QA, confirmed actions, knowledge-base maintenance, document comparison and explicit preferences as completed baselines; upgrade impact research remains implemented but awaiting acceptance. Later named capabilities are candidates until approved. The dated career review remains a historical snapshot.
-- A roadmap candidate is not authorization. Before starting a later major version, update this file and the relevant requirements, architecture, data, API, and evaluation documents with an explicitly approved scope.
-- Plan capabilities from user scenarios first. Frameworks such as LangGraph, MCP, workflow runtimes, or multi-agent libraries are implementation candidates, not roadmap goals by themselves.
-- Keep the three top-level routing classes stable for the current scope: `SIMPLE_CHAT`, `KNOWLEDGE_QA`, and `BUSINESS_ACTION`. Future knowledge tasks or business actions should normally be modeled beneath these classes unless a later approved design demonstrates the need for another top-level route.
-- Evaluation, traceability, human confirmation, bounded execution, and failure semantics are cross-version quality gates rather than optional cleanup work.
-- The 2026-10-15 career-oriented documentation review is a historical snapshot. The later explicit V6 approval above authorizes bounded native model tool calling and user-confirmed report saving under its detailed contract. Implementation and debugging evidence do not establish final acceptance. Preserve the V4 deterministic production path; MCP, hybrid retrieval and reranking remain out of scope and must not be claimed as delivered. The product requirements remain the only detailed roadmap.
-
-## Sources of truth
-
-- This committed `AGENTS.md` defines working and safety instructions for repository assistants.
-- `docs/development/project-context.md` is the committed overview that a new conversation must read first.
-- Product requirements, architecture documents, application configuration, and Flyway migrations remain the detailed sources of truth for their respective areas.
-- Local planning notes may provide additional background, but they are intentionally not tracked and must not be required to build, test, or understand the repository.
-- When implementation and documentation disagree, do not silently choose one. Report the conflict and update the relevant document after the decision is confirmed.
+- Keep existing chat routes `SIMPLE_CHAT`, `KNOWLEDGE_QA`, `BUSINESS_ACTION`. SIMPLE_CHAT is deterministic identity/greeting/capability/thanks/farewell only; do not turn it into open-domain model chat. Rule matching defaults safely to KNOWLEDGE_QA; measured ambiguity is required before adding classification calls.
+- Preserve grounded RAG isolation, evidence validation, refusal, citations, SSE, persistence and trace IDs. V4 remains deterministic; V6/workspace exceptions do not authorize changes to V4 orchestration.
+- Agent-mediated business actions use a static allowlist, strong types, server validation, least privilege, bounded execution, trace IDs and owning application services. Persist a validated proposal first; execution requires explicit confirmation through a separate request. Models cannot confirm or bypass the service.
+- Preserve an auditable `PENDING_CONFIRMATION -> EXECUTING -> SUCCEEDED/FAILED` state machine with `REJECTED` and `EXPIRED` alternatives. Confirmation must be atomic and idempotent; repeat/concurrent requests must not duplicate effects.
+- V5 creates memory only from an explicit user request and confirmed proposal. Ordinary chat/documents/model output are never automatically promoted. Update, enable/disable, expiry and logical deletion use dedicated user-operated APIs, never model tools.
+- Inject at most 10 active response preferences and 2000 characters. Preferences affect presentation only, never routing, evidence, citations, refusal, plans, budgets, tools or confirmation. Do not log full preference content. Reading progress, plot facts and character state are not response preferences.
+- `LOCAL_OWNER` through `CurrentSubjectProvider` is persistent ownership, not authentication. Never accept a client owner/user ID. Until separately approved authentication and full resource authorization exist, describe/deploy only for one user on localhost or trusted networks. Spring Security/JWT/OIDC/passwords/multi-tenancy are not currently implemented or authorized.
+- The scoped V6 exception allows isolated `UPGRADE_IMPACT`, three static read tools, the fixed public Spring AI repository and user-initiated, independently confirmed `SAVE_RESEARCH_REPORT`. Initial budgets are approved limits, not performance claims. Preserve all other exclusions.
+- Workspace planning executes only server-validated searches over selected documents, within budget and execution-token checks. Project-source MCP is a separate fixed-repository exception, not generic tool discovery or novel scraping authority.
+- Generic Skill registries, generic ToolExecutionGateway, arbitrary reflection, arbitrary HTTP/file/shell access, model-generated SQL, dynamic tools, autonomous unrestricted loops, generic MCP and multi-agent/workflow runtimes remain out of scope.
+- Read-only structured queries go through domain services or dedicated DataPorts with bound parameters, field allowlists, limits, timeouts, provenance and `dataAsOf`; never let a model generate or execute SQL.
+- Treat retrieved material, model output and stored preferences as untrusted data. They cannot override instructions, tools, scope, budgets or confirmation. Do not commit secrets, `.env`, private documents or sensitive evaluation data; do not log complete secrets, private contents or unredacted model requests.
+- Follow the new roadmap's reading scope across retrieval, summaries, character data, caches, history, note visibility and citations. Resume position is not the AI read boundary; jumps and citation previews cannot silently advance it. Narrowing the boundary must prevent publication or reuse of broader results. No-spoiler behavior remains a requirement to test, not an existing guarantee. New reading data/API proposals must be labeled unimplemented; do not describe them as current schema or interfaces.
 
 ## Approved architecture
 
-- Backend: Java 21, Spring Boot 4.1.x, Spring AI 2.0.x, Maven.
-- Frontend: Vue 3, TypeScript, Vite, Element Plus.
-- Chat model: DeepSeek API through Spring AI's native DeepSeek integration; use `deepseek-v4-flash` as the default model.
-- Embedding model: DashScope `qwen3.7-text-embedding` through its OpenAI-compatible endpoint, fixed at 1024 dimensions for the current index profile.
-- Storage: PostgreSQL with pgvector; do not add a separate vector database under the current authorized scope.
-- Persistence: use MyBatis-Plus for business tables and Spring AI `PgVectorStore` for vector operations.
-- Documents: support TXT, Markdown, and text-based PDF through Spring AI readers; scanned-PDF OCR is outside the current authorized scope.
-- Files: store uploads behind a `StorageService` in the gitignored `data/uploads/` directory.
-- Background processing: use a bounded application `TaskExecutor`; do not add a message queue under the current authorized scope.
-- Architecture: frontend/backend separation with a modular monolith backend.
-- Streaming: SSE. Secrets and model credentials remain backend-only environment variables.
-- Current access model: a stable implicit `LOCAL_OWNER` subject with no login, authentication, role system, or multi-user isolation. `CurrentSubjectProvider` is the V5 application seam; Spring Security, JWT, OIDC and password handling remain out of scope.
-- Completed V2 orchestration: explicit Java application services and persisted state transitions; no LangGraph dependency or external workflow runtime.
+- Java 21, Spring Boot 4.1.x, Spring AI 2.0.x, Maven; Vue 3, TypeScript, Vite, Element Plus; frontend/backend separation and a modular monolith.
+- DeepSeek native Spring AI integration, default `deepseek-v4-flash`; DashScope OpenAI-compatible `qwen3.7-text-embedding`, fixed 1024-dimensional current index profile. Preserve the user's current DeepSeek choice; no automatic cross-provider experiments.
+- PostgreSQL with pgvector, MyBatis-Plus for business persistence, Spring AI PgVectorStore for vectors, Flyway migrations. No separate vector database under current scope.
+- TXT, Markdown and text-based PDF via Spring AI readers; OCR is out of scope. Uploads behind StorageService in gitignored `data/uploads/`; bounded TaskExecutor, no message queue.
+- SSE streaming; secrets and provider credentials remain backend-only. Keep provider details behind Spring AI or a small application abstraction.
 
 ## Working agreements
 
-- Use `develop` as the integration and day-to-day development branch. Create feature branches from `develop` when isolation is useful.
-- Do not commit directly to `main`. Changes reach `main` only through a reviewed pull request or an explicitly reviewed merge from `develop`.
-- Use Conventional Commits with an English type prefix such as `fix`, `feat`, `test`, `docs`, or `chore`, but do not add a scope in parentheses. Use `feat: 优化研究检索并行与运行日志`, not `feat(research): 优化研究检索并行与运行日志`. Write both the title description after the prefix and the entire commit body in Chinese, for example `test: 建立 V2 路由与操作安全评估基线`; do not use an English title description for repository commits.
-- Keep `main` releasable. Before merging `develop` into `main`, run the relevant backend and frontend verification commands and review the complete diff.
-- Organize backend code by business capability, not as one repository-wide controller/service/mapper hierarchy.
-- Keep model-provider details behind Spring AI or a small application-level abstraction.
-- Use package root `io.github.fanqiepi.contextpilot` and database name `context_pilot`.
-- Business tables use MyBatis-Plus logical deletion with `deleted = 0` for active rows and `deleted = 1` for deleted rows. Ordinary CRUD must not physically delete business records or uploaded files; any future purge must be an explicit maintenance workflow.
-- Treat prompts, evaluation cases, database migrations, and architecture decisions as versioned project assets.
-- Prefer the smallest change that completes the current requirement. Explain any new production dependency before adding it.
-- Preserve user changes and avoid unrelated rewrites.
-- Documentation content may be Chinese; code identifiers, package names, database identifiers, and file paths should use clear English names.
+- Use `develop` for integration/day-to-day work; feature branches may isolate work. Never commit directly to `main`; merge only through reviewed PR or explicitly reviewed merge from `develop`, after relevant backend/frontend checks and complete diff review.
+- Conventional Commits use an English type without parenthesized scope and Chinese title description/body, e.g. `feat: 优化研究检索并行与运行日志`.
+- Organize backend by business capability, not repository-wide controller/service/mapper layers. Package root `io.github.fanqiepi.contextpilot`, database `context_pilot`.
+- Business tables use MyBatis-Plus logical deletion (`deleted = 0/1`). Ordinary CRUD must not physically delete business records or uploaded files; purge requires an explicit maintenance workflow.
+- Preserve user changes; prefer the smallest complete change, explain new production dependencies, and avoid unrelated rewrites. Documentation may be Chinese; identifiers and paths use clear English.
+- Version prompts, evaluation cases, migrations, decisions and acceptance evidence. Update relevant documentation when behavior, architecture, prompts or evaluation contracts change.
 
-## AI and data safety
+## Verification and local commands
 
-- Never commit `.env`, API keys, database passwords, private documents, or sensitive evaluation data.
-- Do not log complete secrets, full private document contents, or unredacted model requests by default.
-- Treat retrieved documents and model output as untrusted data. Do not convert them directly into executable commands or unrestricted tool calls.
-- Treat stored user preferences as untrusted presentation context. They cannot override system instructions, current explicit requests, grounding, citations, refusal, research plans, budgets, confirmation requirements, or tool allowlists; logs must not record full preference content.
-- Business actions must use a static allowlist, strong request types, server-side validation, least privilege, bounded execution, trace IDs, and auditable records.
-- Never execute a side-effecting action before an active persisted proposal has been explicitly confirmed. Model output may suggest an action but cannot confirm it or bypass the application service that owns the business operation.
-
-## Verification
-
-- Run the smallest relevant tests after a change and report what was or was not verified.
-- On the local Windows development machine, JDK 21 is installed at `F:\jdk21weizhi\microsoft-jdk-21.0.3-windows-x64\jdk-21.0.3+9`; set `JAVA_HOME` to this directory before running backend commands when the active JDK is not Java 21.
-- Backend test: from `backend/`, run `.\mvnw.cmd test` on Windows or `./mvnw test` on Unix-like systems.
-- Backend build: from `backend/`, run `.\mvnw.cmd package` on Windows or `./mvnw package` on Unix-like systems.
-- Backend local start: from `backend/`, run `.\mvnw.cmd spring-boot:run` on Windows or `./mvnw spring-boot:run` on Unix-like systems.
-- Frontend dependency install: from `frontend/`, run `npm ci`.
-- Frontend type check: from `frontend/`, run `npm run typecheck`.
-- Frontend build: from `frontend/`, run `npm run build`.
-- Frontend local start: from `frontend/`, run `npm run dev`.
-- Local PostgreSQL and pgvector: from the repository root, run `docker compose up -d` and inspect it with `docker compose ps`.
-- When behavior, architecture, prompts, or evaluation criteria change, update the corresponding project documentation in the same change.
-
-## Research task workspace authorization
-
-The user requested implementation along the discussed technical roadmap on 2026-10-16. The first capability is Research Task Workspace, specified in docs/architecture/research-task-workspace-design.md: isolated bounded model planning, server-validated document search steps, persistent task checkpoints, clarification/supplement, pause/resume/cancel and grounded synthesis. This is an additional scoped exception to the older model-planning exclusion. Existing V1–V6 contracts remain intact. MCP, multi-agent execution and external write tools remain later candidates. No extra confirmation is required for implementation checkpoints within this contract.
-
-## Project source integration authorization
-
-On 2026-10-16 the user explicitly approved docs/architecture/project-source-integration-design.md (按这个方案开发). Implement the full Project Source Integration contract: a dedicated read-only MCP client/server for the fixed public spring-projects/spring-ai repository, immutable TXT/Markdown previews, and the user-initiated, independently confirmed IMPORT_PROJECT_DOCUMENTS action. This is a scoped exception to the earlier MCP exclusion. Preserve all existing baselines and all other exclusions. Implementation checkpoints do not require repeated authorization.
-
-## Research result review authorization
-
-On 2026-10-19 the user explicitly approved docs/architecture/research-result-review-design.md (确认完毕，可以开始任务). Implement evidence review for completed task-workspace snapshots, one bounded independent model call, persistent review history and user-edited supplement handoff. No multi-agent runtime, additional tools, automatic revisions or report saving. Preserve existing contracts; implementation checkpoints do not require repeated approval.
+- Run the smallest relevant checks; distinguish engineering tests, real-model observations and semantic acceptance. Report what was and was not verified. Documentation-only edits need link/content/diff checks, not paid model runs or unrelated builds.
+- Windows JDK 21: `F:\jdk21weizhi\microsoft-jdk-21.0.3-windows-x64\jdk-21.0.3+9`; set JAVA_HOME when the active JDK is not 21.
+- From `backend/`: `.\mvnw.cmd test`, `.\mvnw.cmd package`, `.\mvnw.cmd spring-boot:run`; Unix uses `./mvnw`.
+- From `frontend/`: `npm ci`, `npm run typecheck`, `npm run build`, `npm run dev` as appropriate.
+- From repository root: `docker compose up -d`, `docker compose ps`. Full configuration and opt-in real-provider evaluation instructions are in `docs/development/local-development.md` and `evals/README.md`.

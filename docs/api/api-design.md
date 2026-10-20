@@ -1,8 +1,12 @@
 # REST API、SSE 与操作确认约定
 
-## V6 目标 API（已批准，实施状态以 OpenAPI 为准）
+> 2026-10-20：本文保留既有研究产品的接口合同，实际字段核对代码/OpenAPI。阅读基础已新增 `/api/reading` 导入、书架、正文、状态、书签和用户笔记接口；研究报告接口仍不等于笔记接口。
 
-完整请求、状态码、分页与 SSE 合同见 [V6 详细设计第 7 节](../architecture/v6-upgrade-research-design.md)。已实现 `/api/upgrade-research/repositories`、`/api/upgrade-research/runs` 及运行详情、事件、取消、保存提案、终态逻辑删除接口，以及 `/api/research-reports` 的列表、详情和逻辑删除；仍在版本验收阶段。
+> 已批准的[阅读 API 合同](novel-reading-api.md)标记当前实施子集；索引、AI 任务、范围 SSE、引用和保存提案接口尚未实现，不能作为现有端点调用。
+
+## 升级研究 API（历史标识 V6）
+
+完整请求、状态码、分页与 SSE 合同见 [V6 详细设计第 7 节](../architecture/v6-upgrade-research-design.md)。已实现 `/api/upgrade-research/repositories`、`/api/upgrade-research/runs` 及运行详情、事件、取消、保存提案、终态逻辑删除接口，以及 `/api/research-reports` 的列表、详情和逻辑删除；最终质量验收未通过，2026-10-20 起专项收尾暂停。
 
 研究入口显式声明文档、仓库键和标签，不改变现有聊天或 V4 请求。保存提案由用户调用，正文只取服务端不可变草稿；确认继续走 `/api/action-requests/{id}/confirm`。SSE 发送快照与安全进度，最终正文校验后一次返回；断线不取消，重连读数据库快照。owner、预算、来源地址和确认时的 action 参数均不得由客户端覆盖。运行详情与 SSE 快照包含 `run`、`sources`、`tools`、`modelCalls` 和 `saveActionId`，并在顶层提供 `runId`、`traceId`、`revision`。仓库目录返回 `enabled`，关闭时仅新建运行返回 409，历史与报告接口仍可读。
 
