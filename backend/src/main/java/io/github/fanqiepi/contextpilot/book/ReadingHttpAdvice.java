@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@RestControllerAdvice(assignableTypes=ReadingController.class)
+@RestControllerAdvice(assignableTypes={ReadingController.class,io.github.fanqiepi.contextpilot.readingtask.ReadingTaskController.class})
 public class ReadingHttpAdvice implements ResponseBodyAdvice<Object> {
     @ExceptionHandler(ReadingException.class)
     public ResponseEntity<?> reading(ReadingException error,HttpServletRequest request) {

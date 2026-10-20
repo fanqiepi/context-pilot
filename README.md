@@ -6,7 +6,7 @@
 
 ## 产品方向（2026-10-20）
 
-当前按长篇小说阅读路线推进，首个场景为“中断后快速接着读”。**阅读合同已确认，首个功能点“导入并持续阅读”已实现，待提交 PR；回顾、人物查证和 AI 笔记保存尚未实现。** 新产品名称未定。详见[工程验证记录](docs/evaluation/reading-library-verification.md)。
+当前按长篇小说阅读路线推进，首个场景为“中断后快速接着读”。**基础阅读和已读范围已实现；本轮新增回顾、人物查证、专用索引与有界任务的离线工程链路，待提交 PR。真实 AI 适配及语义验收尚未开放，AI 笔记确认保存仍待下一能力。** 新产品名称未定。详见[任务工程验证记录](docs/evaluation/reading-task-verification.md)。
 
 旧研究路线及转向初稿已弃用，升级研究未完成的质量收尾和旧录屏仍暂停；代码、历史证据与必要回归保留。唯一当前路线为[长篇小说阅读应用开发路线](docs/development/novel-reading-roadmap.md)，新窗口从[当前交接](docs/development/continuation-handoff.md)继续。
 

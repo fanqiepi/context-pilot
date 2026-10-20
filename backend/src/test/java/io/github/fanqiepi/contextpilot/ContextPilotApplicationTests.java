@@ -46,6 +46,9 @@ class ContextPilotApplicationTests {
     private BookMapper bookMapper;
 
     @MockitoBean
+    private io.github.fanqiepi.contextpilot.readingtask.ReadingTaskMapper readingTaskMapper;
+
+    @MockitoBean
     private ReadingStateMapper readingStateMapper;
 
     @MockitoBean
