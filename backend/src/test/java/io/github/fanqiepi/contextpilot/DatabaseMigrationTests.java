@@ -71,7 +71,8 @@ class DatabaseMigrationTests {
                     "research_run", "research_step", "research_evidence", "research_step_evidence",
                     "app_user", "user_memory", "user_memory_revision", "message_memory_context",
                     "reading_task","reading_index_job","reading_ai_call","reading_task_evidence",
-                    "reading_task_event","reading_job_command","reading_index_segment","reading_vector_store","reading_spend_ledger"
+                    "reading_task_event","reading_job_command","reading_index_segment","reading_vector_store","reading_spend_ledger",
+                    "reading_note_proposal"
             }) {
                 assertThat(queryBoolean(connection, """
                         SELECT EXISTS (

@@ -4,7 +4,7 @@
 
 业务语义见[设计](../architecture/novel-reading-design.md)，容量和门槛见[唯一路线](../development/novel-reading-roadmap.md)，接口见[API](../api/novel-reading-api.md)。
 
-当前实现：[V29](../../backend/src/main/resources/db/migration/V29__create_reading_library.sql) 包含基础阅读九张表；本轮 [V30](../../backend/src/main/resources/db/migration/V30__create_reading_tasks.sql) 新增 `reading_task/reading_index_job/reading_job_command/reading_ai_call/reading_task_event/reading_task_evidence/reading_index_segment/reading_vector_store/reading_spend_ledger`。笔记仍仅 MANUAL/EXCERPT，AI 提案表尚未创建。摘录编辑不修改原锚点。迁移仅在隔离测试数据库验证，未迁移用户现有本地数据库。
+当前实现：[V29](../../backend/src/main/resources/db/migration/V29__create_reading_library.sql) 包含基础阅读九张表；[V30](../../backend/src/main/resources/db/migration/V30__create_reading_tasks.sql) 新增 `reading_task/reading_index_job/reading_job_command/reading_ai_call/reading_task_event/reading_task_evidence/reading_index_segment/reading_vector_store/reading_spend_ledger`。本轮 [V31](../../backend/src/main/resources/db/migration/V31__create_reading_note_proposals.sql) 新增 `reading_note_proposal`，并扩展 `reading_note` 为 MANUAL/EXCERPT/AI_RECAP/AI_CHARACTER，增加来源任务、提案、冻结引用和编辑标记。摘录编辑不修改原锚点。迁移仅在隔离测试数据库验证，未迁移用户现有本地数据库。
 
 范围功能本身沿用 V29。`ReadingScopeService` 快照仅在服务端构造；状态 SSE 从当前提交行重建。笔记/书签保留原 `required_boundary`，回退只改变可见性；重新到达足够边界后可重新查看历史记录，旧 epoch 的在途发布仍然失效。
 
@@ -46,6 +46,8 @@ V30 的具体实现映射：任务与索引分别有独立关系表，共用有�
 | `reading_note_proposal` | owner_id、book_id、version_id、task_id、client_request_id、request_hash、body/title、citations_json、required_boundary、content_hash、scope_epoch、status、expires_at、supersedes_id、result_note_id、trace_id、error_code | `(owner_id,client_request_id)` 唯一；同任务最多一个 PENDING 提案（部分唯一索引）；状态按设计 CHECK；成功必须有结果关联 |
 
 AI 笔记与提案之间使用复合关联校验 `(note.id, note.source_proposal_id)`，保证 proposal.result_note_id 真由该提案创建；循环外键可用延迟约束完成同事务插入。source_task 与版本/主体的复合关系在迁移和服务双重验证。
+
+V31 已落实这些关系：提案的 `(task_id,version_id,book_id,owner_id)` 外键到任务；笔记的提案、任务、版本、书籍、主体复合外键到提案；成功结果使用延迟复合外键关联该提案生成的笔记。source_task_id/source_proposal_id 唯一键不会因逻辑删除释放。citations_json 存服务端拷贝的 Evidence/Span 数组；笔记编辑只允许删减它，任务逻辑删除不破坏已保存笔记的原文预览。content_hash 对解析后的结构化引用计算规范 JSON，避免 JSONB 文本格式变化误判。成功状态与笔记写入在同一事务内，数据库异常回滚执行权，业务失败状态单独正常提交。
 
 提案 content_hash 对规范 JSON 的标题、正文、引用、版本、范围、taskId 取 SHA-256；客户端仅回传看到的 hash，不能决定 hash 的计算字段。AI 引用由服务端复制原任务来源，用户只能删减引用而不能伪造来源；编辑不改变原任务的可信度标签。普通笔记编辑保留 kind/source 链，并设 user_edited。
 

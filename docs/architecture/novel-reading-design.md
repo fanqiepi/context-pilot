@@ -4,7 +4,7 @@
 
 本文定义业务与架构合同；实施顺序、容量/调用预算和完成门槛唯一维护在[新路线](../development/novel-reading-roadmap.md)。配套：[数据草案](../data/novel-reading-data-model.md)、[API 草案](../api/novel-reading-api.md)、[评估方案](../evaluation/novel-reading-evaluation.md)。确认这一组合同后连续实施；付费实验仍须单独授权。
 
-## 代码与 Git 核对
+## 合同批准时的代码与 Git 核对（历史快照）
 
 2026-10-20 本轮读取工作树代码和配置，未启动服务、连接数据库或调用供应商：
 
@@ -141,6 +141,8 @@ PAUSED -> CANCELLED | INVALIDATED
 
 可预期业务校验失败记录 `FAILED` 且不写笔记；过期为 `EXPIRED`。数据库异常回滚笔记和执行权，提案保持原待确认态，返回可重试错误；无法确认提交结果时通过 GET/相同确认请求查既有状态，不能先标成功。提案不可通过客户端更改 owner、范围、来源或 actionType。
 
+本轮实现使用 `ReadingNoteProposalService`、V31 和独立预览组件，沿用主体生命周期锁 → reading_state 的事务序列，统一串行化同主体提案、确认、笔记编辑、范围回退及书籍移除。确认不进入模型/通用动作运行时。提案保留创建时 epoch，回退再前进也不能确认旧提案；已成功笔记则按当前范围重新显示。来源引用复制到笔记，任务移除不级联移除已保存内容。页面刷新通过任务的最新提案恢复最终预览，失败响应先查询持久状态，用户需再次显式确认；范围通知/失焦重验会卸载预览并丢弃在途响应。
+
 ## 批准与实施节奏
 
-用户于 2026-10-20 回复“确认可行”，批准本合同及配套数据/API、路线预算与评估门槛；随后要求每个窗口只完成一个大功能点，完成后提醒提交 PR，由用户开新窗口继续。基础阅读、范围和本轮任务的工程记录分别见[基础验证](../evaluation/reading-library-verification.md)、[范围验证](../evaluation/reading-scope-verification.md)、[任务验证](../evaluation/reading-task-verification.md)。AI 保存提案仍为下一目标；真实适配、语义验收和付费批次仍未开放，本轮真实调用为零。
+用户于 2026-10-20 回复“确认可行”，批准本合同及配套数据/API、路线预算与评估门槛；随后要求每轮只完成一个大功能点，完成后提醒提交 PR。基础阅读、范围及任务的工程记录分别见[基础验证](../evaluation/reading-library-verification.md)、[范围验证](../evaluation/reading-scope-verification.md)、[任务验证](../evaluation/reading-task-verification.md)。任务及扫描修复提交后，用户再次要求下一能力，本轮仅实施确认保存 AI 笔记；真实适配、语义验收和付费批次仍未开放。

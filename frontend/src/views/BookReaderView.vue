@@ -19,12 +19,16 @@ const font = ref(20), lineHeight = ref(1.9), dark = ref(false)
 const noteDialog = ref(false), noteTitle = ref(''), noteBody = ref(''), noteKind = ref('MANUAL'), editingNote = ref<Note | null>(null)
 const noteAnchor = ref<{ id: string; start: number; end: number } | null>(null)
 const noteKey = ref(crypto.randomUUID())
+const retainedNoteEvidence = ref<string[]>([])
+const validNoteText = computed(() => noteBody.value.trim().length > 0 && Array.from(noteBody.value.trim()).length <= 5000 && Array.from(noteTitle.value.trim()).length <= 120)
+const noteKindLabel = (kind: string | null) => ({ MANUAL: '手写笔记', EXCERPT: '原文摘录', AI_RECAP: '已确认 AI 回顾', AI_CHARACTER: '已确认 AI 人物查证' }[kind || 'MANUAL'] || '笔记')
 const sourceDialog = ref(false), source = ref<ReadingSource>(), sourceLoading = ref(false), scopeReady = ref(false)
+const sourceChoices = ref<ReadingSource[]>([])
 let sourcePath = '', scopeGeneration = 0, sourceRequest = 0, recordsRequest = 0, chaptersRequest = 0
 let events: EventSource | undefined
 let scopeRefresh = 0
 let readerRequest = 0
-let suspendedDraft: { version: string; epoch: number; title: string; body: string; kind: string; note: Note | null; anchor: typeof noteAnchor.value } | null = null
+let suspendedDraft: { version: string; epoch: number; title: string; body: string; kind: string; note: Note | null; anchor: typeof noteAnchor.value; evidence: string[] } | null = null
 const currentVersion = computed(() => versions.value.find(v => v.id === versionId.value))
 let saveTimer: ReturnType<typeof setTimeout> | undefined
 let savePromise: Promise<void> | undefined, disposed = false, navigating = false
@@ -210,12 +214,12 @@ function newNote(excerpt = false) {
   }
   noteDialog.value = true
 }
-function editNote(note: Note) { editingNote.value = note; noteTitle.value = note.title || ''; noteBody.value = note.body || ''; noteKind.value = note.kind || 'MANUAL'; noteDialog.value = true }
+function editNote(note: Note) { editingNote.value = note; noteTitle.value = note.title || ''; noteBody.value = note.body || ''; noteKind.value = note.kind || 'MANUAL'; retainedNoteEvidence.value = [...note.retainedEvidenceIds]; noteDialog.value = true }
 async function saveNote() {
-  if (!state.value) return
+  if (!state.value || !validNoteText.value) return
   try {
     const content = { title: noteTitle.value, body: noteBody.value, expectedScopeRevision: state.value.scopeRevision }
-    if (editingNote.value) await readingPatch(`/notes/${editingNote.value.id}`, { ...content, expectedRevision: editingNote.value.revision })
+    if (editingNote.value) await readingPatch(`/notes/${editingNote.value.id}`, { ...content, expectedRevision: editingNote.value.revision, retainedEvidenceIds: retainedNoteEvidence.value })
     else await readingPost(`${base()}/notes`, { ...content, clientRequestId: noteKey.value, kind: noteKind.value, anchorParagraphId: noteAnchor.value?.id ?? null, anchorStart: noteAnchor.value?.start ?? null, anchorEnd: noteAnchor.value?.end ?? null })
     noteDialog.value = false; await loadRecords(); records.value = true
   } catch (e) { error.value = errorMessage(e) }
@@ -234,10 +238,10 @@ function mergeState(current: ReadingState) {
   state.value = current
 }
 function invalidateScope() {
-  if (noteDialog.value && state.value) suspendedDraft = { version: versionId.value, epoch: state.value.visibilityEpoch, title: noteTitle.value, body: noteBody.value, kind: noteKind.value, note: editingNote.value, anchor: noteAnchor.value }
+  if (noteDialog.value && state.value) suspendedDraft = { version: versionId.value, epoch: state.value.visibilityEpoch, title: noteTitle.value, body: noteBody.value, kind: noteKind.value, note: editingNote.value, anchor: noteAnchor.value, evidence: [...retainedNoteEvidence.value] }
   scopeGeneration++; scopeReady.value = false
   notes.value = []; bookmarks.value = []; chapters.value = []; chapterTitle.value = null
-  sourceRequest++; source.value = undefined; sourceDialog.value = false; sourceLoading.value = false
+  sourceRequest++; source.value = undefined; sourceChoices.value = []; sourceDialog.value = false; sourceLoading.value = false
   noteDialog.value = false; noteTitle.value = ''; noteBody.value = ''; editingNote.value = null; noteAnchor.value = null
 }
 async function focus() {
@@ -258,7 +262,7 @@ async function focus() {
       scopeReady.value = true
       if (suspendedDraft?.version === version && suspendedDraft.epoch === current.visibilityEpoch) {
         noteTitle.value = suspendedDraft.title; noteBody.value = suspendedDraft.body; noteKind.value = suspendedDraft.kind
-        editingNote.value = suspendedDraft.note; noteAnchor.value = suspendedDraft.anchor; noteDialog.value = true
+        editingNote.value = suspendedDraft.note; noteAnchor.value = suspendedDraft.anchor; retainedNoteEvidence.value = suspendedDraft.evidence; noteDialog.value = true
       }
       suspendedDraft = null
     }
@@ -283,23 +287,27 @@ function subscribeScope() {
 async function previewSource(path: string) {
   if (!scopeReady.value) return
   const request = ++sourceRequest, generation = scopeGeneration, version = versionId.value
-  source.value = undefined; sourcePath = path; sourceDialog.value = true; sourceLoading.value = true
+  source.value = undefined; sourceChoices.value = []; sourcePath = path; sourceDialog.value = true; sourceLoading.value = true
   try {
-    const result = await readingGet<ReadingSource>(path)
+    const result = await readingGet<ReadingSource | { sources: ReadingSource[]; scopeRevision: number; visibilityEpoch: number }>(path)
     if (request !== sourceRequest || generation !== scopeGeneration || version !== versionId.value || !sourceDialog.value) return
     if (result.visibilityEpoch !== state.value?.visibilityEpoch || result.scopeRevision !== state.value?.scopeRevision) { await focus(); return }
-    source.value = result
+    sourceChoices.value = 'sources' in result ? result.sources : [result]
+    source.value = sourceChoices.value[0]
   } catch (e) {
     if (request === sourceRequest) { sourceDialog.value = false; error.value = errorMessage(e) }
   } finally { if (request === sourceRequest) sourceLoading.value = false }
 }
-function closeSource() { sourceRequest++; source.value = undefined }
+function closeSource() { sourceRequest++; source.value = undefined; sourceChoices.value = [] }
 async function continueFromSource() {
   if (!source.value) return
-  const request = sourceRequest, generation = scopeGeneration
+  const request = sourceRequest, generation = scopeGeneration, selectedSource = source.value
   try {
-    const verified = await readingGet<ReadingSource>(sourcePath)
+    const result = await readingGet<ReadingSource | { sources: ReadingSource[]; scopeRevision: number; visibilityEpoch: number }>(sourcePath)
     if (request !== sourceRequest || generation !== scopeGeneration || !sourceDialog.value) return
+    if (result.scopeRevision !== state.value?.scopeRevision || result.visibilityEpoch !== state.value?.visibilityEpoch) { await focus(); return }
+    const verified = ('sources' in result ? result.sources : [result]).find(s => s.paragraphId === selectedSource.paragraphId && s.startOffset === selectedSource.startOffset)
+    if (!verified) return
     sourceDialog.value = false; source.value = undefined; records.value = false
     await openChapter(verified.chapterId, verified.paragraphId, verified.startOffset)
   } catch (e) { sourceDialog.value = false; source.value = undefined; error.value = errorMessage(e) }
@@ -343,7 +351,7 @@ onUnmounted(() => { disposed = true; events?.close(); clearTimeout(saveTimer); c
       <p v-else class="reading-chapter-end">本章正文已加载完 <template v-if="paragraphs.length && paragraphs[paragraphs.length - 1]!.paragraphOrdinal > (state?.readBoundary || 0)">· <button @click="markRead(paragraphs[paragraphs.length - 1]!)">读完本章</button></template> · <button @click="directory = true">选择下一章</button></p>
     </article>
     <el-drawer v-model="assistant" title="回顾前情与人物查证" size="min(94vw, 560px)">
-      <ReadingAssistant :version-id="versionId" :state="state" :ready="scopeReady" :open="assistant" @continue="s => { assistant = false; void openChapter(s.chapterId, s.paragraphId, s.startOffset) }" @close="assistant = false" />
+      <ReadingAssistant :version-id="versionId" :state="state" :ready="scopeReady" :open="assistant" @continue="s => { assistant = false; void openChapter(s.chapterId, s.paragraphId, s.startOffset) }" @close="assistant = false" @saved="loadRecords" />
     </el-drawer>
     <el-drawer v-model="directory" title="目录与版本" direction="ltr" size="min(90vw, 380px)">
       <el-select :model-value="versionId" @change="switchVersion"><el-option v-for="(v, index) in versions" :key="v.id" :value="v.id" :label="`版本 ${versions.length - index} · ${v.chapterCount} 章`" /></el-select>
@@ -357,7 +365,7 @@ onUnmounted(() => { disposed = true; events?.close(); clearTimeout(saveTimer); c
       <el-pagination v-if="bookmarkTotal > 20" v-model:current-page="bookmarkPage" :total="bookmarkTotal" :page-size="20" layout="prev, pager, next" @current-change="loadRecords" />
       <h3>笔记</h3><el-button @click="newNote(false)">新建手写笔记</el-button>
       <div v-for="n in notes" :key="n.id" class="reading-record">
-        <template v-if="scopeReady && n.visibility === 'VISIBLE'"><h4>{{ n.title || (n.kind === 'EXCERPT' ? '原文摘录' : '手写笔记') }}{{ n.userEdited ? ' · 已编辑' : '' }}</h4><p>{{ n.body }}</p><blockquote v-if="n.userEdited">原选文：{{ n.originalExcerpt }}</blockquote><el-button text @click="editNote(n)">编辑</el-button><el-button v-if="n.chapterId && n.anchorParagraphId" text @click="previewSource(`/notes/${n.id}/source`)">查看出处</el-button></template>
+        <template v-if="scopeReady && n.visibility === 'VISIBLE'"><h4>{{ n.title || noteKindLabel(n.kind) }}{{ n.userEdited ? ' · 已编辑' : '' }}</h4><small>{{ noteKindLabel(n.kind) }}</small><p style="white-space: pre-wrap">{{ n.body }}</p><blockquote v-if="n.userEdited && n.originalExcerpt">原选文：{{ n.originalExcerpt }}</blockquote><p v-if="n.sourceTaskId">保留整个来源任务的范围；用户编辑不代表小说事实已获验证。</p><el-button text @click="editNote(n)">编辑</el-button><el-button v-if="n.chapterId && n.anchorParagraphId" text @click="previewSource(`/notes/${n.id}/source`)">查看出处</el-button><el-button v-for="key in n.retainedEvidenceIds" :key="key" text @click="previewSource(`/notes/${n.id}/citations/${key}`)">[{{ key }}] 原文</el-button></template>
         <p v-else>此笔记超出当前已读范围</p><el-button text @click="removeRecord('notes', n)">移除</el-button>
       </div>
       <el-pagination v-if="notesTotal > 20" v-model:current-page="notesPage" :total="notesTotal" :page-size="20" layout="prev, pager, next" @current-change="loadRecords" />
@@ -369,15 +377,18 @@ onUnmounted(() => { disposed = true; events?.close(); clearTimeout(saveTimer); c
       <el-switch v-model="dark" active-text="深色阅读" @change="saveSettings" /><p>设置仅保存在当前浏览器。</p>
     </el-drawer>
     <el-dialog v-model="sourceDialog" title="原文预览" width="min(92vw, 640px)" @close="closeSource">
+      <div v-if="sourceChoices.length > 1"><el-button v-for="s in sourceChoices" :key="`${s.paragraphId}/${s.startOffset}`" @click="source = s">第 {{ s.paragraphOrdinal }} 段 · {{ s.startOffset }}</el-button></div>
       <div v-loading="sourceLoading">
         <template v-if="source"><p>第 {{ source.chapterOrdinal }} 章 {{ source.chapterTitle || '' }} · 第 {{ source.paragraphOrdinal }} 段</p><blockquote style="white-space: pre-wrap">{{ source.text }}</blockquote><p>仅显示当前已读范围内原文。关闭后回到原阅读位置。</p></template>
       </div>
       <template #footer><el-button @click="sourceDialog = false">关闭预览</el-button><el-button type="primary" :disabled="!source" @click="continueFromSource">从这里继续读</el-button></template>
     </el-dialog>
     <el-dialog v-model="noteDialog" :title="editingNote ? '编辑笔记' : noteKind === 'EXCERPT' ? '保存原文摘录' : '新建手写笔记'" width="min(92vw, 580px)">
-      <el-form label-position="top"><el-form-item label="标题"><el-input v-model="noteTitle" maxlength="120" /></el-form-item><el-form-item label="内容"><el-input v-model="noteBody" type="textarea" :rows="8" maxlength="5000" :readonly="noteKind === 'EXCERPT' && !editingNote" /></el-form-item></el-form>
+      <el-form label-position="top"><el-form-item label="标题"><el-input v-model="noteTitle" maxlength="240" /><small>{{ Array.from(noteTitle.trim()).length }} / 120 字符</small></el-form-item><el-form-item label="内容"><el-input v-model="noteBody" type="textarea" :rows="8" maxlength="10000" :readonly="noteKind === 'EXCERPT' && !editingNote" /><small>{{ Array.from(noteBody.trim()).length }} / 5000 字符</small></el-form-item></el-form>
       <p v-if="noteAnchor">如果出处超出已读边界，保存后将暂时隐藏；可先明确确认已读范围。</p>
-      <template #footer><el-button @click="noteDialog = false">取消</el-button><el-button type="primary" :disabled="!noteBody.trim()" @click="saveNote">保存笔记</el-button></template>
+      <el-checkbox-group v-if="editingNote?.sourceTaskId" v-model="retainedNoteEvidence" aria-label="保留笔记引用"><el-checkbox v-for="key in editingNote.retainedEvidenceIds" :key="key" :value="key">{{ key }}</el-checkbox></el-checkbox-group>
+      <p v-if="editingNote?.sourceTaskId">引用只能保留或删减。编辑不会降低此笔记的已读范围标签。</p>
+      <template #footer><el-button @click="noteDialog = false">取消</el-button><el-button type="primary" :disabled="!validNoteText" @click="saveNote">保存笔记</el-button></template>
     </el-dialog>
   </section>
 </template>
