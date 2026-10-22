@@ -15,10 +15,18 @@ public interface ReadingAiGateway {
         public Response(String text,Long inputTokens,Long outputTokens) { this(text,inputTokens,outputTokens,"stop"); }
     }
     record Pricing(UUID authorizationId,String version,BigDecimal inputTokenRate,BigDecimal outputTokenRate) {}
+    record EmbeddingResponse(List<float[]> vectors,Long inputTokens) {
+        public Response usage() { return new Response("",inputTokens,inputTokens==null?null:0L); }
+    }
+    /** Exact serialized generation input, including the provider envelope, for bounds/reservation. */
+    default String generationInput(String prompt,int outputTokens) { return prompt; }
     /** Only test fixtures may opt out of the spend ledger. No production offline bean is registered. */
     default boolean offline() { return false; }
     default Pricing pricing(String phase) { throw ReadingTaskPolicy.failure("PRICING_UNKNOWN"); }
     void requireAuthorized();
     Response generate(String prompt,int outputTokens,Duration timeout);
     List<float[]> embed(List<String> text,Duration timeout);
+    default EmbeddingResponse embedWithUsage(List<String> text,Duration timeout) {
+        return new EmbeddingResponse(embed(text,timeout),null);
+    }
 }

@@ -1,5 +1,7 @@
 # 小说阅读 API 合同草案
 
+2026-10-22：阅读专用 HTTP 客户端和本地协议测试已实现，没有新增业务 API 或开放供应商代理/授权入口。生产 AI 创建仍返回 `LIVE_AI_NOT_AUTHORIZED`。适配及调用审计详情见[协议验证](../evaluation/reading-provider-verification.md)。
+
 版本：`reading-contract-v1-draft1`，2026-10-20 用户已确认。**以下为批准的目标接口，实际实现以 Controller/OpenAPI 和功能清单为准。** 既有 `/api/chat`、知识库、研究和动作接口不变。
 
 业务语义见[设计](../architecture/novel-reading-design.md)，字段约束见[数据](../data/novel-reading-data-model.md)，数值限制见[新路线](../development/novel-reading-roadmap.md)。

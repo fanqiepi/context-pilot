@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-22",
+  "mode": "LOCAL_HTTP_AND_ISOLATED_DATABASE",
+  "gitStart": "4f13128",
+  "backend": [
+    {
+      "name": "book.ReadingLibraryPersistenceTests",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "readingnote.ReadingNoteProposalPersistenceTests",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    {
+      "name": "readingtask.ReadingTaskPolicyTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "readingtask.ReadingTaskPersistenceTests",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    {
+      "name": "readingtask.ReadingProviderProtocolTests",
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "nodeToolTests": 17,
+  "liveGenerationCalls": 0,
+  "liveEmbeddingCalls": 0,
+  "authorizedCny": 0,
+  "productionGateway": "BLOCKED",
+  "semanticAcceptance": "NOT_RUN"
+}

@@ -54,20 +54,19 @@ public class ReadingTaskRunner {
                 String query=p.queries.get(p.searches);String phase="SEARCH_"+p.searches;
                 UUID call=service.reserveCall(false,id,token,phase,query,0);
                 final Payload frozen=p;
-                try {
-                    var spans=bounded(false,id,token,15000,timeout->{
-                        var vectors=ai.embed(List.of(query),timeout);
-                        if(vectors==null || vectors.size()!=1)throw failure("OUTPUT_INVALID");
-                        return service.search(frozen,vectors.getFirst());
-                    },call);
-                    service.checkpoint(false,id,token,state->{
-                        var merged=new ArrayList<>(state.evidence);
-                        for(var span:spans)if(merged.stream().noneMatch(e->e.sources().contains(span)))
-                            merged.add(new Evidence("E"+(merged.size()+1),List.of(span),span.text()));
-                        if(merged.size()>24 || merged.stream().mapToInt(e->ReadingText.length(e.text())).sum()>24000)throw failure("COVERAGE_LIMIT");
-                        state.evidence=merged;state.searches++;state.evidenceReady=state.searches==state.queries.size();
-                    },null);
-                } catch(Exception e) { service.callFinished(call,"UNKNOWN",null);throw e; }
+                var spans=bounded(false,id,token,15000,(timeout,audit)->{
+                    var response=ai.embedWithUsage(List.of(query),timeout);audit.accept(response.usage());
+                    var vectors=response.vectors();
+                    if(vectors==null || vectors.size()!=1)throw failure("OUTPUT_INVALID");
+                    return service.search(frozen,vectors.getFirst());
+                },call);
+                service.checkpoint(false,id,token,state->{
+                    var merged=new ArrayList<>(state.evidence);
+                    for(var span:spans)if(merged.stream().noneMatch(e->e.sources().contains(span)))
+                        merged.add(new Evidence("E"+(merged.size()+1),List.of(span),span.text()));
+                    if(merged.size()>24 || merged.stream().mapToInt(e->ReadingText.length(e.text())).sum()>24000)throw failure("COVERAGE_LIMIT");
+                    state.evidence=merged;state.searches++;state.evidenceReady=state.searches==state.queries.size();
+                },null);
                 p=ReadingTaskService.payload(service.current(false,id,token));
             }
         }
@@ -79,9 +78,12 @@ public class ReadingTaskRunner {
         service.checkpoint(false,id,token,state->state.result=result,result.facts().isEmpty()?"INSUFFICIENT_EVIDENCE":result.partial()?"PARTIAL":"COMPLETED");
     }
     private ReadingAiGateway.Response generate(ReadingWork w,UUID token,String phase,String prompt,int outputLimit,long timeout) throws Exception {
-        UUID call=service.reserveCall(false,w.id,token,phase,prompt,outputLimit);
-        var response=bounded(false,w.id,token,timeout,left->ai.generate(prompt,outputLimit,left),call);
-        if(response==null || response.text()==null || !"stop".equalsIgnoreCase(response.finishReason()))throw failure("OUTPUT_INVALID");
+        UUID call=service.reserveCall(false,w.id,token,phase,ai.generationInput(prompt,outputLimit),outputLimit);
+        var response=bounded(false,w.id,token,timeout,(left,audit)->{
+            var result=ai.generate(prompt,outputLimit,left);audit.accept(result);return result;
+        },call);
+        if(response==null || response.text()==null || !"stop".equalsIgnoreCase(response.finishReason())
+                || (response.outputTokens()!=null && response.outputTokens()>outputLimit))throw failure("OUTPUT_INVALID");
         limit(response.text(),32768,32768,"OUTPUT_INVALID");return response;
     }
     private void index(ReadingWork initial,UUID token) throws Exception {
@@ -95,23 +97,30 @@ public class ReadingTaskRunner {
             String input=String.join("",batch.stream().map(Span::text).toList());
             limit(input,16000,64000,"INPUT_LIMIT");
             UUID call=service.reserveCall(true,id,token,"INDEX_"+p.completedParagraph,input,0);
-            var vectors=bounded(true,id,token,30000,left->ai.embed(batch.stream().map(Span::text).toList(),left),call);
+            var vectors=bounded(true,id,token,30000,(left,audit)->{
+                var response=ai.embedWithUsage(batch.stream().map(Span::text).toList(),left);
+                audit.accept(response.usage());return response.vectors();
+            },call);
             service.indexed(id,token,batch,vectors);
         }
     }
-    @FunctionalInterface private interface Operation<T> { T call(Duration timeout) throws Exception; }
+    @FunctionalInterface private interface Operation<T> {
+        T call(Duration timeout,java.util.function.Consumer<ReadingAiGateway.Response> audit) throws Exception;
+    }
     private <T> T bounded(boolean index,UUID id,UUID token,long limit,Operation<T> operation,UUID call) throws Exception {
         var w=service.current(index,id,token);
         long left=Math.min(limit,deadline(w)-ReadingTaskService.elapsed(w)),end=System.nanoTime()+TimeUnit.MILLISECONDS.toNanos(left);
         Future<T> future;
+        if(left<=0) { service.callFinished(call,"FAILED",null);throw new TimeoutException(); }
         try {
             future=(index?indexCalls:taskCalls).submit(()->{
+                boolean[] audited={false};
                 try {
-                    T response=operation.call(Duration.ofMillis(left));
                     // Audit survives cancellation and does not publish model text or mutate the task.
-                    service.callFinished(call,"SUCCEEDED",response instanceof ReadingAiGateway.Response r?r:null);
-                    return response;
-                } catch(Exception e) { service.callFinished(call,"UNKNOWN",null);throw e; }
+                    return operation.call(Duration.ofMillis(left),response->{
+                        service.callFinished(call,"SUCCEEDED",response);audited[0]=true;
+                    });
+                } catch(Exception e) { if(!audited[0])service.callFinished(call,"UNKNOWN",null);throw e; }
             });
         } catch(RejectedExecutionException e) { service.callFinished(call,"FAILED",null);throw failure("PROVIDER_UNAVAILABLE"); }
         try {

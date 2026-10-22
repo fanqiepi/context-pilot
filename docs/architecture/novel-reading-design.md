@@ -1,5 +1,7 @@
 # 小说阅读业务合同草案
 
+2026-10-22 实现补充：阅读专用 `ReadingProviderClient` 经 `ReadingAiGateway` 隔离，使用已有 WebClient/Reactor Netty 发送固定 DeepSeek/DashScope 请求；不改变旧 Spring AI 配置。`ReadingAiConfiguration` 继续无条件拒绝真实调用，未开放生产授权接线。生成完整 HTTP JSON 包装参与输入上限/预留；embedding 返回 actual/unknown usage 进入既有账本。无新增依赖、表或外部 API，详情及本地协议证据见[验证记录](../evaluation/reading-provider-verification.md)。
+
 合同版本：`reading-contract-v1-draft1`（保留批准时版本标识）。日期：2026-10-20。**用户以“确认可行”批准本合同包，授权连续实施与离线验证；具体实现状态见功能清单，批准不是验收结果。付费实验未授权。**
 
 本文定义业务与架构合同；实施顺序、容量/调用预算和完成门槛唯一维护在[新路线](../development/novel-reading-roadmap.md)。配套：[数据草案](../data/novel-reading-data-model.md)、[API 草案](../api/novel-reading-api.md)、[评估方案](../evaluation/novel-reading-evaluation.md)。确认这一组合同后连续实施；付费实验仍须单独授权。
