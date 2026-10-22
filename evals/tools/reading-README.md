@@ -57,7 +57,7 @@ LIVE_END_TO_END 已执行记录必须有：
 | --- | --- | --- |
 | 阅读专用 DeepSeek / DashScope 适配 | 客户端已实现，生产网关仍阻断 | 固定模型不变；序列化输出上限、错误/截断/usage 已有本地证据，真实供应商行为待验证 |
 | HTTP 协议门禁 | 本地通过 | 捕获序列化请求、无自动重试/重定向、整体限时与取消、embedding 不隐藏拆批；见[协议验证](../../docs/evaluation/reading-provider-verification.md) |
-| 当前价格版本 | 未核实 | 供应商官方依据、日期、计费单位、上下界计算与 UNKNOWN 预留策略 |
+| 当前价格版本 | 公开资料已核实，账户/可执行版本未确认 | 见[授权准备](../../docs/evaluation/reading-live-authorization-preparation.md)；还需可靠 token 上界、usage 修复与价格/授权接线；历史配置与锁保持未就绪状态 |
 | 独立授权 | 未获得 | 确定批次 case/repeat 清单、索引清单、调用上限、金额与到期时间；旧研究授权不能沿用 |
 | 实际评测与试用 | 未执行 | 原始运行、人工独立评分、真实读者反馈与失败记录 |
 

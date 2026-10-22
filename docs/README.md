@@ -15,6 +15,7 @@
 | [基础阅读验证记录](evaluation/reading-library-verification.md) | 首个大功能点的实际工程证据、范围与限制 |
 | [续读体验验证](evaluation/reading-experience-verification.md) / [演示与试用脚本](development/reading-demo.md) | 冻结评测准备、离线容量/页面证据及尚未完成的真实验收 |
 | [阅读供应商协议验证](evaluation/reading-provider-verification.md) | 2026-10-22 本地 HTTP 适配、用量审计与 acceptance-v2；真实调用仍阻断 |
+| [阅读真实调用授权准备](evaluation/reading-live-authorization-preparation.md) | 官方模型/端点/价格、候选批次与费用估算；账户条件和授权执行门禁尚未齐备 |
 
 工作规则见 [AGENTS.md](../AGENTS.md)。详细合同已批准；每个会话只完成一个大功能点，验证后提醒用户提交 PR，下一窗口再继续。不要把未实施的 AI 规划写成已交付。
 
