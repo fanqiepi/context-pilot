@@ -1,0 +1,54 @@
+[
+  {
+    "id": "1507e934-3649-4cc6-914e-322887debb10",
+    "predecessor_id": null,
+    "currency": "CNY",
+    "limit_amount": 20,
+    "settled_amount": 0.017394,
+    "reserved_amount": 0,
+    "calls_started": 16,
+    "call_limit": 154,
+    "stop_reason": "DEBUG_REVIEW_FAILED",
+    "expires_at": "2026-10-22T06:12:16.523401+00:00",
+    "approval_digest": "2b34fb27d295720198fe26d434728101ddd401e12495917976ce8571b186ad5e"
+  },
+  {
+    "id": "320894a8-1128-3a76-83ac-1f75231033ae",
+    "predecessor_id": null,
+    "currency": "CNY",
+    "limit_amount": 10,
+    "settled_amount": 0.000337,
+    "reserved_amount": 0,
+    "calls_started": 19,
+    "call_limit": 192,
+    "stop_reason": "DEBUG_REVIEW_FAILED",
+    "expires_at": "2026-10-22T06:12:16.523401+00:00",
+    "approval_digest": "cd8e444b6ea804e5236e7e307c1061dcc9fa021515588cf348f17bae2859a858"
+  },
+  {
+    "id": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd",
+    "predecessor_id": "1507e934-3649-4cc6-914e-322887debb10",
+    "currency": "CNY",
+    "limit_amount": 19.982606,
+    "settled_amount": 0.019374,
+    "reserved_amount": 0,
+    "calls_started": 16,
+    "call_limit": 16,
+    "stop_reason": "DEBUG_REVIEW_FAILED",
+    "expires_at": "2026-10-22T06:52:25.010861+00:00",
+    "approval_digest": "fa927dd8be495a5c8d4ed7ef915504bf5f26b7aa1cdfb7bb09eeaae9cbccdffa"
+  },
+  {
+    "id": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5",
+    "predecessor_id": "320894a8-1128-3a76-83ac-1f75231033ae",
+    "currency": "CNY",
+    "limit_amount": 9.999663,
+    "settled_amount": 0.0001505,
+    "reserved_amount": 0,
+    "calls_started": 13,
+    "call_limit": 16,
+    "stop_reason": "DEBUG_REVIEW_FAILED",
+    "expires_at": "2026-10-22T06:52:25.010861+00:00",
+    "approval_digest": "79c9fb0ae10bbc958fb536dd6dbba5c3c38edbd6428280d83269e6a99bb3d798"
+  }
+]

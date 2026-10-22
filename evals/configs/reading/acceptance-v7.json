@@ -1,0 +1,36 @@
+{
+  "version": "reading-acceptance-v7",
+  "datasetVersion": "reading-acceptance-v1",
+  "contract": "reading-contract-v1-draft1",
+  "roadmap": "docs/development/novel-reading-roadmap.md",
+  "evaluation": "docs/evaluation/novel-reading-evaluation.md",
+  "scoring": "evals/configs/reading/scoring-v1.md",
+  "generationModel": "deepseek-v4-flash",
+  "embeddingModel": "qwen3.7-text-embedding",
+  "embeddingDimensions": 1024,
+  "promptVersion": "reading-evidence-v2",
+  "repetitions": {
+    "DEBUG": 1,
+    "TEST": 2
+  },
+  "authorization": {
+    "status": "USER_AUTHORIZED_DEBUG_RETEST_REMAINING_BUDGET",
+    "providerLimitsCny": {
+      "DEEPSEEK": "19.98260600",
+      "DASHSCOPE": "9.99966300"
+    },
+    "previousAuthorizationId": "1507e934-3649-4cc6-914e-322887debb10",
+    "pricingVersion": "reading-cny-20261022-v1"
+  },
+  "liveReadiness": {
+    "adapter": "IMPLEMENTED_DEFAULT_DISABLED",
+    "protocolTests": "LOCAL_HTTP_ONLY",
+    "pricing": "REVERIFIED_2026_10_22",
+    "providerModelAvailability": "V5_OBSERVED_V7_RETEST_PENDING",
+    "reservation": "PROVIDER_CONTEXT_CEILING",
+    "collector": "DEBUG_ONLY_EXISTING_INDEX_REQUIRED",
+    "budgetAlerts": "UNIQUE_STOPPED_PREDECESSOR_REMAINDER_WITH_SEPARATE_PROVIDER_LEDGERS",
+    "refusal": "EXPLICIT_LOOKUP_ANSWERABILITY_OFFLINE_ONLY"
+  },
+  "executionScope": "DEBUG_RETEST"
+}

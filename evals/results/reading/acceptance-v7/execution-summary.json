@@ -1,0 +1,84 @@
+{
+  "schema": "reading-live-execution-summary-v1",
+  "capturedAt": "2026-10-22T06:53:22.827Z",
+  "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd",
+  "previousAuthorizationId": "1507e934-3649-4cc6-914e-322887debb10",
+  "previousApprovalDigest": "2b34fb27d295720198fe26d434728101ddd401e12495917976ce8571b186ad5e",
+  "planSha256": "8269bf5e3113cad014b2676e46aec2a4969340833ef3572e1d48be69b712750f",
+  "approvalSha256": "fa927dd8be495a5c8d4ed7ef915504bf5f26b7aa1cdfb7bb09eeaae9cbccdffa",
+  "lockSha256": "a33bff6c76f15cb5a67eb2033a991230016348f31b289da84ede61203361adeb",
+  "executionScope": "DEBUG_RETEST",
+  "debugTasks": 12,
+  "testTasks": 0,
+  "indexJobs": 0,
+  "reusedIndexVersions": 1,
+  "stopReason": "DEBUG_REVIEW_FAILED",
+  "budgets": {
+    "DASHSCOPE": {
+      "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5",
+      "limitCny": 9.999663,
+      "reservedCny": 0,
+      "budgetValuedCny": 0.0001505,
+      "callsStarted": 13,
+      "warningEmitted": false,
+      "stopReason": "DEBUG_REVIEW_FAILED"
+    },
+    "DEEPSEEK": {
+      "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd",
+      "limitCny": 19.982606,
+      "reservedCny": 0,
+      "budgetValuedCny": 0.019374,
+      "callsStarted": 16,
+      "warningEmitted": false,
+      "stopReason": "DEBUG_REVIEW_FAILED"
+    }
+  },
+  "usage": {
+    "GENERATION": {
+      "calls": 16,
+      "inputTokens": 5611,
+      "outputTokens": 1019,
+      "unknown": 0,
+      "providerModels": [
+        "deepseek-flash"
+      ]
+    },
+    "EMBEDDING": {
+      "calls": 13,
+      "inputTokens": 301,
+      "outputTokens": 0,
+      "unknown": 0,
+      "providerModels": [
+        "qwen3.7-text-embedding"
+      ]
+    }
+  },
+  "cumulative": {
+    "DEEPSEEK": {
+      "approvedCny": "20.00000000",
+      "previousSettledCny": "0.01739400",
+      "newSettledCny": "0.01937400",
+      "cumulativeSettledCny": "0.03676800",
+      "remainingCny": "19.96323200"
+    },
+    "DASHSCOPE": {
+      "approvedCny": "10.00000000",
+      "previousSettledCny": "0.00033700",
+      "newSettledCny": "0.00015050",
+      "cumulativeSettledCny": "0.00048750",
+      "remainingCny": "9.99951250"
+    }
+  },
+  "sourceVerification": {
+    "sourcesChecked": 30,
+    "result": "VERSION_ID_PARAGRAPH_ID_HASH_TEXT_BOUNDARY_MATCH"
+  },
+  "evidenceHashes": {
+    "debug-operational-review.json": "f557fa44753f13e605dd3bfe489e7b4a8dcb8cc0ff8b287410586f271c7dba06",
+    "debug-v7-report.json": "d8aa47eef4ce19842263b4da11d43859c6d89b81f11c37564104992b1978575d",
+    "debug-v7.json": "f6628449195ea9862e451616636c02fdbbee1d78546aebc36d034ff287f132da",
+    "ledger-v7-stopped.json": "4afa2922103528512cef4e1cae3c897caa7abd7f055dcb15090adb13ab154911",
+    "status-v7-before.json": "6a26e1edabc375be443b4addb399765b25950ae5d631533e7beb1d64f6d8f160",
+    "status-v7-stopped.json": "8c0c98aa31b0ad87d4ac7bc62cbd4cf830ae95cde9007ca6c32378070ab3eb13"
+  }
+}

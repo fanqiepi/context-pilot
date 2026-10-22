@@ -7,7 +7,9 @@ import {ROOT, loadAssets, validateAssets, verifyLock, hash, template} from './re
 export const endpoints = Object.freeze({generation:'https://api.deepseek.com/chat/completions',
   embedding:'https://llm-90adsh26dbyar5po.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/embeddings'});
 export const PRICE='reading-cny-20261022-v1';
-const lockFile='evals/configs/reading/acceptance-v5.lock.json';
+const lockFile='evals/configs/reading/acceptance-v7.lock.json';
+export const RETEST='DEBUG_RETEST';
+export const retestEntries=dataset=>planEntries(dataset).filter(e=>e.split==='DEBUG'&&e.kind==='TASK');
 const read=f=>JSON.parse(fs.readFileSync(f,'utf8').replace(/^\uFEFF/,''));
 const json=o=>JSON.stringify(o,null,2)+'\n';
 const check=(v,message)=>{if(!v)throw Error(message);};
@@ -76,24 +78,29 @@ export function makePlan(bindings,dataset,config,lockBytes) {
     check(b.corpusSha256===corpus.sha256&&b.bookId&&b.versionId&&b.paragraphs.length===corpus.paragraphs.length,'Invalid corpus binding');
     corpus.paragraphs.forEach((p,i)=>check(b.paragraphs[i].ordinal===p.ordinal&&b.paragraphs[i].sha256===p.sha256&&b.paragraphs[i].id,'Invalid paragraph binding'));
   }
-  return {schema:'reading-live-plan-v1',version:config.version,batchId:randomUUID(),implementationLockSha256:hash(lockBytes),
+  return {schema:'reading-live-plan-v1',version:config.version,executionScope:RETEST,batchId:randomUUID(),implementationLockSha256:hash(lockBytes),
     datasetSha256:hash(fs.readFileSync(path.join(ROOT,'evals/datasets/reading/acceptance-v1.json'))),generationModel:config.generationModel,
     embeddingModel:config.embeddingModel,embeddingDimensions:1024,generationEndpoint:endpoints.generation,embeddingEndpoint:endpoints.embedding,bindings};
 }
 export function approvalTemplate(planBytes) {
   return {schema:'reading-live-approval-v1',status:'NOT_AUTHORIZED',authorizationId:randomUUID(),planSha256:hash(planBytes),
-    pricingVersion:PRICE,pricingVerifiedAt:null,authorizedAt:null,expiresAt:null,limitCny:'30.00',providerLimitsCny:{DEEPSEEK:'20.00',DASHSCOPE:'10.00'},maxCalls:346,accountConditionsConfirmed:false};
+    executionScope:RETEST,previousAuthorizationId:null,previousApprovalDigest:null,
+    pricingVersion:PRICE,pricingVerifiedAt:null,authorizedAt:null,expiresAt:null,limitCny:null,providerLimitsCny:{DEEPSEEK:null,DASHSCOPE:null},maxCalls:32,accountConditionsConfirmed:false};
 }
 function validateApproval(planBytes,approval) {
   const now=Date.now(),start=Date.parse(approval.authorizedAt),end=Date.parse(approval.expiresAt),verified=Date.parse(approval.pricingVerifiedAt);
   check(approval.schema==='reading-live-approval-v1'&&approval.status==='APPROVED'&&approval.accountConditionsConfirmed===true,'Independent paid approval required');
-  check(approval.planSha256===hash(planBytes)&&approval.pricingVersion===PRICE&&approval.maxCalls===346,'Approval mismatch');
+  check(approval.planSha256===hash(planBytes)&&approval.pricingVersion===PRICE&&approval.maxCalls===32,'Approval mismatch');
+  check(JSON.parse(planBytes).executionScope===RETEST&&approval.executionScope===RETEST,'DEBUG retest only');
+  check(/^[a-f0-9-]{36}$/.test(approval.previousAuthorizationId)&&/^[a-f0-9]{64}$/.test(approval.previousApprovalDigest)&&approval.previousAuthorizationId!==approval.authorizationId,'Stopped predecessor required');
   check(start<=now&&end>now&&end-start<=86400000&&verified<=start&&end-verified<=86400000,'Approval or price expired');
   const d=Number(approval.providerLimitsCny?.DEEPSEEK),e=Number(approval.providerLimitsCny?.DASHSCOPE);
-  check(d>0&&d<=20&&e>0&&e<=10&&Number(approval.limitCny)===d+e,'Invalid provider budgets');
+  check(d>0&&d<=20&&e>0&&e<=10&&Number(approval.limitCny).toFixed(8)===(d+e).toFixed(8),'Invalid provider budgets');
 }
 export async function collect(api,plan,approval,raw,dataset,split,checkpoint) {
   check(['DEBUG','TEST'].includes(split),'Select DEBUG or TEST');
+  const retest=plan.executionScope===RETEST;
+  if(retest)check(split==='DEBUG','DEBUG retest forbids TEST');
   const status=await api('/api/reading/evaluation/status');
   check(status.liveAllowed&&status.authorizationId===approval.authorizationId&&status.planSha256===approval.planSha256&&status.implementationLockSha256===plan.implementationLockSha256,'Backend approval mismatch');
   if(split==='DEBUG')check(status.callsStarted===0,'DEBUG already started; recover the journal, do not rerun');
@@ -101,7 +108,19 @@ export async function collect(api,plan,approval,raw,dataset,split,checkpoint) {
   raw.environment={...status.environment,codeFingerprint:plan.implementationLockSha256};raw.bindings=plan.bindings;
   raw.providerBudgets=status.providers;raw.authorizationId=approval.authorizationId;raw.costBasis='PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE';raw.indexObservations??=[];raw.collectorEvents??=[];
   await checkpoint(raw);
-  for(const entry of planEntries(dataset).filter(e=>e.split===split)) {
+  if(retest) {
+    check(status.executionScope===RETEST&&status.maxCalls===32&&status.previousAuthorizationId===approval.previousAuthorizationId,'Retest backend scope mismatch');
+    raw.reusedIndexes=[];
+    for(const corpusId of new Set(retestEntries(dataset).map(e=>e.corpusId))) {
+      const binding=plan.bindings.find(b=>b.corpusId===corpusId),requiredBoundary=Math.max(...retestEntries(dataset).filter(e=>e.corpusId===corpusId).map(e=>e.boundary));
+      const state=await api(`/api/reading/versions/${binding.versionId}/state`);
+      await api(`/api/reading/versions/${binding.versionId}/read-boundary`,'PUT',{clientRequestId:randomUUID(),expectedScopeRevision:state.scopeRevision,lastReadParagraphId:binding.paragraphs[requiredBoundary-1].id,confirmContiguousPrefix:true});
+      const index=await api(`/api/reading/versions/${binding.versionId}/index`);
+      check(index.ready&&index.readyBoundary>=requiredBoundary,'Retest requires existing complete index; no rebuild authorized');
+      raw.reusedIndexes.push({corpusId,versionId:binding.versionId,requiredBoundary,index});await checkpoint(raw);
+    }
+  }
+  for(const entry of (retest?retestEntries(dataset):planEntries(dataset).filter(e=>e.split===split))) {
     const binding=plan.bindings.find(b=>b.corpusId===entry.corpusId),version=binding.versionId;
     const row=entry.kind==='TASK'?raw.results.find(r=>r.caseId===entry.entryId&&r.repeat===entry.repeat):null;
     if(row)check(row.status==='NOT_RUN','Attempted task cannot be rerun');
@@ -166,8 +185,8 @@ if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.ur
     const [bindings,output]=args;check(output&&!fs.existsSync(output)&&!fs.existsSync(output+'.approval.json'),'New plan path required');
     const plan=makePlan(read(bindings),dataset,config,lockBytes),bytes=Buffer.from(json(plan));fs.writeFileSync(output,bytes,{flag:'wx'});
     fs.writeFileSync(output+'.approval.json',json(approvalTemplate(bytes)),{flag:'wx'});
-    console.log(json({status:'NOT_AUTHORIZED',planSha256:hash(bytes),entries:planEntries(dataset).length,maxHttp:346,
-      aggregateReservationCny:planEntries(dataset).reduce((n,e)=>n+reservation(e).reserveCny,0),proposedProviderStopsCny:{DEEPSEEK:20,DASHSCOPE:10}}));
+    console.log(json({status:'NOT_AUTHORIZED',executionScope:RETEST,planSha256:hash(bytes),entries:retestEntries(dataset).length,maxHttp:32,
+      aggregateReservationCny:retestEntries(dataset).reduce((n,e)=>n+reservation(e).reserveCny,0),providerStops:'REQUIRE_VERIFIED_PREDECESSOR_REMAINDER'}));
   }else if(command==='run') {
     const [base,planPath,approvalPath,output,split,debugRaw]=args;check(output&&!fs.existsSync(output)&&!fs.existsSync(output+'.journal.jsonl'),'New output path required');
     const planBytes=fs.readFileSync(planPath),plan=JSON.parse(planBytes),approval=read(approvalPath);validateApproval(planBytes,approval);

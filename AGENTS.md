@@ -1,5 +1,13 @@
 # ContextPilot repository guidance
 
+## Latest user-initiated DEBUG retest (2026-10-22)
+
+The user explicitly requested the proposed next round: fixed 12 DEBUG tasks once, reusing existing indexes and only the original remaining provider budgets. acceptance-v7 adds V34 unique stopped-predecessor ledger linkage and DEBUG_RETEST-only plan/approval gates; Prompt stays reading-evidence-v2. The run completed 29 HTTP calls with known usage; debug-008 refused correctly, but debug-006/011 exposed overly conservative PARTIAL decisions despite retrieved supporting evidence. Both new ledgers are stopped with DEBUG_REVIEW_FAILED; TEST 96 remains NOT_RUN. Original and successor evidence/locks/ledgers must be preserved. Cumulative remaining budgets: DeepSeek CNY 19.96323200, DashScope CNY 9.99951250; no unknown reservations. Next task is the bounded offline FULL/PARTIAL repair, not automatic paid retesting or TEST. See `docs/evaluation/reading-live-v7-results.md`. Historical statements below retain their dated scope.
+
+## Latest refusal repair (2026-10-22)
+
+PR #38 is merged (origin/main 87c3f9f); this round starts at clean develop/724c143. The DEBUG refusal repair uses reading-evidence-v2 and acceptance-v6. CHARACTER_LOOKUP now requires FULL/PARTIAL/INSUFFICIENT_EVIDENCE assessment in the same model response and validates consistency before mapping to the unchanged public Result. This is an offline contract/prompt repair, not verified live semantic success. Preserve v1–v5 locks and v5 failed observations; both previous provider ledgers remain stopped. No new paid run or approval file is installed. See `docs/evaluation/reading-refusal-verification.md`.
+
 ## Latest paid authorization (2026-10-22)
 
 The user explicitly approved CNY 20 for DeepSeek and CNY 10 for Alibaba embeddings and instructed real calls. This supersedes historical no-authorization statements below for this fixed reading batch only. acceptance-v5 separates durable provider ledgers (no borrowing), retaining the fixed dataset, DEBUG review before TEST, expiry, call caps and stop-on-failure rules. Do not request the same permission again, reset spent/unknown amounts, or automatically retry a stopped batch. DEBUG completed 12 tasks and 6 indexes (35 provider calls); debug-008 failed refusal review. Both ledgers are durably stopped with DEBUG_REVIEW_FAILED; TEST remains NOT_RUN. Next work is the DEBUG refusal fix and offline regression, not automatic paid retries. See `docs/evaluation/reading-live-v5-results.md`; earlier v1–v4 locks/plans remain historical.

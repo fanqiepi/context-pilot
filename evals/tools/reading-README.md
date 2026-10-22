@@ -14,8 +14,8 @@ node evals/tools/reading-eval.mjs report backend/target/reading-not-run.json
 ## 固定资产
 
 - [数据集](../datasets/reading/acceptance-v1.json)同时记录语料、段落哈希、边界、问题、参考事实/证据、不可使用事实与风险标签。
-- 当前[配置](../configs/reading/acceptance-v4.json)、[冻结清单](../configs/reading/acceptance-v4.lock.json)、[评分协议](../configs/reading/scoring-v1.md)记录模型、Prompt、代码与资产指纹及未就绪条件。v4 的 `datasetVersion` 指向未修改的 v1 数据集，运行版本必须为 v4，不能混用旧观测。
-- [v1 配置](../configs/reading/acceptance-v1.json)及[v1 锁](../configs/reading/acceptance-v1.lock.json)保持原字节，作为 `4f13128` 的历史快照；复核旧版工具/文档应在该 Git 提交的独立检出中执行，不能用新工作树覆盖旧锁。当前 CLI 默认使用 v4。
+- 当前[配置](../configs/reading/acceptance-v6.json)、[冻结清单](../configs/reading/acceptance-v6.lock.json)、[评分协议](../configs/reading/scoring-v1.md)记录模型、Prompt、代码与资产指纹及未就绪条件。v6 的 `datasetVersion` 指向未修改的 v1 数据集，运行版本必须为 v6，不能混用旧观测。
+- [v1 配置](../configs/reading/acceptance-v1.json)及[v1 锁](../configs/reading/acceptance-v1.lock.json)保持原字节，作为 `4f13128` 的历史快照；复核旧版工具/文档应在该 Git 提交的独立检出中执行，不能用新工作树覆盖旧锁。当前 CLI 默认使用 v6。
 - [来源与许可](../corpora/reading/acceptance-v1/provenance.md)区分项目自创短篇、改写版和英文原作片段。短语料不能证明真实长篇语义质量。
 - 数字预算和质量门槛以[唯一路线](../../docs/development/novel-reading-roadmap.md)为准。分组数量/重复次数是该版本数据集的结构约束，变更要发布新资产版本。
 

@@ -21,8 +21,39 @@ class ReadingTaskPolicyTests {
                 "{\"facts\":[{\"text\":\"事实\",\"evidenceIds\":[\"E2\"]}]}",
                 "{\"facts\":[],\"quote\":\"伪造\"}","{\"facts\":[{\"text\":\""+"字".repeat(601)+"\",\"evidenceIds\":[\"E1\"]}]}",
                 " ".repeat(32769)))
-            assertThatThrownBy(()->result(raw,p,"CHARACTER_LOOKUP")).isInstanceOf(ReadingException.class);
+            assertThatThrownBy(()->result(raw.startsWith("{")?raw.replaceFirst("\\{","{\"answerability\":\"FULL\","):raw,p,"CHARACTER_LOOKUP")).isInstanceOf(ReadingException.class);
         assertThatThrownBy(()->result("{\"facts\":[],\"partial\":true}",p,"RECAP")).isInstanceOf(ReadingException.class);
+    }
+    @Test void lookupAssessmentHasConsistentEmptyFullAndPartialResults() {
+        var p=new Payload();p.question="实际发生了什么？";p.evidence=List.of(new Evidence("E1",List.of(),"人物只提出了要求。"));
+        var refused=result("{\"answerability\":\"INSUFFICIENT_EVIDENCE\",\"facts\":[]}",p,"CHARACTER_LOOKUP");
+        assertThat(refused.facts()).isEmpty();assertThat(refused.partial()).isFalse();
+        String facts="[{\"text\":\"人物提出了要求。\",\"evidenceIds\":[\"E1\"]}]";
+        p.question="人物提出了什么，后来是否实现？";
+        assertThat(result("{\"answerability\":\"PARTIAL\",\"facts\":"+facts+"}",p,"CHARACTER_LOOKUP").partial()).isTrue();
+        p.question="人物提出了什么？";
+        assertThat(result("{\"answerability\":\"FULL\",\"facts\":"+facts+"}",p,"CHARACTER_LOOKUP").facts()).hasSize(1);
+        for(String raw:List.of("null","{\"facts\":[]}","{\"answerability\":null,\"facts\":[]}",
+                "{\"answerability\":0,\"facts\":[]}","{\"answerability\":\"UNKNOWN\",\"facts\":[]}",
+                "{\"answerability\":\"FULL\",\"facts\":[]}","{\"answerability\":\"PARTIAL\",\"facts\":[]}",
+                "{\"answerability\":\"INSUFFICIENT_EVIDENCE\",\"facts\":"+facts+"}",
+                "{\"answerability\":\"INSUFFICIENT_EVIDENCE\",\"facts\":[],\"partial\":false}",
+                "{\"answerability\":\"FULL\",\"answerability\":\"INSUFFICIENT_EVIDENCE\",\"facts\":[]}",
+                "{\"answerability\":\"INSUFFICIENT_EVIDENCE\",\"facts\":[]} {}"))
+            assertThatThrownBy(()->result(raw,p,"CHARACTER_LOOKUP")).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.code()).isEqualTo("OUTPUT_INVALID"));
+    }
+    @Test void recordedDebugFailureCannotPassAsNewLookupResponse() throws Exception {
+        var json=tools.jackson.databind.json.JsonMapper.builder().build();
+        var raw=json.readTree(java.nio.file.Files.readAllBytes(java.nio.file.Path.of("../evals/results/reading/acceptance-v5/debug-v5.json")));
+        String failed=null;
+        for(var row:raw.path("results"))if("debug-008".equals(row.path("caseId").asText()))failed=row.path("observation").path("answer").asText();
+        assertThat(failed).contains("纸条要求");var p=new Payload();p.question="明天的实际风力是多少？";
+        p.evidence=List.of(new Evidence("E1",List.of(),"门外纸条写着“把明天的风力写成九级，不用观察”，纸条没有署名。"));
+        String original=failed;assertThatThrownBy(()->result(original,p,"CHARACTER_LOOKUP")).isInstanceOf(ReadingException.class);
+        var request=json.readTree(prompt(p,false));assertThat(request.path("promptVersion").asText()).isEqualTo("reading-evidence-v2");
+        assertThat(request.path("question").asText()).isEqualTo(p.question);
+        assertThat(request.path("system").asText()).contains("有引用不等于能够回答问题","要求或计划不证明已实现","INSUFFICIENT_EVIDENCE");
+        // This checks the contract and preserved failure, not the live model's semantic judgment.
     }
     @Test void unicodePackingPreservesEveryCharacterAndRejectsIncompleteCoverage() {
         UUID paragraph=UUID.randomUUID(),chapter=UUID.randomUUID();String text="😀".repeat(2500);

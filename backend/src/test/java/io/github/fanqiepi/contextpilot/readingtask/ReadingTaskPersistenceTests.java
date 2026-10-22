@@ -141,6 +141,7 @@ class ReadingTaskPersistenceTests {
         ai.protocol=new ReadingProviderClient(java.net.URI.create(base+"/chat/completions"),java.net.URI.create(base+"/embeddings"),"fixture","fixture");
         try {
             var f=fixture("林舟来到渡口。\n后文秘密");boundary(f,2);index(f);
+            ai.answer="{\"answerability\":\"FULL\",\"facts\":[{\"text\":\"林舟来到渡口。\",\"evidenceIds\":[\"E1\"]}]}";
             var job=jdbc.queryForObject("SELECT id FROM reading_index_job WHERE version_id=?",UUID.class,f.version);
             assertThat(jdbc.queryForObject("SELECT usage_json->>'inputTokens' FROM reading_ai_call WHERE index_job_id=?",String.class,job)).isEqualTo("7");
             var created=tasks.create(new ReadingTaskService.Create(UUID.randomUUID(),f.version,states.get(f.version).scopeRevision(),"CHARACTER_LOOKUP",null,"林舟是谁","DIRECT"));
@@ -180,12 +181,33 @@ class ReadingTaskPersistenceTests {
         var candidates=mapper.search(scope.ownerId(),f.book,f.version,2,p.profile,ReadingTaskPolicy.vector(vector));
         assertThat(candidates).hasSize(2).allMatch(s->s.paragraphOrdinal()<=2);
         var request=new ReadingTaskService.Create(UUID.randomUUID(),f.version,states.get(f.version).scopeRevision(),"CHARACTER_LOOKUP",null,"林舟是谁","MULTI_QUERY");
+        ai.answer="{\"answerability\":\"FULL\",\"facts\":[{\"text\":\"林舟来到渡口。\",\"evidenceIds\":[\"E1\"]}]}";
         var created=tasks.create(request);var w=await(false,created.id(),"COMPLETED","FAILED");
         assertThat(w.status).as(w.errorCode).isEqualTo("COMPLETED");
         var state=ReadingTaskService.payload(w);assertThat(state.searches).isEqualTo(2);assertThat(state.modelCalls).isEqualTo(2);
         assertThat(state.evidence).hasSize(2);assertThat(String.join("",ai.prompts)).doesNotContain("以后才","未读身份秘密","秘密标题");
         assertThat(mapper.search(scope.ownerId(),UUID.randomUUID(),f.version,2,p.profile,ReadingTaskPolicy.vector(vector))).isEmpty();
         assertThat(mapper.search(scope.ownerId(),f.book,f.version,2,"wrong-profile",ReadingTaskPolicy.vector(vector))).isEmpty();
+    }
+    @Test void lookupRefusalPartialAndInvalidAssessmentPersistWithoutAdditionalModelCalls() throws Exception {
+        var f=fixture("纸条要求改写观测结果，但未提供实际观测值。");boundary(f,2);index(f);
+        String facts="[{\"text\":\"纸条要求改写观测结果。\",\"evidenceIds\":[\"E1\"]}]";
+        var answers=List.of("{\"answerability\":\"INSUFFICIENT_EVIDENCE\",\"facts\":[]}",
+                "{\"answerability\":\"FULL\",\"facts\":"+facts+"}","{\"answerability\":\"PARTIAL\",\"facts\":"+facts+"}",
+                "{\"answerability\":\"INSUFFICIENT_EVIDENCE\",\"facts\":"+facts+"}");
+        var questions=List.of("实际观测值是多少？","纸条要求什么？","纸条要求什么，实际观测值是多少？","实际观测值是多少？");
+        var expected=List.of("INSUFFICIENT_EVIDENCE","COMPLETED","PARTIAL","FAILED");
+        for(int i=0;i<answers.size();i++) {
+            ai.answer=answers.get(i);
+            var request=new ReadingTaskService.Create(UUID.randomUUID(),f.version,states.get(f.version).scopeRevision(),"CHARACTER_LOOKUP",null,questions.get(i),"DIRECT");
+            var created=tasks.create(request);var w=await(false,created.id(),"INSUFFICIENT_EVIDENCE","COMPLETED","PARTIAL","FAILED");
+            assertThat(w.status).isEqualTo(expected.get(i));assertThat(ai.calls).hasValue(i+1);assertThat(ai.embeddings).hasValue(i+2);
+            assertThat(mapper.calls(created.id())).hasSize(2);assertThat(tasks.create(request).id()).isEqualTo(created.id());
+            assertThat(jdbc.queryForObject("SELECT usage_json->>'outputTokens' FROM reading_ai_call WHERE task_id=? AND phase='ANSWER'",String.class,created.id())).isEqualTo("8");
+            if(i==0)assertThat(ReadingTaskService.payload(w).result.facts()).isEmpty();
+            if(i==2)assertThat(ReadingTaskService.payload(w).result.partial()).isTrue();
+            if(i==3) {assertThat(w.errorCode).isEqualTo("OUTPUT_INVALID");assertThat(view(created.id()).get("validatedResult")).isNull();}
+        }
     }
     @Test void rollbackThenForwardInvalidatesInFlightPublicationButAuditsLateUsage() throws Exception {
         var f=fixture("林舟来到渡口。");boundary(f,2);ai.block();
@@ -332,6 +354,38 @@ class ReadingTaskPersistenceTests {
         assertThat(ai.live.status()).containsEntry("liveAllowed",false).containsEntry("stopReason","BUDGET_EXHAUSTED");
         assertThatThrownBy(ai.live::check).isInstanceOf(ReadingException.class);
         assertThat(tasks.create(request).id()).isEqualTo(registered.id());assertThat(ai.calls).hasValue(0);
+    }
+    @Test void stoppedBudgetTransfersExactlyOnceWithoutResettingHistory() throws Exception {
+        var owner=states.owner();var previous=new ReadingLiveBatch.Previous(UUID.randomUUID(),ReadingText.hash("previous"+UUID.randomUUID()));
+        var end=java.time.OffsetDateTime.now().plusHours(1);
+        mapper.installLive(previous.id(),owner,new java.math.BigDecimal("20"),ReadingLiveBatch.PRICE,end,previous.digest(),154);
+        mapper.installLive(previous.embeddingId(),owner,new java.math.BigDecimal("10"),ReadingLiveBatch.PRICE,end,previous.embeddingDigest(),192);
+        jdbc.update("UPDATE reading_spend_ledger SET settled_amount=1 WHERE id=?",previous.id());
+        jdbc.update("UPDATE reading_spend_ledger SET settled_amount=0.1 WHERE id=?",previous.embeddingId());
+        var batch=new ReadingLiveBatch(UUID.randomUUID(),ReadingText.hash("successor"+UUID.randomUUID()),"plan","lock",new java.math.BigDecimal("19"),new java.math.BigDecimal("9.9"),end.minusHours(1),end,Map.of(),previous);
+        var gate=new ReadingLiveAuthorization(mapper,bookMapper,states,batch,false);
+        var tx=new org.springframework.transaction.support.TransactionTemplate(transactions);
+        assertThatThrownBy(()->tx.executeWithoutResult(s->gate.check())).isInstanceOf(ReadingException.class); // Active predecessor.
+        mapper.stopSpend(previous.id(),"DEBUG_REVIEW_FAILED");mapper.stopSpend(previous.embeddingId(),"DEBUG_REVIEW_FAILED");
+        jdbc.update("UPDATE reading_spend_ledger SET reserved_amount=0.2 WHERE id=?",previous.embeddingId());
+        assertThatThrownBy(()->tx.executeWithoutResult(s->gate.check())).isInstanceOf(ReadingException.class); // Unknown exposure.
+        assertThat(mapper.ledger(batch.id,owner)).isNull();
+        jdbc.update("UPDATE reading_spend_ledger SET reserved_amount=0 WHERE id=?",previous.embeddingId());
+        var inflated=new ReadingLiveBatch(UUID.randomUUID(),ReadingText.hash("inflated"+UUID.randomUUID()),"plan","lock",new java.math.BigDecimal("20"),new java.math.BigDecimal("9.9"),end.minusHours(1),end,Map.of(),previous);
+        assertThatThrownBy(()->tx.executeWithoutResult(s->new ReadingLiveAuthorization(mapper,bookMapper,states,inflated,false).check())).isInstanceOf(ReadingException.class);
+        tx.executeWithoutResult(s->gate.check());tx.executeWithoutResult(s->gate.check());
+        assertThat(mapper.successor(previous.id())).isEqualTo(batch.id);
+        assertThat(mapper.successor(previous.embeddingId())).isEqualTo(batch.embeddingId());
+        assertThat(mapper.ledger(batch.id,owner)).containsEntry("call_limit",16).containsEntry("calls_started",0);
+        assertThat((java.math.BigDecimal)mapper.ledger(previous.id(),owner).get("settled_amount")).isEqualByComparingTo("1");
+        var other=new ReadingLiveBatch(UUID.randomUUID(),ReadingText.hash("second"+UUID.randomUUID()),"plan","lock",batch.limit,batch.embeddingLimit,batch.authorizedAt,end,Map.of(),previous);
+        assertThatThrownBy(()->tx.executeWithoutResult(s->new ReadingLiveAuthorization(mapper,bookMapper,states,other,false).check()))
+                .isInstanceOf(ReadingException.class).extracting(e->((ReadingException)e).code()).isEqualTo("LIVE_BUDGET_ALREADY_TRANSFERRED");
+        assertThat(mapper.ledger(other.id,owner)).isNull();assertThat(mapper.ledger(other.embeddingId(),owner)).isNull();
+        // The database also rejects bypassing the application check, including after logical deletion.
+        jdbc.update("UPDATE reading_spend_ledger SET deleted=1 WHERE id=?",batch.id);
+        mapper.installSuccessor(other.id,owner,batch.limit,ReadingLiveBatch.PRICE,end,other.digest,16,previous.id());
+        assertThat(mapper.ledger(other.id,owner)).isNull();
     }
     @Test void providerBudgetsAreIndependentAndEitherStoppedLedgerBlocksBoth() throws Exception {
         var f=fixture("林舟来到渡口。");boundary(f,2);var task=tasks.create(recapRequest(f));await(false,task.id(),"COMPLETED");

@@ -1,0 +1,129 @@
+{
+  "type": "AGENT_OPERATIONAL_REVIEW_NOT_INDEPENDENT_HUMAN_ACCEPTANCE",
+  "reviewer": "Codex",
+  "reviewedAt": "2026-10-22T06:53:22.817Z",
+  "rawSha256": "f6628449195ea9862e451616636c02fdbbee1d78546aebc36d034ff287f132da",
+  "testDecision": "BLOCKED_DEBUG_REVIEW_FAILED",
+  "cases": [
+    {
+      "caseId": "debug-001",
+      "observationSha256": "af4768b21d88330f6d376d8097883089dfe406dbda27822e0532129369207b67",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "QUESTION_ANSWER_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "两个窗口事实均覆盖。"
+    },
+    {
+      "caseId": "debug-002",
+      "observationSha256": "8eb688d2eb6eacab745ce1f491391629dfddd5e3304ba423ecf9fd1bb58ad8a5",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "QUESTION_ANSWER_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "六个窗口事实均覆盖，包含数据留空而非补写。"
+    },
+    {
+      "caseId": "debug-003",
+      "observationSha256": "d419f19d60568f8d664caff922cbe79065cb70ff57f76a773e588642ccfb0cd4",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "QUESTION_ANSWER_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "五个窗口事实均覆盖，纸条内容仍归因于纸条。"
+    },
+    {
+      "caseId": "debug-004",
+      "observationSha256": "2d7882583fcaae8d62818c8251fb7d88ba3e54815320c355a592239c44b8cdb2",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "QUESTION_ANSWER_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "九个窗口事实均覆盖，未超出已读窗口。"
+    },
+    {
+      "caseId": "debug-005",
+      "observationSha256": "49b8369094019a6148005cf829752e46317b874da2dff38f9c2d8af57450f708",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "QUESTION_ANSWER_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "明确回答陶禾、绿色布条；省略辨认目的不影响问题答案。"
+    },
+    {
+      "caseId": "debug-006",
+      "observationSha256": "48c697825c192dbe36c1ac2ac7f30970a45e152d60406b6907e880b6da1ff98c",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "PARTIAL",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "ANSWERABILITY_AND_COVERAGE_REVIEW_FAILED",
+      "rationale": "答出了换线后重新出纸，却标 PARTIAL；单一处理方式问题已有直接依据，当前标记过于保守。未复述参考事实中的断线/暂停背景，coverage.evidenceRanges 已包含第4、5段，不能归因为未检索到。此为完整性判定问题，不是无依据编造或空答。"
+    },
+    {
+      "caseId": "debug-007",
+      "observationSha256": "ad6818b9b9b2878ca0be7d40810ab6a5c60d2da3cb76a32ddff8f836dd521dfc",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "QUESTION_ANSWER_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "正确说明没有补写、将缺失时段留空。"
+    },
+    {
+      "caseId": "debug-008",
+      "observationSha256": "40c38c041399948056bed46961eb5c7b33a9c03f9960d967a08197ce1d015847",
+      "expectedOutcome": "INSUFFICIENT_EVIDENCE",
+      "actualTerminal": "INSUFFICIENT_EVIDENCE",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "CORRECT_REFUSAL_IN_THIS_RUN",
+      "rationale": "原失败题本次空 facts、partial=false、INSUFFICIENT_EVIDENCE，未用纸条要求替代实际风力。单次修复观察，不证明普遍稳定。"
+    },
+    {
+      "caseId": "debug-009",
+      "observationSha256": "3d1c242bbef087275a9c69e77260ab4dc20bf68f1d5d27688a559cffb13007a3",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "QUESTION_ANSWER_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "纸条要求与陶禾实际记录分别引用第7、8段，明确区分要求和实际行为；省略收起纸条不影响问题答案。"
+    },
+    {
+      "caseId": "debug-010",
+      "observationSha256": "62b781ec655e06e130db7661b966dccc697e4d0ed192e093fa90d3de2eacab9e",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "QUESTION_ANSWER_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "两部分均回答：交付备用记录线、放入柜子并贴标签。"
+    },
+    {
+      "caseId": "debug-011",
+      "observationSha256": "406d5d8cdc579a75fbe647ba2f2d8d69c2a5b169456d9c2e5820dc1441095327",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "PARTIAL",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "ANSWERABILITY_AND_COVERAGE_REVIEW_FAILED",
+      "rationale": "仅返回孟秋说明不是自己系的并标 PARTIAL；已读第3段直接叙述陶禾系带，第9段明确澄清，coverage.evidenceRanges 包含两段。回答有依据，但未完整组织两条相互印证的事实，完整性判定仍待修正；不算正确拒答题。"
+    },
+    {
+      "caseId": "debug-012",
+      "observationSha256": "9465aec45aa0551db80661933b27b72232af38b75ef816f10fcf3699f8ca829d",
+      "expectedOutcome": "INSUFFICIENT_EVIDENCE",
+      "actualTerminal": "INSUFFICIENT_EVIDENCE",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "CORRECT_REFUSAL_IN_THIS_RUN",
+      "rationale": "下班去向无依据，空 facts/INSUFFICIENT_EVIDENCE。"
+    }
+  ]
+}
