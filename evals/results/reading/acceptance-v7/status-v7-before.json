@@ -1,0 +1,48 @@
+{
+  "liveAllowed": true,
+  "reason": "READY",
+  "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd",
+  "planSha256": "8269bf5e3113cad014b2676e46aec2a4969340833ef3572e1d48be69b712750f",
+  "implementationLockSha256": "a33bff6c76f15cb5a67eb2033a991230016348f31b289da84ede61203361adeb",
+  "limitCny": 29.982269,
+  "expiresAt": "2026-10-23T13:40:00+08:00",
+  "maxCalls": 32,
+  "executionScope": "DEBUG_RETEST",
+  "previousAuthorizationId": "1507e934-3649-4cc6-914e-322887debb10",
+  "callsStarted": 0,
+  "reservedCny": 0,
+  "budgetValuedCny": 0,
+  "debugReviewed": false,
+  "warningThresholdPercent": 80,
+  "warningEmitted": false,
+  "stopReason": null,
+  "providers": {
+    "DASHSCOPE": {
+      "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5",
+      "limitCny": 9.999663,
+      "reservedCny": 0,
+      "budgetValuedCny": 0,
+      "callsStarted": 0,
+      "warningEmitted": false,
+      "stopReason": null
+    },
+    "DEEPSEEK": {
+      "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd",
+      "limitCny": 19.982606,
+      "reservedCny": 0,
+      "budgetValuedCny": 0,
+      "callsStarted": 0,
+      "warningEmitted": false,
+      "stopReason": null
+    }
+  },
+  "costBasis": "PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE",
+  "reservationBasis": "PROVIDER_CONTEXT_CEILING",
+  "environment": {
+    "model": "deepseek-v4-flash",
+    "java": "21.0.3",
+    "embeddingProfile": "dashscope_qwen3_7_1024_v1",
+    "os": "Windows 11",
+    "database": "PostgreSQL 17.10 (Debian 17.10-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit"
+  }
+}

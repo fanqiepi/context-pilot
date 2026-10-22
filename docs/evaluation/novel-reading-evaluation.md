@@ -1,5 +1,7 @@
 # 小说阅读验收方案草案
 
+2026-10-22 DEBUG 重测沿用全部 v1 问题、参考事实和评分合同，Prompt 保持 reading-evidence-v2；acceptance-v7 只更新授权衔接和采集实现。用户已主动发起本轮重测，具体次数、剩余预算和期限仅由 [当前路线](../development/novel-reading-roadmap.md)维护。预先要求旧索引就绪，运行范围严格为 DEBUG，TEST 仍保留 NOT_RUN。执行代理逐条核对另存 operational-review，原始 review 保持 null，不能伪称独立人工评分。结果见 [重测记录](reading-live-v7-results.md)。
+
 2026-10-22 拒答修复轮：当前实现 acceptance-v6、Prompt reading-evidence-v2，保留 v1–v5 配置/锁和 v5 真实 DEBUG 失败。仅以 DEBUG 失败及独立合成协议夹具开发，未采集或据 TEST 调参。新增明确可回答性、部分回答、矛盾响应、旧失败响应拒绝与任务/usage 持久化回归。工程门禁不能证明模型会正确选择 answerability；真实复测与人工评分仍待完成。见[拒答修复验证](reading-refusal-verification.md)。
 
 2026-10-22 最新执行合同：用户已独立授权固定批次付费调用，额度及期限由[路线](../development/novel-reading-roadmap.md)唯一维护。acceptance-v5 保持 v1 语料、题目、Prompt、评分与重复数，按供应商独立账本预留/结算；两账本任何一个停止即阻断全部后续调用。先 DEBUG、复核后 TEST，失败不重试。历史“未授权”描述不覆盖此次明确批准；实际结果单列[执行记录](reading-live-v5-results.md)，不把授权或工程测试当作语义验收。

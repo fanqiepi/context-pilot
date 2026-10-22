@@ -1,0 +1,3873 @@
+{
+  "version": "reading-acceptance-v7",
+  "mode": "LIVE_END_TO_END",
+  "manifestSha256": "a33bff6c76f15cb5a67eb2033a991230016348f31b289da84ede61203361adeb",
+  "environment": {
+    "model": "deepseek-v4-flash",
+    "java": "21.0.3",
+    "embeddingProfile": "dashscope_qwen3_7_1024_v1",
+    "os": "Windows 11",
+    "database": "PostgreSQL 17.10 (Debian 17.10-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit",
+    "codeFingerprint": "a33bff6c76f15cb5a67eb2033a991230016348f31b289da84ede61203361adeb"
+  },
+  "bindings": [
+    {
+      "corpusId": "harbor-v1",
+      "corpusSha256": "fe682b7ed897027232b69e9fe7b245e155fda72397396adc4f42fc9d3e07b7c5",
+      "bookId": "2eba790b-5ae2-4f36-b830-10fd5ed3d9e6",
+      "versionId": "64bea815-de39-4a08-8b65-9c864e0f5770",
+      "paragraphs": [
+        {
+          "id": "53cb3767-4b78-399b-88be-1a84745291b7",
+          "ordinal": 1,
+          "sha256": "46304676562c2b3ab3936073c413572618b6eb09d4883ecdf0f5e6ce83b99e38"
+        },
+        {
+          "id": "a1e92ca6-d354-3afb-97e8-7618e7c78033",
+          "ordinal": 2,
+          "sha256": "29768b4587b4936aec14c81a441c67d17931d863f5f4fc81ccc9be3249a7f3b7"
+        },
+        {
+          "id": "ed2c5a02-fa77-336a-afd3-9297b8563313",
+          "ordinal": 3,
+          "sha256": "cacf973122e541a2bc6b1c3a149f62ce0957ac84828a4df073ad21e111685c33"
+        },
+        {
+          "id": "b1fd35c8-035a-3daf-a35b-cb7e5571bc7d",
+          "ordinal": 4,
+          "sha256": "4305d1fc9a06bb5271f5a4c816ac5334f5b4c0acf23b376b63bc1e9abb78c2a9"
+        },
+        {
+          "id": "4a386956-5ac9-3e75-811f-b46e7d040231",
+          "ordinal": 5,
+          "sha256": "a7968e4f4900113abfc9c36f7c5aca601045fbf8333df6e45175db828915a16c"
+        },
+        {
+          "id": "4ab40b0a-6eef-35e0-a490-6778dbe8d41d",
+          "ordinal": 6,
+          "sha256": "7b7c926665f1415340313dc992aff106387b6a55e9374c94217c7e87f78ff254"
+        },
+        {
+          "id": "2a5489f2-8ffb-33da-8b7b-cd8aa02c1f33",
+          "ordinal": 7,
+          "sha256": "37d8c3fa7617c40cd78c12e7de7482132744e33ef9208391dec11c4cfb1d80a4"
+        },
+        {
+          "id": "94c5f05c-85a1-3225-9186-e44dc65ddee6",
+          "ordinal": 8,
+          "sha256": "73826f08dec79a31911e9720c3125948baa21882ec0b7b09153f36d9dab58211"
+        },
+        {
+          "id": "d169e4b0-8662-377a-a3d3-03ebdd589a94",
+          "ordinal": 9,
+          "sha256": "fdd1100aad9e2845e07b1857b2b900e1d096c7dc0418f017018ff69c4f56b8fe"
+        },
+        {
+          "id": "4559e743-05c2-331b-aa36-3a41c5b17624",
+          "ordinal": 10,
+          "sha256": "e5d778b4b8dbfd4ed92b0b3b1b7db3adab6e1fe2c7fec50740b3af72aa4bc30c"
+        },
+        {
+          "id": "04ce736b-c590-3fa5-80e3-8cbf163f20b4",
+          "ordinal": 11,
+          "sha256": "958b6132282c6df7ebfadc48cc3b2bb77634e32a80c474e61065db7e0351f29b"
+        },
+        {
+          "id": "1f3aceee-8f0e-39ab-99c1-c6b5dcfe2fb2",
+          "ordinal": 12,
+          "sha256": "11de85e1fde6c6efbfe285cb196371519f6762e1dc7561bebbae0ca1250129fe"
+        },
+        {
+          "id": "efc22be7-5ab8-31b4-a8e3-b1fff12d376d",
+          "ordinal": 13,
+          "sha256": "ca85a6b12107dd09ce58f21c7c17837682e15e92bc7c7ae835ece1843fb4d418"
+        },
+        {
+          "id": "5746e749-05b9-34b2-9797-514451448f12",
+          "ordinal": 14,
+          "sha256": "c7a3d1304e752568a378b595ca188ebe2fa04d2282dfd633656a0b420f8fd1f0"
+        },
+        {
+          "id": "b7d7a5b7-5a84-312e-ba37-24ee524dca00",
+          "ordinal": 15,
+          "sha256": "6eceefe570a36b7f16ef280a51604b1a30a1a9d6ae9a829fa9e9421eaae542af"
+        },
+        {
+          "id": "20a892ca-cc2c-3154-ab55-052b346a48e8",
+          "ordinal": 16,
+          "sha256": "f6b84b5e90ea9599bfc56a2a83aa824d4a1d5fed29e91fc83a020d99603f4797"
+        },
+        {
+          "id": "37d07157-06fd-31b9-a0e7-7986db17ab11",
+          "ordinal": 17,
+          "sha256": "14ce7dab29f5708ea32e8635eec1d506a93f1ecd744be754f39fc694b778e9ca"
+        },
+        {
+          "id": "81e91772-94f6-3615-9e8d-d547501c1158",
+          "ordinal": 18,
+          "sha256": "6b49b8804251cb6c193df12bfd3224f641a91fe442c0c208b64f17a76db9e420"
+        },
+        {
+          "id": "ede1e63f-ade8-394b-83e8-fb96185cb4ea",
+          "ordinal": 19,
+          "sha256": "31cedbc8f084aa4007b9473a1d7d5a0b95bd044918ef53356f1fbeb93a4d29b0"
+        },
+        {
+          "id": "78df2052-516c-3a7e-ba8a-424f22b3012b",
+          "ordinal": 20,
+          "sha256": "0f5c65e65c8048b0ee4826bb76d65c75d05fe58ee7cae124860435491ab18426"
+        },
+        {
+          "id": "a2f87a3a-5e73-3c81-958f-77e66d24acda",
+          "ordinal": 21,
+          "sha256": "97b6b1bbd30028e01b887cb83fc5ec7caea96082af7ee106370b8ec50ea4f96a"
+        },
+        {
+          "id": "81dac6ac-6b4c-3787-83e2-4f2ceb74d70b",
+          "ordinal": 22,
+          "sha256": "90df3ff1dbf86d4b3b153cfff1447f9e978acb81cefdf9a0e386724a46d1b2d8"
+        },
+        {
+          "id": "911435e5-450a-3bdf-aa03-161c8d4b201f",
+          "ordinal": 23,
+          "sha256": "9c20a2469a9a85d3cb73f3f61bc0cb914b859c8a9cd4bbd3b28241204d1c3e1d"
+        },
+        {
+          "id": "b2aba0c9-34e2-3732-8588-f140af1599ba",
+          "ordinal": 24,
+          "sha256": "66fca328c1e343859ae53093d29981aa8984b17e6717ffd07f918c7e30313227"
+        },
+        {
+          "id": "f3e45cdb-a5b1-31a6-8138-951a587de737",
+          "ordinal": 25,
+          "sha256": "fa6864a945c7ebf829311f7907dd89a54d5a8dae34fd6ef46f1a830cc7833e56"
+        },
+        {
+          "id": "a55fdc12-1254-3c51-8b6c-8965c13bbe0b",
+          "ordinal": 26,
+          "sha256": "810f6ee278a963f1e5c16b9b94435ff6bb765819d9d32a4eccf1ab54db7b7dab"
+        },
+        {
+          "id": "442743b9-29b3-3cf0-bf5e-d619dc1fa42e",
+          "ordinal": 27,
+          "sha256": "2f2d916fd7394dd0b9cf22633ee90f75dcaca6fa1fefed1156666642317cdf0c"
+        },
+        {
+          "id": "440434e0-3ffb-3868-8aab-3fa539c4b53e",
+          "ordinal": 28,
+          "sha256": "f2bfb13c8bc946393ac4c33c5586e1184aaf5910eae53b352f66477e76918851"
+        },
+        {
+          "id": "f3481d41-0bb8-3471-9a43-c583f51de1d9",
+          "ordinal": 29,
+          "sha256": "4f36efd2ed8c35b16e786223a8b0413b78b0f96fba79870792c2067aba284447"
+        },
+        {
+          "id": "ee3316fc-8cc4-3779-a01c-e977cdc079cd",
+          "ordinal": 30,
+          "sha256": "a210f67c71bd710f8bd3cbe37f6e1c4d78878e26091c68a9a91a11e3a1da1ea2"
+        },
+        {
+          "id": "d69f8036-5ef5-3eed-bb10-be19676fa086",
+          "ordinal": 31,
+          "sha256": "743734f67f9f0907ba4a068860320594c59b3d8f59b4c1a05972cb8817fa6c95"
+        },
+        {
+          "id": "0a4472b1-390d-3a22-9cd0-adcb26412f52",
+          "ordinal": 32,
+          "sha256": "7e049dde190f46235e1b1d10a923f0f9dd80c33d72eae960cc1a64fb83e836e6"
+        },
+        {
+          "id": "7fddcd4b-fd31-35e8-98c4-15c7bdd505ae",
+          "ordinal": 33,
+          "sha256": "ae15d39a0fd1b26385a09dffeeb8a5b218a961869ef21a0d830ffbe1c7d5197a"
+        },
+        {
+          "id": "cbfd9919-57de-3894-9373-ef4feb6b2395",
+          "ordinal": 34,
+          "sha256": "113a42153108dd2353ca080edde6ca13737150d70ad101ee2280719dbc31640a"
+        },
+        {
+          "id": "0e908055-4959-37d3-9106-c35daa3ce6d1",
+          "ordinal": 35,
+          "sha256": "56da7e6ad0a245d1c28c88b639df08375ccfa0778005e571edab319edc22dcf6"
+        },
+        {
+          "id": "45400ed4-36db-3afe-9cde-8dc30b159dfd",
+          "ordinal": 36,
+          "sha256": "fc70636c9133edfbebacfc60aba83bda3a970467772ffca2a4593ce2031f6e39"
+        }
+      ]
+    },
+    {
+      "corpusId": "harbor-v2",
+      "corpusSha256": "15a4ca4b9dcf45bf445b00a91bc5e974b0d6f0b89547f7304e34b905a43d7933",
+      "bookId": "b0a5513c-2a3b-40fa-8cf3-1203171f969d",
+      "versionId": "0e7602e6-e1e9-47b2-8bee-664022be591f",
+      "paragraphs": [
+        {
+          "id": "44a41ad9-9d4e-3545-9ffc-fbdffc664428",
+          "ordinal": 1,
+          "sha256": "46304676562c2b3ab3936073c413572618b6eb09d4883ecdf0f5e6ce83b99e38"
+        },
+        {
+          "id": "63ea5c5d-e801-31ec-bd30-4d823bde9e99",
+          "ordinal": 2,
+          "sha256": "29768b4587b4936aec14c81a441c67d17931d863f5f4fc81ccc9be3249a7f3b7"
+        },
+        {
+          "id": "807ccc31-1e1b-316f-b41f-7bd33686dc89",
+          "ordinal": 3,
+          "sha256": "cacf973122e541a2bc6b1c3a149f62ce0957ac84828a4df073ad21e111685c33"
+        },
+        {
+          "id": "eed4dfd1-7e16-3b96-b070-96ec61817a08",
+          "ordinal": 4,
+          "sha256": "4305d1fc9a06bb5271f5a4c816ac5334f5b4c0acf23b376b63bc1e9abb78c2a9"
+        },
+        {
+          "id": "edc7d19e-332a-38db-a167-fa96532813d4",
+          "ordinal": 5,
+          "sha256": "a7968e4f4900113abfc9c36f7c5aca601045fbf8333df6e45175db828915a16c"
+        },
+        {
+          "id": "170f6457-01f5-3470-8aa0-e360a2df536e",
+          "ordinal": 6,
+          "sha256": "7b7c926665f1415340313dc992aff106387b6a55e9374c94217c7e87f78ff254"
+        },
+        {
+          "id": "2abea7ff-2fb4-3e23-8d81-29edf2cafc0b",
+          "ordinal": 7,
+          "sha256": "37d8c3fa7617c40cd78c12e7de7482132744e33ef9208391dec11c4cfb1d80a4"
+        },
+        {
+          "id": "14ddc0be-e752-3f54-b19a-65ecc8730457",
+          "ordinal": 8,
+          "sha256": "73826f08dec79a31911e9720c3125948baa21882ec0b7b09153f36d9dab58211"
+        },
+        {
+          "id": "58aeb5ca-fd9e-3557-8869-b9f9881bb70d",
+          "ordinal": 9,
+          "sha256": "fdd1100aad9e2845e07b1857b2b900e1d096c7dc0418f017018ff69c4f56b8fe"
+        },
+        {
+          "id": "d5e5f48d-7abd-3873-8459-455c1d15dacc",
+          "ordinal": 10,
+          "sha256": "e5d778b4b8dbfd4ed92b0b3b1b7db3adab6e1fe2c7fec50740b3af72aa4bc30c"
+        },
+        {
+          "id": "2e0d0475-83a9-34ec-9dff-f47e0ffa41a5",
+          "ordinal": 11,
+          "sha256": "958b6132282c6df7ebfadc48cc3b2bb77634e32a80c474e61065db7e0351f29b"
+        },
+        {
+          "id": "c77c0a1a-e649-30ad-8167-c07b716c2ba9",
+          "ordinal": 12,
+          "sha256": "11de85e1fde6c6efbfe285cb196371519f6762e1dc7561bebbae0ca1250129fe"
+        },
+        {
+          "id": "33a0da8c-3ffa-3586-9079-638ba1d0d1b2",
+          "ordinal": 13,
+          "sha256": "ca85a6b12107dd09ce58f21c7c17837682e15e92bc7c7ae835ece1843fb4d418"
+        },
+        {
+          "id": "47115dbb-a76e-39fd-b074-926db56d3d4f",
+          "ordinal": 14,
+          "sha256": "c7a3d1304e752568a378b595ca188ebe2fa04d2282dfd633656a0b420f8fd1f0"
+        },
+        {
+          "id": "dc7a14e2-6886-34c4-876d-6ed0b98289c8",
+          "ordinal": 15,
+          "sha256": "6eceefe570a36b7f16ef280a51604b1a30a1a9d6ae9a829fa9e9421eaae542af"
+        },
+        {
+          "id": "dd29062a-c57d-3e54-a15c-8ed7e1eb5021",
+          "ordinal": 16,
+          "sha256": "f6b84b5e90ea9599bfc56a2a83aa824d4a1d5fed29e91fc83a020d99603f4797"
+        },
+        {
+          "id": "592aa504-014f-3688-a0d4-7312966a712d",
+          "ordinal": 17,
+          "sha256": "14ce7dab29f5708ea32e8635eec1d506a93f1ecd744be754f39fc694b778e9ca"
+        },
+        {
+          "id": "5a9ae68a-391c-39f1-849a-d4ecc011dd00",
+          "ordinal": 18,
+          "sha256": "6b49b8804251cb6c193df12bfd3224f641a91fe442c0c208b64f17a76db9e420"
+        },
+        {
+          "id": "a7de09ef-72aa-3b29-8547-5eec601f09f3",
+          "ordinal": 19,
+          "sha256": "31cedbc8f084aa4007b9473a1d7d5a0b95bd044918ef53356f1fbeb93a4d29b0"
+        },
+        {
+          "id": "2665e861-30c8-34ed-969f-5f25c64afbde",
+          "ordinal": 20,
+          "sha256": "b9a2d2cc5d3318237da7dcee4773edf51a70293cf8da3f3668ef5e6cf6874434"
+        },
+        {
+          "id": "59a4c71f-e454-3bf9-b102-2d80ee5bfafe",
+          "ordinal": 21,
+          "sha256": "63411b7ae6b7a1eb3b58745a378c513509a606fed4aa27bf5e5b8cfbe065a8cf"
+        },
+        {
+          "id": "ab28b4eb-a325-3d1b-85c7-80f3325a7ccc",
+          "ordinal": 22,
+          "sha256": "90df3ff1dbf86d4b3b153cfff1447f9e978acb81cefdf9a0e386724a46d1b2d8"
+        },
+        {
+          "id": "a325aa44-3b2d-329c-8413-390d0208b498",
+          "ordinal": 23,
+          "sha256": "9c20a2469a9a85d3cb73f3f61bc0cb914b859c8a9cd4bbd3b28241204d1c3e1d"
+        },
+        {
+          "id": "79e8f029-4fa1-3b06-a526-b01795980d11",
+          "ordinal": 24,
+          "sha256": "66fca328c1e343859ae53093d29981aa8984b17e6717ffd07f918c7e30313227"
+        },
+        {
+          "id": "fcc55e60-ad9a-3223-b061-7657d8a18843",
+          "ordinal": 25,
+          "sha256": "254d19dddaddf47cb520453d41eca9e08d6660004570d047a404dd1f621a5285"
+        },
+        {
+          "id": "c7c3bf36-2d5a-3ddf-ba7a-b4425a4f67a3",
+          "ordinal": 26,
+          "sha256": "89291cc3609d3dcbf8358bf2e72fd3e175ce6395d62c824e95485a2f483b4329"
+        },
+        {
+          "id": "48282bd1-e2df-317b-9b32-a7e65c37a2b9",
+          "ordinal": 27,
+          "sha256": "591c7f6795cba55a47a0bd6685f191a23c15f94da5b9fb624c0f39f6a0d209fa"
+        },
+        {
+          "id": "890cb0c1-f63d-30f2-8779-3a133e1f458b",
+          "ordinal": 28,
+          "sha256": "27c5c1703188a937eea2dada793e7bd2465b1abef886e87a3725858a8131450e"
+        },
+        {
+          "id": "1e473327-9ffb-384a-a872-5b7b0db50a3b",
+          "ordinal": 29,
+          "sha256": "4f36efd2ed8c35b16e786223a8b0413b78b0f96fba79870792c2067aba284447"
+        },
+        {
+          "id": "bfe0491e-a662-30f7-9b43-2d0046a05ddd",
+          "ordinal": 30,
+          "sha256": "a210f67c71bd710f8bd3cbe37f6e1c4d78878e26091c68a9a91a11e3a1da1ea2"
+        },
+        {
+          "id": "7623f3a1-d857-384f-8630-2aa98901a6c3",
+          "ordinal": 31,
+          "sha256": "743734f67f9f0907ba4a068860320594c59b3d8f59b4c1a05972cb8817fa6c95"
+        },
+        {
+          "id": "11571df0-3d7b-3c05-84ae-79f87b6ffcb4",
+          "ordinal": 32,
+          "sha256": "7e049dde190f46235e1b1d10a923f0f9dd80c33d72eae960cc1a64fb83e836e6"
+        },
+        {
+          "id": "4aa8ffba-6b98-3ee1-8393-271869942c08",
+          "ordinal": 33,
+          "sha256": "ae15d39a0fd1b26385a09dffeeb8a5b218a961869ef21a0d830ffbe1c7d5197a"
+        },
+        {
+          "id": "86c5c939-03c8-3653-bc1f-262119303792",
+          "ordinal": 34,
+          "sha256": "d18074cae1ad293f7b697f544c7a911667f737c83c64dc1cda52f52203f679c5"
+        },
+        {
+          "id": "1c8d436d-5d0c-3b6e-a4c3-023dfe3f9f20",
+          "ordinal": 35,
+          "sha256": "56da7e6ad0a245d1c28c88b639df08375ccfa0778005e571edab319edc22dcf6"
+        },
+        {
+          "id": "3fabe57e-f0d9-3bd8-b720-a2d9e972e5c7",
+          "ordinal": 36,
+          "sha256": "7ec78b4b3c1276922b01722b4328bb719659d94490c892b7813bdde321ff7574"
+        }
+      ]
+    },
+    {
+      "corpusId": "island-debug-v1",
+      "corpusSha256": "234970cd2eb45dd7b6dc78188aed16fe56bb85615b0c4a905b9580ac139bfc61",
+      "bookId": "3a2d5817-2d53-45ca-b727-a248d8958537",
+      "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+      "paragraphs": [
+        {
+          "id": "703e69c9-b767-33e0-87b9-51ee871d3191",
+          "ordinal": 1,
+          "sha256": "110f7fc6ede4c577987984c61d21fcc917167f8449b083858ce6d87eb239a8b3"
+        },
+        {
+          "id": "1c238769-19ec-3164-a3d3-358f85dfb7d6",
+          "ordinal": 2,
+          "sha256": "35531f9c832a3256ddfb55dde54585b2aa946da611bfd3a9d2adb5f03815d03b"
+        },
+        {
+          "id": "c2dde2de-6a16-3be5-8ef5-db1f91636ec6",
+          "ordinal": 3,
+          "sha256": "44867431631ca6449b14969cd149bb7317b90f05808affd578fca1ac498a1dff"
+        },
+        {
+          "id": "f0c1bb89-562d-30d2-9003-c1964fbb6f40",
+          "ordinal": 4,
+          "sha256": "28aea42724b025bd8c76664acddec0307afb5d17233c4a6abb2862645dc27a12"
+        },
+        {
+          "id": "910117a2-7dca-3c56-87b9-f6ad3d823cae",
+          "ordinal": 5,
+          "sha256": "4a6f54d616871dcb6124aa73c37f1d030915d5a435de1716aeaa428e71def6ab"
+        },
+        {
+          "id": "617d3196-0269-382b-828a-215572a1e3a2",
+          "ordinal": 6,
+          "sha256": "e76f0db023c32f14c6cd18f7e0b22286ea792bb91bd69368c76f656e136a63b0"
+        },
+        {
+          "id": "946dae74-7128-3742-939d-c6d662615a73",
+          "ordinal": 7,
+          "sha256": "134908ba770106d927dd2b02332470e40b2fd23970c4601d3deeb9582349d671"
+        },
+        {
+          "id": "568f8e04-4b8a-307c-8bc3-78cee23b7da5",
+          "ordinal": 8,
+          "sha256": "6345baa8db9d7d994c0502d7681f5052059d076e33197b1b5b63b858f121a2fb"
+        },
+        {
+          "id": "48d94575-db05-391e-bd9b-f7cc09c05a61",
+          "ordinal": 9,
+          "sha256": "0977eac1b78afb2a05d66b7904c6363168971c11e2b951cdda48b72c79bd9af7"
+        },
+        {
+          "id": "daffefcb-edec-3232-8252-21f0a533ee69",
+          "ordinal": 10,
+          "sha256": "3414304f1558ceb593edb2e5cbe25326cb5aa2df0d378f302b638656ccc792b1"
+        },
+        {
+          "id": "24d19d5a-0ac9-3d6b-a407-b3110a54a6d9",
+          "ordinal": 11,
+          "sha256": "c8f58dbdb0c2dc18de9b497d37a8913c063b20836ad9188a790a35e85e730b7b"
+        },
+        {
+          "id": "ac68d48d-1bdf-38ef-8910-a332731797f9",
+          "ordinal": 12,
+          "sha256": "27c8da0af57f0fc68361a888f6a6ce510b4796b9d2461ac87f97840e88745943"
+        }
+      ]
+    },
+    {
+      "corpusId": "alice-opening-v1",
+      "corpusSha256": "c95c3e6b3a32f0cee024e3331623ec26abee2a4dff4d9bfdf4311edf3877f49a",
+      "bookId": "4850bbdd-03c5-4610-a5f0-435e7663cb8c",
+      "versionId": "e2f76a21-2fb1-4b3d-be0b-2feb13d4dfa5",
+      "paragraphs": [
+        {
+          "id": "fc2410da-4412-35eb-b837-25809ebe7610",
+          "ordinal": 1,
+          "sha256": "13059a06f39e742eb543f71d331c6088785a34f5286433aec07e4f023e327e70"
+        },
+        {
+          "id": "4020d121-032f-3ca1-a5ec-cdf42ae05677",
+          "ordinal": 2,
+          "sha256": "bcc1283dd130bea7e0770f8d354880f7ee1085748a4c5ee7d75cc59cef3d21fa"
+        }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "caseId": "test-001",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-001",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-002",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-002",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-003",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-003",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-004",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-004",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-005",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-005",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-006",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-006",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-007",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-007",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-008",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-008",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-009",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-009",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-010",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-010",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-011",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-011",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-012",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-012",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-013",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-013",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-014",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-014",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-015",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-015",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-016",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-016",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-017",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-017",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-018",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-018",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-019",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-019",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-020",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-020",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-021",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-021",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-022",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-022",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-023",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-023",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-024",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-024",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-025",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-025",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-026",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-026",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-027",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-027",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-028",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-028",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-029",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-029",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-030",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-030",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-031",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-031",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-032",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-032",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-033",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-033",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-034",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-034",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-035",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-035",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-036",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-036",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-037",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-037",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-038",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-038",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-039",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-039",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-040",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-040",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-041",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-041",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-042",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-042",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-043",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-043",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-044",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-044",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-045",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-045",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-046",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-046",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-047",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-047",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-048",
+      "repeat": 1,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "test-048",
+      "repeat": 2,
+      "status": "NOT_RUN",
+      "observation": null,
+      "review": null
+    },
+    {
+      "caseId": "debug-001",
+      "repeat": 1,
+      "status": "OBSERVED",
+      "observation": {
+        "taskId": "db8e4634-81a2-4855-b56f-5bf1b8e691d6",
+        "traceId": "76c953e5-b0e2-449c-9669-d3ba0d9d56d4",
+        "terminal": "COMPLETED",
+        "answer": "{\"facts\":[{\"text\":\"陶禾在小岛天文台负责记录每日的云量。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"园丁孟秋把一盆夜来香放在天文台门外。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}",
+        "citations": [
+          {
+            "id": "E1",
+            "text": "陶禾在小岛天文台负责记录每日的云量。\n园丁孟秋把一盆夜来香放在天文台门外。",
+            "sources": [
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "fa73dceb-7af4-3986-b667-0a6ff7bd9ebd",
+                "chapterOrdinal": 1,
+                "chapterTitle": null,
+                "paragraphId": "703e69c9-b767-33e0-87b9-51ee871d3191",
+                "paragraphOrdinal": 1,
+                "startOffset": 0,
+                "endOffset": 18,
+                "text": "陶禾在小岛天文台负责记录每日的云量。",
+                "textHash": "110f7fc6ede4c577987984c61d21fcc917167f8449b083858ce6d87eb239a8b3",
+                "requiredBoundary": 2,
+                "scopeRevision": 20,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:19.2462579+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "fa73dceb-7af4-3986-b667-0a6ff7bd9ebd",
+                "chapterOrdinal": 1,
+                "chapterTitle": null,
+                "paragraphId": "1c238769-19ec-3164-a3d3-358f85dfb7d6",
+                "paragraphOrdinal": 2,
+                "startOffset": 0,
+                "endOffset": 18,
+                "text": "园丁孟秋把一盆夜来香放在天文台门外。",
+                "textHash": "35531f9c832a3256ddfb55dde54585b2aa946da611bfd3a9d2adb5f03815d03b",
+                "requiredBoundary": 2,
+                "scopeRevision": 20,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:19.2462579+08:00"
+              }
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 210,
+            "outputTokens": 59,
+            "reservedCny": 2.12992,
+            "settledCny": 0.000892,
+            "phase": "ANSWER",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "28e4439d-d0dc-4ab1-ab65-3276f55bbeab",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          }
+        ],
+        "elapsedMs": 1996,
+        "errorCode": null,
+        "rawTask": {
+          "id": "db8e4634-81a2-4855-b56f-5bf1b8e691d6",
+          "status": "COMPLETED",
+          "revision": 3,
+          "visibility": "VISIBLE",
+          "type": "RECAP",
+          "errorCode": null,
+          "traceId": "76c953e5-b0e2-449c-9669-d3ba0d9d56d4",
+          "scope": {
+            "boundaryOrdinal": 2,
+            "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+            "visibilityEpoch": 1,
+            "scopeRevision": 20
+          },
+          "currentScopeRevision": 20,
+          "visibilityEpoch": 1,
+          "queuedAt": "2026-10-22T06:51:17.161891Z",
+          "elapsedMillis": 1996,
+          "question": null,
+          "validatedResult": {
+            "facts": [
+              {
+                "text": "陶禾在小岛天文台负责记录每日的云量。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "园丁孟秋把一盆夜来香放在天文台门外。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              }
+            ],
+            "partial": false
+          },
+          "dataAsOf": "2026-10-22T14:51:19.2262315+08:00",
+          "message": null,
+          "coverage": {
+            "completedParagraph": 0,
+            "targetBoundary": 2,
+            "evidenceRanges": [
+              1,
+              2
+            ],
+            "requestedRange": [
+              1,
+              2
+            ],
+            "completeness": "FULL_WINDOW"
+          },
+          "budget": {
+            "embeddingCalls": 0,
+            "inputBytes": 1001,
+            "inputCharacters": 631,
+            "modelCalls": 1,
+            "limitMillis": 90000,
+            "activeMillis": 1881
+          },
+          "usage": {
+            "usageStatus": "ACTUAL",
+            "inputTokens": 210,
+            "outputTokens": 59,
+            "calls": [
+              {
+                "ordinal": 1,
+                "phase": "ANSWER",
+                "status": "SUCCEEDED",
+                "inputTokens": 210,
+                "outputTokens": 59,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "28e4439d-d0dc-4ab1-ab65-3276f55bbeab",
+                "estimatedInputTokens": 1001,
+                "reservedAmount": 2.12992,
+                "settledAmount": 0.000892,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              }
+            ],
+            "tokenEstimateMethod": "UTF8_BYTES_ESTIMATE",
+            "reservationMethod": "PROVIDER_CONTEXT_CEILING",
+            "costBasis": "PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE"
+          }
+        }
+      },
+      "review": null
+    },
+    {
+      "caseId": "debug-002",
+      "repeat": 1,
+      "status": "OBSERVED",
+      "observation": {
+        "taskId": "a7204284-346f-4839-bd90-30945d17f614",
+        "traceId": "8a12e4cf-db49-4e73-98db-86938c9695ae",
+        "terminal": "COMPLETED",
+        "answer": "{\"facts\":[{\"text\":\"陶禾在小岛天文台负责记录每日的云量。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"园丁孟秋把一盆夜来香放在天文台门外。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"陶禾给花盆系上绿色布条，方便值夜班的人辨认。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"测风仪的记录线在傍晚断开，陶禾暂停了记录。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"电工罗澄换好记录线后，测风仪重新出纸。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"陶禾把缺失的那一小时标成空白，没有补写数据。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}",
+        "citations": [
+          {
+            "id": "E1",
+            "text": "陶禾在小岛天文台负责记录每日的云量。\n园丁孟秋把一盆夜来香放在天文台门外。\n陶禾给花盆系上绿色布条，方便值夜班的人辨认。\n测风仪的记录线在傍晚断开，陶禾暂停了记录。\n电工罗澄换好记录线后，测风仪重新出纸。\n陶禾把缺失的那一小时标成空白，没有补写数据。",
+            "sources": [
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "fa73dceb-7af4-3986-b667-0a6ff7bd9ebd",
+                "chapterOrdinal": 1,
+                "chapterTitle": "第1章 天文台",
+                "paragraphId": "703e69c9-b767-33e0-87b9-51ee871d3191",
+                "paragraphOrdinal": 1,
+                "startOffset": 0,
+                "endOffset": 18,
+                "text": "陶禾在小岛天文台负责记录每日的云量。",
+                "textHash": "110f7fc6ede4c577987984c61d21fcc917167f8449b083858ce6d87eb239a8b3",
+                "requiredBoundary": 6,
+                "scopeRevision": 23,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:24.1718947+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "fa73dceb-7af4-3986-b667-0a6ff7bd9ebd",
+                "chapterOrdinal": 1,
+                "chapterTitle": "第1章 天文台",
+                "paragraphId": "1c238769-19ec-3164-a3d3-358f85dfb7d6",
+                "paragraphOrdinal": 2,
+                "startOffset": 0,
+                "endOffset": 18,
+                "text": "园丁孟秋把一盆夜来香放在天文台门外。",
+                "textHash": "35531f9c832a3256ddfb55dde54585b2aa946da611bfd3a9d2adb5f03815d03b",
+                "requiredBoundary": 6,
+                "scopeRevision": 23,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:24.1718947+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "fa73dceb-7af4-3986-b667-0a6ff7bd9ebd",
+                "chapterOrdinal": 1,
+                "chapterTitle": "第1章 天文台",
+                "paragraphId": "c2dde2de-6a16-3be5-8ef5-db1f91636ec6",
+                "paragraphOrdinal": 3,
+                "startOffset": 0,
+                "endOffset": 22,
+                "text": "陶禾给花盆系上绿色布条，方便值夜班的人辨认。",
+                "textHash": "44867431631ca6449b14969cd149bb7317b90f05808affd578fca1ac498a1dff",
+                "requiredBoundary": 6,
+                "scopeRevision": 23,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:24.1718947+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f8ad504a-4d5d-3a64-be83-5792fa048f61",
+                "chapterOrdinal": 2,
+                "chapterTitle": "第2章 断线",
+                "paragraphId": "f0c1bb89-562d-30d2-9003-c1964fbb6f40",
+                "paragraphOrdinal": 4,
+                "startOffset": 0,
+                "endOffset": 21,
+                "text": "测风仪的记录线在傍晚断开，陶禾暂停了记录。",
+                "textHash": "28aea42724b025bd8c76664acddec0307afb5d17233c4a6abb2862645dc27a12",
+                "requiredBoundary": 6,
+                "scopeRevision": 23,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:24.1718947+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f8ad504a-4d5d-3a64-be83-5792fa048f61",
+                "chapterOrdinal": 2,
+                "chapterTitle": "第2章 断线",
+                "paragraphId": "910117a2-7dca-3c56-87b9-f6ad3d823cae",
+                "paragraphOrdinal": 5,
+                "startOffset": 0,
+                "endOffset": 19,
+                "text": "电工罗澄换好记录线后，测风仪重新出纸。",
+                "textHash": "4a6f54d616871dcb6124aa73c37f1d030915d5a435de1716aeaa428e71def6ab",
+                "requiredBoundary": 6,
+                "scopeRevision": 23,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:24.1718947+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f8ad504a-4d5d-3a64-be83-5792fa048f61",
+                "chapterOrdinal": 2,
+                "chapterTitle": "第2章 断线",
+                "paragraphId": "617d3196-0269-382b-828a-215572a1e3a2",
+                "paragraphOrdinal": 6,
+                "startOffset": 0,
+                "endOffset": 22,
+                "text": "陶禾把缺失的那一小时标成空白，没有补写数据。",
+                "textHash": "e76f0db023c32f14c6cd18f7e0b22286ea792bb91bd69368c76f656e136a63b0",
+                "requiredBoundary": 6,
+                "scopeRevision": 23,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:24.1718947+08:00"
+              }
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 290,
+            "outputTokens": 167,
+            "reservedCny": 2.12992,
+            "settledCny": 0.001916,
+            "phase": "ANSWER",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "99b5a143-d126-4181-a1ee-5479c62919c0",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          }
+        ],
+        "elapsedMs": 1248,
+        "errorCode": null,
+        "rawTask": {
+          "id": "a7204284-346f-4839-bd90-30945d17f614",
+          "status": "COMPLETED",
+          "revision": 3,
+          "visibility": "VISIBLE",
+          "type": "RECAP",
+          "errorCode": null,
+          "traceId": "8a12e4cf-db49-4e73-98db-86938c9695ae",
+          "scope": {
+            "boundaryOrdinal": 6,
+            "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+            "visibilityEpoch": 1,
+            "scopeRevision": 23
+          },
+          "currentScopeRevision": 23,
+          "visibilityEpoch": 1,
+          "queuedAt": "2026-10-22T06:51:22.771309Z",
+          "elapsedMillis": 1248,
+          "question": null,
+          "validatedResult": {
+            "facts": [
+              {
+                "text": "陶禾在小岛天文台负责记录每日的云量。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "园丁孟秋把一盆夜来香放在天文台门外。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "陶禾给花盆系上绿色布条，方便值夜班的人辨认。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "测风仪的记录线在傍晚断开，陶禾暂停了记录。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "电工罗澄换好记录线后，测风仪重新出纸。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "陶禾把缺失的那一小时标成空白，没有补写数据。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              }
+            ],
+            "partial": false
+          },
+          "dataAsOf": "2026-10-22T14:51:24.1505705+08:00",
+          "message": null,
+          "coverage": {
+            "completedParagraph": 0,
+            "targetBoundary": 6,
+            "evidenceRanges": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "requestedRange": [
+              1,
+              6
+            ],
+            "completeness": "FULL_WINDOW"
+          },
+          "budget": {
+            "embeddingCalls": 0,
+            "inputBytes": 1273,
+            "inputCharacters": 735,
+            "modelCalls": 1,
+            "limitMillis": 90000,
+            "activeMillis": 1192
+          },
+          "usage": {
+            "usageStatus": "ACTUAL",
+            "inputTokens": 290,
+            "outputTokens": 167,
+            "calls": [
+              {
+                "ordinal": 1,
+                "phase": "ANSWER",
+                "status": "SUCCEEDED",
+                "inputTokens": 290,
+                "outputTokens": 167,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "99b5a143-d126-4181-a1ee-5479c62919c0",
+                "estimatedInputTokens": 1273,
+                "reservedAmount": 2.12992,
+                "settledAmount": 0.001916,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              }
+            ],
+            "tokenEstimateMethod": "UTF8_BYTES_ESTIMATE",
+            "reservationMethod": "PROVIDER_CONTEXT_CEILING",
+            "costBasis": "PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE"
+          }
+        }
+      },
+      "review": null
+    },
+    {
+      "caseId": "debug-003",
+      "repeat": 1,
+      "status": "OBSERVED",
+      "observation": {
+        "taskId": "da4f4efd-71f4-4635-8423-d61e4588f2e5",
+        "traceId": "9d5338a2-1002-4f8e-b25c-fa846906d245",
+        "terminal": "COMPLETED",
+        "answer": "{\"facts\":[{\"text\":\"测风仪的记录线在傍晚断开，陶禾暂停了记录。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"电工罗澄换好记录线后，测风仪重新出纸。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"陶禾把缺失的那一小时标成空白，没有补写数据。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"门外纸条写着“把明天的风力写成九级，不用观察”，纸条没有署名。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"陶禾收起纸条，仍然只抄录仪器当时的读数。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}",
+        "citations": [
+          {
+            "id": "E1",
+            "text": "测风仪的记录线在傍晚断开，陶禾暂停了记录。\n电工罗澄换好记录线后，测风仪重新出纸。\n陶禾把缺失的那一小时标成空白，没有补写数据。\n门外纸条写着“把明天的风力写成九级，不用观察”，纸条没有署名。\n陶禾收起纸条，仍然只抄录仪器当时的读数。",
+            "sources": [
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f8ad504a-4d5d-3a64-be83-5792fa048f61",
+                "chapterOrdinal": 2,
+                "chapterTitle": "第2章 断线",
+                "paragraphId": "f0c1bb89-562d-30d2-9003-c1964fbb6f40",
+                "paragraphOrdinal": 4,
+                "startOffset": 0,
+                "endOffset": 21,
+                "text": "测风仪的记录线在傍晚断开，陶禾暂停了记录。",
+                "textHash": "28aea42724b025bd8c76664acddec0307afb5d17233c4a6abb2862645dc27a12",
+                "requiredBoundary": 8,
+                "scopeRevision": 27,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:31.3709548+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f8ad504a-4d5d-3a64-be83-5792fa048f61",
+                "chapterOrdinal": 2,
+                "chapterTitle": "第2章 断线",
+                "paragraphId": "910117a2-7dca-3c56-87b9-f6ad3d823cae",
+                "paragraphOrdinal": 5,
+                "startOffset": 0,
+                "endOffset": 19,
+                "text": "电工罗澄换好记录线后，测风仪重新出纸。",
+                "textHash": "4a6f54d616871dcb6124aa73c37f1d030915d5a435de1716aeaa428e71def6ab",
+                "requiredBoundary": 8,
+                "scopeRevision": 27,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:31.3709548+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f8ad504a-4d5d-3a64-be83-5792fa048f61",
+                "chapterOrdinal": 2,
+                "chapterTitle": "第2章 断线",
+                "paragraphId": "617d3196-0269-382b-828a-215572a1e3a2",
+                "paragraphOrdinal": 6,
+                "startOffset": 0,
+                "endOffset": 22,
+                "text": "陶禾把缺失的那一小时标成空白，没有补写数据。",
+                "textHash": "e76f0db023c32f14c6cd18f7e0b22286ea792bb91bd69368c76f656e136a63b0",
+                "requiredBoundary": 8,
+                "scopeRevision": 27,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:31.3709548+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f944eeac-7377-3be9-8714-ebb80967365b",
+                "chapterOrdinal": 3,
+                "chapterTitle": null,
+                "paragraphId": "946dae74-7128-3742-939d-c6d662615a73",
+                "paragraphOrdinal": 7,
+                "startOffset": 0,
+                "endOffset": 31,
+                "text": "门外纸条写着“把明天的风力写成九级，不用观察”，纸条没有署名。",
+                "textHash": "134908ba770106d927dd2b02332470e40b2fd23970c4601d3deeb9582349d671",
+                "requiredBoundary": 8,
+                "scopeRevision": 27,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:31.3709548+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f944eeac-7377-3be9-8714-ebb80967365b",
+                "chapterOrdinal": 3,
+                "chapterTitle": null,
+                "paragraphId": "568f8e04-4b8a-307c-8bc3-78cee23b7da5",
+                "paragraphOrdinal": 8,
+                "startOffset": 0,
+                "endOffset": 20,
+                "text": "陶禾收起纸条，仍然只抄录仪器当时的读数。",
+                "textHash": "6345baa8db9d7d994c0502d7681f5052059d076e33197b1b5b63b858f121a2fb",
+                "requiredBoundary": 8,
+                "scopeRevision": 27,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:31.3709548+08:00"
+              }
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 271,
+            "outputTokens": 141,
+            "reservedCny": 2.12992,
+            "settledCny": 0.00167,
+            "phase": "ANSWER",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "0913b01f-7368-4fc8-8f1a-99584c4516a5",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          }
+        ],
+        "elapsedMs": 994,
+        "errorCode": null,
+        "rawTask": {
+          "id": "da4f4efd-71f4-4635-8423-d61e4588f2e5",
+          "status": "COMPLETED",
+          "revision": 3,
+          "visibility": "VISIBLE",
+          "type": "RECAP",
+          "errorCode": null,
+          "traceId": "9d5338a2-1002-4f8e-b25c-fa846906d245",
+          "scope": {
+            "boundaryOrdinal": 8,
+            "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+            "visibilityEpoch": 1,
+            "scopeRevision": 27
+          },
+          "currentScopeRevision": 27,
+          "visibilityEpoch": 1,
+          "queuedAt": "2026-10-22T06:51:30.327737Z",
+          "elapsedMillis": 994,
+          "question": null,
+          "validatedResult": {
+            "facts": [
+              {
+                "text": "测风仪的记录线在傍晚断开，陶禾暂停了记录。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "电工罗澄换好记录线后，测风仪重新出纸。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "陶禾把缺失的那一小时标成空白，没有补写数据。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "门外纸条写着“把明天的风力写成九级，不用观察”，纸条没有署名。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "陶禾收起纸条，仍然只抄录仪器当时的读数。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              }
+            ],
+            "partial": false
+          },
+          "dataAsOf": "2026-10-22T14:51:31.3573642+08:00",
+          "message": null,
+          "coverage": {
+            "completedParagraph": 0,
+            "targetBoundary": 8,
+            "evidenceRanges": [
+              4,
+              5,
+              6,
+              7,
+              8
+            ],
+            "requestedRange": [
+              4,
+              8
+            ],
+            "completeness": "FULL_WINDOW"
+          },
+          "budget": {
+            "embeddingCalls": 0,
+            "inputBytes": 1247,
+            "inputCharacters": 723,
+            "modelCalls": 1,
+            "limitMillis": 90000,
+            "activeMillis": 939
+          },
+          "usage": {
+            "usageStatus": "ACTUAL",
+            "inputTokens": 271,
+            "outputTokens": 141,
+            "calls": [
+              {
+                "ordinal": 1,
+                "phase": "ANSWER",
+                "status": "SUCCEEDED",
+                "inputTokens": 271,
+                "outputTokens": 141,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "0913b01f-7368-4fc8-8f1a-99584c4516a5",
+                "estimatedInputTokens": 1247,
+                "reservedAmount": 2.12992,
+                "settledAmount": 0.00167,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              }
+            ],
+            "tokenEstimateMethod": "UTF8_BYTES_ESTIMATE",
+            "reservationMethod": "PROVIDER_CONTEXT_CEILING",
+            "costBasis": "PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE"
+          }
+        }
+      },
+      "review": null
+    },
+    {
+      "caseId": "debug-004",
+      "repeat": 1,
+      "status": "OBSERVED",
+      "observation": {
+        "taskId": "24e33bd8-bb63-4b62-b839-eb3555067438",
+        "traceId": "c025b3f1-6b9a-4fe0-bd69-057b382bce99",
+        "terminal": "COMPLETED",
+        "answer": "{\"facts\":[{\"text\":\"测风仪的记录线在傍晚断开，陶禾暂停了记录。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"电工罗澄换好记录线后，测风仪重新出纸。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"陶禾把缺失的那一小时标成空白，没有补写数据。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"门外纸条写着“把明天的风力写成九级，不用观察”，纸条没有署名。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"陶禾收起纸条，仍然只抄录仪器当时的读数。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"园丁孟秋说明绿色布条是陶禾系的，不是自己系的。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"罗澄把备用记录线交给陶禾保管。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"陶禾将备用线放进柜子，柜门贴上“记录线”的标签。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"下班前陶禾把空白记录和纸条一起交给接班员。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}",
+        "citations": [
+          {
+            "id": "E1",
+            "text": "测风仪的记录线在傍晚断开，陶禾暂停了记录。\n电工罗澄换好记录线后，测风仪重新出纸。\n陶禾把缺失的那一小时标成空白，没有补写数据。\n门外纸条写着“把明天的风力写成九级，不用观察”，纸条没有署名。\n陶禾收起纸条，仍然只抄录仪器当时的读数。\n园丁孟秋说明绿色布条是陶禾系的，不是自己系的。\n罗澄把备用记录线交给陶禾保管。\n陶禾将备用线放进柜子，柜门贴上“记录线”的标签。\n下班前陶禾把空白记录和纸条一起交给接班员。",
+            "sources": [
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f8ad504a-4d5d-3a64-be83-5792fa048f61",
+                "chapterOrdinal": 2,
+                "chapterTitle": "第2章 断线",
+                "paragraphId": "f0c1bb89-562d-30d2-9003-c1964fbb6f40",
+                "paragraphOrdinal": 4,
+                "startOffset": 0,
+                "endOffset": 21,
+                "text": "测风仪的记录线在傍晚断开，陶禾暂停了记录。",
+                "textHash": "28aea42724b025bd8c76664acddec0307afb5d17233c4a6abb2862645dc27a12",
+                "requiredBoundary": 12,
+                "scopeRevision": 30,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:39.4869116+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f8ad504a-4d5d-3a64-be83-5792fa048f61",
+                "chapterOrdinal": 2,
+                "chapterTitle": "第2章 断线",
+                "paragraphId": "910117a2-7dca-3c56-87b9-f6ad3d823cae",
+                "paragraphOrdinal": 5,
+                "startOffset": 0,
+                "endOffset": 19,
+                "text": "电工罗澄换好记录线后，测风仪重新出纸。",
+                "textHash": "4a6f54d616871dcb6124aa73c37f1d030915d5a435de1716aeaa428e71def6ab",
+                "requiredBoundary": 12,
+                "scopeRevision": 30,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:39.4869116+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f8ad504a-4d5d-3a64-be83-5792fa048f61",
+                "chapterOrdinal": 2,
+                "chapterTitle": "第2章 断线",
+                "paragraphId": "617d3196-0269-382b-828a-215572a1e3a2",
+                "paragraphOrdinal": 6,
+                "startOffset": 0,
+                "endOffset": 22,
+                "text": "陶禾把缺失的那一小时标成空白，没有补写数据。",
+                "textHash": "e76f0db023c32f14c6cd18f7e0b22286ea792bb91bd69368c76f656e136a63b0",
+                "requiredBoundary": 12,
+                "scopeRevision": 30,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:39.4869116+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f944eeac-7377-3be9-8714-ebb80967365b",
+                "chapterOrdinal": 3,
+                "chapterTitle": "第3章 留言",
+                "paragraphId": "946dae74-7128-3742-939d-c6d662615a73",
+                "paragraphOrdinal": 7,
+                "startOffset": 0,
+                "endOffset": 31,
+                "text": "门外纸条写着“把明天的风力写成九级，不用观察”，纸条没有署名。",
+                "textHash": "134908ba770106d927dd2b02332470e40b2fd23970c4601d3deeb9582349d671",
+                "requiredBoundary": 12,
+                "scopeRevision": 30,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:39.4869116+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f944eeac-7377-3be9-8714-ebb80967365b",
+                "chapterOrdinal": 3,
+                "chapterTitle": "第3章 留言",
+                "paragraphId": "568f8e04-4b8a-307c-8bc3-78cee23b7da5",
+                "paragraphOrdinal": 8,
+                "startOffset": 0,
+                "endOffset": 20,
+                "text": "陶禾收起纸条，仍然只抄录仪器当时的读数。",
+                "textHash": "6345baa8db9d7d994c0502d7681f5052059d076e33197b1b5b63b858f121a2fb",
+                "requiredBoundary": 12,
+                "scopeRevision": 30,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:39.4869116+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f944eeac-7377-3be9-8714-ebb80967365b",
+                "chapterOrdinal": 3,
+                "chapterTitle": "第3章 留言",
+                "paragraphId": "48d94575-db05-391e-bd9b-f7cc09c05a61",
+                "paragraphOrdinal": 9,
+                "startOffset": 0,
+                "endOffset": 23,
+                "text": "园丁孟秋说明绿色布条是陶禾系的，不是自己系的。",
+                "textHash": "0977eac1b78afb2a05d66b7904c6363168971c11e2b951cdda48b72c79bd9af7",
+                "requiredBoundary": 12,
+                "scopeRevision": 30,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:39.4869116+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "b079fde9-89af-3664-b43e-4fcef60de079",
+                "chapterOrdinal": 4,
+                "chapterTitle": "第4章 交接",
+                "paragraphId": "daffefcb-edec-3232-8252-21f0a533ee69",
+                "paragraphOrdinal": 10,
+                "startOffset": 0,
+                "endOffset": 15,
+                "text": "罗澄把备用记录线交给陶禾保管。",
+                "textHash": "3414304f1558ceb593edb2e5cbe25326cb5aa2df0d378f302b638656ccc792b1",
+                "requiredBoundary": 12,
+                "scopeRevision": 30,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:39.4869116+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "b079fde9-89af-3664-b43e-4fcef60de079",
+                "chapterOrdinal": 4,
+                "chapterTitle": "第4章 交接",
+                "paragraphId": "24d19d5a-0ac9-3d6b-a407-b3110a54a6d9",
+                "paragraphOrdinal": 11,
+                "startOffset": 0,
+                "endOffset": 24,
+                "text": "陶禾将备用线放进柜子，柜门贴上“记录线”的标签。",
+                "textHash": "c8f58dbdb0c2dc18de9b497d37a8913c063b20836ad9188a790a35e85e730b7b",
+                "requiredBoundary": 12,
+                "scopeRevision": 30,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:39.4869116+08:00"
+              },
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "b079fde9-89af-3664-b43e-4fcef60de079",
+                "chapterOrdinal": 4,
+                "chapterTitle": "第4章 交接",
+                "paragraphId": "ac68d48d-1bdf-38ef-8910-a332731797f9",
+                "paragraphOrdinal": 12,
+                "startOffset": 0,
+                "endOffset": 21,
+                "text": "下班前陶禾把空白记录和纸条一起交给接班员。",
+                "textHash": "27c8da0af57f0fc68361a888f6a6ce510b4796b9d2461ac87f97840e88745943",
+                "requiredBoundary": 12,
+                "scopeRevision": 30,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:39.4869116+08:00"
+              }
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 348,
+            "outputTokens": 246,
+            "reservedCny": 2.12992,
+            "settledCny": 0.002664,
+            "phase": "ANSWER",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "21b9b433-db06-4b80-a520-fce5a6d7cdb0",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          }
+        ],
+        "elapsedMs": 1595,
+        "errorCode": null,
+        "rawTask": {
+          "id": "24e33bd8-bb63-4b62-b839-eb3555067438",
+          "status": "COMPLETED",
+          "revision": 3,
+          "visibility": "VISIBLE",
+          "type": "RECAP",
+          "errorCode": null,
+          "traceId": "c025b3f1-6b9a-4fe0-bd69-057b382bce99",
+          "scope": {
+            "boundaryOrdinal": 12,
+            "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+            "visibilityEpoch": 1,
+            "scopeRevision": 30
+          },
+          "currentScopeRevision": 30,
+          "visibilityEpoch": 1,
+          "queuedAt": "2026-10-22T06:51:37.794859Z",
+          "elapsedMillis": 1595,
+          "question": null,
+          "validatedResult": {
+            "facts": [
+              {
+                "text": "测风仪的记录线在傍晚断开，陶禾暂停了记录。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "电工罗澄换好记录线后，测风仪重新出纸。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "陶禾把缺失的那一小时标成空白，没有补写数据。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "门外纸条写着“把明天的风力写成九级，不用观察”，纸条没有署名。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "陶禾收起纸条，仍然只抄录仪器当时的读数。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "园丁孟秋说明绿色布条是陶禾系的，不是自己系的。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "罗澄把备用记录线交给陶禾保管。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "陶禾将备用线放进柜子，柜门贴上“记录线”的标签。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "下班前陶禾把空白记录和纸条一起交给接班员。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              }
+            ],
+            "partial": false
+          },
+          "dataAsOf": "2026-10-22T14:51:39.4755827+08:00",
+          "message": null,
+          "coverage": {
+            "completedParagraph": 0,
+            "targetBoundary": 12,
+            "evidenceRanges": [
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12
+            ],
+            "requestedRange": [
+              4,
+              12
+            ],
+            "completeness": "FULL_WINDOW"
+          },
+          "budget": {
+            "embeddingCalls": 0,
+            "inputBytes": 1519,
+            "inputCharacters": 829,
+            "modelCalls": 1,
+            "limitMillis": 90000,
+            "activeMillis": 1548
+          },
+          "usage": {
+            "usageStatus": "ACTUAL",
+            "inputTokens": 348,
+            "outputTokens": 246,
+            "calls": [
+              {
+                "ordinal": 1,
+                "phase": "ANSWER",
+                "status": "SUCCEEDED",
+                "inputTokens": 348,
+                "outputTokens": 246,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "21b9b433-db06-4b80-a520-fce5a6d7cdb0",
+                "estimatedInputTokens": 1519,
+                "reservedAmount": 2.12992,
+                "settledAmount": 0.002664,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              }
+            ],
+            "tokenEstimateMethod": "UTF8_BYTES_ESTIMATE",
+            "reservationMethod": "PROVIDER_CONTEXT_CEILING",
+            "costBasis": "PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE"
+          }
+        }
+      },
+      "review": null
+    },
+    {
+      "caseId": "debug-005",
+      "repeat": 1,
+      "status": "OBSERVED",
+      "observation": {
+        "taskId": "d964cf3a-f049-4777-b76d-3176e62e27d3",
+        "traceId": "a38499d2-f478-4b61-b581-9e5655f06805",
+        "terminal": "COMPLETED",
+        "answer": "{\"facts\":[{\"text\":\"陶禾给花盆系上绿色布条。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}",
+        "citations": [
+          {
+            "id": "E1",
+            "text": "陶禾给花盆系上绿色布条，方便值夜班的人辨认。",
+            "sources": [
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "fa73dceb-7af4-3986-b667-0a6ff7bd9ebd",
+                "chapterOrdinal": 1,
+                "chapterTitle": "第1章 天文台",
+                "paragraphId": "c2dde2de-6a16-3be5-8ef5-db1f91636ec6",
+                "paragraphOrdinal": 3,
+                "startOffset": 0,
+                "endOffset": 22,
+                "text": "陶禾给花盆系上绿色布条，方便值夜班的人辨认。",
+                "textHash": "44867431631ca6449b14969cd149bb7317b90f05808affd578fca1ac498a1dff",
+                "requiredBoundary": 3,
+                "scopeRevision": 21,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:21.0018556+08:00"
+              }
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "kind": "EMBEDDING",
+            "status": "SUCCEEDED",
+            "inputTokens": 25,
+            "outputTokens": 0,
+            "reservedCny": 0.064,
+            "settledCny": 0.0000125,
+            "phase": "SEARCH_0",
+            "providerModel": "qwen3.7-text-embedding",
+            "providerRequestId": "496d0ac9-cfa9-9830-b9df-c56b950a41f0",
+            "reservedInputTokens": 128000,
+            "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+          },
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 418,
+            "outputTokens": 33,
+            "reservedCny": 2.113536,
+            "settledCny": 0.0011,
+            "phase": "ANSWER",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "774d031e-5fb0-40e5-9e65-dea947b2157f",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          }
+        ],
+        "elapsedMs": 1500,
+        "errorCode": null,
+        "rawTask": {
+          "id": "d964cf3a-f049-4777-b76d-3176e62e27d3",
+          "status": "COMPLETED",
+          "revision": 5,
+          "visibility": "VISIBLE",
+          "type": "CHARACTER_LOOKUP",
+          "errorCode": null,
+          "traceId": "a38499d2-f478-4b61-b581-9e5655f06805",
+          "scope": {
+            "boundaryOrdinal": 3,
+            "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+            "visibilityEpoch": 1,
+            "scopeRevision": 21
+          },
+          "currentScopeRevision": 21,
+          "visibilityEpoch": 1,
+          "queuedAt": "2026-10-22T06:51:19.29912Z",
+          "elapsedMillis": 1500,
+          "question": "谁给花盆系了什么颜色的布条？",
+          "validatedResult": {
+            "facts": [
+              {
+                "text": "陶禾给花盆系上绿色布条。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              }
+            ],
+            "partial": false
+          },
+          "dataAsOf": "2026-10-22T14:51:20.9881025+08:00",
+          "message": null,
+          "coverage": {
+            "completedParagraph": 0,
+            "targetBoundary": 3,
+            "evidenceRanges": [
+              3,
+              2,
+              1
+            ],
+            "requestedRange": [
+              1,
+              3
+            ],
+            "completeness": "SEARCH_MATCHES"
+          },
+          "budget": {
+            "embeddingCalls": 1,
+            "inputBytes": 1909,
+            "inputCharacters": 1063,
+            "modelCalls": 1,
+            "limitMillis": 60000,
+            "activeMillis": 1442
+          },
+          "usage": {
+            "usageStatus": "ACTUAL",
+            "inputTokens": 443,
+            "outputTokens": 33,
+            "calls": [
+              {
+                "ordinal": 1,
+                "phase": "SEARCH_0",
+                "status": "SUCCEEDED",
+                "inputTokens": 25,
+                "outputTokens": 0,
+                "usageStatus": "ACTUAL",
+                "providerModel": "qwen3.7-text-embedding",
+                "providerRequestId": "496d0ac9-cfa9-9830-b9df-c56b950a41f0",
+                "estimatedInputTokens": 42,
+                "reservedAmount": 0.064,
+                "settledAmount": 0.0000125,
+                "reservedInputTokens": 128000,
+                "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+              },
+              {
+                "ordinal": 2,
+                "phase": "ANSWER",
+                "status": "SUCCEEDED",
+                "inputTokens": 418,
+                "outputTokens": 33,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "774d031e-5fb0-40e5-9e65-dea947b2157f",
+                "estimatedInputTokens": 1909,
+                "reservedAmount": 2.113536,
+                "settledAmount": 0.0011,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              }
+            ],
+            "tokenEstimateMethod": "UTF8_BYTES_ESTIMATE",
+            "reservationMethod": "PROVIDER_CONTEXT_CEILING",
+            "costBasis": "PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE"
+          }
+        }
+      },
+      "review": null
+    },
+    {
+      "caseId": "debug-006",
+      "repeat": 1,
+      "status": "OBSERVED",
+      "observation": {
+        "taskId": "a3222e62-cf22-47f1-a69e-7ac05cd1153d",
+        "traceId": "c7879b02-43ff-433d-9cd5-89ede4dc28cf",
+        "terminal": "PARTIAL",
+        "answer": "{\"facts\":[{\"text\":\"罗澄换好记录线后，测风仪重新出纸。\",\"evidenceIds\":[\"E1\"]}],\"partial\":true}",
+        "citations": [
+          {
+            "id": "E1",
+            "text": "电工罗澄换好记录线后，测风仪重新出纸。",
+            "sources": [
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f8ad504a-4d5d-3a64-be83-5792fa048f61",
+                "chapterOrdinal": 2,
+                "chapterTitle": null,
+                "paragraphId": "910117a2-7dca-3c56-87b9-f6ad3d823cae",
+                "paragraphOrdinal": 5,
+                "startOffset": 0,
+                "endOffset": 19,
+                "text": "电工罗澄换好记录线后，测风仪重新出纸。",
+                "textHash": "4a6f54d616871dcb6124aa73c37f1d030915d5a435de1716aeaa428e71def6ab",
+                "requiredBoundary": 5,
+                "scopeRevision": 22,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:22.7290704+08:00"
+              }
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "kind": "EMBEDDING",
+            "status": "SUCCEEDED",
+            "inputTokens": 25,
+            "outputTokens": 0,
+            "reservedCny": 0.064,
+            "settledCny": 0.0000125,
+            "phase": "SEARCH_0",
+            "providerModel": "qwen3.7-text-embedding",
+            "providerRequestId": "dade7ab8-58e0-9a83-aa13-93fb06801d5a",
+            "reservedInputTokens": 128000,
+            "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+          },
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 476,
+            "outputTokens": 37,
+            "reservedCny": 2.113536,
+            "settledCny": 0.001248,
+            "phase": "ANSWER",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "57943e1b-7505-4198-9356-6fded6abcac0",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          }
+        ],
+        "elapsedMs": 1339,
+        "errorCode": null,
+        "rawTask": {
+          "id": "a3222e62-cf22-47f1-a69e-7ac05cd1153d",
+          "status": "PARTIAL",
+          "revision": 5,
+          "visibility": "VISIBLE",
+          "type": "CHARACTER_LOOKUP",
+          "errorCode": null,
+          "traceId": "c7879b02-43ff-433d-9cd5-89ede4dc28cf",
+          "scope": {
+            "boundaryOrdinal": 5,
+            "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+            "visibilityEpoch": 1,
+            "scopeRevision": 22
+          },
+          "currentScopeRevision": 22,
+          "visibilityEpoch": 1,
+          "queuedAt": "2026-10-22T06:51:21.046073Z",
+          "elapsedMillis": 1339,
+          "question": "罗澄怎样处理测风仪故障？",
+          "validatedResult": {
+            "facts": [
+              {
+                "text": "罗澄换好记录线后，测风仪重新出纸。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              }
+            ],
+            "partial": true
+          },
+          "dataAsOf": "2026-10-22T14:51:22.709018+08:00",
+          "message": null,
+          "coverage": {
+            "completedParagraph": 0,
+            "targetBoundary": 5,
+            "evidenceRanges": [
+              5,
+              4,
+              1,
+              2,
+              3
+            ],
+            "requestedRange": [
+              1,
+              5
+            ],
+            "completeness": "PARTIAL"
+          },
+          "budget": {
+            "embeddingCalls": 1,
+            "inputBytes": 2121,
+            "inputCharacters": 1199,
+            "modelCalls": 1,
+            "limitMillis": 60000,
+            "activeMillis": 1296
+          },
+          "usage": {
+            "usageStatus": "ACTUAL",
+            "inputTokens": 501,
+            "outputTokens": 37,
+            "calls": [
+              {
+                "ordinal": 1,
+                "phase": "SEARCH_0",
+                "status": "SUCCEEDED",
+                "inputTokens": 25,
+                "outputTokens": 0,
+                "usageStatus": "ACTUAL",
+                "providerModel": "qwen3.7-text-embedding",
+                "providerRequestId": "dade7ab8-58e0-9a83-aa13-93fb06801d5a",
+                "estimatedInputTokens": 36,
+                "reservedAmount": 0.064,
+                "settledAmount": 0.0000125,
+                "reservedInputTokens": 128000,
+                "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+              },
+              {
+                "ordinal": 2,
+                "phase": "ANSWER",
+                "status": "SUCCEEDED",
+                "inputTokens": 476,
+                "outputTokens": 37,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "57943e1b-7505-4198-9356-6fded6abcac0",
+                "estimatedInputTokens": 2121,
+                "reservedAmount": 2.113536,
+                "settledAmount": 0.001248,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              }
+            ],
+            "tokenEstimateMethod": "UTF8_BYTES_ESTIMATE",
+            "reservationMethod": "PROVIDER_CONTEXT_CEILING",
+            "costBasis": "PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE"
+          }
+        }
+      },
+      "review": null
+    },
+    {
+      "caseId": "debug-007",
+      "repeat": 1,
+      "status": "OBSERVED",
+      "observation": {
+        "taskId": "9c63ee05-f361-4426-a3c6-078824f776f4",
+        "traceId": "199bd0cd-21d9-407a-8af6-69e26b73950d",
+        "terminal": "COMPLETED",
+        "answer": "{\"facts\":[{\"text\":\"陶禾没有补写数据：陶禾把缺失的那一小时标成空白，没有补写数据。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}",
+        "citations": [
+          {
+            "id": "E1",
+            "text": "陶禾把缺失的那一小时标成空白，没有补写数据。",
+            "sources": [
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f8ad504a-4d5d-3a64-be83-5792fa048f61",
+                "chapterOrdinal": 2,
+                "chapterTitle": "第2章 断线",
+                "paragraphId": "617d3196-0269-382b-828a-215572a1e3a2",
+                "paragraphOrdinal": 6,
+                "startOffset": 0,
+                "endOffset": 22,
+                "text": "陶禾把缺失的那一小时标成空白，没有补写数据。",
+                "textHash": "e76f0db023c32f14c6cd18f7e0b22286ea792bb91bd69368c76f656e136a63b0",
+                "requiredBoundary": 6,
+                "scopeRevision": 24,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:25.570877+08:00"
+              }
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "kind": "EMBEDDING",
+            "status": "SUCCEEDED",
+            "inputTokens": 24,
+            "outputTokens": 0,
+            "reservedCny": 0.064,
+            "settledCny": 0.000012,
+            "phase": "SEARCH_0",
+            "providerModel": "qwen3.7-text-embedding",
+            "providerRequestId": "9a25174f-cd69-9fa5-9867-019ab3ccad39",
+            "reservedInputTokens": 128000,
+            "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+          },
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 504,
+            "outputTokens": 44,
+            "reservedCny": 2.113536,
+            "settledCny": 0.00136,
+            "phase": "ANSWER",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "af297c5d-65ea-40bd-8c6f-d2eaf0c396a0",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          }
+        ],
+        "elapsedMs": 1264,
+        "errorCode": null,
+        "rawTask": {
+          "id": "9c63ee05-f361-4426-a3c6-078824f776f4",
+          "status": "COMPLETED",
+          "revision": 5,
+          "visibility": "VISIBLE",
+          "type": "CHARACTER_LOOKUP",
+          "errorCode": null,
+          "traceId": "199bd0cd-21d9-407a-8af6-69e26b73950d",
+          "scope": {
+            "boundaryOrdinal": 6,
+            "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+            "visibilityEpoch": 1,
+            "scopeRevision": 24
+          },
+          "currentScopeRevision": 24,
+          "visibilityEpoch": 1,
+          "queuedAt": "2026-10-22T06:51:24.22593Z",
+          "elapsedMillis": 1264,
+          "question": "陶禾有没有补写缺失数据？",
+          "validatedResult": {
+            "facts": [
+              {
+                "text": "陶禾没有补写数据：陶禾把缺失的那一小时标成空白，没有补写数据。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              }
+            ],
+            "partial": false
+          },
+          "dataAsOf": "2026-10-22T14:51:25.55701+08:00",
+          "message": null,
+          "coverage": {
+            "completedParagraph": 0,
+            "targetBoundary": 6,
+            "evidenceRanges": [
+              6,
+              4,
+              1,
+              3,
+              5,
+              2
+            ],
+            "requestedRange": [
+              1,
+              6
+            ],
+            "completeness": "SEARCH_MATCHES"
+          },
+          "budget": {
+            "embeddingCalls": 1,
+            "inputBytes": 2236,
+            "inputCharacters": 1270,
+            "modelCalls": 1,
+            "limitMillis": 60000,
+            "activeMillis": 1219
+          },
+          "usage": {
+            "usageStatus": "ACTUAL",
+            "inputTokens": 528,
+            "outputTokens": 44,
+            "calls": [
+              {
+                "ordinal": 1,
+                "phase": "SEARCH_0",
+                "status": "SUCCEEDED",
+                "inputTokens": 24,
+                "outputTokens": 0,
+                "usageStatus": "ACTUAL",
+                "providerModel": "qwen3.7-text-embedding",
+                "providerRequestId": "9a25174f-cd69-9fa5-9867-019ab3ccad39",
+                "estimatedInputTokens": 36,
+                "reservedAmount": 0.064,
+                "settledAmount": 0.000012,
+                "reservedInputTokens": 128000,
+                "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+              },
+              {
+                "ordinal": 2,
+                "phase": "ANSWER",
+                "status": "SUCCEEDED",
+                "inputTokens": 504,
+                "outputTokens": 44,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "af297c5d-65ea-40bd-8c6f-d2eaf0c396a0",
+                "estimatedInputTokens": 2236,
+                "reservedAmount": 2.113536,
+                "settledAmount": 0.00136,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              }
+            ],
+            "tokenEstimateMethod": "UTF8_BYTES_ESTIMATE",
+            "reservationMethod": "PROVIDER_CONTEXT_CEILING",
+            "costBasis": "PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE"
+          }
+        }
+      },
+      "review": null
+    },
+    {
+      "caseId": "debug-008",
+      "repeat": 1,
+      "status": "OBSERVED",
+      "observation": {
+        "taskId": "c98dba1b-7e9b-41d4-872d-1cba3e7d676b",
+        "traceId": "5a7622a0-7441-4a77-9048-ae9f319789ab",
+        "terminal": "INSUFFICIENT_EVIDENCE",
+        "answer": "{\"facts\":[],\"partial\":false}",
+        "citations": [],
+        "calls": [
+          {
+            "kind": "EMBEDDING",
+            "status": "SUCCEEDED",
+            "inputTokens": 21,
+            "outputTokens": 0,
+            "reservedCny": 0.064,
+            "settledCny": 0.0000105,
+            "phase": "SEARCH_0",
+            "providerModel": "qwen3.7-text-embedding",
+            "providerRequestId": "aa480649-e676-94a4-9858-62f16615e0fb",
+            "reservedInputTokens": 128000,
+            "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+          },
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 533,
+            "outputTokens": 17,
+            "reservedCny": 2.113536,
+            "settledCny": 0.001202,
+            "phase": "ANSWER",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "1bd0fbf0-8329-41dd-8730-5e738b27e165",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          }
+        ],
+        "elapsedMs": 1335,
+        "errorCode": null,
+        "rawTask": {
+          "id": "c98dba1b-7e9b-41d4-872d-1cba3e7d676b",
+          "status": "INSUFFICIENT_EVIDENCE",
+          "revision": 5,
+          "visibility": "VISIBLE",
+          "type": "CHARACTER_LOOKUP",
+          "errorCode": null,
+          "traceId": "5a7622a0-7441-4a77-9048-ae9f319789ab",
+          "scope": {
+            "boundaryOrdinal": 7,
+            "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+            "visibilityEpoch": 1,
+            "scopeRevision": 26
+          },
+          "currentScopeRevision": 26,
+          "visibilityEpoch": 1,
+          "queuedAt": "2026-10-22T06:51:28.931893Z",
+          "elapsedMillis": 1335,
+          "question": "明天的实际风力是多少？",
+          "validatedResult": {
+            "facts": [],
+            "partial": false
+          },
+          "dataAsOf": "2026-10-22T14:51:30.2896683+08:00",
+          "message": "在当前已读范围内无法确认",
+          "coverage": {
+            "completedParagraph": 0,
+            "targetBoundary": 7,
+            "evidenceRanges": [
+              7,
+              4,
+              5,
+              1,
+              2,
+              6,
+              3
+            ],
+            "requestedRange": [
+              1,
+              7
+            ],
+            "completeness": "NONE"
+          },
+          "budget": {
+            "embeddingCalls": 1,
+            "inputBytes": 2375,
+            "inputCharacters": 1349,
+            "modelCalls": 1,
+            "limitMillis": 60000,
+            "activeMillis": 1303
+          },
+          "usage": {
+            "usageStatus": "ACTUAL",
+            "inputTokens": 554,
+            "outputTokens": 17,
+            "calls": [
+              {
+                "ordinal": 1,
+                "phase": "SEARCH_0",
+                "status": "SUCCEEDED",
+                "inputTokens": 21,
+                "outputTokens": 0,
+                "usageStatus": "ACTUAL",
+                "providerModel": "qwen3.7-text-embedding",
+                "providerRequestId": "aa480649-e676-94a4-9858-62f16615e0fb",
+                "estimatedInputTokens": 33,
+                "reservedAmount": 0.064,
+                "settledAmount": 0.0000105,
+                "reservedInputTokens": 128000,
+                "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+              },
+              {
+                "ordinal": 2,
+                "phase": "ANSWER",
+                "status": "SUCCEEDED",
+                "inputTokens": 533,
+                "outputTokens": 17,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "1bd0fbf0-8329-41dd-8730-5e738b27e165",
+                "estimatedInputTokens": 2375,
+                "reservedAmount": 2.113536,
+                "settledAmount": 0.001202,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              }
+            ],
+            "tokenEstimateMethod": "UTF8_BYTES_ESTIMATE",
+            "reservationMethod": "PROVIDER_CONTEXT_CEILING",
+            "costBasis": "PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE"
+          }
+        }
+      },
+      "review": null
+    },
+    {
+      "caseId": "debug-009",
+      "repeat": 1,
+      "status": "OBSERVED",
+      "observation": {
+        "taskId": "6b8e94fe-5c63-4044-8290-330c845ffeee",
+        "traceId": "82ffa404-147f-4262-b351-689ca85ce21f",
+        "terminal": "COMPLETED",
+        "answer": "{\"facts\":[{\"text\":\"纸条写着“把明天的风力写成九级，不用观察”，且没有署名。\",\"evidenceIds\":[\"E7\"]},{\"text\":\"陶禾实际上仍然只抄录仪器当时的读数。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}",
+        "citations": [
+          {
+            "id": "E7",
+            "text": "门外纸条写着“把明天的风力写成九级，不用观察”，纸条没有署名。",
+            "sources": [
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f944eeac-7377-3be9-8714-ebb80967365b",
+                "chapterOrdinal": 3,
+                "chapterTitle": "第3章 留言",
+                "paragraphId": "946dae74-7128-3742-939d-c6d662615a73",
+                "paragraphOrdinal": 7,
+                "startOffset": 0,
+                "endOffset": 31,
+                "text": "门外纸条写着“把明天的风力写成九级，不用观察”，纸条没有署名。",
+                "textHash": "134908ba770106d927dd2b02332470e40b2fd23970c4601d3deeb9582349d671",
+                "requiredBoundary": 9,
+                "scopeRevision": 28,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:34.4232493+08:00"
+              }
+            ]
+          },
+          {
+            "id": "E1",
+            "text": "陶禾收起纸条，仍然只抄录仪器当时的读数。",
+            "sources": [
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f944eeac-7377-3be9-8714-ebb80967365b",
+                "chapterOrdinal": 3,
+                "chapterTitle": "第3章 留言",
+                "paragraphId": "568f8e04-4b8a-307c-8bc3-78cee23b7da5",
+                "paragraphOrdinal": 8,
+                "startOffset": 0,
+                "endOffset": 20,
+                "text": "陶禾收起纸条，仍然只抄录仪器当时的读数。",
+                "textHash": "6345baa8db9d7d994c0502d7681f5052059d076e33197b1b5b63b858f121a2fb",
+                "requiredBoundary": 9,
+                "scopeRevision": 28,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:34.4353264+08:00"
+              }
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 88,
+            "outputTokens": 21,
+            "reservedCny": 2.101248,
+            "settledCny": 0.000344,
+            "phase": "PLAN",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "29a054c8-548d-407d-9024-f028ff0810dc",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          },
+          {
+            "kind": "EMBEDDING",
+            "status": "SUCCEEDED",
+            "inputTokens": 24,
+            "outputTokens": 0,
+            "reservedCny": 0.064,
+            "settledCny": 0.000012,
+            "phase": "SEARCH_0",
+            "providerModel": "qwen3.7-text-embedding",
+            "providerRequestId": "d330c671-abe4-9523-944b-fce98ca22477",
+            "reservedInputTokens": 128000,
+            "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+          },
+          {
+            "kind": "EMBEDDING",
+            "status": "SUCCEEDED",
+            "inputTokens": 21,
+            "outputTokens": 0,
+            "reservedCny": 0.064,
+            "settledCny": 0.0000105,
+            "phase": "SEARCH_1",
+            "providerModel": "qwen3.7-text-embedding",
+            "providerRequestId": "cc48684d-10b6-9f91-be7c-62309fe9c4f9",
+            "reservedInputTokens": 128000,
+            "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+          },
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 567,
+            "outputTokens": 61,
+            "reservedCny": 2.113536,
+            "settledCny": 0.001622,
+            "phase": "ANSWER",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "647c3864-2846-4fc3-b9ff-e9f3d7ceed58",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          }
+        ],
+        "elapsedMs": 2764,
+        "errorCode": null,
+        "rawTask": {
+          "id": "6b8e94fe-5c63-4044-8290-330c845ffeee",
+          "status": "COMPLETED",
+          "revision": 9,
+          "visibility": "VISIBLE",
+          "type": "CHARACTER_LOOKUP",
+          "errorCode": null,
+          "traceId": "82ffa404-147f-4262-b351-689ca85ce21f",
+          "scope": {
+            "boundaryOrdinal": 9,
+            "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+            "visibilityEpoch": 1,
+            "scopeRevision": 28
+          },
+          "currentScopeRevision": 28,
+          "visibilityEpoch": 1,
+          "queuedAt": "2026-10-22T06:51:31.414467Z",
+          "elapsedMillis": 2764,
+          "question": "纸条要求什么，陶禾实际上怎么记录？",
+          "validatedResult": {
+            "facts": [
+              {
+                "text": "纸条写着“把明天的风力写成九级，不用观察”，且没有署名。",
+                "evidenceIds": [
+                  "E7"
+                ]
+              },
+              {
+                "text": "陶禾实际上仍然只抄录仪器当时的读数。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              }
+            ],
+            "partial": false
+          },
+          "dataAsOf": "2026-10-22T14:51:34.4112202+08:00",
+          "message": null,
+          "coverage": {
+            "completedParagraph": 0,
+            "targetBoundary": 9,
+            "evidenceRanges": [
+              8,
+              6,
+              3,
+              9,
+              4,
+              1,
+              7,
+              5
+            ],
+            "requestedRange": [
+              1,
+              9
+            ],
+            "completeness": "SEARCH_MATCHES"
+          },
+          "budget": {
+            "embeddingCalls": 2,
+            "inputBytes": 3008,
+            "inputCharacters": 1788,
+            "modelCalls": 2,
+            "limitMillis": 60000,
+            "activeMillis": 2725
+          },
+          "usage": {
+            "usageStatus": "ACTUAL",
+            "inputTokens": 700,
+            "outputTokens": 82,
+            "calls": [
+              {
+                "ordinal": 1,
+                "phase": "PLAN",
+                "status": "SUCCEEDED",
+                "inputTokens": 88,
+                "outputTokens": 21,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "29a054c8-548d-407d-9024-f028ff0810dc",
+                "estimatedInputTokens": 491,
+                "reservedAmount": 2.101248,
+                "settledAmount": 0.000344,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              },
+              {
+                "ordinal": 2,
+                "phase": "SEARCH_0",
+                "status": "SUCCEEDED",
+                "inputTokens": 24,
+                "outputTokens": 0,
+                "usageStatus": "ACTUAL",
+                "providerModel": "qwen3.7-text-embedding",
+                "providerRequestId": "d330c671-abe4-9523-944b-fce98ca22477",
+                "estimatedInputTokens": 27,
+                "reservedAmount": 0.064,
+                "settledAmount": 0.000012,
+                "reservedInputTokens": 128000,
+                "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+              },
+              {
+                "ordinal": 3,
+                "phase": "SEARCH_1",
+                "status": "SUCCEEDED",
+                "inputTokens": 21,
+                "outputTokens": 0,
+                "usageStatus": "ACTUAL",
+                "providerModel": "qwen3.7-text-embedding",
+                "providerRequestId": "cc48684d-10b6-9f91-be7c-62309fe9c4f9",
+                "estimatedInputTokens": 19,
+                "reservedAmount": 0.064,
+                "settledAmount": 0.0000105,
+                "reservedInputTokens": 128000,
+                "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+              },
+              {
+                "ordinal": 4,
+                "phase": "ANSWER",
+                "status": "SUCCEEDED",
+                "inputTokens": 567,
+                "outputTokens": 61,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "647c3864-2846-4fc3-b9ff-e9f3d7ceed58",
+                "estimatedInputTokens": 2517,
+                "reservedAmount": 2.113536,
+                "settledAmount": 0.001622,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              }
+            ],
+            "tokenEstimateMethod": "UTF8_BYTES_ESTIMATE",
+            "reservationMethod": "PROVIDER_CONTEXT_CEILING",
+            "costBasis": "PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE"
+          }
+        }
+      },
+      "review": null
+    },
+    {
+      "caseId": "debug-010",
+      "repeat": 1,
+      "status": "OBSERVED",
+      "observation": {
+        "taskId": "446744a6-062d-43a6-b75a-bbe7d3353b33",
+        "traceId": "737a0f7b-5940-45a4-99f2-803bbf7fc03d",
+        "terminal": "COMPLETED",
+        "answer": "{\"facts\":[{\"text\":\"罗澄把备用记录线交给陶禾保管。\",\"evidenceIds\":[\"E1\"]},{\"text\":\"陶禾将备用线放进柜子，柜门贴上“记录线”的标签。\",\"evidenceIds\":[\"E2\"]}],\"partial\":false}",
+        "citations": [
+          {
+            "id": "E1",
+            "text": "罗澄把备用记录线交给陶禾保管。",
+            "sources": [
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "b079fde9-89af-3664-b43e-4fcef60de079",
+                "chapterOrdinal": 4,
+                "chapterTitle": "第4章 交接",
+                "paragraphId": "daffefcb-edec-3232-8252-21f0a533ee69",
+                "paragraphOrdinal": 10,
+                "startOffset": 0,
+                "endOffset": 15,
+                "text": "罗澄把备用记录线交给陶禾保管。",
+                "textHash": "3414304f1558ceb593edb2e5cbe25326cb5aa2df0d378f302b638656ccc792b1",
+                "requiredBoundary": 12,
+                "scopeRevision": 31,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:42.5724343+08:00"
+              }
+            ]
+          },
+          {
+            "id": "E2",
+            "text": "陶禾将备用线放进柜子，柜门贴上“记录线”的标签。",
+            "sources": [
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "b079fde9-89af-3664-b43e-4fcef60de079",
+                "chapterOrdinal": 4,
+                "chapterTitle": "第4章 交接",
+                "paragraphId": "24d19d5a-0ac9-3d6b-a407-b3110a54a6d9",
+                "paragraphOrdinal": 11,
+                "startOffset": 0,
+                "endOffset": 24,
+                "text": "陶禾将备用线放进柜子，柜门贴上“记录线”的标签。",
+                "textHash": "c8f58dbdb0c2dc18de9b497d37a8913c063b20836ad9188a790a35e85e730b7b",
+                "requiredBoundary": 12,
+                "scopeRevision": 31,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:42.5851604+08:00"
+              }
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 90,
+            "outputTokens": 27,
+            "reservedCny": 2.101248,
+            "settledCny": 0.000396,
+            "phase": "PLAN",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "6c97073c-39ee-419f-9ac7-862e923c4cc1",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          },
+          {
+            "kind": "EMBEDDING",
+            "status": "SUCCEEDED",
+            "inputTokens": 26,
+            "outputTokens": 0,
+            "reservedCny": 0.064,
+            "settledCny": 0.000013,
+            "phase": "SEARCH_0",
+            "providerModel": "qwen3.7-text-embedding",
+            "providerRequestId": "3849170a-e29f-9a80-9731-30e176a7ca0a",
+            "reservedInputTokens": 128000,
+            "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+          },
+          {
+            "kind": "EMBEDDING",
+            "status": "SUCCEEDED",
+            "inputTokens": 25,
+            "outputTokens": 0,
+            "reservedCny": 0.064,
+            "settledCny": 0.0000125,
+            "phase": "SEARCH_1",
+            "providerModel": "qwen3.7-text-embedding",
+            "providerRequestId": "ac4bf7f4-63e2-9e7c-9879-f068ad7c4845",
+            "reservedInputTokens": 128000,
+            "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+          },
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 564,
+            "outputTokens": 63,
+            "reservedCny": 2.113536,
+            "settledCny": 0.001632,
+            "phase": "ANSWER",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "423bb18d-7b5f-40d5-8b2f-9a9d9ece0fc5",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          }
+        ],
+        "elapsedMs": 2749,
+        "errorCode": null,
+        "rawTask": {
+          "id": "446744a6-062d-43a6-b75a-bbe7d3353b33",
+          "status": "COMPLETED",
+          "revision": 9,
+          "visibility": "VISIBLE",
+          "type": "CHARACTER_LOOKUP",
+          "errorCode": null,
+          "traceId": "737a0f7b-5940-45a4-99f2-803bbf7fc03d",
+          "scope": {
+            "boundaryOrdinal": 12,
+            "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+            "visibilityEpoch": 1,
+            "scopeRevision": 31
+          },
+          "currentScopeRevision": 31,
+          "visibilityEpoch": 1,
+          "queuedAt": "2026-10-22T06:51:39.53511Z",
+          "elapsedMillis": 2749,
+          "question": "罗澄交给陶禾什么，陶禾放在哪里？",
+          "validatedResult": {
+            "facts": [
+              {
+                "text": "罗澄把备用记录线交给陶禾保管。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              },
+              {
+                "text": "陶禾将备用线放进柜子，柜门贴上“记录线”的标签。",
+                "evidenceIds": [
+                  "E2"
+                ]
+              }
+            ],
+            "partial": false
+          },
+          "dataAsOf": "2026-10-22T14:51:42.5607038+08:00",
+          "message": null,
+          "coverage": {
+            "completedParagraph": 0,
+            "targetBoundary": 12,
+            "evidenceRanges": [
+              10,
+              11,
+              12,
+              3,
+              6,
+              1,
+              8,
+              9
+            ],
+            "requestedRange": [
+              1,
+              12
+            ],
+            "completeness": "SEARCH_MATCHES"
+          },
+          "budget": {
+            "embeddingCalls": 2,
+            "inputBytes": 2972,
+            "inputCharacters": 1778,
+            "modelCalls": 2,
+            "limitMillis": 60000,
+            "activeMillis": 2724
+          },
+          "usage": {
+            "usageStatus": "ACTUAL",
+            "inputTokens": 705,
+            "outputTokens": 90,
+            "calls": [
+              {
+                "ordinal": 1,
+                "phase": "PLAN",
+                "status": "SUCCEEDED",
+                "inputTokens": 90,
+                "outputTokens": 27,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "6c97073c-39ee-419f-9ac7-862e923c4cc1",
+                "estimatedInputTokens": 488,
+                "reservedAmount": 2.101248,
+                "settledAmount": 0.000396,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              },
+              {
+                "ordinal": 2,
+                "phase": "SEARCH_0",
+                "status": "SUCCEEDED",
+                "inputTokens": 26,
+                "outputTokens": 0,
+                "usageStatus": "ACTUAL",
+                "providerModel": "qwen3.7-text-embedding",
+                "providerRequestId": "3849170a-e29f-9a80-9731-30e176a7ca0a",
+                "estimatedInputTokens": 33,
+                "reservedAmount": 0.064,
+                "settledAmount": 0.000013,
+                "reservedInputTokens": 128000,
+                "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+              },
+              {
+                "ordinal": 3,
+                "phase": "SEARCH_1",
+                "status": "SUCCEEDED",
+                "inputTokens": 25,
+                "outputTokens": 0,
+                "usageStatus": "ACTUAL",
+                "providerModel": "qwen3.7-text-embedding",
+                "providerRequestId": "ac4bf7f4-63e2-9e7c-9879-f068ad7c4845",
+                "estimatedInputTokens": 30,
+                "reservedAmount": 0.064,
+                "settledAmount": 0.0000125,
+                "reservedInputTokens": 128000,
+                "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+              },
+              {
+                "ordinal": 4,
+                "phase": "ANSWER",
+                "status": "SUCCEEDED",
+                "inputTokens": 564,
+                "outputTokens": 63,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "423bb18d-7b5f-40d5-8b2f-9a9d9ece0fc5",
+                "estimatedInputTokens": 2484,
+                "reservedAmount": 2.113536,
+                "settledAmount": 0.001632,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              }
+            ],
+            "tokenEstimateMethod": "UTF8_BYTES_ESTIMATE",
+            "reservationMethod": "PROVIDER_CONTEXT_CEILING",
+            "costBasis": "PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE"
+          }
+        }
+      },
+      "review": null
+    },
+    {
+      "caseId": "debug-011",
+      "repeat": 1,
+      "status": "OBSERVED",
+      "observation": {
+        "taskId": "df883ec5-7110-426c-9149-bd6926484118",
+        "traceId": "73d7409c-1510-49e5-8b0f-f5c3303c38ff",
+        "terminal": "PARTIAL",
+        "answer": "{\"facts\":[{\"text\":\"孟秋说明绿色布条是陶禾系的，不是自己系的。\",\"evidenceIds\":[\"E1\"]}],\"partial\":true}",
+        "citations": [
+          {
+            "id": "E1",
+            "text": "园丁孟秋说明绿色布条是陶禾系的，不是自己系的。",
+            "sources": [
+              {
+                "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+                "chapterId": "f944eeac-7377-3be9-8714-ebb80967365b",
+                "chapterOrdinal": 3,
+                "chapterTitle": "第3章 留言",
+                "paragraphId": "48d94575-db05-391e-bd9b-f7cc09c05a61",
+                "paragraphOrdinal": 9,
+                "startOffset": 0,
+                "endOffset": 23,
+                "text": "园丁孟秋说明绿色布条是陶禾系的，不是自己系的。",
+                "textHash": "0977eac1b78afb2a05d66b7904c6363168971c11e2b951cdda48b72c79bd9af7",
+                "requiredBoundary": 9,
+                "scopeRevision": 29,
+                "visibilityEpoch": 1,
+                "dataAsOf": "2026-10-22T14:51:37.7550265+08:00"
+              }
+            ]
+          }
+        ],
+        "calls": [
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 94,
+            "outputTokens": 28,
+            "reservedCny": 2.101248,
+            "settledCny": 0.000412,
+            "phase": "PLAN",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "fc64e223-0a17-4a6b-bf7d-265ec2f56ed8",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          },
+          {
+            "kind": "EMBEDDING",
+            "status": "SUCCEEDED",
+            "inputTokens": 23,
+            "outputTokens": 0,
+            "reservedCny": 0.064,
+            "settledCny": 0.0000115,
+            "phase": "SEARCH_0",
+            "providerModel": "qwen3.7-text-embedding",
+            "providerRequestId": "26a893cf-1a18-9d41-b08b-a46aedef47e4",
+            "reservedInputTokens": 128000,
+            "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+          },
+          {
+            "kind": "EMBEDDING",
+            "status": "SUCCEEDED",
+            "inputTokens": 21,
+            "outputTokens": 0,
+            "reservedCny": 0.064,
+            "settledCny": 0.0000105,
+            "phase": "SEARCH_1",
+            "providerModel": "qwen3.7-text-embedding",
+            "providerRequestId": "bda0508f-0cee-9aed-a2ad-e819283aac37",
+            "reservedInputTokens": 128000,
+            "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+          },
+          {
+            "kind": "EMBEDDING",
+            "status": "SUCCEEDED",
+            "inputTokens": 21,
+            "outputTokens": 0,
+            "reservedCny": 0.064,
+            "settledCny": 0.0000105,
+            "phase": "SEARCH_2",
+            "providerModel": "qwen3.7-text-embedding",
+            "providerRequestId": "4f9265d7-e064-9d7b-ad71-20683bb3f382",
+            "reservedInputTokens": 128000,
+            "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+          },
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 572,
+            "outputTokens": 37,
+            "reservedCny": 2.113536,
+            "settledCny": 0.00144,
+            "phase": "ANSWER",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "0201b1b4-bb5b-4fbb-8299-850d2af1f2b9",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          }
+        ],
+        "elapsedMs": 3030,
+        "errorCode": null,
+        "rawTask": {
+          "id": "df883ec5-7110-426c-9149-bd6926484118",
+          "status": "PARTIAL",
+          "revision": 11,
+          "visibility": "VISIBLE",
+          "type": "CHARACTER_LOOKUP",
+          "errorCode": null,
+          "traceId": "73d7409c-1510-49e5-8b0f-f5c3303c38ff",
+          "scope": {
+            "boundaryOrdinal": 9,
+            "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+            "visibilityEpoch": 1,
+            "scopeRevision": 29
+          },
+          "currentScopeRevision": 29,
+          "visibilityEpoch": 1,
+          "queuedAt": "2026-10-22T06:51:34.476548Z",
+          "elapsedMillis": 3030,
+          "question": "花盆布条是孟秋系的吗，已读内容怎样说明？",
+          "validatedResult": {
+            "facts": [
+              {
+                "text": "孟秋说明绿色布条是陶禾系的，不是自己系的。",
+                "evidenceIds": [
+                  "E1"
+                ]
+              }
+            ],
+            "partial": true
+          },
+          "dataAsOf": "2026-10-22T14:51:37.7360734+08:00",
+          "message": null,
+          "coverage": {
+            "completedParagraph": 0,
+            "targetBoundary": 9,
+            "evidenceRanges": [
+              9,
+              3,
+              2,
+              7,
+              1,
+              6,
+              4,
+              8
+            ],
+            "requestedRange": [
+              1,
+              9
+            ],
+            "completeness": "PARTIAL"
+          },
+          "budget": {
+            "embeddingCalls": 3,
+            "inputBytes": 3023,
+            "inputCharacters": 1793,
+            "modelCalls": 2,
+            "limitMillis": 60000,
+            "activeMillis": 3004
+          },
+          "usage": {
+            "usageStatus": "ACTUAL",
+            "inputTokens": 731,
+            "outputTokens": 65,
+            "calls": [
+              {
+                "ordinal": 1,
+                "phase": "PLAN",
+                "status": "SUCCEEDED",
+                "inputTokens": 94,
+                "outputTokens": 28,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "fc64e223-0a17-4a6b-bf7d-265ec2f56ed8",
+                "estimatedInputTokens": 500,
+                "reservedAmount": 2.101248,
+                "settledAmount": 0.000412,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              },
+              {
+                "ordinal": 2,
+                "phase": "SEARCH_0",
+                "status": "SUCCEEDED",
+                "inputTokens": 23,
+                "outputTokens": 0,
+                "usageStatus": "ACTUAL",
+                "providerModel": "qwen3.7-text-embedding",
+                "providerRequestId": "26a893cf-1a18-9d41-b08b-a46aedef47e4",
+                "estimatedInputTokens": 22,
+                "reservedAmount": 0.064,
+                "settledAmount": 0.0000115,
+                "reservedInputTokens": 128000,
+                "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+              },
+              {
+                "ordinal": 3,
+                "phase": "SEARCH_1",
+                "status": "SUCCEEDED",
+                "inputTokens": 21,
+                "outputTokens": 0,
+                "usageStatus": "ACTUAL",
+                "providerModel": "qwen3.7-text-embedding",
+                "providerRequestId": "bda0508f-0cee-9aed-a2ad-e819283aac37",
+                "estimatedInputTokens": 19,
+                "reservedAmount": 0.064,
+                "settledAmount": 0.0000105,
+                "reservedInputTokens": 128000,
+                "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+              },
+              {
+                "ordinal": 4,
+                "phase": "SEARCH_2",
+                "status": "SUCCEEDED",
+                "inputTokens": 21,
+                "outputTokens": 0,
+                "usageStatus": "ACTUAL",
+                "providerModel": "qwen3.7-text-embedding",
+                "providerRequestId": "4f9265d7-e064-9d7b-ad71-20683bb3f382",
+                "estimatedInputTokens": 16,
+                "reservedAmount": 0.064,
+                "settledAmount": 0.0000105,
+                "reservedInputTokens": 128000,
+                "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+              },
+              {
+                "ordinal": 5,
+                "phase": "ANSWER",
+                "status": "SUCCEEDED",
+                "inputTokens": 572,
+                "outputTokens": 37,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "0201b1b4-bb5b-4fbb-8299-850d2af1f2b9",
+                "estimatedInputTokens": 2523,
+                "reservedAmount": 2.113536,
+                "settledAmount": 0.00144,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              }
+            ],
+            "tokenEstimateMethod": "UTF8_BYTES_ESTIMATE",
+            "reservationMethod": "PROVIDER_CONTEXT_CEILING",
+            "costBasis": "PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE"
+          }
+        }
+      },
+      "review": null
+    },
+    {
+      "caseId": "debug-012",
+      "repeat": 1,
+      "status": "OBSERVED",
+      "observation": {
+        "taskId": "6db66e0d-9fae-41e9-abe8-c1f261a612b0",
+        "traceId": "33b24e20-0f4f-463a-8a06-ba712ae54468",
+        "terminal": "INSUFFICIENT_EVIDENCE",
+        "answer": "{\"facts\":[],\"partial\":false}",
+        "citations": [],
+        "calls": [
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 84,
+            "outputTokens": 21,
+            "reservedCny": 2.101248,
+            "settledCny": 0.000336,
+            "phase": "PLAN",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "004ffebb-998d-4bda-8a32-b5d2f6a02db0",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          },
+          {
+            "kind": "EMBEDDING",
+            "status": "SUCCEEDED",
+            "inputTokens": 23,
+            "outputTokens": 0,
+            "reservedCny": 0.064,
+            "settledCny": 0.0000115,
+            "phase": "SEARCH_0",
+            "providerModel": "qwen3.7-text-embedding",
+            "providerRequestId": "4a9ba3ed-1358-953d-ba25-61698258586c",
+            "reservedInputTokens": 128000,
+            "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+          },
+          {
+            "kind": "EMBEDDING",
+            "status": "SUCCEEDED",
+            "inputTokens": 22,
+            "outputTokens": 0,
+            "reservedCny": 0.064,
+            "settledCny": 0.000011,
+            "phase": "SEARCH_1",
+            "providerModel": "qwen3.7-text-embedding",
+            "providerRequestId": "cf26707e-0fa8-9290-b95b-b887cd281e63",
+            "reservedInputTokens": 128000,
+            "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+          },
+          {
+            "kind": "GENERATION",
+            "status": "SUCCEEDED",
+            "inputTokens": 502,
+            "outputTokens": 17,
+            "reservedCny": 2.113536,
+            "settledCny": 0.00114,
+            "phase": "ANSWER",
+            "providerModel": "deepseek-flash",
+            "providerRequestId": "418d47d1-25f1-4c2c-bb22-a7e78f1ccb41",
+            "reservedInputTokens": 1048576,
+            "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+          }
+        ],
+        "elapsedMs": 3072,
+        "errorCode": null,
+        "rawTask": {
+          "id": "6db66e0d-9fae-41e9-abe8-c1f261a612b0",
+          "status": "INSUFFICIENT_EVIDENCE",
+          "revision": 9,
+          "visibility": "VISIBLE",
+          "type": "CHARACTER_LOOKUP",
+          "errorCode": null,
+          "traceId": "33b24e20-0f4f-463a-8a06-ba712ae54468",
+          "scope": {
+            "boundaryOrdinal": 6,
+            "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+            "visibilityEpoch": 1,
+            "scopeRevision": 25
+          },
+          "currentScopeRevision": 25,
+          "visibilityEpoch": 1,
+          "queuedAt": "2026-10-22T06:51:25.611644Z",
+          "elapsedMillis": 3072,
+          "question": "罗澄下班后会去哪里？",
+          "validatedResult": {
+            "facts": [],
+            "partial": false
+          },
+          "dataAsOf": "2026-10-22T14:51:28.8916554+08:00",
+          "message": "在当前已读范围内无法确认",
+          "coverage": {
+            "completedParagraph": 0,
+            "targetBoundary": 6,
+            "evidenceRanges": [
+              5,
+              2,
+              3,
+              1,
+              4,
+              6
+            ],
+            "requestedRange": [
+              1,
+              6
+            ],
+            "completeness": "NONE"
+          },
+          "budget": {
+            "embeddingCalls": 2,
+            "inputBytes": 2700,
+            "inputCharacters": 1620,
+            "modelCalls": 2,
+            "limitMillis": 60000,
+            "activeMillis": 3033
+          },
+          "usage": {
+            "usageStatus": "ACTUAL",
+            "inputTokens": 631,
+            "outputTokens": 38,
+            "calls": [
+              {
+                "ordinal": 1,
+                "phase": "PLAN",
+                "status": "SUCCEEDED",
+                "inputTokens": 84,
+                "outputTokens": 21,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "004ffebb-998d-4bda-8a32-b5d2f6a02db0",
+                "estimatedInputTokens": 470,
+                "reservedAmount": 2.101248,
+                "settledAmount": 0.000336,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              },
+              {
+                "ordinal": 2,
+                "phase": "SEARCH_0",
+                "status": "SUCCEEDED",
+                "inputTokens": 23,
+                "outputTokens": 0,
+                "usageStatus": "ACTUAL",
+                "providerModel": "qwen3.7-text-embedding",
+                "providerRequestId": "4a9ba3ed-1358-953d-ba25-61698258586c",
+                "estimatedInputTokens": 23,
+                "reservedAmount": 0.064,
+                "settledAmount": 0.0000115,
+                "reservedInputTokens": 128000,
+                "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+              },
+              {
+                "ordinal": 3,
+                "phase": "SEARCH_1",
+                "status": "SUCCEEDED",
+                "inputTokens": 22,
+                "outputTokens": 0,
+                "usageStatus": "ACTUAL",
+                "providerModel": "qwen3.7-text-embedding",
+                "providerRequestId": "cf26707e-0fa8-9290-b95b-b887cd281e63",
+                "estimatedInputTokens": 20,
+                "reservedAmount": 0.064,
+                "settledAmount": 0.000011,
+                "reservedInputTokens": 128000,
+                "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5"
+              },
+              {
+                "ordinal": 4,
+                "phase": "ANSWER",
+                "status": "SUCCEEDED",
+                "inputTokens": 502,
+                "outputTokens": 17,
+                "usageStatus": "ACTUAL",
+                "providerModel": "deepseek-flash",
+                "providerRequestId": "418d47d1-25f1-4c2c-bb22-a7e78f1ccb41",
+                "estimatedInputTokens": 2230,
+                "reservedAmount": 2.113536,
+                "settledAmount": 0.00114,
+                "reservedInputTokens": 1048576,
+                "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd"
+              }
+            ],
+            "tokenEstimateMethod": "UTF8_BYTES_ESTIMATE",
+            "reservationMethod": "PROVIDER_CONTEXT_CEILING",
+            "costBasis": "PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE"
+          }
+        }
+      },
+      "review": null
+    }
+  ],
+  "providerBudgets": {
+    "DASHSCOPE": {
+      "authorizationId": "a6ff3614-3392-3be5-93fe-6eddfdc7c4d5",
+      "limitCny": 9.999663,
+      "reservedCny": 0,
+      "budgetValuedCny": 0,
+      "callsStarted": 0,
+      "warningEmitted": false,
+      "stopReason": null
+    },
+    "DEEPSEEK": {
+      "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd",
+      "limitCny": 19.982606,
+      "reservedCny": 0,
+      "budgetValuedCny": 0,
+      "callsStarted": 0,
+      "warningEmitted": false,
+      "stopReason": null
+    }
+  },
+  "authorizationId": "17e7ed10-a1d8-48b0-9c40-8ac18d9f41bd",
+  "costBasis": "PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE",
+  "indexObservations": [],
+  "collectorEvents": [
+    {
+      "entryId": "debug-001",
+      "repeat": 1,
+      "at": "2026-10-22T06:51:17.150Z",
+      "event": "PREPARED",
+      "maxCalls": 1,
+      "reserveCny": 2.12992
+    },
+    {
+      "entryId": "debug-001",
+      "repeat": 1,
+      "event": "SUBMITTED",
+      "workId": "db8e4634-81a2-4855-b56f-5bf1b8e691d6",
+      "traceId": "76c953e5-b0e2-449c-9669-d3ba0d9d56d4"
+    },
+    {
+      "entryId": "debug-005",
+      "repeat": 1,
+      "at": "2026-10-22T06:51:19.294Z",
+      "event": "PREPARED",
+      "maxCalls": 2,
+      "reserveCny": 2.177536
+    },
+    {
+      "entryId": "debug-005",
+      "repeat": 1,
+      "event": "SUBMITTED",
+      "workId": "d964cf3a-f049-4777-b76d-3176e62e27d3",
+      "traceId": "a38499d2-f478-4b61-b581-9e5655f06805"
+    },
+    {
+      "entryId": "debug-006",
+      "repeat": 1,
+      "at": "2026-10-22T06:51:21.041Z",
+      "event": "PREPARED",
+      "maxCalls": 2,
+      "reserveCny": 2.177536
+    },
+    {
+      "entryId": "debug-006",
+      "repeat": 1,
+      "event": "SUBMITTED",
+      "workId": "a3222e62-cf22-47f1-a69e-7ac05cd1153d",
+      "traceId": "c7879b02-43ff-433d-9cd5-89ede4dc28cf"
+    },
+    {
+      "entryId": "debug-002",
+      "repeat": 1,
+      "at": "2026-10-22T06:51:22.768Z",
+      "event": "PREPARED",
+      "maxCalls": 1,
+      "reserveCny": 2.12992
+    },
+    {
+      "entryId": "debug-002",
+      "repeat": 1,
+      "event": "SUBMITTED",
+      "workId": "a7204284-346f-4839-bd90-30945d17f614",
+      "traceId": "8a12e4cf-db49-4e73-98db-86938c9695ae"
+    },
+    {
+      "entryId": "debug-007",
+      "repeat": 1,
+      "at": "2026-10-22T06:51:24.223Z",
+      "event": "PREPARED",
+      "maxCalls": 2,
+      "reserveCny": 2.177536
+    },
+    {
+      "entryId": "debug-007",
+      "repeat": 1,
+      "event": "SUBMITTED",
+      "workId": "9c63ee05-f361-4426-a3c6-078824f776f4",
+      "traceId": "199bd0cd-21d9-407a-8af6-69e26b73950d"
+    },
+    {
+      "entryId": "debug-012",
+      "repeat": 1,
+      "at": "2026-10-22T06:51:25.608Z",
+      "event": "PREPARED",
+      "maxCalls": 5,
+      "reserveCny": 4.406784
+    },
+    {
+      "entryId": "debug-012",
+      "repeat": 1,
+      "event": "SUBMITTED",
+      "workId": "6db66e0d-9fae-41e9-abe8-c1f261a612b0",
+      "traceId": "33b24e20-0f4f-463a-8a06-ba712ae54468"
+    },
+    {
+      "entryId": "debug-008",
+      "repeat": 1,
+      "at": "2026-10-22T06:51:28.928Z",
+      "event": "PREPARED",
+      "maxCalls": 2,
+      "reserveCny": 2.177536
+    },
+    {
+      "entryId": "debug-008",
+      "repeat": 1,
+      "event": "SUBMITTED",
+      "workId": "c98dba1b-7e9b-41d4-872d-1cba3e7d676b",
+      "traceId": "5a7622a0-7441-4a77-9048-ae9f319789ab"
+    },
+    {
+      "entryId": "debug-003",
+      "repeat": 1,
+      "at": "2026-10-22T06:51:30.324Z",
+      "event": "PREPARED",
+      "maxCalls": 1,
+      "reserveCny": 2.12992
+    },
+    {
+      "entryId": "debug-003",
+      "repeat": 1,
+      "event": "SUBMITTED",
+      "workId": "da4f4efd-71f4-4635-8423-d61e4588f2e5",
+      "traceId": "9d5338a2-1002-4f8e-b25c-fa846906d245"
+    },
+    {
+      "entryId": "debug-009",
+      "repeat": 1,
+      "at": "2026-10-22T06:51:31.411Z",
+      "event": "PREPARED",
+      "maxCalls": 5,
+      "reserveCny": 4.406784
+    },
+    {
+      "entryId": "debug-009",
+      "repeat": 1,
+      "event": "SUBMITTED",
+      "workId": "6b8e94fe-5c63-4044-8290-330c845ffeee",
+      "traceId": "82ffa404-147f-4262-b351-689ca85ce21f"
+    },
+    {
+      "entryId": "debug-011",
+      "repeat": 1,
+      "at": "2026-10-22T06:51:34.473Z",
+      "event": "PREPARED",
+      "maxCalls": 5,
+      "reserveCny": 4.406784
+    },
+    {
+      "entryId": "debug-011",
+      "repeat": 1,
+      "event": "SUBMITTED",
+      "workId": "df883ec5-7110-426c-9149-bd6926484118",
+      "traceId": "73d7409c-1510-49e5-8b0f-f5c3303c38ff"
+    },
+    {
+      "entryId": "debug-004",
+      "repeat": 1,
+      "at": "2026-10-22T06:51:37.791Z",
+      "event": "PREPARED",
+      "maxCalls": 1,
+      "reserveCny": 2.12992
+    },
+    {
+      "entryId": "debug-004",
+      "repeat": 1,
+      "event": "SUBMITTED",
+      "workId": "24e33bd8-bb63-4b62-b839-eb3555067438",
+      "traceId": "c025b3f1-6b9a-4fe0-bd69-057b382bce99"
+    },
+    {
+      "entryId": "debug-010",
+      "repeat": 1,
+      "at": "2026-10-22T06:51:39.531Z",
+      "event": "PREPARED",
+      "maxCalls": 5,
+      "reserveCny": 4.406784
+    },
+    {
+      "entryId": "debug-010",
+      "repeat": 1,
+      "event": "SUBMITTED",
+      "workId": "446744a6-062d-43a6-b75a-bbe7d3353b33",
+      "traceId": "737a0f7b-5940-45a4-99f2-803bbf7fc03d"
+    }
+  ],
+  "reusedIndexes": [
+    {
+      "corpusId": "island-debug-v1",
+      "versionId": "12492c37-3337-4649-9ca3-49a7b63c502f",
+      "requiredBoundary": 12,
+      "index": {
+        "ready": true,
+        "liveAllowed": true,
+        "profile": "dashscope_qwen3_7_1024_v1",
+        "requestedBoundary": 12,
+        "readyBoundary": 12,
+        "dataAsOf": "2026-10-22T14:51:17.097604+08:00",
+        "activeJob": null
+      }
+    }
+  ]
+}

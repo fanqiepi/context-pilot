@@ -52,6 +52,15 @@ public interface ReadingTaskMapper {
     void finishCall(@Param("id")UUID id,@Param("status")String status,@Param("usage")String usage);
     @Select("SELECT * FROM reading_spend_ledger WHERE id=#{id} AND owner_id=#{owner} AND deleted=0 FOR UPDATE") @Options(timeout=3)
     Map<String,Object> ledger(@Param("id")UUID id,@Param("owner")UUID owner);
+    @Select("SELECT id FROM reading_spend_ledger WHERE predecessor_id=#{id}") @Options(timeout=3)
+    UUID successor(UUID id);
+    @Insert("""
+        INSERT INTO reading_spend_ledger(id,owner_id,currency,limit_amount,pricing_version,expires_at,approval_digest,call_limit,predecessor_id)
+        VALUES(#{id},#{owner},'CNY',#{amount},#{price},#{expires},#{digest},#{calls},#{previous}) ON CONFLICT DO NOTHING
+        """) @Options(timeout=3)
+    void installSuccessor(@Param("id")UUID id,@Param("owner")UUID owner,@Param("amount")java.math.BigDecimal amount,
+                     @Param("price")String price,@Param("expires")java.time.OffsetDateTime expires,@Param("digest")String digest,
+                     @Param("calls")int calls,@Param("previous")UUID previous);
     @Insert("""
         INSERT INTO reading_spend_ledger(id,owner_id,currency,limit_amount,pricing_version,expires_at,approval_digest,call_limit)
         VALUES(#{id},#{owner},'CNY',#{amount},#{price},#{expires},#{digest},#{calls}) ON CONFLICT(id) DO NOTHING

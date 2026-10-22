@@ -1,5 +1,7 @@
 # 小说阅读业务合同草案
 
+2026-10-22 DEBUG 重测授权衔接使用 V34 的唯一前置账本关联；审批输入绑定新实现锁和 DEBUG_RETEST，供应商独立余额由已停止账本计算，不能恢复旧账本或重复授予额度。采集前验证已有索引覆盖本轮最大边界，任务仍逐条应用自己的已读范围；禁止新索引和 TEST。本轮不改 reading-evidence-v2、业务结果或笔记确认合同。
+
 2026-10-22 拒答修复：人物查证在原有一次回答生成中同时输出 answerability=FULL/PARTIAL/INSUFFICIENT_EVIDENCE 和 facts。模型应先判断原文能否回答当前问题，区分实际事实与说法/要求/计划；服务端只校验协议一致性与既有引用/长度约束，再映射现有结果状态，不新增分类/审查调用。判断仍可能错误，不能由结构校验推导语义可靠。Prompt reading-evidence-v2，详见[验证](../evaluation/reading-refusal-verification.md)。
 
 2026-10-22 评测授权补充：固定阅读批次按生成/embedding 路由到两个独立持久账本，金额不可互借，任一停止阻断整批。仍为小型应用服务，不引入通用预算平台；授权仅限[路线](../development/novel-reading-roadmap.md)的当前批次。

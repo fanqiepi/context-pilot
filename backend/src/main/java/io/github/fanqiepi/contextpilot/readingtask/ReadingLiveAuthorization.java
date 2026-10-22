@@ -30,15 +30,33 @@ public class ReadingLiveAuthorization {
     ReadingLiveAuthorization(ReadingTaskMapper mapper,BookMapper books,ReadingStateService states,ReadingLiveBatch batch,boolean testReviewed) {
         this.mapper=mapper;this.books=books;this.states=states;this.batch=batch;this.testReviewed=testReviewed;
     }
+    @Transactional(timeout=5)
     public void check() {
         if(batch==null)throw failure("LIVE_AI_NOT_AUTHORIZED");
-        checkLedger(batch.id,batch.digest,batch.limit,154);
-        checkLedger(batch.embeddingId(),batch.embeddingDigest(),batch.embeddingLimit,192);
+        if(batch.debugRetest()) {
+            checkPrevious(batch.previous.id(),batch.previous.digest(),batch.id,batch.limit);
+            checkPrevious(batch.previous.embeddingId(),batch.previous.embeddingDigest(),batch.embeddingId(),batch.embeddingLimit);
+        }
+        checkLedger(batch.id,batch.digest,batch.limit,batch.generationCalls(),batch.debugRetest()?batch.previous.id():null);
+        checkLedger(batch.embeddingId(),batch.embeddingDigest(),batch.embeddingLimit,batch.embeddingCalls(),batch.debugRetest()?batch.previous.embeddingId():null);
     }
-    private void checkLedger(UUID id,String digest,BigDecimal limit,int calls) {
-        UUID owner=states.owner();mapper.installLive(id,owner,limit,ReadingLiveBatch.PRICE,batch.expiresAt,digest,calls);
+    private void checkPrevious(UUID id,String digest,UUID successor,BigDecimal amount) {
+        var row=mapper.ledger(id,states.owner());
+        if(row==null || !digest.equals(row.get("approval_digest")) || row.get("stop_reason")==null
+                || !"CNY".equals(row.get("currency")) || !ReadingLiveBatch.PRICE.equals(row.get("pricing_version"))
+                || ((BigDecimal)row.get("reserved_amount")).signum()!=0
+                || amount.compareTo(((BigDecimal)row.get("limit_amount")).subtract((BigDecimal)row.get("settled_amount")))!=0)
+            throw failure("LIVE_PREDECESSOR_MISMATCH");
+        UUID child=mapper.successor(id);
+        if(child!=null && !child.equals(successor))throw failure("LIVE_BUDGET_ALREADY_TRANSFERRED");
+    }
+    private void checkLedger(UUID id,String digest,BigDecimal limit,int calls,UUID previous) {
+        UUID owner=states.owner();
+        if(previous==null)mapper.installLive(id,owner,limit,ReadingLiveBatch.PRICE,batch.expiresAt,digest,calls);
+        else mapper.installSuccessor(id,owner,limit,ReadingLiveBatch.PRICE,batch.expiresAt,digest,calls,previous);
         var row=mapper.ledger(id,owner);
         if(row==null || !digest.equals(row.get("approval_digest")) || limit.compareTo((BigDecimal)row.get("limit_amount"))!=0
+                || !Objects.equals(previous,row.get("predecessor_id"))
                 || !ReadingLiveBatch.PRICE.equals(row.get("pricing_version")) || ((Number)row.get("call_limit")).intValue()!=calls)
             throw failure("LIVE_APPROVAL_MISMATCH");
         if(mapper.liveAvailable(id,owner,digest)!=1)throw failure("LIVE_AUTHORIZATION_STOPPED");
@@ -66,8 +84,10 @@ public class ReadingLiveAuthorization {
         }
         payload.liveApprovalDigest=batch.digest;
     }
+    @Transactional(timeout=5)
     public ReadingAiGateway.Pricing pricing(String phase) {
         check();boolean generation=Set.of("PLAN","ANSWER").contains(phase);
+        if(batch.debugRetest() && phase.startsWith("INDEX_"))throw failure("LIVE_BATCH_MISMATCH");
         if(!generation && !phase.matches("(SEARCH|INDEX)_\\d+"))throw failure("PRICING_UNKNOWN");
         return new ReadingAiGateway.Pricing(generation?batch.id:batch.embeddingId(),ReadingLiveBatch.PRICE,generation?ReadingLiveBatch.INPUT:ReadingLiveBatch.EMBEDDING,
                 generation?ReadingLiveBatch.OUTPUT:BigDecimal.ZERO);
@@ -95,7 +115,9 @@ public class ReadingLiveAuthorization {
         var row=mapper.ledger(batch.id,states.owner());var embedding=mapper.ledger(batch.embeddingId(),states.owner());var result=new LinkedHashMap<String,Object>();
         result.put("liveAllowed","READY".equals(reason));result.put("reason",reason);result.put("authorizationId",batch.id);
         result.put("planSha256",batch.planHash);result.put("implementationLockSha256",batch.lockHash);
-        result.put("limitCny",batch.limit.add(batch.embeddingLimit));result.put("expiresAt",batch.expiresAt);result.put("maxCalls",ReadingLiveBatch.CALL_LIMIT);
+        result.put("limitCny",batch.limit.add(batch.embeddingLimit));result.put("expiresAt",batch.expiresAt);result.put("maxCalls",batch.generationCalls()+batch.embeddingCalls());
+        result.put("executionScope",batch.debugRetest()?ReadingLiveBatch.SCOPE:"FULL_BATCH");
+        result.put("previousAuthorizationId",batch.debugRetest()?batch.previous.id():null);
         result.put("callsStarted",number(row,"calls_started")+number(embedding,"calls_started"));result.put("reservedCny",amount(row,"reserved_amount").add(amount(embedding,"reserved_amount")));
         result.put("budgetValuedCny",amount(row,"settled_amount").add(amount(embedding,"settled_amount")));result.put("debugReviewed",testReviewed);
         result.put("warningThresholdPercent",80);result.put("warningEmitted",warned(row)||warned(embedding));

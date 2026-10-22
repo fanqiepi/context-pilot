@@ -355,6 +355,38 @@ class ReadingTaskPersistenceTests {
         assertThatThrownBy(ai.live::check).isInstanceOf(ReadingException.class);
         assertThat(tasks.create(request).id()).isEqualTo(registered.id());assertThat(ai.calls).hasValue(0);
     }
+    @Test void stoppedBudgetTransfersExactlyOnceWithoutResettingHistory() throws Exception {
+        var owner=states.owner();var previous=new ReadingLiveBatch.Previous(UUID.randomUUID(),ReadingText.hash("previous"+UUID.randomUUID()));
+        var end=java.time.OffsetDateTime.now().plusHours(1);
+        mapper.installLive(previous.id(),owner,new java.math.BigDecimal("20"),ReadingLiveBatch.PRICE,end,previous.digest(),154);
+        mapper.installLive(previous.embeddingId(),owner,new java.math.BigDecimal("10"),ReadingLiveBatch.PRICE,end,previous.embeddingDigest(),192);
+        jdbc.update("UPDATE reading_spend_ledger SET settled_amount=1 WHERE id=?",previous.id());
+        jdbc.update("UPDATE reading_spend_ledger SET settled_amount=0.1 WHERE id=?",previous.embeddingId());
+        var batch=new ReadingLiveBatch(UUID.randomUUID(),ReadingText.hash("successor"+UUID.randomUUID()),"plan","lock",new java.math.BigDecimal("19"),new java.math.BigDecimal("9.9"),end.minusHours(1),end,Map.of(),previous);
+        var gate=new ReadingLiveAuthorization(mapper,bookMapper,states,batch,false);
+        var tx=new org.springframework.transaction.support.TransactionTemplate(transactions);
+        assertThatThrownBy(()->tx.executeWithoutResult(s->gate.check())).isInstanceOf(ReadingException.class); // Active predecessor.
+        mapper.stopSpend(previous.id(),"DEBUG_REVIEW_FAILED");mapper.stopSpend(previous.embeddingId(),"DEBUG_REVIEW_FAILED");
+        jdbc.update("UPDATE reading_spend_ledger SET reserved_amount=0.2 WHERE id=?",previous.embeddingId());
+        assertThatThrownBy(()->tx.executeWithoutResult(s->gate.check())).isInstanceOf(ReadingException.class); // Unknown exposure.
+        assertThat(mapper.ledger(batch.id,owner)).isNull();
+        jdbc.update("UPDATE reading_spend_ledger SET reserved_amount=0 WHERE id=?",previous.embeddingId());
+        var inflated=new ReadingLiveBatch(UUID.randomUUID(),ReadingText.hash("inflated"+UUID.randomUUID()),"plan","lock",new java.math.BigDecimal("20"),new java.math.BigDecimal("9.9"),end.minusHours(1),end,Map.of(),previous);
+        assertThatThrownBy(()->tx.executeWithoutResult(s->new ReadingLiveAuthorization(mapper,bookMapper,states,inflated,false).check())).isInstanceOf(ReadingException.class);
+        tx.executeWithoutResult(s->gate.check());tx.executeWithoutResult(s->gate.check());
+        assertThat(mapper.successor(previous.id())).isEqualTo(batch.id);
+        assertThat(mapper.successor(previous.embeddingId())).isEqualTo(batch.embeddingId());
+        assertThat(mapper.ledger(batch.id,owner)).containsEntry("call_limit",16).containsEntry("calls_started",0);
+        assertThat((java.math.BigDecimal)mapper.ledger(previous.id(),owner).get("settled_amount")).isEqualByComparingTo("1");
+        var other=new ReadingLiveBatch(UUID.randomUUID(),ReadingText.hash("second"+UUID.randomUUID()),"plan","lock",batch.limit,batch.embeddingLimit,batch.authorizedAt,end,Map.of(),previous);
+        assertThatThrownBy(()->tx.executeWithoutResult(s->new ReadingLiveAuthorization(mapper,bookMapper,states,other,false).check()))
+                .isInstanceOf(ReadingException.class).extracting(e->((ReadingException)e).code()).isEqualTo("LIVE_BUDGET_ALREADY_TRANSFERRED");
+        assertThat(mapper.ledger(other.id,owner)).isNull();assertThat(mapper.ledger(other.embeddingId(),owner)).isNull();
+        // The database also rejects bypassing the application check, including after logical deletion.
+        jdbc.update("UPDATE reading_spend_ledger SET deleted=1 WHERE id=?",batch.id);
+        mapper.installSuccessor(other.id,owner,batch.limit,ReadingLiveBatch.PRICE,end,other.digest,16,previous.id());
+        assertThat(mapper.ledger(other.id,owner)).isNull();
+    }
     @Test void providerBudgetsAreIndependentAndEitherStoppedLedgerBlocksBoth() throws Exception {
         var f=fixture("林舟来到渡口。");boundary(f,2);var task=tasks.create(recapRequest(f));await(false,task.id(),"COMPLETED");
         UUID authorization=UUID.randomUUID(),a=UUID.randomUUID(),b=UUID.randomUUID();

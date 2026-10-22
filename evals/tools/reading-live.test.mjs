@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import {ROOT,loadAssets,template,report} from './reading-eval.mjs';
-import {planEntries,reservation,entryKey,approvalTemplate,localApi,collect} from './reading-live.mjs';
+import {planEntries,retestEntries,RETEST,reservation,entryKey,approvalTemplate,localApi,collect} from './reading-live.mjs';
 const {dataset,config}=loadAssets();
 test('fixed batch preserves all repetitions and incremental prefix indexes',()=>{
   const entries=planEntries(dataset);assert.equal(entries.length,135);
@@ -15,6 +15,28 @@ test('fixed batch preserves all repetitions and incremental prefix indexes',()=>
 });
 test('approval template never authorizes paid traffic',()=>{
   const a=approvalTemplate(Buffer.from('{}'));assert.equal(a.status,'NOT_AUTHORIZED');assert.equal(a.authorizedAt,null);assert.equal(a.accountConditionsConfirmed,false);
+  assert.equal(a.limitCny,null);assert.equal(a.previousAuthorizationId,null);assert.equal(a.maxCalls,32);
+});
+test('retest permits twelve tasks and no new indexes or TEST traffic',async()=>{
+  const entries=retestEntries(dataset);assert.equal(entries.length,12);assert.equal(entries.reduce((n,e)=>n+reservation(e).maxCalls,0),32);
+  assert(entries.every(e=>e.kind==='TASK'&&e.split==='DEBUG'&&e.repeat===1));
+  let calls=0;await assert.rejects(collect(async()=>{calls++;},{executionScope:RETEST},{},{},dataset,'TEST',async()=>{}),/forbids TEST/);assert.equal(calls,0);
+});
+test('retest fails before paid task submission when existing index is incomplete',async()=>{
+  const binding={corpusId:'island-debug-v1',versionId:'version',paragraphs:Array.from({length:12},(_,i)=>({id:'p'+i}))};
+  // Use the frozen corpus id, never substitute the fixture's invented id into a real request.
+  binding.corpusId=dataset.corpora.find(c=>c.split==='DEBUG').id;
+  let posts=0;const raw=template(dataset,config,'LIVE_END_TO_END');
+  const api=async(route,method)=>{
+    if(method==='POST')posts++;
+    if(route.endsWith('/status'))return {liveAllowed:true,authorizationId:'a',planSha256:'p',implementationLockSha256:'l',callsStarted:0,executionScope:RETEST,maxCalls:32,previousAuthorizationId:'old'};
+    if(route.endsWith('/state'))return {scopeRevision:1};
+    if(route.endsWith('/read-boundary'))return {state:{scopeRevision:2}};
+    if(route.endsWith('/index'))return {ready:false,readyBoundary:6};
+    throw Error('unexpected route');
+  };
+  await assert.rejects(collect(api,{executionScope:RETEST,implementationLockSha256:'l',bindings:[binding]},{authorizationId:'a',planSha256:'p',previousAuthorizationId:'old'},raw,dataset,'DEBUG',async()=>{}),/no rebuild authorized/);
+  assert.equal(posts,0);assert(raw.results.every(r=>r.status==='NOT_RUN'));
 });
 test('collector cannot use provider addresses or redirects',async()=>{
   for(const url of ['https://api.deepseek.com','http://localhost:8080','http://127.0.0.1:8080/other','http://user@127.0.0.1:8080'])assert.throws(()=>localApi(url));
@@ -29,7 +51,7 @@ test('transport uncertainty remains a failed observation and stops without retry
   const plan={batchId:'00000000-0000-0000-0000-000000000001',implementationLockSha256:'lock',bindings};
   const approval={authorizationId:'approval',planSha256:'plan'};const raw=template(dataset,config,'LIVE_END_TO_END');
   const api=async(route,method)=>{
-    if(route.endsWith('/evaluation/status'))return {liveAllowed:true,authorizationId:'approval',planSha256:'plan',implementationLockSha256:'lock',callsStarted:0,environment:{os:'fixture',java:'21',database:'fixture',model:config.generationModel,embeddingProfile:'fixture'}};
+    if(route.endsWith('/evaluation/status'))return {liveAllowed:true,authorizationId:'approval',planSha256:'plan',implementationLockSha256:'lock',callsStarted:0,executionScope:RETEST,maxCalls:32,previousAuthorizationId:'old',environment:{os:'fixture',java:'21',database:'fixture',model:config.generationModel,embeddingProfile:'fixture'}};
     if(route.endsWith('/state'))return {scopeRevision:1};
     if(route.endsWith('/read-boundary'))return {state:{scopeRevision:2}};
     if(route.endsWith('/tasks')&&method==='POST'){submits++;throw Error('HTTP_TIMEOUT');}throw Error('Unexpected route');
@@ -41,19 +63,19 @@ test('transport uncertainty remains a failed observation and stops without retry
 test('old locks and data remain separate files',()=>{
   for(const name of ['acceptance-v1.lock.json','acceptance-v2.lock.json','acceptance-v3.lock.json'])assert(fs.existsSync(path.join(ROOT,'evals/configs/reading',name)));
 });
-test('successful local collector fixture keeps sources, timing and shared index costs once',async()=>{
+for(const retest of [false,true])test(`successful collector fixture preserves sources and ${retest?'reuses indexes without POST or old costs':'attributes index costs once'}`,async()=>{
   const bindings=dataset.corpora.map(c=>({corpusId:c.id,corpusSha256:c.sha256,bookId:'book-'+c.id,versionId:c.id,paragraphs:c.paragraphs.map(p=>({id:p.id,ordinal:p.ordinal,sha256:p.sha256}))}));
-  const plan={batchId:'00000000-0000-0000-0000-000000000002',implementationLockSha256:'lock',bindings};const approval={authorizationId:'approval',planSha256:'plan'};
-  const raw=template(dataset,config,'LIVE_END_TO_END'),works=new Map();let boundary=0,ready=0,submitted=0;
+  const plan={batchId:'00000000-0000-0000-0000-000000000002',implementationLockSha256:'lock',bindings,executionScope:retest?RETEST:undefined};const approval={authorizationId:'approval',planSha256:'plan',previousAuthorizationId:'old'};
+  const raw=template(dataset,config,'LIVE_END_TO_END'),works=new Map();let boundary=0,ready=retest?12:0,submitted=0;
   const call=phase=>({phase,status:'SUCCEEDED',usageStatus:'ACTUAL',inputTokens:10,outputTokens:phase==='ANSWER'?5:0,reservedAmount:1,settledAmount:.001,authorizationId:'approval'});
   const api=async(route,method='GET',body)=>{
-    if(route.endsWith('/evaluation/status'))return {liveAllowed:true,authorizationId:'approval',planSha256:'plan',implementationLockSha256:'lock',callsStarted:0,environment:{os:'fixture',java:'21',database:'fixture',model:config.generationModel,embeddingProfile:'fixture'}};
+    if(route.endsWith('/evaluation/status'))return {liveAllowed:true,authorizationId:'approval',planSha256:'plan',implementationLockSha256:'lock',callsStarted:0,executionScope:RETEST,maxCalls:32,previousAuthorizationId:'old',environment:{os:'fixture',java:'21',database:'fixture',model:config.generationModel,embeddingProfile:'fixture'}};
     if(route.endsWith('/state'))return {scopeRevision:1};
     if(route.endsWith('/read-boundary')){boundary=Number(body.lastReadParagraphId.split(':p')[1]);return {state:{scopeRevision:2}};}
-    if(route.endsWith('/index'))return {ready:ready>=boundary};
+    if(route.endsWith('/index'))return {ready:ready>=boundary,readyBoundary:Math.min(ready,boundary)};
     if(route.includes('/index-estimate?'))return {fromBoundary:ready,targetBoundary:boundary,estimateHash:'fixture'};
     if(method==='POST') {
-      const index=route.endsWith('/index-jobs'),id='work-'+(++submitted);if(index)ready=boundary;
+      const index=route.endsWith('/index-jobs'),id='work-'+(++submitted);if(retest)assert.equal(index,false);if(index)ready=boundary;
       works.set(id,{id,traceId:'trace-'+id,status:index?'READY':'COMPLETED',validatedResult:index?null:{facts:[{text:'离线固定结果',evidenceIds:['E1']}],partial:false},usage:{calls:[call(index?'INDEX_0':'ANSWER')]},elapsedMillis:23});
       return {id,traceId:'trace-'+id,status:'QUEUED'};
     }
@@ -61,8 +83,8 @@ test('successful local collector fixture keeps sources, timing and shared index 
     return works.get(route.split('/').at(-1));
   };
   await collect(api,plan,approval,raw,dataset,'DEBUG',async()=>{});
-  assert.equal(submitted,18);assert.equal(raw.results.filter(r=>r.status==='OBSERVED').length,12);assert.equal(raw.indexObservations.length,6);
-  assert.equal(raw.results.flatMap(r=>r.observation?.calls??[]).length,18);assert(raw.indexObservations.every(i=>i.attributedTo));
+  assert.equal(submitted,retest?12:18);assert.equal(raw.results.filter(r=>r.status==='OBSERVED').length,12);assert.equal(raw.indexObservations.length,retest?0:6);if(retest)assert.equal(raw.reusedIndexes.length,1);
+  assert.equal(raw.results.flatMap(r=>r.observation?.calls??[]).length,retest?12:18);assert(raw.indexObservations.every(i=>i.attributedTo));
   assert.equal(raw.results.find(r=>r.status==='OBSERVED').observation.elapsedMs,23);
-  const summary=report(dataset,config,raw);assert.equal(summary.calls.total,18);assert.equal(summary.reviewStatus,'INCOMPLETE');
+  const summary=report(dataset,config,raw);assert.equal(summary.calls.total,retest?12:18);assert.equal(summary.reviewStatus,'INCOMPLETE');
 });
