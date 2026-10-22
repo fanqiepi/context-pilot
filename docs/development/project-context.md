@@ -1,6 +1,6 @@
 # 研序 项目背景
 
-> 新会话先读本文，再读 [AGENTS.md](../../AGENTS.md)、[新开发路线](novel-reading-roadmap.md)和[当前交接](continuation-handoff.md)，并核对代码、配置和 Git 状态。更新：2026-10-20。
+> 新会话先读本文，再读 [AGENTS.md](../../AGENTS.md)、[新开发路线](novel-reading-roadmap.md)和[当前交接](continuation-handoff.md)，并核对代码、配置和 Git 状态。更新：2026-10-22。
 
 ## 当前方向
 
@@ -10,7 +10,7 @@
 
 **[长篇小说阅读应用开发路线](novel-reading-roadmap.md)是唯一当前开发路线；旧研究路线及转向初稿已弃用。** 既有能力与验收事实保留，未完成收尾仍暂停，不默认恢复升级研究调优、录屏或检索优化。产品目标和参考见[产品需求](../requirements/product-requirements.md)，实施顺序、复用、预算和验收条件只在新路线维护。
 
-已批准[业务合同包](../architecture/novel-reading-design.md) `reading-contract-v1-draft1`。基础阅读和范围功能已提交至 `86f4579`，阅读任务离线链路为 `0e3e137`，笔记确认为 `42686ca`。本次起点是干净的 `develop/42686ca`；远程 develop 相同，2026-10-20 核对笔记 PR #34 仍打开，任务 PR #33 已合并。用户再次要求下一能力后，新增固定语料、分组问题、哈希冻结/人工评分工具、容量样本与[演示脚本](reading-demo.md)。生产真实适配、协议测试和计价仍待补齐，付费授权为零；本轮没有调用真实模型或 embedding。
+已批准[业务合同包](../architecture/novel-reading-design.md) `reading-contract-v1-draft1`。2026-10-22 核对 PR #31–#35 均已合并，本轮起点为干净的 `develop/4f13128`，与远程一致。固定语料、评分工具、容量证据和[演示脚本](reading-demo.md)已提交；本轮按用户授权补齐阅读专用 HTTP 客户端、完整请求包装计量、embedding usage 传递和本地协议测试。生产网关仍无条件拒绝真实调用，未获得付费授权；价格、真实供应商可用性及语义/体验验收仍待完成。当前验收实现版本为 `reading-acceptance-v2`，保留 v1 数据集及历史锁，见[协议验证记录](../evaluation/reading-provider-verification.md)。
 
 ## 已有能力与证据
 
@@ -22,8 +22,8 @@
 | 导入并持续阅读 | 已提交基础功能及启动测试修复，远程 PR 状态以 Git/平台为准 | [验证记录](../evaluation/reading-library-verification.md) |
 | 明确已读范围并查阅原文 | 已提交 `86f4579`，离线工程与代表页面证据已记录 | [范围验证记录](../evaluation/reading-scope-verification.md) |
 | 回顾前情并查证人物 | 已提交离线工程链路，真实适配/语义验收未开放 | [任务验证记录](../evaluation/reading-task-verification.md) |
-| 确认保存回顾笔记 | 已提交 `42686ca`；PR #34 状态以平台最新记录为准 | [笔记确认验证](../evaluation/reading-note-verification.md) |
-| 验证续读体验并准备展示 | 离线资产、评分工具、容量/页面证据与演示准备已完成；整项体验及语义验收未完成 | [本轮验证](../evaluation/reading-experience-verification.md) |
+| 确认保存回顾笔记 | 已提交 `42686ca`，PR #34 已合并 | [笔记确认验证](../evaluation/reading-note-verification.md) |
+| 验证续读体验并准备展示 | 离线资产/展示准备已提交；本轮补齐本地 HTTP 适配与协议证据，整项验收未完成 | [离线准备](../evaluation/reading-experience-verification.md)、[协议验证](../evaluation/reading-provider-verification.md) |
 
 统一 50 项核心任务已有首次实跑；升级研究新 DEBUG、新 TEST 与 8×2 代表运行也已采集。语义复核暂缓、录屏未完成，终态匹配不是任务质量成绩。最新事实与缺口集中在功能清单，历史失败、Prompt、评估输入和原始结果不删除、不改写。
 

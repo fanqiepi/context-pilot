@@ -6,8 +6,8 @@ import {execFileSync} from 'node:child_process';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const DATA = 'evals/datasets/reading/acceptance-v1.json';
-const CONFIG = 'evals/configs/reading/acceptance-v1.json';
-const LOCK = 'evals/configs/reading/acceptance-v1.lock.json';
+const CONFIG = 'evals/configs/reading/acceptance-v2.json';
+const LOCK = 'evals/configs/reading/acceptance-v2.lock.json';
 export const hash = value => createHash('sha256').update(value).digest('hex');
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const read = file => JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/^\uFEFF/, ''));
@@ -20,7 +20,7 @@ const finite = value => typeof value === 'number' && Number.isFinite(value) && v
 export function loadAssets() { return {dataset: read(DATA), config: read(CONFIG)}; }
 
 export function validateAssets(dataset, config, readFile = file => fs.readFileSync(path.join(ROOT, file))) {
-  check(dataset.version === config.version, 'Version mismatch');
+  check(dataset.version === (config.datasetVersion ?? config.version), 'Version mismatch');
   unique(dataset.corpora.map(c => c.id), 'corpus');
   unique(dataset.cases.map(c => c.caseId), 'case');
   const families = new Map();
@@ -111,6 +111,7 @@ function sourceFiles() {
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingnote/ReadingNoteProposalPersistenceTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingTaskPolicyTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingTaskPersistenceTests.java',
+      'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingProviderProtocolTests.java',
       ...walk('frontend/src/components').filter(f=>/Reading/.test(f)),
       ...walk('frontend/src/views').filter(f=>/Book/.test(f))]);
 }
@@ -120,7 +121,7 @@ export function freeze(dataset, config, output) {
     'evals/tools/reading-eval.mjs', 'evals/tools/reading-assets.mjs',
     ...walk('evals/corpora/reading/acceptance-v1')];
   const fingerprints = files => Object.fromEntries([...new Set(files)].sort().map(file => [file, hash(fs.readFileSync(path.join(ROOT, file)))]));
-  const lock = {version: dataset.version, createdAt: new Date().toISOString(),
+  const lock = {version: config.version, datasetVersion: dataset.version, createdAt: new Date().toISOString(),
     gitHead: execFileSync('git', ['rev-parse', 'HEAD'], {cwd:ROOT, encoding:'utf8'}).trim(),
     model: config.generationModel, embedding: {model:config.embeddingModel, dimensions:config.embeddingDimensions},
     promptVersion: config.promptVersion, assetHashes: fingerprints(assets),
@@ -137,7 +138,7 @@ export function verifyLock(lock, {source = false} = {}) {
 }
 export function template(dataset, config, mode = 'OFFLINE_FIXTURE') {
   check(['OFFLINE_FIXTURE','LIVE_END_TO_END'].includes(mode), 'Invalid mode');
-  return {version: dataset.version, mode, manifestSha256: null, environment: null, bindings: [],
+  return {version: config.version, mode, manifestSha256: null, environment: null, bindings: [],
     results: dataset.cases.flatMap(c => Array.from({length: config.repetitions[c.split]}, (_, i) => ({
       caseId:c.caseId, repeat:i + 1, status:'NOT_RUN', observation:null, review:null,
     })))};
@@ -180,7 +181,7 @@ function reviewCounts(c, row) {
     recall:ratio(covered.size,c.expectedFacts.length), spoiler, usable, refused};
 }
 export function report(dataset, config, raw) {
-  check(raw.version === dataset.version && ['OFFLINE_FIXTURE','LIVE_END_TO_END'].includes(raw.mode), 'Run version/mode mismatch');
+  check(raw.version === config.version && ['OFFLINE_FIXTURE','LIVE_END_TO_END'].includes(raw.mode), 'Run version/mode mismatch');
   const expected = template(dataset, config).results.map(r => `${r.caseId}/${r.repeat}`);
   check(Array.isArray(raw.results), 'Missing results');
   const keys = raw.results.map(r => `${r.caseId}/${r.repeat}`);

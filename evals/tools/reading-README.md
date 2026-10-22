@@ -14,7 +14,8 @@ node evals/tools/reading-eval.mjs report backend/target/reading-not-run.json
 ## 固定资产
 
 - [数据集](../datasets/reading/acceptance-v1.json)同时记录语料、段落哈希、边界、问题、参考事实/证据、不可使用事实与风险标签。
-- [配置](../configs/reading/acceptance-v1.json)、[冻结清单](../configs/reading/acceptance-v1.lock.json)、[评分协议](../configs/reading/scoring-v1.md)记录模型、Prompt、代码与资产指纹及未就绪条件。
+- 当前[配置](../configs/reading/acceptance-v2.json)、[冻结清单](../configs/reading/acceptance-v2.lock.json)、[评分协议](../configs/reading/scoring-v1.md)记录模型、Prompt、代码与资产指纹及未就绪条件。v2 的 `datasetVersion` 指向未修改的 v1 数据集，运行版本必须为 v2，不能混用旧观测。
+- [v1 配置](../configs/reading/acceptance-v1.json)及[v1 锁](../configs/reading/acceptance-v1.lock.json)保持原字节，作为 `4f13128` 的历史快照；复核旧版工具/文档应在该 Git 提交的独立检出中执行，不能用新工作树覆盖旧锁。当前 CLI 默认使用 v2。
 - [来源与许可](../corpora/reading/acceptance-v1/provenance.md)区分项目自创短篇、改写版和英文原作片段。短语料不能证明真实长篇语义质量。
 - 数字预算和质量门槛以[唯一路线](../../docs/development/novel-reading-roadmap.md)为准。分组数量/重复次数是该版本数据集的结构约束，变更要发布新资产版本。
 
@@ -54,10 +55,10 @@ LIVE_END_TO_END 已执行记录必须有：
 
 | 前置项 | 当前状态 | 需提交的证据 |
 | --- | --- | --- |
-| 阅读专用 DeepSeek / DashScope 适配 | 未实现 | 现有模型选择不变；有效输出限制、错误/截断/usage 映射 |
-| HTTP 协议门禁 | 未实现 | 本地 stub server 捕获真实序列化请求；单调用单请求、无自动重试、限时与取消、embedding 不隐藏拆批 |
+| 阅读专用 DeepSeek / DashScope 适配 | 客户端已实现，生产网关仍阻断 | 固定模型不变；序列化输出上限、错误/截断/usage 已有本地证据，真实供应商行为待验证 |
+| HTTP 协议门禁 | 本地通过 | 捕获序列化请求、无自动重试/重定向、整体限时与取消、embedding 不隐藏拆批；见[协议验证](../../docs/evaluation/reading-provider-verification.md) |
 | 当前价格版本 | 未核实 | 供应商官方依据、日期、计费单位、上下界计算与 UNKNOWN 预留策略 |
 | 独立授权 | 未获得 | 确定批次 case/repeat 清单、索引清单、调用上限、金额与到期时间；旧研究授权不能沿用 |
 | 实际评测与试用 | 未执行 | 原始运行、人工独立评分、真实读者反馈与失败记录 |
 
-以上不是新产品功能授权；它们是已经批准的阅读闭环开放真实调用所需的门禁。本轮交付离线准备，不代表这些条件已满足。
+以上不是新产品功能授权；它们是已经批准的阅读闭环开放真实调用所需的门禁。本地 HTTP 通过不证明供应商真实支持，也不提供计价/授权接线或在线执行器。

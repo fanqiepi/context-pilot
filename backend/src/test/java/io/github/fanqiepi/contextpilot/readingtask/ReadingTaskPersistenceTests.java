@@ -35,6 +35,7 @@ class ReadingTaskPersistenceTests {
         @Bean @Primary FakeAi offlineReadingAi() { return new FakeAi(); }
     }
     static class FakeAi implements ReadingAiGateway {
+        volatile ReadingProviderClient protocol;
         volatile boolean allowed=true,blockEmbedding=false;volatile String finish="stop";volatile String answer="{\"facts\":[{\"text\":\"林舟来到渡口。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}";
         volatile String plan="{\"queries\":[\"林舟\",\"渡口\"]}";
         volatile CountDownLatch entered,release;
@@ -43,6 +44,7 @@ class ReadingTaskPersistenceTests {
         public boolean offline(){return true;}
         public void requireAuthorized(){if(!allowed)throw ReadingTaskPolicy.failure("LIVE_AI_NOT_AUTHORIZED");}
         public Response generate(String prompt,int limit,Duration timeout) {
+            if(protocol!=null)return protocol.generate(prompt,limit,timeout);
             requireAuthorized();calls.incrementAndGet();prompts.add(prompt);
             waitForRelease();
             return new Response(limit==512?plan:answer,12L,8L,finish);
@@ -59,6 +61,10 @@ class ReadingTaskPersistenceTests {
             requireAuthorized();embeddings.incrementAndGet();
             if(blockEmbedding)waitForRelease();
             return texts.stream().map(t->{float[] v=new float[1024];v[0]=1;return v;}).toList();
+        }
+        public String generationInput(String prompt,int limit) { return protocol==null?prompt:protocol.generationInput(prompt,limit); }
+        public EmbeddingResponse embedWithUsage(List<String> texts,Duration timeout) {
+            return protocol==null?ReadingAiGateway.super.embedWithUsage(texts,timeout):protocol.embed(texts,timeout);
         }
         void block(){entered=new CountDownLatch(1);release=new CountDownLatch(1);}
         void unblock(){if(release!=null)release.countDown();release=null;entered=null;}
@@ -78,7 +84,7 @@ class ReadingTaskPersistenceTests {
     @Autowired WebApplicationContext web;
     @org.springframework.boot.test.web.server.LocalServerPort int port;
     record Fixture(UUID book,UUID version,List<BookRows.Paragraph> paragraphs) {}
-    @BeforeEach void reset() { ai.allowed=true;ai.blockEmbedding=false;ai.finish="stop";ai.unblock();ai.prompts.clear();ai.calls.set(0);ai.embeddings.set(0);ai.answer="{\"facts\":[{\"text\":\"林舟来到渡口。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}"; }
+    @BeforeEach void reset() { ai.protocol=null;ai.allowed=true;ai.blockEmbedding=false;ai.finish="stop";ai.unblock();ai.prompts.clear();ai.calls.set(0);ai.embeddings.set(0);ai.answer="{\"facts\":[{\"text\":\"林舟来到渡口。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}"; }
     @AfterEach void unblock(){ai.unblock();}
     Fixture fixture(String body) {
         byte[] bytes=("第一章 渡口\n"+UUID.randomUUID()+"\n"+body+"\n第二章 秘密标题\n未读身份秘密").getBytes(StandardCharsets.UTF_8);
@@ -107,6 +113,43 @@ class ReadingTaskPersistenceTests {
         var e=tasks.estimate(f.version,states.get(f.version).scopeRevision());
         var created=tasks.createIndex(f.version,new ReadingTaskService.IndexCreate(UUID.randomUUID(),states.get(f.version).scopeRevision(),e.estimateHash()));
         var w=await(true,created.id(),"READY","FAILED");assertThat(w.status).as(w.errorCode).isEqualTo("READY");
+    }
+    @Test void localHttpProtocolFlowsThroughIndexLookupUsageAndTruncationGate() throws Exception {
+        var http=com.sun.net.httpserver.HttpServer.create(new java.net.InetSocketAddress("127.0.0.1",0),0);
+        var json=tools.jackson.databind.json.JsonMapper.builder().build();var httpCalls=new AtomicInteger();
+        var finish=new java.util.concurrent.atomic.AtomicReference<>("stop");
+        http.createContext("/",exchange->{
+            var request=json.readTree(exchange.getRequestBody().readAllBytes());httpCalls.incrementAndGet();String result;
+            if(exchange.getRequestURI().getPath().equals("/embeddings")) {
+                var rows=new ArrayList<Map<String,Object>>();for(int i=0;i<request.path("input").size();i++) {
+                    float[] vector=new float[1024];vector[0]=1;rows.add(Map.of("index",i,"embedding",vector));
+                }
+                result=ReadingText.json(Map.of("data",rows,"usage",Map.of("prompt_tokens",7,"total_tokens",7)));
+            } else result=ReadingText.json(Map.of("choices",List.of(Map.of("message",Map.of("role","assistant","content",ai.answer),"finish_reason",finish.get())),
+                    "usage",Map.of("prompt_tokens",12,"completion_tokens",8)));
+            byte[] data=result.getBytes(StandardCharsets.UTF_8);exchange.getResponseHeaders().set("Content-Type","application/json");
+            exchange.sendResponseHeaders(200,data.length);exchange.getResponseBody().write(data);exchange.close();
+        });http.start();
+        String base="http://127.0.0.1:"+http.getAddress().getPort();
+        ai.protocol=new ReadingProviderClient(java.net.URI.create(base+"/chat/completions"),java.net.URI.create(base+"/embeddings"),"fixture","fixture");
+        try {
+            var f=fixture("林舟来到渡口。\n后文秘密");boundary(f,2);index(f);
+            var job=jdbc.queryForObject("SELECT id FROM reading_index_job WHERE version_id=?",UUID.class,f.version);
+            assertThat(jdbc.queryForObject("SELECT usage_json->>'inputTokens' FROM reading_ai_call WHERE index_job_id=?",String.class,job)).isEqualTo("7");
+            var created=tasks.create(new ReadingTaskService.Create(UUID.randomUUID(),f.version,states.get(f.version).scopeRevision(),"CHARACTER_LOOKUP",null,"林舟是谁","DIRECT"));
+            assertThat(await(false,created.id(),"COMPLETED","FAILED").status).isEqualTo("COMPLETED");
+            assertThat(httpCalls).hasValue(3); // One batch, one query embedding, one answer.
+            assertThat(jdbc.queryForObject("SELECT usage_json->>'inputTokens' FROM reading_ai_call WHERE task_id=? AND phase='SEARCH_0'",String.class,created.id())).isEqualTo("7");
+            assertThat(jdbc.queryForObject("SELECT usage_json->>'outputTokens' FROM reading_ai_call WHERE task_id=? AND phase='SEARCH_0'",String.class,created.id())).isEqualTo("0");
+            var payload=ReadingTaskService.payload(mapper.get(false,created.id()));
+            int wireBytes=ReadingTaskPolicy.bytes(ai.generationInput(ReadingTaskPolicy.prompt(payload,false),2048));
+            assertThat(jdbc.queryForObject("SELECT input_bytes FROM reading_ai_call WHERE task_id=? AND phase='ANSWER'",Integer.class,created.id())).isEqualTo(wireBytes);
+            finish.set("length");var truncated=tasks.create(recapRequest(f));
+            assertThat(await(false,truncated.id(),"FAILED").errorCode).isEqualTo("OUTPUT_INVALID");
+            assertThat(view(truncated.id()).get("validatedResult")).isNull();
+            assertThat(jdbc.queryForObject("SELECT usage_json->>'outputTokens' FROM reading_ai_call WHERE task_id=?",String.class,truncated.id())).isEqualTo("8");
+            assertThat(httpCalls).hasValue(4);
+        } finally { ai.protocol=null;http.stop(0); }
     }
     @Test void recapPersistsCompleteOrderedEvidenceAndCitationWithoutUnreadTextOrPositionWrites() throws Exception {
         var f=fixture("林舟来到渡口。\n青禾递给他一封信。");boundary(f,2);

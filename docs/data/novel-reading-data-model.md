@@ -1,5 +1,7 @@
 # 小说阅读数据合同草案
 
+2026-10-22 实现补充：本轮没有新迁移或表结构变化。阅读供应商适配将 embedding 的 `prompt_tokens` 作为实际输入用量传入既有 `reading_ai_call.usage_json`，已知输入时输出用量为 0；缺失/非法用量保持未知，不释放预留。生成 `input_characters/input_bytes` 计入实际发送的完整 JSON 包装，复用既有预留与结算事务。见[协议验证](../evaluation/reading-provider-verification.md)。
+
 版本：`reading-contract-v1-draft1`，2026-10-20 用户已确认。**以下为批准的数据合同；实际实施以新增 Flyway 脚本及功能清单为准，不能把全部目标表当作已存在。** 批准时源码迁移最高 V28，不改历史脚本。
 
 业务语义见[设计](../architecture/novel-reading-design.md)，容量和门槛见[唯一路线](../development/novel-reading-roadmap.md)，接口见[API](../api/novel-reading-api.md)。

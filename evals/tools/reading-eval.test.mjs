@@ -22,6 +22,14 @@ test('asset layout, counts, hashes and split isolation are valid', () => {
   assert.equal(result.cases,60);
   assert.equal(result.corpora,4);
 });
+test('new implementation manifest reuses frozen cases but rejects older run versions', () => {
+  assert.equal(config.datasetVersion, dataset.version);
+  assert.notEqual(config.version, dataset.version);
+  const raw = template(dataset, config);
+  assert.equal(raw.version, config.version);
+  raw.version = dataset.version;
+  assert.throws(() => report(dataset, config, raw), /version/);
+});
 test('scope, wrong-version evidence and shortened recap window are rejected', () => {
   for (const mutate of [
     d=>d.cases[0].expectedEvidence[0].ordinal=2,
