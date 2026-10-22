@@ -63,7 +63,9 @@ The last three capabilities have first-implementation engineering/representative
 ## Working agreements
 
 - Use `develop` for integration/day-to-day work; feature branches may isolate work. Never commit directly to `main`; merge only through reviewed PR or explicitly reviewed merge from `develop`, after relevant backend/frontend checks and complete diff review.
-- Conventional Commits use an English type without parenthesized scope and Chinese title description/body, e.g. `feat: 优化研究检索并行与运行日志`.
+- 每次开发完成后（包括修复、测试和文档规范更新），必须在相关检查通过、完整审阅本轮 diff 后主动创建本地 Git 提交，无需再次请求提交许可。只提交本轮任务的相关改动，保留用户其他未提交修改；没有改动时不创建空提交。若检查失败或提交受阻，应如实说明，不得宣称已完成提交。用户明确要求暂不提交时，以用户要求为准。
+- 提交信息遵循 Conventional Commits：保留英文 type，不使用括号 scope，标题描述和正文使用中文，例如 `feat: 优化研究检索并行与运行日志`。标题准确概括本轮变更，必要时在中文正文中说明原因、主要改动及验证结果。
+- 完成后汇报提交哈希、中文提交标题和工作区状态，并提醒用户发起 PR。自动本地提交不包含自动推送、创建 PR 或合并；这些操作需有用户授权。每轮只推进一个大功能点的约定继续有效。
 - Organize backend by business capability, not repository-wide controller/service/mapper layers. Package root `io.github.fanqiepi.contextpilot`, database `context_pilot`.
 - Business tables use MyBatis-Plus logical deletion (`deleted = 0/1`). Ordinary CRUD must not physically delete business records or uploaded files; purge requires an explicit maintenance workflow.
 - Preserve user changes; prefer the smallest complete change, explain new production dependencies, and avoid unrelated rewrites. Documentation may be Chinese; identifiers and paths use clear English.
