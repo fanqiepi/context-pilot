@@ -1,8 +1,12 @@
 # ContextPilot repository guidance
 
-## Delivery cadence correction (2026-10-22)
+## 当前开发方式：以大功能点为主（2026-10-22）
 
-The user explicitly rejected fragmenting development/testing into separate PR milestones and asked to continue. Complete a substantial user capability and its end-to-end checks before recommending a PR; internal fixes, prompt revisions, test passes and documentation updates are not individual PR checkpoints. Continue the approved interrupted-reading workflow through a usable shelf-to-recap-to-source-to-note-to-reader experience and repeatable local demonstration. Keep the mandatory local commit rule, but do not stop after each internal repair. Paid stopped-batch, scope and truthful acceptance boundaries still apply.
+- 以用户可实际使用、能够完整展示的大功能点组织开发；每轮围绕一个完整用户目标，连续完成所需实现、集成、文档和必要验证，再集中交付。
+- 不做细碎的开发和测试拆分交付：不把单个修复、提示词调整、测试用例或文档更新拆成独立开发阶段、验收节点或 PR。功能内部的小步骤自行推进，不反复停下来要求用户确认或提醒提 PR。
+- 测试围绕完整功能的关键流程和实际风险集中安排；保留必要的安全、数据一致性和相关回归门禁。没有新增改动、失败或明确风险时，不反复跑相同检查，不为低影响改动补写无价值的细碎测试。这不表示取消必要验证，也不改变付费调用和停止批次的边界。
+- 每次完成一个大功能点后，必须说明：本阶段交付了什么、验证结果与未完成项、**下一个阶段具体做什么**。下一阶段要写明用户目标、主要范围、完成标准，以及依赖或需另行授权的事项；不能只说“继续优化”“继续测试”或只提醒提交 PR。同步当前交接文档，避免后续会话重新拆成零碎任务。
+- 大功能点完成并集中验证后再提醒用户发起 PR；内部小步骤不单独触发 PR 提醒。用户明确要求的独立文档或规则修改仍直接完成并按约定本地提交，无需为此扩展产品开发范围。
 
 Current delivery is the interrupted-reading workspace and repeatable isolated demonstration, frozen as acceptance-v9 with reading-evidence-v3. Shelf-to-recap, character lookup history, citations, confirmed notes and adjacent chapter navigation have desktop/narrow-screen engineering evidence in `docs/evaluation/reading-workspace-verification.md`. No paid calls or new approval were installed; v1–v8 locks and stopped ledgers remain untouched. Formal semantic acceptance, actual reader feedback, browser performance and recording remain outstanding. Historical notes below retain their dated scope.
 
@@ -93,7 +97,7 @@ The last three capabilities have first-implementation engineering/representative
 - Use `develop` for integration/day-to-day work; feature branches may isolate work. Never commit directly to `main`; merge only through reviewed PR or explicitly reviewed merge from `develop`, after relevant backend/frontend checks and complete diff review.
 - 每次开发完成后（包括修复、测试和文档规范更新），必须在相关检查通过、完整审阅本轮 diff 后主动创建本地 Git 提交，无需再次请求提交许可。只提交本轮任务的相关改动，保留用户其他未提交修改；没有改动时不创建空提交。若检查失败或提交受阻，应如实说明，不得宣称已完成提交。用户明确要求暂不提交时，以用户要求为准。
 - 提交信息遵循 Conventional Commits：保留英文 type，不使用括号 scope，标题描述和正文使用中文，例如 `feat: 优化研究检索并行与运行日志`。标题准确概括本轮变更，必要时在中文正文中说明原因、主要改动及验证结果。
-- 完成后汇报提交哈希、中文提交标题和工作区状态，并提醒用户发起 PR。自动本地提交不包含自动推送、创建 PR 或合并；这些操作需有用户授权。每轮只推进一个大功能点的约定继续有效。
+- 完成后汇报提交哈希、中文提交标题和工作区状态；大功能点完成时，必须明确下一阶段的目标、范围和完成标准，并提醒用户发起 PR。内部修复、测试和独立文档更新不单独触发 PR 提醒。自动本地提交不包含自动推送、创建 PR 或合并；这些操作需有用户授权。每轮只推进一个大功能点的约定继续有效。
 - Organize backend by business capability, not repository-wide controller/service/mapper layers. Package root `io.github.fanqiepi.contextpilot`, database `context_pilot`.
 - Business tables use MyBatis-Plus logical deletion (`deleted = 0/1`). Ordinary CRUD must not physically delete business records or uploaded files; purge requires an explicit maintenance workflow.
 - Preserve user changes; prefer the smallest complete change, explain new production dependencies, and avoid unrelated rewrites. Documentation may be Chinese; identifiers and paths use clear English.
@@ -101,7 +105,7 @@ The last three capabilities have first-implementation engineering/representative
 
 ## Verification and local commands
 
-- Run the smallest relevant checks; distinguish engineering tests, real-model observations and semantic acceptance. Report what was and was not verified. Documentation-only edits need link/content/diff checks, not paid model runs or unrelated builds.
+- 按完整功能的关键流程与实际风险集中执行必要检查，不把细碎测试作为独立开发阶段；只有新增改动、失败或未解决风险才追加或重跑相关验证。区分工程测试、真实模型观测和语义验收，如实说明已验证与未验证内容。纯文档修改只做链接、内容和 diff 检查，不运行付费模型或无关构建。
 - Windows JDK 21: `F:\jdk21weizhi\microsoft-jdk-21.0.3-windows-x64\jdk-21.0.3+9`; set JAVA_HOME when the active JDK is not 21.
 - From `backend/`: `.\mvnw.cmd test`, `.\mvnw.cmd package`, `.\mvnw.cmd spring-boot:run`; Unix uses `./mvnw`.
 - From `frontend/`: `npm ci`, `npm run typecheck`, `npm run build`, `npm run dev` as appropriate.
