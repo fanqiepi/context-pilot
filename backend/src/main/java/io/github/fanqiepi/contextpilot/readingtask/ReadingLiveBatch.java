@@ -13,8 +13,8 @@ import static io.github.fanqiepi.contextpilot.readingtask.ReadingTaskPolicy.fail
 
 /** Fixed local evaluation contract, not an HTTP authorization API or arbitrary job registry. */
 final class ReadingLiveBatch {
-    static final String VERSION="reading-acceptance-v3", PRICE="reading-cny-20261022-v1";
-    static final String LOCK="evals/configs/reading/acceptance-v3.lock.json", DATA="evals/datasets/reading/acceptance-v1.json";
+    static final String VERSION="reading-acceptance-v4", PRICE="reading-cny-20261022-v1";
+    static final String LOCK="evals/configs/reading/acceptance-v4.lock.json", DATA="evals/datasets/reading/acceptance-v1.json";
     static final int GENERATION_INPUT_BOUND=1_048_576, EMBEDDING_LINE_BOUND=128_000, CALL_LIMIT=346;
     static final BigDecimal INPUT=new BigDecimal("0.000002"),OUTPUT=new BigDecimal("0.000008"),EMBEDDING=new BigDecimal("0.0000005");
     private static final JsonMapper JSON=JsonMapper.builder().enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)

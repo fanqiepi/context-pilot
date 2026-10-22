@@ -303,7 +303,7 @@ public class ReadingTaskService {
         usage.put("usageStatus",response!=null && response.inputTokens()!=null && response.outputTokens()!=null?"ACTUAL":"UNKNOWN");
         mapper.finishCall(call,status,ReadingText.json(usage));
         spend.settle(states.owner(),call,response);
-        if(!ai.offline() && response!=null && !"stop".equalsIgnoreCase(response.finishReason()))ai.haltBatch();
+        if(!ai.offline() && response!=null && !"stop".equalsIgnoreCase(response.finishReason()))ai.haltBatch("OUTPUT_INVALID");
     }
     List<Span> search(Payload p,float[] vector) {
         return scopes.publish(p.scope,s->{
@@ -340,7 +340,7 @@ public class ReadingTaskService {
     private void stopLocked(boolean index,UUID id,UUID token,String status,String code) {
         var w=mapper.get(index,id);if(w==null || w.terminal() || (token!=null && !token.equals(w.executionId)))return;
         settle(w);w.status=status;w.errorCode=code;w.executionId=null;mapper.unknown(id);save(index,w,payload(w));
-        if(!ai.offline() && payload(w).liveApprovalDigest!=null)ai.haltBatch();
+        if(!ai.offline() && payload(w).liveApprovalDigest!=null)ai.haltBatch(code);
     }
     void recover() {
         for(boolean index:List.of(false,true))active(index,w->{

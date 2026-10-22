@@ -7,7 +7,7 @@ import {ROOT, loadAssets, validateAssets, verifyLock, hash, template} from './re
 export const endpoints = Object.freeze({generation:'https://api.deepseek.com/chat/completions',
   embedding:'https://llm-90adsh26dbyar5po.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/embeddings'});
 export const PRICE='reading-cny-20261022-v1';
-const lockFile='evals/configs/reading/acceptance-v3.lock.json';
+const lockFile='evals/configs/reading/acceptance-v4.lock.json';
 const read=f=>JSON.parse(fs.readFileSync(f,'utf8').replace(/^\uFEFF/,''));
 const json=o=>JSON.stringify(o,null,2)+'\n';
 const check=(v,message)=>{if(!v)throw Error(message);};

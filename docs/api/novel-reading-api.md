@@ -1,5 +1,7 @@
 # 小说阅读 API 合同草案
 
+2026-10-22 预算保护补充：evaluation/status 新增 warningThresholdPercent、warningEmitted、stopReason，表示本地批次预警和首次停止原因；未启用时仍只返回关闭状态。调用创建合同与授权范围不变，见[预算日志与停止](../evaluation/reading-budget-alerts.md)。
+
 2026-10-22 授权接线补充：新增状态查询 GET /api/reading/evaluation/status，返回 liveAllowed/reason、authorizationId、planSha256、implementationLockSha256、limitCny、expiresAt、maxCalls/callsStarted、reservedCny/budgetValuedCny、debugReviewed、environment 和成本/预留口径；未启用时仅返回关闭原因。没有 HTTP 授权创建或增额入口。任务/索引创建请求形状不变，真实调用只接受批准文件派生的 clientRequestId 和对应版本/问题/范围。详情增加 queuedAt/elapsedMillis；usage.calls 增加 reservedInputTokens、authorizationId、providerModel/providerRequestId，费用口径显式为预算记账。索引 estimate 的 estimatedCost 为整作业上下文容量预留值，仅限批准评测条目。错误新增 LIVE_APPROVAL_INVALID、LIVE_APPROVAL_MISMATCH、LIVE_BATCH_MISMATCH、LIVE_CORPUS_MISMATCH、LIVE_AUTHORIZATION_STOPPED、DEBUG_REVIEW_REQUIRED；无密钥/内容泄露。默认仍拒绝真实调用，见[门禁验证](../evaluation/reading-live-gates-verification.md)。
 
 以下协议轮记录保留为历史状态。

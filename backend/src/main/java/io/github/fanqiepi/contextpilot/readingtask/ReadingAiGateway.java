@@ -29,6 +29,7 @@ public interface ReadingAiGateway {
     }
     default int reservationInputTokens(String phase,int inputBytes) { return inputBytes; }
     default void haltBatch() {}
+    default void haltBatch(String reason) { haltBatch(); }
     default Pricing pricing(String phase) { throw ReadingTaskPolicy.failure("PRICING_UNKNOWN"); }
     void requireAuthorized();
     Response generate(String prompt,int outputTokens,Duration timeout);

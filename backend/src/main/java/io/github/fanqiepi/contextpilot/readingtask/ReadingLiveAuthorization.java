@@ -70,7 +70,13 @@ public class ReadingLiveAuthorization {
                 generation?ReadingLiveBatch.OUTPUT:BigDecimal.ZERO);
     }
     @Transactional(timeout=5)
-    public void halt() { if(batch!=null && mapper.ledger(batch.id,states.owner())!=null)mapper.freezeSpend(batch.id); }
+    public void halt() { halt("BATCH_STOPPED"); }
+    @Transactional(timeout=5)
+    public void halt(String reason) {
+        if(batch==null)return;
+        var row=mapper.ledger(batch.id,states.owner());
+        if(row!=null)ReadingBudgetLog.stop(mapper,batch.id,null,row,reason);
+    }
     static int tokenBound(String phase) {
         if(Set.of("PLAN","ANSWER").contains(phase))return ReadingLiveBatch.GENERATION_INPUT_BOUND;
         if(phase.matches("SEARCH_\\d+"))return ReadingLiveBatch.EMBEDDING_LINE_BOUND;
@@ -87,6 +93,8 @@ public class ReadingLiveAuthorization {
         result.put("limitCny",batch.limit);result.put("expiresAt",batch.expiresAt);result.put("maxCalls",ReadingLiveBatch.CALL_LIMIT);
         result.put("callsStarted",row==null?0:row.get("calls_started"));result.put("reservedCny",row==null?null:row.get("reserved_amount"));
         result.put("budgetValuedCny",row==null?null:row.get("settled_amount"));result.put("debugReviewed",testReviewed);
+        result.put("warningThresholdPercent",80);result.put("warningEmitted",row!=null && Boolean.TRUE.equals(row.get("warning_emitted")));
+        result.put("stopReason",row==null?null:row.get("stop_reason"));
         result.put("costBasis","PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE");result.put("reservationBasis","PROVIDER_CONTEXT_CEILING");
         result.put("environment",Map.of("os",System.getProperty("os.name"),"java",System.getProperty("java.version"),"database",mapper.databaseVersion(),
                 "model",ReadingProviderClient.GENERATION_MODEL,"embeddingProfile","dashscope_qwen3_7_1024_v1"));

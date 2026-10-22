@@ -11,7 +11,7 @@ node evals/tools/reading-live.mjs bind http://127.0.0.1:8080 backend/target/read
 node evals/tools/reading-live.mjs prepare backend/target/reading-bindings.json backend/target/reading-live-plan.json
 ```
 
-`prepare` 校验 acceptance-v3 资产和源码锁，写新 plan 及 `reading-live-plan.json.approval.json`。两个文件均拒绝覆盖。批准模板为 `NOT_AUTHORIZED`，时间为空；不是创建授权的接口。计划绑定版本锁、语料文件与段落哈希、真实 book/version/paragraph UUID、固定供应商端点。题目/repeat 和增量索引只从冻结数据集派生，不允许文件中注入任意新任务。
+`prepare` 校验 acceptance-v4 资产和源码锁，写新 plan 及 `reading-live-plan.json.approval.json`。两个文件均拒绝覆盖。批准模板为 `NOT_AUTHORIZED`，时间为空；不是创建授权的接口。计划绑定版本锁、语料文件与段落哈希、真实 book/version/paragraph UUID、固定供应商端点。题目/repeat 和增量索引只从冻结数据集派生，不允许文件中注入任意新任务。
 
 服务端与脚本使用相同的确定性 clientRequestId（batchId + entryId + repeat），数据库现有唯一键保证重复请求不新建任务。修改源码、数据、端点或绑定之后须重新准备并审核，不能修改旧锁让校验通过。
 
@@ -45,6 +45,8 @@ node evals/tools/reading-eval.mjs report backend/target/reading-test.json
 输出文件拒绝覆盖。每个检查点向 `.journal.jsonl` 追加完整状态并 fsync；正常/异常退出均保存最终 JSON，强制杀进程时可从最后完整 journal 行人工恢复证据。成功索引费用只归集一次；尚未归集的索引单独计入报告。未采集题保留 NOT_RUN，提交/观测不确定的尝试标 FAILED/UNRESOLVED，并使报告保持不完整。输出可能包含固定语料与供应商正文，保存在 gitignored `backend/target/`，审核后仅提交脱敏证据。
 
 ## 费用口径
+
+新增本地 80% 日志提醒、持久停止原因与供应商控制台配置说明见[预算预警与停止](../../docs/evaluation/reading-budget-alerts.md)。当前 v4 需要 V33；旧 v3 plan 保持原字节且不适用于 v4，复用已绑定的语料 UUID 重新 prepare，不重复导入。
 
 字节估算仅用于历史预测，不能当作已验证 token 上界。实际预留改用供应商公开上下文上限：生成每次按完整上下文上限加已限制的输出预留；单查询 embedding 按单行上限，索引每批按最多行数上限预留。没有匹配 tokenizer 的证明也不会低估输入。具体参数、算术及假设见[工程验证](../../docs/evaluation/reading-live-gates-verification.md)。
 

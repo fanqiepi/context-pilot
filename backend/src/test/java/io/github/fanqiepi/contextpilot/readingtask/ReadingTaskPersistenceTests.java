@@ -48,6 +48,7 @@ class ReadingTaskPersistenceTests {
         public Pricing pricing(String phase){return live.pricing(phase);}
         public int reservationInputTokens(String phase,int bytes){return live==null?bytes:ReadingLiveAuthorization.tokenBound(phase);}
         public void haltBatch(){if(live!=null)live.halt();}
+        public void haltBatch(String reason){if(live!=null)live.halt(reason);}
         public Response generate(String prompt,int limit,Duration timeout) {
             if(protocol!=null)return protocol.generate(prompt,limit,timeout);
             requireAuthorized();calls.incrementAndGet();prompts.add(prompt);
@@ -86,6 +87,7 @@ class ReadingTaskPersistenceTests {
     @Autowired ReadingStateService states;
     @Autowired ReadingScopeService scopes;
     @Autowired JdbcTemplate jdbc;
+    @Autowired org.springframework.transaction.PlatformTransactionManager transactions;
     @Autowired WebApplicationContext web;
     @org.springframework.boot.test.web.server.LocalServerPort int port;
     record Fixture(UUID book,UUID version,List<BookRows.Paragraph> paragraphs) {}
@@ -314,6 +316,66 @@ class ReadingTaskPersistenceTests {
         assertThat(jdbc.queryForObject("SELECT settled_amount FROM reading_spend_ledger WHERE id=?",java.math.BigDecimal.class,authorization)).isEqualByComparingTo("0.000088");
         assertThat(jdbc.queryForObject("SELECT input_token_bound FROM reading_ai_call WHERE task_id=?",Integer.class,registered.id())).isEqualTo(1048576);
         assertThat(view(registered.id())).containsKey("elapsedMillis");
+    }
+    @Test void budgetRefusalStopsBatchBeforeAnyProviderInvocation() throws Exception {
+        var f=fixture("林舟来到渡口。");boundary(f,2);var request=recapRequest(f);var version=states.version(states.owner(),f.version);
+        var entry=new ReadingLiveBatch.Entry("debug-001",1,"DEBUG",f.version,f.book,version.fileHash(),version.parserId(),2,"RECAP",null,null,3,1,2,
+                f.paragraphs.stream().map(p->new ReadingLiveBatch.Paragraph(p.id(),p.paragraphOrdinal(),p.textHash())).toList());
+        UUID authorization=UUID.randomUUID();String digest=ReadingText.hash(authorization.toString());
+        var batch=new ReadingLiveBatch(authorization,digest,"plan","lock",java.math.BigDecimal.ONE,java.time.OffsetDateTime.now().minusMinutes(1),
+                java.time.OffsetDateTime.now().plusHours(1),Map.of(request.clientRequestId(),entry));
+        ai.live=new ReadingLiveAuthorization(mapper,bookMapper,states,batch,false);
+        var registered=tasks.create(request);assertThat(await(false,registered.id(),"FAILED").errorCode).isEqualTo("BUDGET_EXHAUSTED");
+        assertThat(ai.calls).hasValue(0);assertThat(ai.embeddings).hasValue(0);
+        assertThat(mapper.calls(registered.id())).isEmpty();
+        assertThat(mapper.ledger(authorization,states.owner())).containsEntry("stop_reason","BUDGET_EXHAUSTED").containsEntry("calls_started",0);
+        assertThat(ai.live.status()).containsEntry("liveAllowed",false).containsEntry("stopReason","BUDGET_EXHAUSTED");
+        assertThatThrownBy(ai.live::check).isInstanceOf(ReadingException.class);
+        assertThat(tasks.create(request).id()).isEqualTo(registered.id());assertThat(ai.calls).hasValue(0);
+    }
+    @Test void thresholdWarningCommitsOnceAndSurvivesRepeatedInstall() throws Exception {
+        var f=fixture("林舟来到渡口。");boundary(f,2);var task=tasks.create(recapRequest(f));await(false,task.id(),"COMPLETED");
+        UUID authorization=UUID.randomUUID(),a=UUID.randomUUID(),b=UUID.randomUUID();String digest=ReadingText.hash(authorization.toString());
+        mapper.installLive(authorization,states.owner(),java.math.BigDecimal.ONE,ReadingLiveBatch.PRICE,java.time.OffsetDateTime.now().plusHours(1),digest,10);
+        mapper.call(a,task.id(),null,UUID.randomUUID(),2,"TEST_A",80,80,0);mapper.call(b,task.id(),null,UUID.randomUUID(),3,"TEST_B",1,1,0);
+        var price=new ReadingAiGateway.Pricing(authorization,ReadingLiveBatch.PRICE,new java.math.BigDecimal("0.01"),java.math.BigDecimal.ZERO);
+        var logger=(ch.qos.logback.classic.Logger)org.slf4j.LoggerFactory.getLogger(ReadingBudgetLog.class);
+        var capture=new ch.qos.logback.core.read.ListAppender<ch.qos.logback.classic.spi.ILoggingEvent>();capture.start();logger.addAppender(capture);
+        try {
+            new org.springframework.transaction.support.TransactionTemplate(transactions).executeWithoutResult(tx->{spend.reserve(states.owner(),a,price,80,0);tx.setRollbackOnly();});
+            assertThat(capture.list).isEmpty();assertThat(mapper.ledger(authorization,states.owner())).containsEntry("warning_emitted",false);
+            spend.reserve(states.owner(),a,price,80,0);spend.settle(states.owner(),a,new ReadingAiGateway.Response("NEVER_LOG_THIS_BODY",80L,0L));
+            mapper.installLive(authorization,states.owner(),java.math.BigDecimal.ONE,ReadingLiveBatch.PRICE,java.time.OffsetDateTime.now().plusHours(1),digest,10);
+            spend.reserve(states.owner(),b,price,1,0);
+            assertThat(mapper.ledger(authorization,states.owner())).containsEntry("warning_emitted",true);
+            assertThat(capture.list.stream().map(e->e.getFormattedMessage()).filter(m->m.contains("READING_BUDGET_WARNING")).count()).isEqualTo(1);
+            assertThat(capture.list.toString()).doesNotContain("NEVER_LOG_THIS_BODY","林舟");
+        } finally {logger.detachAppender(capture);capture.stop();}
+    }
+    @Test void exceededUsageRetainsReservationAndFirstStopReason() throws Exception {
+        var f=fixture("林舟来到渡口。");boundary(f,2);var task=tasks.create(recapRequest(f));await(false,task.id(),"COMPLETED");
+        UUID authorization=UUID.randomUUID(),call=UUID.randomUUID();String digest=ReadingText.hash(authorization.toString());
+        mapper.installLive(authorization,states.owner(),java.math.BigDecimal.ONE,ReadingLiveBatch.PRICE,java.time.OffsetDateTime.now().plusHours(1),digest,10);
+        mapper.call(call,task.id(),null,UUID.randomUUID(),2,"TEST_A",50,50,0);
+        var price=new ReadingAiGateway.Pricing(authorization,ReadingLiveBatch.PRICE,new java.math.BigDecimal("0.01"),java.math.BigDecimal.ZERO);
+        spend.reserve(states.owner(),call,price,50,0);spend.settle(states.owner(),call,new ReadingAiGateway.Response("",51L,0L));
+        mapper.freezeSpend(authorization);
+        assertThat(mapper.ledger(authorization,states.owner())).containsEntry("stop_reason","TOKEN_BOUND_EXCEEDED");
+        assertThat(mapper.liveAvailable(authorization,states.owner(),digest)).isZero();
+        assertThat(mapper.callRow(call).get("settled_amount")).isNull();
+        assertThat((java.math.BigDecimal)mapper.ledger(authorization,states.owner()).get("reserved_amount")).isEqualByComparingTo("0.5");
+    }
+    @Test void exactlySpentLimitStopsWithoutPermittingAnotherCall() throws Exception {
+        var f=fixture("林舟来到渡口。");boundary(f,2);var task=tasks.create(recapRequest(f));await(false,task.id(),"COMPLETED");
+        UUID authorization=UUID.randomUUID(),a=UUID.randomUUID(),b=UUID.randomUUID();String digest=ReadingText.hash(authorization.toString());
+        mapper.installLive(authorization,states.owner(),java.math.BigDecimal.ONE,ReadingLiveBatch.PRICE,java.time.OffsetDateTime.now().plusHours(1),digest,10);
+        mapper.call(a,task.id(),null,UUID.randomUUID(),2,"TEST_A",100,100,0);mapper.call(b,task.id(),null,UUID.randomUUID(),3,"TEST_B",1,1,0);
+        var price=new ReadingAiGateway.Pricing(authorization,ReadingLiveBatch.PRICE,new java.math.BigDecimal("0.01"),java.math.BigDecimal.ZERO);
+        spend.reserve(states.owner(),a,price,100,0);
+        assertThat(mapper.liveAvailable(authorization,states.owner(),digest)).isEqualTo(1); // Reserved request may still execute.
+        spend.settle(states.owner(),a,new ReadingAiGateway.Response("",100L,0L));
+        assertThat(mapper.ledger(authorization,states.owner())).containsEntry("stop_reason","BUDGET_EXHAUSTED");
+        assertThatThrownBy(()->spend.reserve(states.owner(),b,price,1,0)).isInstanceOf(ReadingException.class);
     }
     @Test void evidenceAndVectorWritesRollBackOnDatabaseFailure() throws Exception {
         var f=fixture("林舟来到渡口。");boundary(f,2);

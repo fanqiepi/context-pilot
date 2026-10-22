@@ -1,5 +1,7 @@
 # 小说阅读验收方案草案
 
+2026-10-22 预算日志轮：当前冻结升级为 acceptance-v4，保留 v1/v2/v3 历史锁。新增预警去重/事务回滚、预算拒绝无供应商调用、恰好用尽与超界保留预留的门禁；旧 v3 plan 不再适用。详见[预算保护验证](reading-budget-alerts.md)。以下各轮说明保持历史状态。
+
 2026-10-22 授权接线补充：当前实现冻结为 reading-acceptance-v3，保留 v1/v2 锁与 v1 语料/题目/评分。新增本地 plan/approval、独立 DEBUG/TEST 采集及追加 journal；未知提交/观测标 FAILED/UNRESOLVED，不伪造任务 UUID 或免费用量；孤立索引费用也计入汇总。预留按供应商上下文容量，实际 token 与保守预算结算/最终账单分开。真实调用未获授权，见[门禁工程验证](reading-live-gates-verification.md)和[采集操作](../../evals/tools/reading-live-README.md)。
 
 以下 v2 协议轮记录保留为历史状态。

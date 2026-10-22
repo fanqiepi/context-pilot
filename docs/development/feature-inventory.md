@@ -8,6 +8,8 @@ V1–V5 已验收；升级研究最终质量验收未通过、默认关闭。工
 
 ## 小说基础阅读
 
+2026-10-22 [预算日志与停止](../evaluation/reading-budget-alerts.md)已增加：80% 阈值 WARN、持久去重/停止原因、预算拒绝无调用验证；当前 acceptance-v4，旧 v3 计划不适用，付费仍未授权。
+
 2026-10-22 [最终批次准备](../evaluation/reading-live-batch-preparation.md)已完成：实际隔离库导入与绑定通过，最终 plan 已生成，模型开通/按量条件由用户确认；实际付费授权和运行仍未发生。
 
 2026-10-22 最新交付：[固定批次授权与采集门禁](../evaluation/reading-live-gates-verification.md)已实现并保持默认关闭，使用 acceptance-v3；包含 total_tokens 修复、北京专属端点、V32 金额/调用数约束、状态查询与本机采集器。未安装有效批准文件，未跑真实模型，语义/体验验收仍未完成。以下各轮证据保留其当时状态。
