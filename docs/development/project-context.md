@@ -1,5 +1,7 @@
 # 研序 项目背景
 
+2026-10-22 最新交付：完成长篇续读性能闭环，新增隔离测量入口、500 万字/1000 章夹具、桌面/窄屏各至少 30 次浏览器往返及失败判定。续读 p95 为 438.1/327.5 ms，口径及局限见[长篇性能验证](../evaluation/reading-performance-verification.md)。生产源码、Prompt 与 acceptance-v9 锁不变，无新增付费调用。下一阶段为可复现的续读展示与试用交付，范围、完成标准和依赖见[当前交接](continuation-handoff.md)。以下为历史交付，不再要求重复已完成的本机浏览器采样。
+
 2026-10-22 最新交付：用户要求按完整功能点推进，当前已完成“回来接着读”工作台的桌面/窄屏交互与一键隔离演示：书架直达回顾、回顾/人物/历史分栏、引用与确认笔记、跨目录页续读。使用 reading-evidence-v3 / acceptance-v9；固定离线结果不代表真实语义通过。详见[工作台验证](../evaluation/reading-workspace-verification.md)和[当前交接](continuation-handoff.md)。以下各轮记录保留历史范围，旧的下一步不再作为当前待办。
 
 2026-10-22 最新开发：已完成 FULL/PARTIAL 与依据组织的离线修正，Prompt 为 reading-evidence-v3，实现冻结 acceptance-v8。完整性按用户所问事项判断；有依据但遗漏时补齐答案，真实缺口继续 PARTIAL，无依据继续拒答。公共协议、检索与预算不变。v5/v7 真实观测及四个停止账本保留，本轮未执行付费或 TEST；离线回归不证明真实模型已修好。详见[完整性修复验证](../evaluation/reading-completeness-verification.md)和[当前交接](continuation-handoff.md)。下文为各轮历史记录。

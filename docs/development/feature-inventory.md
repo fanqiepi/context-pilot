@@ -1,5 +1,7 @@
 # 研序 功能与证据索引
 
+2026-10-22 最新交付：新增长篇续读性能工作流（500 万字/1000 章、生产前端、桌面/窄屏实际采样、失败判定与隔离回收）。本机续读 p95 为 438.1/327.5 ms；数据与限制见[长篇性能验证](../evaluation/reading-performance-verification.md)。生产 acceptance-v9 / reading-evidence-v3 锁不变，真实语义、读者反馈和录屏仍未完成。
+
 2026-10-22 当前交付：已完成续读工作台（书架直达回顾、回顾/人物/历史分栏、引用、确认笔记、跨页章节切换）及一键隔离演示；桌面/窄屏完整流程已核对。acceptance-v9 / reading-evidence-v3，详见[工作台验证](../evaluation/reading-workspace-verification.md)。真实 AI 语义、正式 TEST 和真实试用仍未完成，以下历史“下一轮”不覆盖当前交接。
 
 2026-10-22 最新开发：acceptance-v8 / reading-evidence-v3 已补齐按问题判断 FULL/PARTIAL、组织已有直接依据的提示规则及离线回归。仅工程验证，真实语义效果未重测；保留 v5/v7 失败、旧锁和停止账本，TEST 仍 NOT_RUN。见[完整性修复验证](../evaluation/reading-completeness-verification.md)。下文为历史轮次记录。

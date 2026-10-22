@@ -4,6 +4,8 @@
 
 ## 准备
 
+长篇容量与页面性能使用独立入口 `tools/reading-performance.ps1`，操作与实测结果见[长篇性能验证](../evaluation/reading-performance-verification.md)。该入口覆盖基础阅读和位置保存，不替代下方固定回顾/确认笔记演示；两个隔离脚本不要同时运行。
+
 按[本地开发](local-development.md)启动基础阅读；首次演示用自创 [reading-library-demo.txt](../../evals/corpora/reading/reading-library-demo.txt)。不要用最终 TEST 调整 Prompt。用于真实评测的固定资产和报告命令见[阅读工具](../../evals/tools/reading-README.md)。
 
 完整工作台可以一键启动独立离线演示。前置条件：Docker 已启动、JDK 21、Node.js 符合 frontend/package.json，已在 frontend 执行 npm ci。在仓库根目录执行：

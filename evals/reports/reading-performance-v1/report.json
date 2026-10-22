@@ -1,0 +1,5915 @@
+{
+  "version": "reading-performance-v1",
+  "recordedAt": "2026-10-22T08:04:57.559Z",
+  "fixture": {
+    "mode": "OFFLINE_ENGINEERING",
+    "recordedAt": "2026-10-22T08:03:11.771436Z",
+    "port": 7561,
+    "bookId": "402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+    "versionId": "3891f523-df19-4d84-bd7a-e5f3077be621",
+    "fixture": {
+      "sha256": "41d3fe00859e511518203d14de4a5e4821ba18a21c7bdbe92f5e567401961fff",
+      "characters": 5000000,
+      "resumeParagraph": 9610,
+      "resumeOffset": 7,
+      "chapters": 1000,
+      "paragraphs": 10000,
+      "finalChapterParagraphs": 400
+    },
+    "environment": {
+      "java": "21.0.3",
+      "os": "Windows 11",
+      "processors": 16,
+      "postgres": "PostgreSQL 17.10 (Debian 17.10-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit",
+      "maxHeapBytes": 8556380160
+    },
+    "parsePreviewMs": 1188,
+    "confirmMs": 2015,
+    "paragraphSamplesMs": [
+      15.0446,
+      13.2825,
+      12.0003,
+      12.2035,
+      11.5438,
+      11.9701,
+      12.576,
+      13.7796,
+      12.0979,
+      11.2752,
+      10.9723,
+      10.4549,
+      11.2948,
+      11.482,
+      10.9219,
+      10.6511,
+      11.2709,
+      10.3679,
+      10.9244,
+      10.5001,
+      10.9499,
+      10.7118,
+      10.3633,
+      10.5787,
+      11.312,
+      10.1098,
+      10.4562,
+      9.4559,
+      9.6435,
+      10.1051
+    ],
+    "positionWriteSamplesMs": [
+      12.1875,
+      11.2559,
+      10.6556,
+      12.5292,
+      11.176,
+      10.4567,
+      11.1845,
+      10.9492,
+      10.1245,
+      10.0192,
+      9.3231,
+      9.739,
+      10.4017,
+      10.1324,
+      8.8844,
+      9.4762,
+      9.6937,
+      11.0485,
+      9.2742,
+      10.336,
+      8.6827,
+      9.3615,
+      8.7771,
+      8.3564,
+      8.806,
+      9.2706,
+      9.1366,
+      8.5662,
+      8.4787,
+      8.3103
+    ],
+    "limitations": [
+      "Service timings exclude HTTP/browser. Application and database already started.",
+      "Synthetic text, no AI calls, no reader feedback. Browser cache state is recorded separately."
+    ]
+  },
+  "environment": {
+    "os": "Windows 11 Enterprise",
+    "cpu": "AMD Ryzen 7 5800H with Radeon Graphics         ",
+    "memoryBytes": 34221649920,
+    "node": "v22.12.0"
+  },
+  "implementationLockSha256": "769512e343f7d1e9b0ee29f44c6363d25c1252d3627c0844e2bd0011336e61f0",
+  "builtIndexSha256": "03e188130c3e67acd7b73873d0b321cd33d383378d1719a78bd17ac2b66768d9",
+  "service": {
+    "paragraphP95Ms": 13.7796,
+    "positionWriteP95Ms": 12.1875
+  },
+  "browser": {
+    "status": "BROWSER_SAMPLES_PASS",
+    "groups": {
+      "1280x900/shelf-navigation": {
+        "count": 1,
+        "failed": 0,
+        "samplesMs": [
+          718.5999999996275
+        ],
+        "maxMs": 718.5999999996275,
+        "p95Ms": 718.5999999996275,
+        "withinTwoSeconds": true
+      },
+      "1280x900/continue-reading": {
+        "count": 30,
+        "failed": 0,
+        "samplesMs": [
+          438.09999999962747,
+          538.5,
+          362.90000000037253,
+          358.30000000074506,
+          339.69999999925494,
+          309.7999999988824,
+          356.09999999962747,
+          327.2999999988824,
+          328.59999999962747,
+          309.09999999962747,
+          357.2000000011176,
+          291.69999999925494,
+          326.19999999925494,
+          328.09999999962747,
+          340.90000000037253,
+          310.3999999985099,
+          308.59999999962747,
+          292.19999999925494,
+          310,
+          291.80000000074506,
+          310.59999999962747,
+          290.59999999962747,
+          308,
+          291.6000000014901,
+          374.5,
+          292.19999999925494,
+          310.5,
+          291.3999999985099,
+          327.7999999988824,
+          310.5
+        ],
+        "maxMs": 538.5,
+        "p95Ms": 438.09999999962747,
+        "withinTwoSeconds": true
+      },
+      "1280x900/shelf-return": {
+        "count": 30,
+        "failed": 0,
+        "samplesMs": [
+          62.40000000037253,
+          64,
+          58.90000000037253,
+          55.59999999962747,
+          48,
+          46.29999999888241,
+          55.09999999962747,
+          47.69999999925494,
+          47.90000000037253,
+          45.90000000037253,
+          49,
+          47.899999998509884,
+          47.399999998509884,
+          48,
+          47.69999999925494,
+          48.69999999925494,
+          49.09999999962747,
+          48.09999999962747,
+          47.90000000037253,
+          47.59999999962747,
+          47.79999999888241,
+          48.5,
+          48.69999999925494,
+          49.40000000037253,
+          55.20000000111759,
+          48.09999999962747,
+          47.59999999962747,
+          47.69999999925494,
+          48,
+          48.09999999962747
+        ],
+        "maxMs": 64,
+        "p95Ms": 62.40000000037253,
+        "withinTwoSeconds": true
+      },
+      "390x844/continue-reading": {
+        "count": 31,
+        "failed": 0,
+        "samplesMs": [
+          320.40000000037253,
+          310.2000000011176,
+          292.2000000011176,
+          292.7999999988824,
+          362.7999999988824,
+          292.5,
+          295.30000000074506,
+          292.40000000037253,
+          291.5,
+          292.19999999925494,
+          308.59999999962747,
+          290.7000000011176,
+          327.5,
+          255.90000000037253,
+          295.59999999962747,
+          292.5,
+          290.80000000074506,
+          290.69999999925494,
+          292.40000000037253,
+          290.40000000037253,
+          292.5,
+          291.7999999988824,
+          289.30000000074506,
+          310.30000000074506,
+          292.6000000014901,
+          273,
+          273.90000000037253,
+          291.59999999962747,
+          292.40000000037253,
+          292.40000000037253,
+          301.59999999962747
+        ],
+        "maxMs": 362.7999999988824,
+        "p95Ms": 327.5,
+        "withinTwoSeconds": true
+      },
+      "390x844/shelf-return": {
+        "count": 30,
+        "failed": 0,
+        "samplesMs": [
+          47.80000000074506,
+          52.80000000074506,
+          47.90000000037253,
+          48.09999999962747,
+          49.09999999962747,
+          47.899999998509884,
+          47.80000000074506,
+          47.80000000074506,
+          48,
+          47.80000000074506,
+          59.80000000074506,
+          35.79999999888241,
+          47.69999999925494,
+          44.30000000074506,
+          44.19999999925494,
+          48,
+          43.59999999962747,
+          47.5,
+          47.79999999888241,
+          48.09999999962747,
+          55,
+          48.19999999925494,
+          50.59999999962747,
+          47.90000000037253,
+          48.30000000074506,
+          47.90000000037253,
+          48,
+          32.59999999962747,
+          47.90000000037253,
+          47.69999999925494
+        ],
+        "maxMs": 59.80000000074506,
+        "p95Ms": 55,
+        "withinTwoSeconds": true
+      },
+      "390x844/shelf-navigation": {
+        "count": 1,
+        "failed": 0,
+        "samplesMs": [
+          178.69999999925494
+        ],
+        "maxMs": 178.69999999925494,
+        "p95Ms": 178.69999999925494,
+        "withinTwoSeconds": true
+      }
+    }
+  },
+  "samples": [
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-navigation",
+      "status": "READY",
+      "elapsedMs": 718.5999999996275,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/assets/runtime-dom.esm-bundler-CBHs0A95.js",
+          "durationMs": 55.59999999962747,
+          "transferBytes": 83094,
+          "bodyBytes": 82794
+        },
+        {
+          "path": "/assets/index-5mj19SIT.js",
+          "durationMs": 72.69999999925494,
+          "transferBytes": 771066,
+          "bodyBytes": 770766
+        },
+        {
+          "path": "/assets/use-global-config-D-xvXUWx.js",
+          "durationMs": 53.90000000037253,
+          "transferBytes": 60967,
+          "bodyBytes": 60667
+        },
+        {
+          "path": "/assets/message-box-BlKb92-v.js",
+          "durationMs": 57.79999999888241,
+          "transferBytes": 60310,
+          "bodyBytes": 60010
+        },
+        {
+          "path": "/assets/index-DSnMHLES.css",
+          "durationMs": 64.90000000037253,
+          "transferBytes": 366136,
+          "bodyBytes": 365836
+        },
+        {
+          "path": "/assets/message-jtn2-t41.js",
+          "durationMs": 64.80000000074506,
+          "transferBytes": 8219,
+          "bodyBytes": 7919
+        },
+        {
+          "path": "/assets/vue-router-CyD5s52g.js",
+          "durationMs": 68.5,
+          "transferBytes": 25261,
+          "bodyBytes": 24961
+        },
+        {
+          "path": "/assets/BooksView-DREafnAs.js",
+          "durationMs": 4.099999999627471,
+          "transferBytes": 3492,
+          "bodyBytes": 3192
+        },
+        {
+          "path": "/assets/client-G_r46O13.js",
+          "durationMs": 4.900000000372529,
+          "transferBytes": 50801,
+          "bodyBytes": 50501
+        },
+        {
+          "path": "/assets/reading-CjdUYebT.js",
+          "durationMs": 4.700000001117587,
+          "transferBytes": 649,
+          "bodyBytes": 349
+        },
+        {
+          "path": "/favicon.ico",
+          "durationMs": 2.700000001117587,
+          "transferBytes": 309,
+          "bodyBytes": 9
+        },
+        {
+          "path": "/api/reading/books",
+          "durationMs": 167.09999999962747,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 438.09999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/assets/BookReaderView-CBNF4AhI.js",
+          "durationMs": 5.400000000372529,
+          "transferBytes": 46142,
+          "bodyBytes": 45842
+        },
+        {
+          "path": "/assets/_plugin-vue_export-helper-BDNMzG2s.js",
+          "durationMs": 5.400000000372529,
+          "transferBytes": 384,
+          "bodyBytes": 84
+        },
+        {
+          "path": "/assets/BookReaderView-qSz5Y72M.css",
+          "durationMs": 9.299999998882413,
+          "transferBytes": 539,
+          "bodyBytes": 239
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 17.200000001117587,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 13,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 13.099999999627471,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 17.40000000037253,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 28.59999999962747,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 18.100000001490116,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 26.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 62.40000000037253,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 15.599999999627471,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 538.5,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 9.700000001117587,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8.400000000372529,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 24.09999999962747,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 14.299999998882413,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 21,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 23.200000001117587,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 15.399999998509884,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 64,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 17.90000000037253,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 362.90000000037253,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 10.400000000372529,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 11.800000000745058,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 19.300000000745058,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 17,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 24.59999999962747,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 15.900000000372529,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 23.800000000745058,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 58.90000000037253,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 13.400000000372529,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 358.30000000074506,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 9.099999999627471,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8.599999999627471,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 24.5,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 14.699999999254942,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 23.90000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 14.700000001117587,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 20.799999998882413,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 55.59999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 13,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 339.69999999925494,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 9.899999998509884,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 17.5,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 10.5,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13.599999999627471,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 21.199999999254942,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 13.700000001117587,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 20.90000000037253,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 11.299999998882413,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 309.7999999988824,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 9,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 9.199999999254942,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 17.59999999962747,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 15.200000001117587,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 18.899999998509884,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 14.599999999627471,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 20.90000000037253,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 46.29999999888241,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 11.799999998882413,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 356.09999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 9.800000000745058,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 10.199999999254942,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 25.59999999962747,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 15.100000001490116,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 19.899999998509884,
+          "transferBytes": 72619,
+          "bodyBytes": 72319
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 15,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 22.299999998882413,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 55.09999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 14.799999998882413,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 327.2999999988824,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.899999998509884,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 9,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 24.09999999962747,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 15.700000001117587,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 18.5,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 14.200000001117587,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 19.90000000037253,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.69999999925494,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 11,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 328.59999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.900000000372529,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8.699999999254942,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 20.700000001117587,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 14.599999999627471,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 20.299999998882413,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 13.400000000372529,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 19.899999998509884,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.90000000037253,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 12.200000001117587,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 309.09999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.600000001490116,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8.900000000372529,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 15.900000000372529,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 14.099999999627471,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 19.09999999962747,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 14.800000000745058,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 20.100000001490116,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 45.90000000037253,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 11.5,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 357.2000000011176,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.099999999627471,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8.900000000372529,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 17,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 17,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 18.90000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 21.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 32.59999999962747,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 49,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 11,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 291.69999999925494,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.800000000745058,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8.099999999627471,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 16.700000001117587,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13.700000001117587,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 19.40000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 13.100000001490116,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 18.299999998882413,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.899999998509884,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 11,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 326.19999999925494,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 9.900000000372529,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8.799999998882413,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 18.799999998882413,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 16.300000000745058,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 20.90000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 14.900000000372529,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 20.699999999254942,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.399999998509884,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.5,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 328.09999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.5,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8.100000001490116,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 23.59999999962747,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13.400000000372529,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 20.899999998509884,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 22.800000000745058,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 16.199999999254942,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 11.700000001117587,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 340.90000000037253,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 11.5,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 9.800000000745058,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 20.09999999962747,
+          "transferBytes": 631,
+          "bodyBytes": 331
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 14.700000001117587,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 22,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 13.599999999627471,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 19.899999998509884,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.69999999925494,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 12,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 310.3999999985099,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.199999999254942,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 10.900000000372529,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 18.59999999962747,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13.900000000372529,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 21.09999999962747,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.599999999627471,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 19.100000001490116,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48.69999999925494,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.599999999627471,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 308.59999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 9.299999998882413,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.700000001117587,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 16.300000000745058,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 15.099999999627471,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 18.90000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 15.299999998882413,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 21.700000001117587,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state/events",
+          "durationMs": 14.399999998509884,
+          "transferBytes": 435,
+          "bodyBytes": 135
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 49.09999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 11.800000000745058,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 292.19999999925494,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.5,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 9,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 18.40000000037253,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12.699999999254942,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 19.199999999254942,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.599999999627471,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 18.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state/events",
+          "durationMs": 10.299999998882413,
+          "transferBytes": 435,
+          "bodyBytes": 135
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48.09999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.5,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 310,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.5,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 9.400000000372529,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 19,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13.400000000372529,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 19.199999999254942,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 13.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 18.90000000037253,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.90000000037253,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.5,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 291.80000000074506,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.800000000745058,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8.900000000372529,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 10,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 16.09999999962747,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 18.299999998882413,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 20.800000000745058,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 14.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state/events",
+          "durationMs": 10.5,
+          "transferBytes": 435,
+          "bodyBytes": 135
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.59999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.800000000745058,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 310.59999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.700000001117587,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 19.700000001117587,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13.199999999254942,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 25.09999999962747,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 17.200000001117587,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 12,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.79999999888241,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 11.5,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 290.59999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.5,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.800000000745058,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 17.59999999962747,
+          "transferBytes": 630,
+          "bodyBytes": 330
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13.5,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 18.5,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.400000000372529,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17.700000001117587,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48.5,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 13,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 308,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 9,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8.099999999627471,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 14.899999998509884,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 14.099999999627471,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 18.59999999962747,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 13.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 20.200000001117587,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48.69999999925494,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.199999999254942,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 291.6000000014901,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 19.40000000037253,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 17.5,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.399999998509884,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 49.40000000037253,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.199999999254942,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 374.5,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.600000001490116,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 10,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 13.300000000745058,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 35.5,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 25.199999999254942,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 13.599999999627471,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 23.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 55.20000000111759,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.800000000745058,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 292.19999999925494,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.199999999254942,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.599999999627471,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 19.100000001490116,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13.099999999627471,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 17.399999998509884,
+          "transferBytes": 72619,
+          "bodyBytes": 72319
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 15.099999999627471,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 20.800000000745058,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48.09999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.400000000372529,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 310.5,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.199999999254942,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8.599999999627471,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 20.300000000745058,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 19,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.300000000745058,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 18.09999999962747,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.59999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 291.3999999985099,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.5,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 19.199999999254942,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13.700000001117587,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 18.5,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 11.800000000745058,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17.200000001117587,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.69999999925494,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.400000000372529,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 327.7999999988824,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.300000000745058,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 6.800000000745058,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 21.700000001117587,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13.599999999627471,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 17.299999998882413,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 17.40000000037253,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 22.800000000745058,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 9.299999998882413,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 310.5,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 9.5,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.900000000372529,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 16.199999999254942,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13.699999999254942,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 17.40000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.099999999627471,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48.09999999962747,
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.300000000745058,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 320.40000000037253,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 9.800000000745058,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 14.5,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 11.099999999627471,
+          "transferBytes": 630,
+          "bodyBytes": 330
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12.299999998882413,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 18.09999999962747,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 11.900000000372529,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.80000000074506,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.299999998882413,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 310.2000000011176,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.300000000745058,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.199999999254942,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 19.40000000037253,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12.800000000745058,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 18.600000001490116,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 21.90000000037253,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 15.799999998882413,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 52.80000000074506,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 12.300000000745058,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 292.2000000011176,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.900000000372529,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 17.299999998882413,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12.5,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 18.800000000745058,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 18.700000001117587,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 13.200000001117587,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.90000000037253,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.599999999627471,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 292.7999999988824,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.5,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.300000000745058,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 19.5,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12.699999999254942,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.09999999962747,
+          "transferBytes": 72619,
+          "bodyBytes": 72319
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 13.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 19.199999999254942,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48.09999999962747,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 9.600000001490116,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 362.7999999988824,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.599999999627471,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 9.799999998882413,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 13.5,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 20.5,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 24.200000001117587,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 22.300000000745058,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 31.90000000037253,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 49.09999999962747,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.300000000745058,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 292.5,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.800000000745058,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.600000001490116,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 20.299999998882413,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13.299999998882413,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 17.799999998882413,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.099999999627471,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17.300000000745058,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.899999998509884,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.5,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 295.30000000074506,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.199999999254942,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 6.900000000372529,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 19.700000001117587,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.59999999962747,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.300000000745058,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.80000000074506,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 9.900000000372529,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 292.40000000037253,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.5,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.699999999254942,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 20.59999999962747,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 11.700000001117587,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.09999999962747,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 11.699999999254942,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 16.800000000745058,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.80000000074506,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 8.699999999254942,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 291.5,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.199999999254942,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.599999999627471,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 16.699999999254942,
+          "transferBytes": 631,
+          "bodyBytes": 331
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 14,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.5,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 11.300000000745058,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 16.199999999254942,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.300000000745058,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 292.19999999925494,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.400000000372529,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.799999998882413,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 15,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12.300000000745058,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 17,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.400000000372529,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.80000000074506,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 308.59999999962747,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 9.599999999627471,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.099999999627471,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 21.700000001117587,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.90000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 11.900000000372529,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 16.899999998509884,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 59.80000000074506,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 12.099999999627471,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 290.7000000011176,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 6.800000000745058,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.5,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 23.200000001117587,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 11.700000001117587,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.90000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 11.599999999627471,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 16.800000000745058,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 35.79999999888241,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 12.599999999627471,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 327.5,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 9.799999998882413,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.199999999254942,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 20.700000001117587,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12.199999999254942,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 20.09999999962747,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 14,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 18.90000000037253,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state/events",
+          "durationMs": 9.299999998882413,
+          "transferBytes": 435,
+          "bodyBytes": 135
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.69999999925494,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 9.800000000745058,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 255.90000000037253,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.099999999627471,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 6.700000001117587,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 9.600000001490116,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 16.100000001490116,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.800000000745058,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 11.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 16.399999998509884,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state/events",
+          "durationMs": 8.699999999254942,
+          "transferBytes": 435,
+          "bodyBytes": 135
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 44.30000000074506,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 9.299999998882413,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 295.59999999962747,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 6.5,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.199999999254942,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 18.40000000037253,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 20.09999999962747,
+          "transferBytes": 72619,
+          "bodyBytes": 72319
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.099999999627471,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state/events",
+          "durationMs": 9.300000000745058,
+          "transferBytes": 435,
+          "bodyBytes": 135
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 44.19999999925494,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 9.099999999627471,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 292.5,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.799999998882413,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 9.400000000372529,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 18.199999999254942,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 17.40000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 11.399999998509884,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 20.199999999254942,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state/events",
+          "durationMs": 11,
+          "transferBytes": 435,
+          "bodyBytes": 135
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 9.099999999627471,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 290.80000000074506,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 6.599999999627471,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 8.599999999627471,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 18.59999999962747,
+          "transferBytes": 631,
+          "bodyBytes": 331
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12.300000000745058,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 18,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.199999999254942,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17.40000000037253,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 43.59999999962747,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.299999998882413,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 290.69999999925494,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.800000000745058,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.200000001117587,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 17.199999999254942,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12.300000000745058,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.800000000745058,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 11.699999999254942,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17.100000001490116,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.5,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 292.40000000037253,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.199999999254942,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 20.59999999962747,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12.599999999627471,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.40000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 14.099999999627471,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 19.59999999962747,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.79999999888241,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 9.899999998509884,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 290.40000000037253,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.200000001117587,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.600000001490116,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 16.90000000037253,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 11.699999999254942,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.90000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.199999999254942,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 18.200000001117587,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48.09999999962747,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 8.699999999254942,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 292.5,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.200000001117587,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.099999999627471,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 19.90000000037253,
+          "transferBytes": 631,
+          "bodyBytes": 331
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12.700000001117587,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 17.90000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 11,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 15.699999999254942,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 55,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 12.400000000372529,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 291.7999999988824,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.5,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.099999999627471,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 8.900000000372529,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 17.59999999962747,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 17.199999999254942,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 11.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48.19999999925494,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 9.800000000745058,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 289.30000000074506,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 5.899999998509884,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.400000000372529,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 18.40000000037253,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 11.699999999254942,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 17,
+          "transferBytes": 72618,
+          "bodyBytes": 72318
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.699999999254942,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 18.90000000037253,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 50.59999999962747,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 10.599999999627471,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 310.30000000074506,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 6.900000000372529,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 14.5,
+          "transferBytes": 631,
+          "bodyBytes": 331
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12.599999999627471,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 17.40000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.100000001490116,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17.200000001117587,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.90000000037253,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 9.199999999254942,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 292.6000000014901,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.199999999254942,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 6.599999999627471,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 22,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12.400000000372529,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 18.5,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 12.400000000372529,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17.59999999962747,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state/events",
+          "durationMs": 9.100000001490116,
+          "transferBytes": 435,
+          "bodyBytes": 135
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48.30000000074506,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 9.399999998509884,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 273,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 6.599999999627471,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 7.300000000745058,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 18.200000001117587,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 13.199999999254942,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.799999998882413,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 11.199999999254942,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 16,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.90000000037253,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 9.200000001117587,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 273.90000000037253,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 8.099999999627471,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 6.200000001117587,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 9.300000000745058,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 23.5,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.90000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 11.799999998882413,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 16.699999999254942,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 48,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 8.900000000372529,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 291.59999999962747,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 7.900000000372529,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 6.100000001490116,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 20.200000001117587,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.5,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 11.600000001490116,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 17.399999998509884,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state/events",
+          "durationMs": 8.599999999627471,
+          "transferBytes": 435,
+          "bodyBytes": 135
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 32.59999999962747,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 8.299999998882413,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 292.40000000037253,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 6.300000000745058,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 6.600000001490116,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 9.599999999627471,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 25,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.90000000037253,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 16.100000001490116,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 11,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state/events",
+          "durationMs": 8.299999998882413,
+          "transferBytes": 435,
+          "bodyBytes": 135
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.90000000037253,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 8.400000000372529,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 292.40000000037253,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 6.900000000372529,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 6.899999998509884,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 21.199999999254942,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 12.400000000372529,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 16.5,
+          "transferBytes": 72619,
+          "bodyBytes": 72319
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 13.299999998882413,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 20.09999999962747,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "1e3b638f-c8ee-4ad8-85bb-1dc04468cdf1",
+      "kind": "shelf-return",
+      "status": "READY",
+      "elapsedMs": 47.69999999925494,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/api/reading/books",
+          "durationMs": 9.199999999254942,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "e9130998-4af7-43bf-a336-6eba193ec884",
+      "kind": "shelf-navigation",
+      "status": "READY",
+      "elapsedMs": 178.69999999925494,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/assets/use-global-config-D-xvXUWx.js",
+          "durationMs": 29.199999999254942,
+          "transferBytes": 0,
+          "bodyBytes": 60667
+        },
+        {
+          "path": "/assets/runtime-dom.esm-bundler-CBHs0A95.js",
+          "durationMs": 30.300000000745058,
+          "transferBytes": 0,
+          "bodyBytes": 82794
+        },
+        {
+          "path": "/assets/message-jtn2-t41.js",
+          "durationMs": 34,
+          "transferBytes": 0,
+          "bodyBytes": 7919
+        },
+        {
+          "path": "/assets/message-box-BlKb92-v.js",
+          "durationMs": 32.5,
+          "transferBytes": 0,
+          "bodyBytes": 60010
+        },
+        {
+          "path": "/assets/index-5mj19SIT.js",
+          "durationMs": 39.30000000074506,
+          "transferBytes": 0,
+          "bodyBytes": 770766
+        },
+        {
+          "path": "/assets/index-DSnMHLES.css",
+          "durationMs": 38.70000000111759,
+          "transferBytes": 0,
+          "bodyBytes": 365836
+        },
+        {
+          "path": "/assets/vue-router-CyD5s52g.js",
+          "durationMs": 35.80000000074506,
+          "transferBytes": 0,
+          "bodyBytes": 24961
+        },
+        {
+          "path": "/assets/BooksView-DREafnAs.js",
+          "durationMs": 1.6000000014901161,
+          "transferBytes": 0,
+          "bodyBytes": 3192
+        },
+        {
+          "path": "/assets/reading-CjdUYebT.js",
+          "durationMs": 3.799999998882413,
+          "transferBytes": 0,
+          "bodyBytes": 349
+        },
+        {
+          "path": "/assets/client-G_r46O13.js",
+          "durationMs": 3.699999999254942,
+          "transferBytes": 0,
+          "bodyBytes": 50501
+        },
+        {
+          "path": "/api/reading/books",
+          "durationMs": 11.699999999254942,
+          "transferBytes": 794,
+          "bodyBytes": 494
+        }
+      ],
+      "paragraphCount": 0,
+      "firstParagraph": null,
+      "selectedParagraph": null,
+      "readingStatus": null,
+      "horizontalOverflow": false,
+      "error": null
+    },
+    {
+      "runId": "e9130998-4af7-43bf-a336-6eba193ec884",
+      "kind": "continue-reading",
+      "status": "READY",
+      "elapsedMs": 301.59999999962747,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "documentVisibility": "visible",
+      "resources": [
+        {
+          "path": "/assets/BookReaderView-CBNF4AhI.js",
+          "durationMs": 0,
+          "transferBytes": 0,
+          "bodyBytes": 45842
+        },
+        {
+          "path": "/assets/_plugin-vue_export-helper-BDNMzG2s.js",
+          "durationMs": 0,
+          "transferBytes": 0,
+          "bodyBytes": 84
+        },
+        {
+          "path": "/assets/BookReaderView-qSz5Y72M.css",
+          "durationMs": 0,
+          "transferBytes": 0,
+          "bodyBytes": 239
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b",
+          "durationMs": 9.5,
+          "transferBytes": 728,
+          "bodyBytes": 428
+        },
+        {
+          "path": "/api/reading/books/402e7e24-7983-4e8f-bd3b-1efbdb69906b/versions",
+          "durationMs": 6.799999998882413,
+          "transferBytes": 852,
+          "bodyBytes": 552
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/state",
+          "durationMs": 16.40000000037253,
+          "transferBytes": 632,
+          "bodyBytes": 332
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters",
+          "durationMs": 11.799999998882413,
+          "transferBytes": 7964,
+          "bodyBytes": 7664
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/chapters/49ffb6cd-b824-3d66-8c2f-e84d886bea2d/paragraphs",
+          "durationMs": 17.100000001490116,
+          "transferBytes": 72620,
+          "bodyBytes": 72320
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/notes",
+          "durationMs": 17.5,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        },
+        {
+          "path": "/api/reading/versions/3891f523-df19-4d84-bd7a-e5f3077be621/bookmarks",
+          "durationMs": 11.900000000372529,
+          "transferBytes": 341,
+          "bodyBytes": 41
+        }
+      ],
+      "paragraphCount": 40,
+      "firstParagraph": "第 9610 段",
+      "selectedParagraph": "第 9610 段",
+      "readingStatus": "已恢复上次保存的位置第 1000 / 1000 章已读边界：0 段",
+      "horizontalOverflow": false,
+      "error": null
+    }
+  ],
+  "limitations": [
+    "First navigation uses a fresh localhost origin; inspect resource transfer sizes for browser cache evidence.",
+    "Warm application/DB and OS; not a cold machine or throttled network.",
+    "Browser readiness = rendered controls and restored position, no loading mask, followed by two animation frames. Includes loopback HTTP and browser work.",
+    "No AI performance, semantic acceptance, reader feedback or video recording. Failed/hidden/timeout samples are retained."
+  ]
+}
