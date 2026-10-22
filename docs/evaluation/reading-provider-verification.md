@@ -14,6 +14,8 @@ embedding 的 `prompt_tokens` 传入原有调用审计和结算；缺失/非法�
 
 ## 官方协议参考与未解决差异
 
+后续核实见[真实调用授权准备](reading-live-authorization-preparation.md)：公开文档已补足旧 DeepSeek 名称兼容和北京共享域名依据，并提供公开价格；同时发现 embedding `total_tokens` 与此版客户端读取字段不符。下文保留适配轮当时的调查状态及本地测试结论，不能把它们当作真实供应商验收。
+
 2026-10-22 只读取公开文档，没有请求付费 API：
 
 - [DeepSeek Chat Completions](https://api-docs.deepseek.com/api/create-chat-completion/)：依据消息、输出上限、thinking、结束原因和 usage 字段实现。当前文档枚举展示 `deepseek-flash`，仓库已批准模型为 `deepseek-v4-flash`；本轮保留原选择，别名兼容性尚无实际供应商证据，不能静默替换模型。

@@ -1,5 +1,9 @@
 # 小说阅读数据合同草案
 
+2026-10-22 授权接线补充：[V32](../../backend/src/main/resources/db/migration/V32__bind_reading_live_authorization.sql) 为 reading_spend_ledger 增加 approval_digest、call_limit、calls_started，为 reading_ai_call 增加 input_token_bound。旧账本允许摘要/次数上限为空；新批次摘要唯一，次数和金额同事务预留，重复安装不重置。payload_json 保存 liveApprovalDigest；usage_json 新增有限 providerModel/providerRequestId，embedding 以 total_tokens 计量。settled_amount 为高峰未命中价格的保守预算记账，不是账单金额；UNKNOWN 保留预留并停止批次。详见[门禁工程验证](../evaluation/reading-live-gates-verification.md)。
+
+以下协议轮记录保留为历史状态。
+
 2026-10-22 实现补充：本轮没有新迁移或表结构变化。阅读供应商适配将 embedding 的 `prompt_tokens` 作为实际输入用量传入既有 `reading_ai_call.usage_json`，已知输入时输出用量为 0；缺失/非法用量保持未知，不释放预留。生成 `input_characters/input_bytes` 计入实际发送的完整 JSON 包装，复用既有预留与结算事务。见[协议验证](../evaluation/reading-provider-verification.md)。
 
 版本：`reading-contract-v1-draft1`，2026-10-20 用户已确认。**以下为批准的数据合同；实际实施以新增 Flyway 脚本及功能清单为准，不能把全部目标表当作已存在。** 批准时源码迁移最高 V28，不改历史脚本。

@@ -1,5 +1,9 @@
 # 小说阅读 API 合同草案
 
+2026-10-22 授权接线补充：新增状态查询 GET /api/reading/evaluation/status，返回 liveAllowed/reason、authorizationId、planSha256、implementationLockSha256、limitCny、expiresAt、maxCalls/callsStarted、reservedCny/budgetValuedCny、debugReviewed、environment 和成本/预留口径；未启用时仅返回关闭原因。没有 HTTP 授权创建或增额入口。任务/索引创建请求形状不变，真实调用只接受批准文件派生的 clientRequestId 和对应版本/问题/范围。详情增加 queuedAt/elapsedMillis；usage.calls 增加 reservedInputTokens、authorizationId、providerModel/providerRequestId，费用口径显式为预算记账。索引 estimate 的 estimatedCost 为整作业上下文容量预留值，仅限批准评测条目。错误新增 LIVE_APPROVAL_INVALID、LIVE_APPROVAL_MISMATCH、LIVE_BATCH_MISMATCH、LIVE_CORPUS_MISMATCH、LIVE_AUTHORIZATION_STOPPED、DEBUG_REVIEW_REQUIRED；无密钥/内容泄露。默认仍拒绝真实调用，见[门禁验证](../evaluation/reading-live-gates-verification.md)。
+
+以下协议轮记录保留为历史状态。
+
 2026-10-22：阅读专用 HTTP 客户端和本地协议测试已实现，没有新增业务 API 或开放供应商代理/授权入口。生产 AI 创建仍返回 `LIVE_AI_NOT_AUTHORIZED`。适配及调用审计详情见[协议验证](../evaluation/reading-provider-verification.md)。
 
 版本：`reading-contract-v1-draft1`，2026-10-20 用户已确认。**以下为批准的目标接口，实际实现以 Controller/OpenAPI 和功能清单为准。** 既有 `/api/chat`、知识库、研究和动作接口不变。

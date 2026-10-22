@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface ReadingTaskMapper {
+    @Select("SELECT version()") @Options(timeout=3)
+    String databaseVersion();
     // The table choice is a server-owned boolean, never a client/model SQL identifier.
     String TABLE="<choose><when test='index'>reading_index_job</when><otherwise>reading_task</otherwise></choose>";
     @Select("<script>SELECT * FROM "+TABLE+" WHERE id=#{id}</script>") @Options(timeout=3)
@@ -50,18 +52,27 @@ public interface ReadingTaskMapper {
     void finishCall(@Param("id")UUID id,@Param("status")String status,@Param("usage")String usage);
     @Select("SELECT * FROM reading_spend_ledger WHERE id=#{id} AND owner_id=#{owner} AND deleted=0 FOR UPDATE") @Options(timeout=3)
     Map<String,Object> ledger(@Param("id")UUID id,@Param("owner")UUID owner);
+    @Insert("""
+        INSERT INTO reading_spend_ledger(id,owner_id,currency,limit_amount,pricing_version,expires_at,approval_digest,call_limit)
+        VALUES(#{id},#{owner},'CNY',#{amount},#{price},#{expires},#{digest},#{calls}) ON CONFLICT(id) DO NOTHING
+        """) @Options(timeout=3)
+    void installLive(@Param("id")UUID id,@Param("owner")UUID owner,@Param("amount")java.math.BigDecimal amount,
+                     @Param("price")String price,@Param("expires")java.time.OffsetDateTime expires,@Param("digest")String digest,@Param("calls")int calls);
+    @Select("SELECT count(*) FROM reading_spend_ledger WHERE id=#{id} AND owner_id=#{owner} AND approval_digest=#{digest} AND deleted=0 AND expires_at>CURRENT_TIMESTAMP") @Options(timeout=3)
+    int liveAvailable(@Param("id")UUID id,@Param("owner")UUID owner,@Param("digest")String digest);
     @Update("""
-        UPDATE reading_spend_ledger SET reserved_amount=reserved_amount+#{amount},revision=revision+1,updated_at=CURRENT_TIMESTAMP
+        UPDATE reading_spend_ledger SET reserved_amount=reserved_amount+#{amount},calls_started=calls_started+1,revision=revision+1,updated_at=CURRENT_TIMESTAMP
         WHERE id=#{id} AND deleted=0 AND expires_at>CURRENT_TIMESTAMP
         AND reserved_amount+settled_amount+#{amount}<=limit_amount AND pricing_version=#{version}
+        AND (call_limit IS NULL OR calls_started<call_limit)
         """) @Options(timeout=3)
     int reserveSpend(@Param("id")UUID id,@Param("amount")java.math.BigDecimal amount,@Param("version")String version);
     @Update("""
-        UPDATE reading_ai_call SET authorization_id=#{authorization},reserved_amount=#{amount},input_token_rate=#{inputRate},output_token_rate=#{outputRate}
+        UPDATE reading_ai_call SET authorization_id=#{authorization},reserved_amount=#{amount},input_token_rate=#{inputRate},output_token_rate=#{outputRate},input_token_bound=#{inputBound}
         WHERE id=#{id}
         """) @Options(timeout=3)
     void priceCall(@Param("id")UUID id,@Param("authorization")UUID authorization,@Param("amount")java.math.BigDecimal amount,
-                   @Param("inputRate")java.math.BigDecimal inputRate,@Param("outputRate")java.math.BigDecimal outputRate);
+                   @Param("inputRate")java.math.BigDecimal inputRate,@Param("outputRate")java.math.BigDecimal outputRate,@Param("inputBound")int inputBound);
     @Select("SELECT * FROM reading_ai_call WHERE id=#{id}") @Options(timeout=3)
     Map<String,Object> callRow(UUID id);
     @Select("SELECT id FROM reading_ai_call WHERE id=#{id} FOR UPDATE") @Options(timeout=3)
@@ -81,7 +92,7 @@ public interface ReadingTaskMapper {
     int phaseCalls(@Param("id")UUID id,@Param("phase")String phase);
     @Update("UPDATE reading_ai_call SET status='UNKNOWN',updated_at=CURRENT_TIMESTAMP WHERE (task_id=#{id} OR index_job_id=#{id}) AND status='STARTED'") @Options(timeout=3)
     void unknown(UUID id);
-    @Select("SELECT ordinal,phase,status,usage_json::text AS usage,reserved_amount,settled_amount,input_bytes FROM reading_ai_call WHERE task_id=#{id} OR index_job_id=#{id} ORDER BY ordinal") @Options(timeout=3)
+    @Select("SELECT ordinal,phase,status,usage_json::text AS usage,reserved_amount,settled_amount,input_bytes,input_token_bound,authorization_id FROM reading_ai_call WHERE task_id=#{id} OR index_job_id=#{id} ORDER BY ordinal") @Options(timeout=3)
     List<Map<String,Object>> calls(UUID id);
     @Select("""
         SELECT p.id,p.version_id,p.chapter_id,p.paragraph_ordinal,p.chapter_paragraph_ordinal,p.text,p.code_point_count,p.text_hash

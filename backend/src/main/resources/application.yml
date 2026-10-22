@@ -41,6 +41,13 @@ spring:
         dimensions: 1024
 
 contextpilot:
+  reading:
+    # Evaluation only; credentials alone never enable calls. Keep approval files local/ignored.
+    live-enabled: ${READING_LIVE_ENABLED:false}
+    live-repository: ${READING_LIVE_REPOSITORY:..}
+    live-plan: ${READING_LIVE_PLAN:}
+    live-approval: ${READING_LIVE_APPROVAL:}
+    live-debug-reviewed: ${READING_LIVE_DEBUG_REVIEWED:false}
   task-workspace:
     enabled: ${TASK_WORKSPACE_ENABLED:false}
   upgrade-research:

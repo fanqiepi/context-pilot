@@ -36,13 +36,18 @@ class ReadingTaskPersistenceTests {
     }
     static class FakeAi implements ReadingAiGateway {
         volatile ReadingProviderClient protocol;
+        volatile ReadingLiveAuthorization live;
         volatile boolean allowed=true,blockEmbedding=false;volatile String finish="stop";volatile String answer="{\"facts\":[{\"text\":\"林舟来到渡口。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}";
         volatile String plan="{\"queries\":[\"林舟\",\"渡口\"]}";
         volatile CountDownLatch entered,release;
         final List<String> prompts=new CopyOnWriteArrayList<>();
         final AtomicInteger calls=new AtomicInteger(),embeddings=new AtomicInteger();
-        public boolean offline(){return true;}
-        public void requireAuthorized(){if(!allowed)throw ReadingTaskPolicy.failure("LIVE_AI_NOT_AUTHORIZED");}
+        public boolean offline(){return live==null;}
+        public void requireAuthorized(){if(live!=null)live.check();if(!allowed)throw ReadingTaskPolicy.failure("LIVE_AI_NOT_AUTHORIZED");}
+        public void authorizeWork(ReadingWork w,ReadingWork.Payload p){if(live!=null)live.authorize(w,p);}
+        public Pricing pricing(String phase){return live.pricing(phase);}
+        public int reservationInputTokens(String phase,int bytes){return live==null?bytes:ReadingLiveAuthorization.tokenBound(phase);}
+        public void haltBatch(){if(live!=null)live.halt();}
         public Response generate(String prompt,int limit,Duration timeout) {
             if(protocol!=null)return protocol.generate(prompt,limit,timeout);
             requireAuthorized();calls.incrementAndGet();prompts.add(prompt);
@@ -84,7 +89,7 @@ class ReadingTaskPersistenceTests {
     @Autowired WebApplicationContext web;
     @org.springframework.boot.test.web.server.LocalServerPort int port;
     record Fixture(UUID book,UUID version,List<BookRows.Paragraph> paragraphs) {}
-    @BeforeEach void reset() { ai.protocol=null;ai.allowed=true;ai.blockEmbedding=false;ai.finish="stop";ai.unblock();ai.prompts.clear();ai.calls.set(0);ai.embeddings.set(0);ai.answer="{\"facts\":[{\"text\":\"林舟来到渡口。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}"; }
+    @BeforeEach void reset() { ai.live=null;ai.protocol=null;ai.allowed=true;ai.blockEmbedding=false;ai.finish="stop";ai.unblock();ai.prompts.clear();ai.calls.set(0);ai.embeddings.set(0);ai.answer="{\"facts\":[{\"text\":\"林舟来到渡口。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}"; }
     @AfterEach void unblock(){ai.unblock();}
     Fixture fixture(String body) {
         byte[] bytes=("第一章 渡口\n"+UUID.randomUUID()+"\n"+body+"\n第二章 秘密标题\n未读身份秘密").getBytes(StandardCharsets.UTF_8);
@@ -124,7 +129,7 @@ class ReadingTaskPersistenceTests {
                 var rows=new ArrayList<Map<String,Object>>();for(int i=0;i<request.path("input").size();i++) {
                     float[] vector=new float[1024];vector[0]=1;rows.add(Map.of("index",i,"embedding",vector));
                 }
-                result=ReadingText.json(Map.of("data",rows,"usage",Map.of("prompt_tokens",7,"total_tokens",7)));
+                result=ReadingText.json(Map.of("data",rows,"usage",Map.of("total_tokens",7)));
             } else result=ReadingText.json(Map.of("choices",List.of(Map.of("message",Map.of("role","assistant","content",ai.answer),"finish_reason",finish.get())),
                     "usage",Map.of("prompt_tokens",12,"completion_tokens",8)));
             byte[] data=result.getBytes(StandardCharsets.UTF_8);exchange.getResponseHeaders().set("Content-Type","application/json");
@@ -273,6 +278,42 @@ class ReadingTaskPersistenceTests {
         assertThat(jdbc.queryForObject("SELECT reserved_amount FROM reading_spend_ledger WHERE id=?",java.math.BigDecimal.class,authorization)).isZero();
         mapper.freezeSpend(authorization);
         assertThatThrownBy(()->spend.reserve(states.owner(),used.equals(a)?b:a,pricing,60,0)).isInstanceOf(ReadingException.class);
+    }
+    @Test void liveCallCapUnknownFreezeAndReinstallationCannotResetBudget() throws Exception {
+        var f=fixture("林舟来到渡口。");boundary(f,2);var task=tasks.create(recapRequest(f));await(false,task.id(),"COMPLETED");
+        UUID authorization=UUID.randomUUID(),a=UUID.randomUUID(),b=UUID.randomUUID();String digest=ReadingText.hash(authorization.toString());
+        mapper.installLive(authorization,states.owner(),new java.math.BigDecimal("20"),ReadingLiveBatch.PRICE,java.time.OffsetDateTime.now().plusHours(1),digest,1);
+        mapper.call(a,task.id(),null,UUID.randomUUID(),2,"TEST_A",60,60,0);mapper.call(b,task.id(),null,UUID.randomUUID(),3,"TEST_B",60,60,0);
+        var pricing=new ReadingAiGateway.Pricing(authorization,ReadingLiveBatch.PRICE,ReadingLiveBatch.INPUT,java.math.BigDecimal.ZERO);
+        try(var pool=Executors.newFixedThreadPool(2)) {
+            var results=pool.invokeAll(List.<Callable<Boolean>>of(()->{try{spend.reserve(states.owner(),a,pricing,1048576,0);return true;}catch(ReadingException e){return false;}},
+                    ()->{try{spend.reserve(states.owner(),b,pricing,1048576,0);return true;}catch(ReadingException e){return false;}}));
+            assertThat(results.stream().filter(x->{try{return x.get();}catch(Exception e){throw new RuntimeException(e);}}).count()).isEqualTo(1);
+        }
+        UUID used=mapper.callRow(a).get("authorization_id")!=null?a:b;
+        assertThatThrownBy(()->spend.reserve(states.owner(),used,pricing,1048576,0)).isInstanceOf(ReadingException.class);
+        spend.settle(states.owner(),used,null);
+        assertThat(mapper.liveAvailable(authorization,states.owner(),digest)).isZero();
+        mapper.installLive(authorization,states.owner(),new java.math.BigDecimal("20"),ReadingLiveBatch.PRICE,java.time.OffsetDateTime.now().plusHours(1),digest,1);
+        assertThat(mapper.liveAvailable(authorization,states.owner(),digest)).isZero();
+        assertThat(jdbc.queryForObject("SELECT calls_started FROM reading_spend_ledger WHERE id=?",Integer.class,authorization)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT reserved_amount FROM reading_spend_ledger WHERE id=?",java.math.BigDecimal.class,authorization)).isEqualByComparingTo("2.097152");
+    }
+    @Test void authorizedTaskUsesDurableBudgetAndReplayCannotGenerateTwice() throws Exception {
+        var f=fixture("林舟来到渡口。");boundary(f,2);var request=recapRequest(f);var version=states.version(states.owner(),f.version);
+        var entry=new ReadingLiveBatch.Entry("debug-001",1,"DEBUG",f.version,f.book,version.fileHash(),version.parserId(),2,"RECAP",null,null,3,1,2,
+                f.paragraphs.stream().map(p->new ReadingLiveBatch.Paragraph(p.id(),p.paragraphOrdinal(),p.textHash())).toList());
+        UUID authorization=UUID.randomUUID();String digest=ReadingText.hash(authorization.toString());
+        var batch=new ReadingLiveBatch(authorization,digest,"plan","lock",new java.math.BigDecimal("20"),java.time.OffsetDateTime.now().minusMinutes(1),
+                java.time.OffsetDateTime.now().plusHours(1),Map.of(request.clientRequestId(),entry));
+        ai.live=new ReadingLiveAuthorization(mapper,bookMapper,states,batch,false);
+        var registered=tasks.create(request);assertThat(await(false,registered.id(),"COMPLETED","FAILED").status).isEqualTo("COMPLETED");
+        assertThat(tasks.create(request).id()).isEqualTo(registered.id());assertThat(ai.calls).hasValue(1);
+        assertThatThrownBy(()->tasks.create(recapRequest(f))).isInstanceOf(ReadingException.class);
+        assertThat(jdbc.queryForObject("SELECT calls_started FROM reading_spend_ledger WHERE id=?",Integer.class,authorization)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT settled_amount FROM reading_spend_ledger WHERE id=?",java.math.BigDecimal.class,authorization)).isEqualByComparingTo("0.000088");
+        assertThat(jdbc.queryForObject("SELECT input_token_bound FROM reading_ai_call WHERE task_id=?",Integer.class,registered.id())).isEqualTo(1048576);
+        assertThat(view(registered.id())).containsKey("elapsedMillis");
     }
     @Test void evidenceAndVectorWritesRollBackOnDatabaseFailure() throws Exception {
         var f=fixture("林舟来到渡口。");boundary(f,2);

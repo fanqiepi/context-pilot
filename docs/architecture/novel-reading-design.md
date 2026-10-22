@@ -1,5 +1,9 @@
 # 小说阅读业务合同草案
 
+2026-10-22 授权接线补充：阅读真实调用改为默认关闭、显式本地批准文件启用的固定评测批次。服务端校验源码/资产锁、语料版本/段落、题目/repeat、索引前缀及到期时间；金额与调用数原子预留。读取 embedding total_tokens，固定用户确认的北京专属端点；新增本机采集器和状态查询接口。批准文件属于受信任本地运维输入，单用户可信网络边界不变，无公网认证或 HTTP 授权创建入口。实际付费授权仍为零。详见[门禁工程验证](../evaluation/reading-live-gates-verification.md)。
+
+以下供应商适配轮记录保留为历史状态。
+
 2026-10-22 实现补充：阅读专用 `ReadingProviderClient` 经 `ReadingAiGateway` 隔离，使用已有 WebClient/Reactor Netty 发送固定 DeepSeek/DashScope 请求；不改变旧 Spring AI 配置。`ReadingAiConfiguration` 继续无条件拒绝真实调用，未开放生产授权接线。生成完整 HTTP JSON 包装参与输入上限/预留；embedding 返回 actual/unknown usage 进入既有账本。无新增依赖、表或外部 API，详情及本地协议证据见[验证记录](../evaluation/reading-provider-verification.md)。
 
 合同版本：`reading-contract-v1-draft1`（保留批准时版本标识）。日期：2026-10-20。**用户以“确认可行”批准本合同包，授权连续实施与离线验证；具体实现状态见功能清单，批准不是验收结果。付费实验未授权。**

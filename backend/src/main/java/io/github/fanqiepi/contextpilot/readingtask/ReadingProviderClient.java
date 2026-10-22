@@ -29,7 +29,7 @@ import static io.github.fanqiepi.contextpilot.readingtask.ReadingTaskPolicy.*;
 final class ReadingProviderClient {
     static final String GENERATION_MODEL="deepseek-v4-flash", EMBEDDING_MODEL="qwen3.7-text-embedding";
     static final URI GENERATION_URI=URI.create("https://api.deepseek.com/chat/completions");
-    static final URI EMBEDDING_URI=URI.create("https://dashscope.aliyuncs.com/compatible-mode/v1/embeddings");
+    static final URI EMBEDDING_URI=URI.create("https://llm-90adsh26dbyar5po.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/embeddings");
     private static final JsonMapper JSON=JsonMapper.builder()
             .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
             .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS).build();
@@ -85,7 +85,7 @@ final class ReadingProviderClient {
         limit(text,32768,32768,"OUTPUT_INVALID");
         // Preserve length/content_filter and actual usage for audit. The runner refuses publication.
         return new ReadingAiGateway.Response(text,token(root.path("usage"),"prompt_tokens"),
-                token(root.path("usage"),"completion_tokens"),finish);
+                token(root.path("usage"),"completion_tokens"),finish,metadata(root,"model"),metadata(root,"id"));
     }
     ReadingAiGateway.EmbeddingResponse embed(List<String> texts,Duration timeout) {
         if(texts==null || texts.isEmpty() || texts.size()>16)throw failure("INPUT_LIMIT");
@@ -112,7 +112,14 @@ final class ReadingProviderClient {
             }
             vector(vector);ordered[index.intValue()]=vector;
         }
-        return new ReadingAiGateway.EmbeddingResponse(List.copyOf(Arrays.asList(ordered)),token(root.path("usage"),"prompt_tokens"));
+        var usage=root.path("usage");
+        Long total=token(usage,"total_tokens");
+        // The selected model documents total_tokens only. An optional prompt count must agree.
+        if(usage.has("prompt_tokens") && !Objects.equals(total,token(usage,"prompt_tokens")))total=null;
+        return new ReadingAiGateway.EmbeddingResponse(List.copyOf(Arrays.asList(ordered)),total,metadata(root,"model"),metadata(root,"id"));
+    }
+    private static String metadata(JsonNode root,String field) {
+        var value=root.path(field);return value.isTextual() && value.asText().matches("[A-Za-z0-9_./:-]{1,160}")?value.asText():null;
     }
     private static Long token(JsonNode usage,String name) {
         var value=usage.path(name);
