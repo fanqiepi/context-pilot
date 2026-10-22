@@ -1,0 +1,79 @@
+{
+  "version": "reading-performance-evidence-v1",
+  "date": "2026-10-22",
+  "productionImplementation": "reading-acceptance-v9",
+  "prompt": "reading-evidence-v3",
+  "mode": "OFFLINE_ENGINEERING",
+  "finalSamples": 123,
+  "initialSamplingIssue": "68 of 123 resource traces missing due to browser timing-buffer capacity; retained and rejected by final summary rules.",
+  "files": [
+    {
+      "file": "evals/reports/reading-performance-v1/browser-samples.jsonl",
+      "sha256": "3abb73e9978991d3f6b5c9b79fd7e5a65e506ef6e3c37ff80341e714fb784a78"
+    },
+    {
+      "file": "evals/reports/reading-performance-v1/final-state.json",
+      "sha256": "d2754e5cf255df15cc120660bed2d41f0a1c5a9324f089c4c7f7aa9507d8beb4"
+    },
+    {
+      "file": "evals/reports/reading-performance-v1/initial/browser-samples.jsonl",
+      "sha256": "cf8198c8957536ce2ed56c25996ad457cf3fcdf7ec72577b349426e3bae746d3"
+    },
+    {
+      "file": "evals/reports/reading-performance-v1/initial/probe.js",
+      "sha256": "fa339a3ceb0b01e1a1a9e8dfb7c824c78e047617c09f36534b39513c5f398385"
+    },
+    {
+      "file": "evals/reports/reading-performance-v1/initial/report.json",
+      "sha256": "5b0b17592fa0f4ffafa84a5f6b50ba52ee5fea3aa861be4dbccddc462cb00c70"
+    },
+    {
+      "file": "evals/reports/reading-performance-v1/initial/verified-summary.json",
+      "sha256": "8a58c2c9f14f453109ada5963465695f33dff77304445f1dde72fe27187966ba"
+    },
+    {
+      "file": "evals/reports/reading-performance-v1/narrow-directory.png",
+      "sha256": "20ae4de96e230b47a1a6935e9511a50e82687b6a2666caf0c4e387b5ef0c7371"
+    },
+    {
+      "file": "evals/reports/reading-performance-v1/narrow-pagination.png",
+      "sha256": "a07dd91d5d9b46e66be3121b8866fb2dc25d35968b373afcfdfdc2f15e02d516"
+    },
+    {
+      "file": "evals/reports/reading-performance-v1/narrow-reader.png",
+      "sha256": "7c001b9afcf41e08726e79b0904552397b471e7905262d4dcf53251adb841059"
+    },
+    {
+      "file": "evals/reports/reading-performance-v1/pagination.json",
+      "sha256": "9a0b71e2d62e1d215d609eccce1f9bea7219155c4bc03a79f63cc2bc4074e2f5"
+    },
+    {
+      "file": "evals/reports/reading-performance-v1/report.json",
+      "sha256": "62eba4bc583a2955a5ace92ba1a12079aa2bf682ea181e93c15d3e07387a3fcd"
+    },
+    {
+      "file": "evals/reports/reading-performance-v1/verified-summary.json",
+      "sha256": "f504f86920c54dac86d26afb3af59e72d0e9e527df14e43711739b62cbae30cd"
+    },
+    {
+      "file": "tools/reading-performance.ps1",
+      "sha256": "6dbc0149280af44599067d39d7fd7f58c1145a5b185bcbd67ef23c508ffcb99d"
+    },
+    {
+      "file": "evals/tools/reading-performance.mjs",
+      "sha256": "2c39e87ee64502fb845121f046baf425a621e9d36c887e3249a76727416b5631"
+    },
+    {
+      "file": "evals/tools/reading-performance-probe.js",
+      "sha256": "7fbc82a6d7dc740ca78e878cc11067f7e4a8323397e01b79757b42fd4e8c8e6b"
+    },
+    {
+      "file": "evals/tools/reading-performance.test.mjs",
+      "sha256": "bd0a194c5d160b8b26fb72f542c72c088389d505b3f68c69bb6598a7f1b77e70"
+    },
+    {
+      "file": "backend/src/test/java/io/github/fanqiepi/contextpilot/book/ReadingPerformanceFixtureTests.java",
+      "sha256": "68efdedcce9e7425430ae1b86f09b3e91f749f3adf0e1957eb9de909ffed7439"
+    }
+  ]
+}
