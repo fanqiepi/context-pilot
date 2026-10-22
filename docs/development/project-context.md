@@ -1,5 +1,7 @@
 # 研序 项目背景
 
+2026-10-22 最新开发：已完成 FULL/PARTIAL 与依据组织的离线修正，Prompt 为 reading-evidence-v3，实现冻结 acceptance-v8。完整性按用户所问事项判断；有依据但遗漏时补齐答案，真实缺口继续 PARTIAL，无依据继续拒答。公共协议、检索与预算不变。v5/v7 真实观测及四个停止账本保留，本轮未执行付费或 TEST；离线回归不证明真实模型已修好。详见[完整性修复验证](../evaluation/reading-completeness-verification.md)和[当前交接](continuation-handoff.md)。下文为各轮历史记录。
+
 2026-10-22 最新结果：用户主动发起 DEBUG 重测，已完成 acceptance-v7（Prompt 仍为 reading-evidence-v2）。V34 唯一前置账本承接剩余额度，严格限 12 条 DEBUG、复用旧索引。真实执行 29 次 HTTP，原 debug-008 正确拒答；debug-006/011 出现依据充分但 PARTIAL 过于保守的问题，因此新账本也以 DEBUG_REVIEW_FAILED 持久停止，TEST 96 次仍 NOT_RUN。本轮保守结算 DeepSeek 0.019374 元、阿里 0.00015050 元；含 v5 剩余分别为 19.963232 元、9.99951250 元，未知/预留均为零。后端和隔离库已停止。 详见[重测记录](../evaluation/reading-live-v7-results.md)。下一轮只推进完整性判断的离线修正，不自动恢复付费或 TEST；下文旧版本记录保留为历史。
 
 2026-10-22 当前进展：已核实 PR #38 合并。本轮针对 debug-008 完成人物查证的明确可回答性协议与离线回归，Prompt 升级 reading-evidence-v2，实现冻结 acceptance-v6。公共结果格式、调用数及预算不变。新提示词尚未真实复测，v5 失败及停止账本保留；详见[拒答修复验证](../evaluation/reading-refusal-verification.md)。下方此前版本记录按当时状态保留。

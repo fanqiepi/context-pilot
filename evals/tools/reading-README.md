@@ -14,8 +14,8 @@ node evals/tools/reading-eval.mjs report backend/target/reading-not-run.json
 ## 固定资产
 
 - [数据集](../datasets/reading/acceptance-v1.json)同时记录语料、段落哈希、边界、问题、参考事实/证据、不可使用事实与风险标签。
-- 当前[配置](../configs/reading/acceptance-v6.json)、[冻结清单](../configs/reading/acceptance-v6.lock.json)、[评分协议](../configs/reading/scoring-v1.md)记录模型、Prompt、代码与资产指纹及未就绪条件。v6 的 `datasetVersion` 指向未修改的 v1 数据集，运行版本必须为 v6，不能混用旧观测。
-- [v1 配置](../configs/reading/acceptance-v1.json)及[v1 锁](../configs/reading/acceptance-v1.lock.json)保持原字节，作为 `4f13128` 的历史快照；复核旧版工具/文档应在该 Git 提交的独立检出中执行，不能用新工作树覆盖旧锁。当前 CLI 默认使用 v6。
+- 当前[配置](../configs/reading/acceptance-v8.json)、[冻结清单](../configs/reading/acceptance-v8.lock.json)、[评分协议](../configs/reading/scoring-v1.md)记录模型、Prompt、代码与资产指纹及未就绪条件。v8 的 `datasetVersion` 指向未修改的 v1 数据集，运行版本必须为 v8，不能混用旧观测。本轮仅离线修复，尚无 v8 真实观测或批准文件。
+- v1–v7 配置、锁与真实结果保持原字节。复核旧版工具/文档应在对应 Git 提交的独立检出中执行，不能用新工作树覆盖旧锁。当前 CLI 默认使用 v8；旧版源码哈希与当前不同是预期行为。
 - [来源与许可](../corpora/reading/acceptance-v1/provenance.md)区分项目自创短篇、改写版和英文原作片段。短语料不能证明真实长篇语义质量。
 - 数字预算和质量门槛以[唯一路线](../../docs/development/novel-reading-roadmap.md)为准。分组数量/重复次数是该版本数据集的结构约束，变更要发布新资产版本。
 
@@ -53,16 +53,16 @@ LIVE_END_TO_END 已执行记录必须有：
 
 [reading-live.mjs](reading-live.mjs) 和[操作说明](reading-live-README.md)已实现本机绑定、默认未批准模板、DEBUG/TEST 分离采集；后端默认关闭。v2 配置与锁也保持原字节，历史复现使用 d6f3f05 的检出。历史 v3 增加 V32 和本地批准门禁，不代表付费已授权。
 
-## 付费执行前仍缺什么
+## 当前真实验收缺口
 
-生产默认仍拒绝真实调用；固定批次执行器已实现，但实际绑定、有效批准文件与真实运行证据尚未产生。
+v5/v7 已获用户主动授权并执行 DEBUG，两轮均因复核问题停止；保留[最新真实结果](../../docs/evaluation/reading-live-v7-results.md)。v8 仅完成[完整性离线修复](../../docs/evaluation/reading-completeness-verification.md)，不能重放旧批准文件。
 
 | 前置项 | 当前状态 | 需提交的证据 |
 | --- | --- | --- |
-| 阅读专用 DeepSeek / DashScope 适配 | 客户端已实现，生产网关仍阻断 | 固定模型不变；序列化输出上限、错误/截断/usage 已有本地证据，真实供应商行为待验证 |
+| 阅读专用 DeepSeek / DashScope 适配 | 已有 v5/v7 真实协议及 usage 观测，默认关闭 | 固定模型不变，历史观测不证明 v8 提示词语义效果 |
 | HTTP 协议门禁 | 本地通过 | 捕获序列化请求、无自动重试/重定向、整体限时与取消、embedding 不隐藏拆批；见[协议验证](../../docs/evaluation/reading-provider-verification.md) |
-| 当前价格版本 | 公开资料已核实，币种/地域经用户确认；账户权限及可执行版本未验证 | 见[授权准备](../../docs/evaluation/reading-live-authorization-preparation.md)；已使用上下文容量预留并修复 usage/授权接线，仍需运行时价格复核和实际批准；历史配置与锁不回写 |
-| 独立授权 | 未获得 | 确定批次 case/repeat 清单、索引清单、调用上限、金额与到期时间；旧研究授权不能沿用 |
-| 实际评测与试用 | 未执行 | 原始运行、人工独立评分、真实读者反馈与失败记录 |
+| 当前价格版本 | 账户条件已确认，价格快照有时效 | 新执行前复核当时价格和有效期，历史配置与锁不回写 |
+| 独立授权 | v5/v7 已批准但均停止，v8 无新批准 | 用户主动发起后绑定新锁、原 DEBUG 清单和唯一前置账本剩余额度；预算与到期时间由路线维护 |
+| 实际评测与试用 | DEBUG 未放行，TEST 与读者体验未完成 | 保留失败；新的真实 DEBUG 复核、人工独立评分与真实读者反馈仍需完成 |
 
 以上不是新产品功能授权；它们是已经批准的阅读闭环执行真实评测所需的门禁。本地 HTTP 通过不证明供应商真实支持；实现及测试见[授权采集门禁](../../docs/evaluation/reading-live-gates-verification.md)。

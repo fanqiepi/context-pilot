@@ -6,8 +6,8 @@ import {execFileSync} from 'node:child_process';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const DATA = 'evals/datasets/reading/acceptance-v1.json';
-const CONFIG = 'evals/configs/reading/acceptance-v7.json';
-const LOCK = 'evals/configs/reading/acceptance-v7.lock.json';
+const CONFIG = 'evals/configs/reading/acceptance-v8.json';
+const LOCK = 'evals/configs/reading/acceptance-v8.lock.json';
 export const hash = value => createHash('sha256').update(value).digest('hex');
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const read = file => JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/^\uFEFF/, ''));
@@ -113,6 +113,7 @@ function sourceFiles() {
       'backend/src/test/java/io/github/fanqiepi/contextpilot/book/ReadingLibraryPersistenceTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingnote/ReadingNoteProposalPersistenceTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingTaskPolicyTests.java',
+      'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingLookupCompletenessTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingTaskPersistenceTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingProviderProtocolTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingLiveAuthorizationTests.java',
@@ -122,7 +123,8 @@ function sourceFiles() {
 export function freeze(dataset, config, output) {
   validateAssets(dataset, config);
   const assets = [DATA, CONFIG, config.scoring, config.roadmap, config.evaluation,
-    'evals/tools/reading-eval.mjs', 'evals/tools/reading-assets.mjs', 'evals/tools/reading-live.mjs', 'evals/tools/reading-live.test.mjs', 'evals/results/reading/acceptance-v5/debug-v5.json',
+    'evals/tools/reading-eval.mjs', 'evals/tools/reading-assets.mjs', 'evals/tools/reading-live.mjs', 'evals/tools/reading-live.test.mjs',
+    'evals/results/reading/acceptance-v5/debug-v5.json', 'evals/results/reading/acceptance-v7/debug-v7.json',
     ...walk('evals/corpora/reading/acceptance-v1')];
   const fingerprints = files => Object.fromEntries([...new Set(files)].sort().map(file => [file, hash(fs.readFileSync(path.join(ROOT, file)))]));
   const lock = {version: config.version, datasetVersion: dataset.version, createdAt: new Date().toISOString(),
