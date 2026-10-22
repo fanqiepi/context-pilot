@@ -7,7 +7,7 @@ import {ROOT, loadAssets, validateAssets, verifyLock, hash, template} from './re
 export const endpoints = Object.freeze({generation:'https://api.deepseek.com/chat/completions',
   embedding:'https://llm-90adsh26dbyar5po.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/embeddings'});
 export const PRICE='reading-cny-20261022-v1';
-const lockFile='evals/configs/reading/acceptance-v4.lock.json';
+const lockFile='evals/configs/reading/acceptance-v5.lock.json';
 const read=f=>JSON.parse(fs.readFileSync(f,'utf8').replace(/^\uFEFF/,''));
 const json=o=>JSON.stringify(o,null,2)+'\n';
 const check=(v,message)=>{if(!v)throw Error(message);};
@@ -82,14 +82,15 @@ export function makePlan(bindings,dataset,config,lockBytes) {
 }
 export function approvalTemplate(planBytes) {
   return {schema:'reading-live-approval-v1',status:'NOT_AUTHORIZED',authorizationId:randomUUID(),planSha256:hash(planBytes),
-    pricingVersion:PRICE,pricingVerifiedAt:null,authorizedAt:null,expiresAt:null,limitCny:'20.00',maxCalls:346,accountConditionsConfirmed:false};
+    pricingVersion:PRICE,pricingVerifiedAt:null,authorizedAt:null,expiresAt:null,limitCny:'30.00',providerLimitsCny:{DEEPSEEK:'20.00',DASHSCOPE:'10.00'},maxCalls:346,accountConditionsConfirmed:false};
 }
 function validateApproval(planBytes,approval) {
   const now=Date.now(),start=Date.parse(approval.authorizedAt),end=Date.parse(approval.expiresAt),verified=Date.parse(approval.pricingVerifiedAt);
   check(approval.schema==='reading-live-approval-v1'&&approval.status==='APPROVED'&&approval.accountConditionsConfirmed===true,'Independent paid approval required');
   check(approval.planSha256===hash(planBytes)&&approval.pricingVersion===PRICE&&approval.maxCalls===346,'Approval mismatch');
   check(start<=now&&end>now&&end-start<=86400000&&verified<=start&&end-verified<=86400000,'Approval or price expired');
-  check(Number(approval.limitCny)>0&&Number(approval.limitCny)<=20,'Invalid approved budget');
+  const d=Number(approval.providerLimitsCny?.DEEPSEEK),e=Number(approval.providerLimitsCny?.DASHSCOPE);
+  check(d>0&&d<=20&&e>0&&e<=10&&Number(approval.limitCny)===d+e,'Invalid provider budgets');
 }
 export async function collect(api,plan,approval,raw,dataset,split,checkpoint) {
   check(['DEBUG','TEST'].includes(split),'Select DEBUG or TEST');
@@ -98,7 +99,7 @@ export async function collect(api,plan,approval,raw,dataset,split,checkpoint) {
   if(split==='DEBUG')check(status.callsStarted===0,'DEBUG already started; recover the journal, do not rerun');
   if(split==='TEST')check(status.debugReviewed&&dataset.cases.filter(c=>c.split==='DEBUG').every(c=>raw.results.find(r=>r.caseId===c.caseId)?.status==='OBSERVED'),'Complete and review DEBUG first');
   raw.environment={...status.environment,codeFingerprint:plan.implementationLockSha256};raw.bindings=plan.bindings;
-  raw.authorizationId=approval.authorizationId;raw.costBasis='PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE';raw.indexObservations??=[];raw.collectorEvents??=[];
+  raw.providerBudgets=status.providers;raw.authorizationId=approval.authorizationId;raw.costBasis='PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE';raw.indexObservations??=[];raw.collectorEvents??=[];
   await checkpoint(raw);
   for(const entry of planEntries(dataset).filter(e=>e.split===split)) {
     const binding=plan.bindings.find(b=>b.corpusId===entry.corpusId),version=binding.versionId;
@@ -166,7 +167,7 @@ if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.ur
     const plan=makePlan(read(bindings),dataset,config,lockBytes),bytes=Buffer.from(json(plan));fs.writeFileSync(output,bytes,{flag:'wx'});
     fs.writeFileSync(output+'.approval.json',json(approvalTemplate(bytes)),{flag:'wx'});
     console.log(json({status:'NOT_AUTHORIZED',planSha256:hash(bytes),entries:planEntries(dataset).length,maxHttp:346,
-      aggregateReservationCny:planEntries(dataset).reduce((n,e)=>n+reservation(e).reserveCny,0),proposedStopCny:20}));
+      aggregateReservationCny:planEntries(dataset).reduce((n,e)=>n+reservation(e).reserveCny,0),proposedProviderStopsCny:{DEEPSEEK:20,DASHSCOPE:10}}));
   }else if(command==='run') {
     const [base,planPath,approvalPath,output,split,debugRaw]=args;check(output&&!fs.existsSync(output)&&!fs.existsSync(output+'.journal.jsonl'),'New output path required');
     const planBytes=fs.readFileSync(planPath),plan=JSON.parse(planBytes),approval=read(approvalPath);validateApproval(planBytes,approval);

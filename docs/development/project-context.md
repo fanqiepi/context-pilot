@@ -1,5 +1,9 @@
 # 研序 项目背景
 
+2026-10-22 最新授权：用户明确批准 DeepSeek 20 元、阿里向量模型 10 元，并允许真实调用。执行固定语料批次，两个供应商独立账本、额度不可互借，任一停止阻止整个批次；此前“未授权/待确认”描述仅为历史。当前实现冻结为 acceptance-v5，保留 v1–v4；结果见[本轮执行记录](../evaluation/reading-live-v5-results.md)。
+
+执行结果：真实 DEBUG 已完成 12 题和 6 个索引，35 次 HTTP 有已知用量；debug-008 未正确拒答，两个账本已以 DEBUG_REVIEW_FAILED 持久停止，TEST 96 次保留 NOT_RUN。下一步修复该 DEBUG 缺陷并离线验证，不能沿用旧“请求付费授权”待办或自动重跑停止批次。详细金额、证据、恢复材料及未完成项见上方执行记录。
+
 > 新会话先读本文，再读 [AGENTS.md](../../AGENTS.md)、[新开发路线](novel-reading-roadmap.md)和[当前交接](continuation-handoff.md)，并核对代码、配置和 Git 状态。更新：2026-10-22。
 
 ## 当前方向

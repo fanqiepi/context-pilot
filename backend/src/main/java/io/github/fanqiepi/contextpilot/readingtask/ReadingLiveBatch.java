@@ -13,15 +13,15 @@ import static io.github.fanqiepi.contextpilot.readingtask.ReadingTaskPolicy.fail
 
 /** Fixed local evaluation contract, not an HTTP authorization API or arbitrary job registry. */
 final class ReadingLiveBatch {
-    static final String VERSION="reading-acceptance-v4", PRICE="reading-cny-20261022-v1";
-    static final String LOCK="evals/configs/reading/acceptance-v4.lock.json", DATA="evals/datasets/reading/acceptance-v1.json";
+    static final String VERSION="reading-acceptance-v5", PRICE="reading-cny-20261022-v1";
+    static final String LOCK="evals/configs/reading/acceptance-v5.lock.json", DATA="evals/datasets/reading/acceptance-v1.json";
     static final int GENERATION_INPUT_BOUND=1_048_576, EMBEDDING_LINE_BOUND=128_000, CALL_LIMIT=346;
     static final BigDecimal INPUT=new BigDecimal("0.000002"),OUTPUT=new BigDecimal("0.000008"),EMBEDDING=new BigDecimal("0.0000005");
     private static final JsonMapper JSON=JsonMapper.builder().enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
             .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS).build();
     final UUID id;
     final String digest,planHash,lockHash;
-    final BigDecimal limit;
+    final BigDecimal limit,embeddingLimit;
     final OffsetDateTime authorizedAt,expiresAt;
     final Map<UUID,Entry> entries;
     record Entry(String caseId,int repeat,String split,UUID versionId,UUID bookId,String fileHash,String parserId,
@@ -30,9 +30,15 @@ final class ReadingLiveBatch {
 
     ReadingLiveBatch(UUID id,String digest,String planHash,String lockHash,BigDecimal limit,OffsetDateTime authorizedAt,
                              OffsetDateTime expiresAt,Map<UUID,Entry> entries) {
-        this.id=id;this.digest=digest;this.planHash=planHash;this.lockHash=lockHash;this.limit=limit;
+        this(id,digest,planHash,lockHash,limit,limit,authorizedAt,expiresAt,entries);
+    }
+    ReadingLiveBatch(UUID id,String digest,String planHash,String lockHash,BigDecimal limit,BigDecimal embeddingLimit,OffsetDateTime authorizedAt,
+                     OffsetDateTime expiresAt,Map<UUID,Entry> entries) {
+        this.embeddingLimit=embeddingLimit;this.id=id;this.digest=digest;this.planHash=planHash;this.lockHash=lockHash;this.limit=limit;
         this.authorizedAt=authorizedAt;this.expiresAt=expiresAt;this.entries=Map.copyOf(entries);
     }
+    UUID embeddingId() { return key(id,"DASHSCOPE_LEDGER",0); }
+    String embeddingDigest() { return ReadingText.hash(digest+":DASHSCOPE"); }
     static ReadingLiveBatch load(Path repository,Path planFile,Path approvalFile,Clock clock) {
         try {
             Path root=repository.toRealPath();byte[] planBytes=read(planFile),approvalBytes=read(approvalFile);
@@ -46,7 +52,11 @@ final class ReadingLiveBatch {
             OffsetDateTime verified=OffsetDateTime.parse(approval.path("pricingVerifiedAt").asText()),now=OffsetDateTime.now(clock);
             require(!start.isAfter(now) && end.isAfter(now) && end.isAfter(start) && Duration.between(start,end).compareTo(Duration.ofHours(24))<=0);
             require(!verified.isAfter(start) && Duration.between(verified,end).compareTo(Duration.ofHours(24))<=0);
-            BigDecimal amount=new BigDecimal(approval.path("limitCny").asText());require(amount.signum()>0 && amount.compareTo(new BigDecimal("20"))<=0 && amount.scale()<=8);
+            var limits=approval.path("providerLimitsCny");
+            BigDecimal amount=new BigDecimal(limits.path("DEEPSEEK").asText()),embeddingAmount=new BigDecimal(limits.path("DASHSCOPE").asText());
+            require(amount.signum()>0 && amount.compareTo(new BigDecimal("20"))<=0 && amount.scale()<=8);
+            require(embeddingAmount.signum()>0 && embeddingAmount.compareTo(new BigDecimal("10"))<=0 && embeddingAmount.scale()<=8);
+            require(amount.add(embeddingAmount).compareTo(new BigDecimal(approval.path("limitCny").asText()))==0);
             require(ReadingProviderClient.GENERATION_MODEL.equals(plan.path("generationModel").asText())
                     && ReadingProviderClient.EMBEDDING_MODEL.equals(plan.path("embeddingModel").asText())
                     && ReadingProviderClient.GENERATION_URI.toString().equals(plan.path("generationEndpoint").asText())
@@ -99,7 +109,7 @@ final class ReadingLiveBatch {
                 }
             }
             require(entries.size()==135);
-            return new ReadingLiveBatch(id,ReadingText.hash(approvalBytes),planHash,lockHash,amount,start,end,entries);
+            return new ReadingLiveBatch(id,ReadingText.hash(approvalBytes),planHash,lockHash,amount,embeddingAmount,start,end,entries);
         } catch(Exception invalid) { throw failure("LIVE_APPROVAL_INVALID"); }
     }
     static UUID key(UUID batch,String entry,int repeat) { return UUID.nameUUIDFromBytes((batch+":"+entry+":"+repeat).getBytes(StandardCharsets.UTF_8)); }

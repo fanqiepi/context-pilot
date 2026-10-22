@@ -1,5 +1,9 @@
 # ContextPilot repository guidance
 
+## Latest paid authorization (2026-10-22)
+
+The user explicitly approved CNY 20 for DeepSeek and CNY 10 for Alibaba embeddings and instructed real calls. This supersedes historical no-authorization statements below for this fixed reading batch only. acceptance-v5 separates durable provider ledgers (no borrowing), retaining the fixed dataset, DEBUG review before TEST, expiry, call caps and stop-on-failure rules. Do not request the same permission again, reset spent/unknown amounts, or automatically retry a stopped batch. DEBUG completed 12 tasks and 6 indexes (35 provider calls); debug-008 failed refusal review. Both ledgers are durably stopped with DEBUG_REVIEW_FAILED; TEST remains NOT_RUN. Next work is the DEBUG refusal fix and offline regression, not automatic paid retries. See `docs/evaluation/reading-live-v5-results.md`; earlier v1–v4 locks/plans remain historical.
+
 ## Session startup and current direction
 
 - At the beginning of each conversation, read `docs/development/project-context.md`, this file, and `docs/development/novel-reading-roadmap.md` before planning repository work; then read the current handoff and verify mutable details against code, configuration and Git.

@@ -333,6 +333,24 @@ class ReadingTaskPersistenceTests {
         assertThatThrownBy(ai.live::check).isInstanceOf(ReadingException.class);
         assertThat(tasks.create(request).id()).isEqualTo(registered.id());assertThat(ai.calls).hasValue(0);
     }
+    @Test void providerBudgetsAreIndependentAndEitherStoppedLedgerBlocksBoth() throws Exception {
+        var f=fixture("林舟来到渡口。");boundary(f,2);var task=tasks.create(recapRequest(f));await(false,task.id(),"COMPLETED");
+        UUID authorization=UUID.randomUUID(),a=UUID.randomUUID(),b=UUID.randomUUID();
+        var batch=new ReadingLiveBatch(authorization,ReadingText.hash(authorization.toString()),"plan","lock",new java.math.BigDecimal("20"),new java.math.BigDecimal("10"),
+                java.time.OffsetDateTime.now().minusMinutes(1),java.time.OffsetDateTime.now().plusHours(1),Map.of());
+        var gate=new ReadingLiveAuthorization(mapper,bookMapper,states,batch,false);gate.check();
+        mapper.call(a,task.id(),null,UUID.randomUUID(),2,"INDEX_0",1,1,0);mapper.call(b,task.id(),null,UUID.randomUUID(),3,"INDEX_1",1,1,0);
+        var price=new ReadingAiGateway.Pricing(gate.pricing("INDEX_0").authorizationId(),ReadingLiveBatch.PRICE,java.math.BigDecimal.ONE,java.math.BigDecimal.ZERO);
+        spend.reserve(states.owner(),a,price,8,0);
+        assertThatThrownBy(()->spend.reserve(states.owner(),b,price,3,0)).isInstanceOf(ReadingException.class);
+        assertThat(mapper.ledger(batch.id,states.owner())).containsEntry("warning_emitted",false).containsEntry("calls_started",0);
+        assertThat(mapper.ledger(batch.embeddingId(),states.owner())).containsEntry("warning_emitted",true).containsEntry("calls_started",1);
+        assertThat((java.math.BigDecimal)mapper.ledger(batch.id,states.owner()).get("reserved_amount")).isZero();
+        assertThat(gate.status()).containsEntry("callsStarted",1L).containsEntry("limitCny",new java.math.BigDecimal("30"));
+        spend.settle(states.owner(),a,null);
+        assertThatThrownBy(()->gate.pricing("ANSWER")).isInstanceOf(ReadingException.class);
+        assertThat(gate.status()).containsEntry("liveAllowed",false).containsEntry("stopReason","USAGE_UNKNOWN");
+    }
     @Test void thresholdWarningCommitsOnceAndSurvivesRepeatedInstall() throws Exception {
         var f=fixture("林舟来到渡口。");boundary(f,2);var task=tasks.create(recapRequest(f));await(false,task.id(),"COMPLETED");
         UUID authorization=UUID.randomUUID(),a=UUID.randomUUID(),b=UUID.randomUUID();String digest=ReadingText.hash(authorization.toString());
