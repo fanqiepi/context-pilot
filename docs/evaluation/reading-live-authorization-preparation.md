@@ -13,14 +13,16 @@
 | DeepSeek 模型 | [人民币模型与价格](https://api-docs.deepseek.com/zh-cn/quick_start/pricing/)列出 `deepseek-flash`，版本为 `DeepSeek-V4.1-Flash-1017`；脚注明确旧名 `deepseek-v4-flash` 仍可调用，由该新版服务并按 Flash 计费 | 保留已批准的请求名；不能声称运行的仍是旧 V4 权重。未来运行需记录请求名、响应 model、调用时间与当日公开版本映射；响应别名不能证明权重固定 |
 | DeepSeek 端点与参数 | 上述页面给出 `https://api.deepseek.com`；[Chat Completions](https://api-docs.deepseek.com/api/create-chat-completion/)支持 `max_tokens`、`thinking.type=disabled`、`response_format.type=json_object` | 代码固定 POST `https://api.deepseek.com/chat/completions`，非流式；字段有文档依据，实际输出限制仍待获授权的请求验证 |
 | DashScope 模型 | [同步接口](https://help.aliyun.com/zh/model-studio/text-embedding-synchronous-api)北京表列出 `qwen3.7-text-embedding`，支持 1024 维、每请求最多 20 条输入 | 保留原模型和 1024 维；项目每批最多 16 条，未要求改成 flash 或其他模型 |
-| DashScope 端点 | [Base URL 总览](https://help.aliyun.com/zh/model-studio/base-url)明确共享域名继续可用，北京 OpenAI 兼容地址为 `https://dashscope.aliyuncs.com/compatible-mode/v1`；API Key 与地域、计费方案需匹配 | 仓库固定 POST 该地址下的 `/embeddings` 有官方支持依据。文档推荐业务空间域名不等于旧端点下线；无需自动迁移。实际账户地域及权限仍待确认 |
+| DashScope 端点 | [Base URL 总览](https://help.aliyun.com/zh/model-studio/base-url)明确共享域名继续可用，北京 OpenAI 兼容地址为 `https://dashscope.aliyuncs.com/compatible-mode/v1`；API Key 与地域、计费方案需匹配 | 仓库固定 POST 该地址下的 `/embeddings` 有官方支持依据。文档推荐业务空间域名不等于旧端点下线；无需自动迁移。北京地域现已由用户确认，账户权限未实测；用户提供的专属端点见下文 |
 | embedding 用量 | 同步接口当前中文文档说明：本项目模型仅返回 `usage.total_tokens`；`prompt_tokens` 由另一个 flash 模型返回 | 发现现有 `ReadingProviderClient.embed` 只读取 `prompt_tokens`，合法响应会落为 UNKNOWN。付费前需修复并补协议/账本测试，不得将缺失字段记为零或自动重发 |
 
 DeepSeek API 枚举只列推荐模型名，价格页脚注补充旧名兼容承诺；这解决了之前“文档枚举不同”的公开依据缺口，仍不构成账户实测。DashScope 示例换成业务空间域名也不构成迁移授权。
 
 ## 公开价格与适用条件
 
-候选计价快照标识：`reading-public-cny-20261022-draft1`，状态为 `PUBLIC_DOCUMENTS_VERIFIED_ACCOUNT_PENDING`，**未写入运行配置或账本**。该标识是项目本地证据名，不是供应商价格版本号。仅适用于 DeepSeek 人民币计费账户及 DashScope 北京按量同步调用；账户条件确认后才能激活，运行前还要复核页面有无变更。
+2026-10-22 用户后续明确确认：DeepSeek 账户以人民币计费，百炼地域为北京，控制台 Base URL 为 `https://llm-90adsh26dbyar5po.cn-beijing.maas.aliyuncs.com/compatible-mode/v1`。这是用户提供的账户信息，未登录控制台或发送 API 请求复验。该地址是业务空间专属端点，当前阅读客户端仍固定使用共享端点 `https://dashscope.aliyuncs.com/compatible-mode/v1/embeddings`；后续接线需将所选端点明确绑定到最终批次及固定允许列表，不扩展为任意 URL。
+
+候选计价快照标识：`reading-public-cny-20261022-draft1`，状态更新为 `PUBLIC_DOCUMENTS_VERIFIED_CURRENCY_REGION_USER_CONFIRMED`，**未写入运行配置或账本**。该标识是项目本地证据名，不是供应商价格版本号。币种和地域符合本表适用条件；百炼按量方案、模型权限、余额/限流及实际请求支持仍未验证。价格和授权执行门禁齐备后才能激活，运行前还要复核页面有无变更。用户补充账户信息不构成付费授权。
 
 | 模型/费用项 | 公布价格 | 保守预留单价（元/token） |
 | --- | --- | --- |
@@ -73,7 +75,7 @@ DeepSeek API 枚举只列推荐模型名，价格页脚注补充旧名兼容承�
 
 ## 付费前仍需补齐的事项
 
-1. 账户条件：用户确认 DeepSeek 的人民币计费、DashScope 北京地域及当前公开 Base URL；账户模型权限、余额与限流仍需账户证据或获授权后受控请求验证。不要在文档或聊天中收集 API Key。
+1. 账户条件：人民币计费、北京地域及控制台专属 Base URL 已由用户确认，无需重复询问。后续接线需处理专属端点与现有固定共享端点的差异；按量方案、模型权限、余额与限流仍需账户证据或获授权后受控请求验证。不要在文档或聊天中收集 API Key。
 2. 修复 embedding `total_tokens` 审计；覆盖仅 total、字段缺失、负数、冲突/异常值等，并验证 UNKNOWN 不释放预留。这是当前实现与官方协议的具体差异，不是模型质量问题。
 3. 完成受账本保护的生产授权与采集入口。当前网关无条件拒绝，`pricing()` 默认抛 `PRICING_UNKNOWN`；账本金额/到期门禁已有，但 case/repeat、模型/端点、索引计划、请求数量与运行版本仍需在执行端强制绑定。不能只手工插入余额并删除拒绝语句。
 4. 费用口径：校验 token 上界、峰谷/缓存与账单语义；提供逐任务/索引估算和原子预留，超额/过期/未知价格停止。失败/UNKNOWN 保持预留，无隐藏重试。完成这些离线检查后生成新锁及最终批次。

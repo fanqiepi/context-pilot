@@ -14,7 +14,7 @@
 
 ## 已有能力与证据
 
-2026-10-22 后续核对起点为干净的 `develop/144726e`，远程 develop 相同。本轮完成[公开模型/端点/价格核实与授权准备](../evaluation/reading-live-authorization-preparation.md)：旧 DeepSeek 请求名有兼容依据，北京 DashScope 共享端点仍支持；账户条件未核实，付费授权仍为零。发现 embedding 用量字段与当前官方文档不一致，需在真实调用前修复；授权接线、采集入口及可靠费用上界仍待补齐。此记录更新公开资料状态，不覆盖 acceptance-v2 的历史锁，也不代表生产已开放。
+2026-10-22 后续核对起点为干净的 `develop/144726e`，远程 develop 相同。本轮完成[公开模型/端点/价格核实与授权准备](../evaluation/reading-live-authorization-preparation.md)：旧 DeepSeek 请求名有兼容依据，北京 DashScope 共享端点仍支持；用户随后确认 DeepSeek 人民币计费、百炼北京地域及业务空间专属端点；账户权限尚未实测，付费授权仍为零。代码仍固定共享端点，后续接线需明确最终端点。发现 embedding 用量字段与当前官方文档不一致，需在真实调用前修复；授权接线、采集入口及可靠费用上界仍待补齐。此记录更新公开资料状态，不覆盖 acceptance-v2 的历史锁，也不代表生产已开放。
 
 | 能力 | 当前结论 | 详情 |
 | --- | --- | --- |

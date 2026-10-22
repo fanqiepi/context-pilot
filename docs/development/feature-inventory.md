@@ -8,7 +8,7 @@ V1–V5 已验收；升级研究最终质量验收未通过、默认关闭。工
 
 ## 小说基础阅读
 
-2026-10-22 后续完成[真实调用授权准备](../evaluation/reading-live-authorization-preparation.md)：公开模型映射、北京兼容端点及人民币价格已有官方依据，候选 case/repeat、增量索引及费用计算已列明。账户条件、可靠 token 上界、生产授权与采集入口仍缺；新增发现已选 embedding 模型的 `total_tokens` 与客户端读取字段不符。未改源码、未修复该差异、未调用付费 API，不能把公开资料核实写成线上协议通过。
+2026-10-22 后续完成[真实调用授权准备](../evaluation/reading-live-authorization-preparation.md)：公开模型映射、北京兼容端点及人民币价格已有官方依据，候选 case/repeat、增量索引及费用计算已列明。用户已确认人民币计费、北京地域及控制台专属端点；账户权限/按量方案、可靠 token 上界、生产授权与采集入口仍待验证或补齐；新增发现已选 embedding 模型的 `total_tokens` 与客户端读取字段不符。未改源码、未修复该差异、未调用付费 API，不能把公开资料核实写成线上协议通过。
 
 “验证续读体验并准备展示”的离线准备见[验证记录](../evaluation/reading-experience-verification.md)和[演示脚本](reading-demo.md)。2026-10-22 新增[阅读供应商协议验证](../evaluation/reading-provider-verification.md)：固定 DeepSeek/DashScope 客户端、请求包装计量、embedding usage 审计，以及本地 HTTP 无重试/超时/取消/截断测试。固定 DEBUG/TEST 未修改，当前实现锁为 acceptance-v2；生产调用继续阻断。真实协议/计价授权/付费采集、人工语义、真实试用与录屏未完成，整项能力不能标为已验收。
 
