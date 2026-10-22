@@ -1,5 +1,15 @@
 # ContextPilot repository guidance
 
+## Delivery cadence correction (2026-10-22)
+
+The user explicitly rejected fragmenting development/testing into separate PR milestones and asked to continue. Complete a substantial user capability and its end-to-end checks before recommending a PR; internal fixes, prompt revisions, test passes and documentation updates are not individual PR checkpoints. Continue the approved interrupted-reading workflow through a usable shelf-to-recap-to-source-to-note-to-reader experience and repeatable local demonstration. Keep the mandatory local commit rule, but do not stop after each internal repair. Paid stopped-batch, scope and truthful acceptance boundaries still apply.
+
+Current delivery is the interrupted-reading workspace and repeatable isolated demonstration, frozen as acceptance-v9 with reading-evidence-v3. Shelf-to-recap, character lookup history, citations, confirmed notes and adjacent chapter navigation have desktop/narrow-screen engineering evidence in `docs/evaluation/reading-workspace-verification.md`. No paid calls or new approval were installed; v1–v8 locks and stopped ledgers remain untouched. Formal semantic acceptance, actual reader feedback, browser performance and recording remain outstanding. Historical notes below retain their dated scope.
+
+## Latest offline completeness repair (2026-10-22)
+
+The current implementation is acceptance-v8 / reading-evidence-v3. This bounded offline repair defines completeness by the actual question, distinguishes missing evidence from omitted answer content, and organizes direct narration with attributed statements. The response schema, retrieval, public Result and budgets are unchanged; never force PARTIAL to FULL. Preserve v1–v7 locks, v5/v7 observations and all four stopped ledgers. No v8 paid plan/approval is installed and no live semantic success is claimed. See `docs/evaluation/reading-completeness-verification.md`. Next work requires user-initiated DEBUG retesting with the latest stopped predecessor and remaining budgets; no automatic retest or TEST.
+
 ## Latest user-initiated DEBUG retest (2026-10-22)
 
 The user explicitly requested the proposed next round: fixed 12 DEBUG tasks once, reusing existing indexes and only the original remaining provider budgets. acceptance-v7 adds V34 unique stopped-predecessor ledger linkage and DEBUG_RETEST-only plan/approval gates; Prompt stays reading-evidence-v2. The run completed 29 HTTP calls with known usage; debug-008 refused correctly, but debug-006/011 exposed overly conservative PARTIAL decisions despite retrieved supporting evidence. Both new ledgers are stopped with DEBUG_REVIEW_FAILED; TEST 96 remains NOT_RUN. Original and successor evidence/locks/ledgers must be preserved. Cumulative remaining budgets: DeepSeek CNY 19.96323200, DashScope CNY 9.99951250; no unknown reservations. Next task is the bounded offline FULL/PARTIAL repair, not automatic paid retesting or TEST. See `docs/evaluation/reading-live-v7-results.md`. Historical statements below retain their dated scope.

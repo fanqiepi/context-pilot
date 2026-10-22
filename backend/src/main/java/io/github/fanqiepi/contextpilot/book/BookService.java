@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BookService {
     public record Page<T>(List<T> items,int page,int size,long total) {}
     public record Chapter(UUID id,int chapterOrdinal,String title,boolean titleHidden,int firstParagraphOrdinal,int lastParagraphOrdinal) {}
-    public record Paragraphs(UUID versionId,UUID chapterId,String title,List<BookRows.Paragraph> paragraphs,String nextCursor,OffsetDateTime dataAsOf) {}
+    public record Paragraphs(UUID versionId,UUID chapterId,int chapterOrdinal,String title,List<BookRows.Paragraph> paragraphs,String nextCursor,OffsetDateTime dataAsOf) {}
     public record Edit(Long expectedRevision,String title,String sourceDescription) {}
     private final BookMapper mapper;
     private final ReadingStateService states;
@@ -80,7 +80,7 @@ public class BookService {
         }
         int last=items.isEmpty()?after:items.getLast().paragraphOrdinal();
         String next=last<c.lastParagraphOrdinal()?cursor(version,chapter,last):null;
-        return new Paragraphs(version,chapter,revealTitle || c.lastParagraphOrdinal()<=boundary?c.title():null,List.copyOf(items),next,OffsetDateTime.now());
+        return new Paragraphs(version,chapter,c.chapterOrdinal(),revealTitle || c.lastParagraphOrdinal()<=boundary?c.title():null,List.copyOf(items),next,OffsetDateTime.now());
     }
     public static String cursor(UUID version,UUID chapter,int after) {
         return Base64.getUrlEncoder().withoutPadding().encodeToString((version+":"+chapter+":"+after).getBytes(StandardCharsets.UTF_8));

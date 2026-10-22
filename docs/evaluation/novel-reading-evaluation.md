@@ -1,5 +1,9 @@
 # 小说阅读验收方案草案
 
+2026-10-22 续读工作台使用 acceptance-v9，Prompt 保持 reading-evidence-v3。新增桌面/窄屏工程交互证据及独立演示入口：固定已完成任务、范围回退、原文返回、预览与确认保存、跨页续读。未运行任何供应商请求，不计入 DEBUG/TEST 语义样本或真实读者人数。证据、命令与局限见[工作台验证](reading-workspace-verification.md)。
+
+2026-10-22 完整性修复使用 reading-evidence-v3 / acceptance-v8。从 v7 debug-006/011 的已记录检索段落重建离线输入，用明确标注的手写响应检查完整答案与历史 PARTIAL 的不同处理；保留真缺口、无依据、说法/计划与实际事实的反例及既有拒答回归。没有让模型回答或改 TEST，合成终态不能证明语义修复成功。旧配置/锁/失败原字节保留，本轮无新付费计划、批准或观测，详见[完整性修复验证](reading-completeness-verification.md)。
+
 2026-10-22 DEBUG 重测沿用全部 v1 问题、参考事实和评分合同，Prompt 保持 reading-evidence-v2；acceptance-v7 只更新授权衔接和采集实现。用户已主动发起本轮重测，具体次数、剩余预算和期限仅由 [当前路线](../development/novel-reading-roadmap.md)维护。预先要求旧索引就绪，运行范围严格为 DEBUG，TEST 仍保留 NOT_RUN。执行代理逐条核对另存 operational-review，原始 review 保持 null，不能伪称独立人工评分。结果见 [重测记录](reading-live-v7-results.md)。
 
 2026-10-22 拒答修复轮：当前实现 acceptance-v6、Prompt reading-evidence-v2，保留 v1–v5 配置/锁和 v5 真实 DEBUG 失败。仅以 DEBUG 失败及独立合成协议夹具开发，未采集或据 TEST 调参。新增明确可回答性、部分回答、矛盾响应、旧失败响应拒绝与任务/usage 持久化回归。工程门禁不能证明模型会正确选择 answerability；真实复测与人工评分仍待完成。见[拒答修复验证](reading-refusal-verification.md)。

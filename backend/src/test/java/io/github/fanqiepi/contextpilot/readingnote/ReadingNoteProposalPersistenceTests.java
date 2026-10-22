@@ -24,8 +24,22 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         "server.address=127.0.0.1","spring.ai.model.chat=none","spring.ai.model.embedding=none","spring.ai.vectorstore.type=none",
         "contextpilot.storage.root=target/reading-note-test-uploads","contextpilot.task-workspace.enabled=false","contextpilot.upgrade-research.enabled=false"})
 @org.springframework.test.annotation.DirtiesContext
+@org.springframework.context.annotation.Import(ReadingNoteProposalPersistenceTests.DemoConfiguration.class)
 @Testcontainers
 class ReadingNoteProposalPersistenceTests {
+    @org.springframework.boot.test.context.TestConfiguration
+    @org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name="reading.note.ui",havingValue="true")
+    static class DemoConfiguration {
+        @org.springframework.context.annotation.Bean @org.springframework.context.annotation.Primary
+        ReadingAiGateway readOnlyDemoAi() {
+            return new ReadingAiGateway() {
+                public boolean offline() { return true; }
+                public void requireAuthorized() { throw ReadingTaskPolicy.failure("LIVE_AI_NOT_AUTHORIZED"); }
+                public Response generate(String prompt,int limit,java.time.Duration timeout) { throw new AssertionError("Demo cannot generate"); }
+                public List<float[]> embed(List<String> texts,java.time.Duration timeout) { throw new AssertionError("Demo cannot embed"); }
+            };
+        }
+    }
     @Container static final PostgreSQLContainer POSTGRES=new PostgreSQLContainer(DockerImageName.parse("pgvector/pgvector:0.8.2-pg17-bookworm").asCompatibleSubstituteFor("postgres"));
     @DynamicPropertySource static void database(DynamicPropertyRegistry r) {
         r.add("spring.datasource.url",POSTGRES::getJdbcUrl);r.add("spring.datasource.username",POSTGRES::getUsername);r.add("spring.datasource.password",POSTGRES::getPassword);
@@ -47,8 +61,11 @@ class ReadingNoteProposalPersistenceTests {
 
     record Fixture(UUID book,UUID version,UUID task,List<BookRows.Paragraph> paragraphs) {}
     Fixture fixture() {
-        byte[] bytes=("第一章 渡口\n林舟来到渡口。\n青禾递给他一封信。\n"+UUID.randomUUID()+"\n第二章 未读的秘密\n此处尚未读到。").getBytes(StandardCharsets.UTF_8);
-        var reg=imports.register(new BookImportService.Request(UUID.randomUUID(),"笔记工程故事","自创离线夹具","TXT_CN_CHAPTER_V1",null,null),"note.txt",bytes);
+        return fixture("笔记工程故事","第一章 渡口\n林舟来到渡口。\n青禾递给他一封信。\n"+UUID.randomUUID()+"\n第二章 未读的秘密\n此处尚未读到。");
+    }
+    Fixture fixture(String title,String text) {
+        byte[] bytes=text.getBytes(StandardCharsets.UTF_8);
+        var reg=imports.register(new BookImportService.Request(UUID.randomUUID(),title,"自创离线夹具","TXT_CN_CHAPTER_V1",null,null),"note.txt",bytes);
         imports.parsed(reg.row().ownerId,reg.row().id,parser.parse(bytes,BookParser.Rule.TXT_CN_CHAPTER_V1,null));
         var published=imports.confirm(reg.row().id,imports.preview(reg.row().id).previewHash());
         var ps=jdbc.query("SELECT id FROM book_paragraph WHERE version_id=? ORDER BY paragraph_ordinal",
@@ -260,12 +277,24 @@ class ReadingNoteProposalPersistenceTests {
     @Test
     @org.junit.jupiter.api.condition.EnabledIfSystemProperty(named="reading.note.ui",matches="true")
     void offlineBrowserFixture() throws Exception {
-        var desktop=fixture();var mobile=fixture();
-        var metadata=java.nio.file.Path.of("target/reading-note-ui.json");
-        var done=java.nio.file.Path.of("target/reading-note-ui.done");
-        java.nio.file.Files.deleteIfExists(done);
-        java.nio.file.Files.writeString(metadata,ReadingText.json(Map.of("port",port,"desktop",desktop,"mobile",mobile)));
-        long until=System.nanoTime()+TimeUnit.MINUTES.toNanos(20);
+        String story="第一章 渡口\n林舟来到渡口。\n青禾递给他一封信。\n渡口的灯慢慢亮了起来，他把信收在外衣口袋里。\n第二章 沿岸\n林舟沿着石阶走向河岸，远处传来收帆的声音。\n他在桥头停下，记下了返程的路。\n第三章 归途\n夜色落下时，他重新回到渡口。";
+        var desktop=fixture("渡口来信 · 桌面演示",story);var mobile=fixture("渡口来信 · 窄屏演示",story+"\n河面映出最后一盏灯。");
+        for(var f:List.of(desktop,mobile)) {
+            states.resume(f.version,new ReadingStateService.Resume(UUID.randomUUID(),0L,f.paragraphs.get(1).id(),3));
+            var recap=tasks.get(false,f.task);var p=ReadingText.read(recap.payloadJson,ReadingWork.Payload.class);
+            recap.id=UUID.randomUUID();recap.clientRequestId=UUID.randomUUID();recap.traceId=UUID.randomUUID();recap.type="CHARACTER_LOOKUP";
+            p.question="林舟去了哪里？";p.mode="DIRECT";recap.payloadJson=ReadingText.json(p);tasks.insert(false,recap);
+            var evidence=p.evidence.getFirst();tasks.evidence(UUID.randomUUID(),recap.id,f.version,evidence.id(),ReadingText.json(evidence),ReadingText.hash(evidence.text()));
+        }
+        var longText=new StringBuilder();
+        for(int n=1;n<=52;n++)longText.append("第").append(n).append("章 行路\n第").append(n).append("站，旅人沿河走过一段石路。\n他记下路边的树影，准备继续前行。\n");
+        var navigation=fixture("沿河行路 · 跨页目录演示",longText.toString());
+        states.resume(navigation.version,new ReadingStateService.Resume(UUID.randomUUID(),0L,navigation.paragraphs.get(98).id(),0));
+        var folder=java.nio.file.Path.of(System.getProperty("reading.note.ui.directory","target"));java.nio.file.Files.createDirectories(folder);
+        var metadata=folder.resolve("reading-note-ui.json");
+        var done=folder.resolve("reading-note-ui.done");
+        java.nio.file.Files.writeString(metadata,ReadingText.json(Map.of("port",port,"desktop",desktop,"mobile",mobile,"navigation",navigation,"mode","OFFLINE_FIXTURE")));
+        long until=System.nanoTime()+TimeUnit.MINUTES.toNanos(60);
         while(!java.nio.file.Files.exists(done) && System.nanoTime()<until)Thread.sleep(500);
         assertThat(java.nio.file.Files.exists(done)).as("Browser fixture must be explicitly closed").isTrue();
     }

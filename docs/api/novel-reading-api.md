@@ -1,5 +1,7 @@
 # 小说阅读 API 合同草案
 
+2026-10-22 续读工作台补充：GET /versions/{versionId}/chapters/{chapterId}/paragraphs 响应增加 chapterOrdinal（1 起），用于恢复到目录分页之外时正确显示当前章和相邻章；未读 title 仍为 null。GET /versions/{versionId}/index 增加 executionMode=OFFLINE_FIXTURE/EVALUATION_ONLY/DISABLED，分别表示离线替身、已批准固定评测、关闭；它是界面说明，不授予调用权限。liveAllowed 及服务端每次请求的批准、范围和预算检查继续有效；EVALUATION_ONLY 不允许页面随机创建自由任务。无新写接口。
+
 2026-10-22 acceptance-v7 的本地 plan/approval 必须绑定 executionScope=DEBUG_RETEST，批准文件另含 previousAuthorizationId/previousApprovalDigest。状态接口新增 executionScope/previousAuthorizationId 并按批次返回调用上限；不提供 HTTP 授权/增额接口。仅接受冻结 DEBUG 请求，INDEX、TEST 或其他请求不在允许清单内，即使开启 debug-reviewed 也不能放行。前置账本不匹配/有未知预留返回 LIVE_PREDECESSOR_MISMATCH，已被其他批次承接返回 LIVE_BUDGET_ALREADY_TRANSFERRED；其余服务端门禁不变。
 
 2026-10-22 拒答修复保持公共 API 不变：人物查证内部模型响应要求可回答性评估；有效 INSUFFICIENT_EVIDENCE+空 facts 返回既有拒答状态，FULL+非空 facts 为 COMPLETED，PARTIAL+非空 facts 为 PARTIAL。缺失/未知评估或空/非空矛盾为 FAILED/OUTPUT_INVALID，不伪装成语义拒答；validatedResult 仍为 facts/partial，不暴露新授权入口。回顾响应合同不变。

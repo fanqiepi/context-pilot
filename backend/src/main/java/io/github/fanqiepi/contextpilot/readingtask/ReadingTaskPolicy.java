@@ -11,7 +11,7 @@ import static io.github.fanqiepi.contextpilot.readingtask.ReadingWork.*;
 
 /** Versioned prompt and strict, deterministic validation. No model-supplied source text is trusted. */
 public final class ReadingTaskPolicy {
-    public static final String PROMPT_VERSION="reading-evidence-v2";
+    public static final String PROMPT_VERSION="reading-evidence-v3";
     private static final JsonMapper LOOKUP_JSON=JsonMapper.builder()
             .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
             .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
@@ -54,7 +54,12 @@ public final class ReadingTaskPolicy {
                 "仅依据给出的已读原文回答用户当前问题，输出 JSON {\"answerability\":\"FULL\",\"facts\":[{\"text\":\"直接回答问题的事实\",\"evidenceIds\":[\"E1\"]}]}。"
                 +"answerability 必须从 FULL、PARTIAL、INSUFFICIENT_EVIDENCE 中选择一个。"
                 +"先判断原文能否回答问题所问的事实，再提取答案；有相关原文、有引用不等于能够回答问题。"
-                +"FULL 表示问题全部有依据；PARTIAL 仅用于多部分问题中至少一部分有依据，facts 只包含已回答部分；二者 facts 必须非空。"
+                +"完整性以用户实际问到的事项为准，不以人物全部经历、全部检索片段或未读后文为准。先识别问题中的实质事项，逐项核对全部已给证据，再组织 facts 并确定 answerability。"
+                +"FULL 表示所问事项均已得到直接支持的回答；单一事项有明确答案即可 FULL，不因答案简短、未复述无关背景或未知后续而降为 PARTIAL。"
+                +"PARTIAL 仅用于多部分问题中至少一项可回答、另一项确实缺少依据；必须能指出问题中具体哪一项无法回答，不能仅因谨慎而选 PARTIAL。facts 只包含已回答部分；FULL/PARTIAL 的 facts 必须非空。"
+                +"若已给证据足以回答但草稿遗漏了所问事项，应补齐答案后选 FULL，不能把组织遗漏当成证据缺口。"
+                +"问处理方式时，按已给原文组织与问题直接相关的背景、实际行动和已发生结果，不推断未记载的原因或后续。"
+                +"问是否及依据时，明确结论并组织支持它的直接叙述；存在相关人物澄清时保留说法归属，与直接叙述分别引用、相互核对，不能只摘一句说法而遗漏已有的直接依据。"
                 +"没有任何部分能确认时必须为 INSUFFICIENT_EVIDENCE 且 facts=[]，不输出仅相关背景代替拒答。"
                 +"严格区分实际发生、人物说法、要求、计划、假设和预测；要求或计划不证明已实现，说法不证明客观事实。"
                 +"若问某人说了什么或文本要求什么，可据对应原文回答；若问实际情况，仅有该说法或要求则不能确认。"

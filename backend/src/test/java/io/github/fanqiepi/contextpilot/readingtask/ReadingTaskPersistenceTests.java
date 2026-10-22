@@ -175,6 +175,7 @@ class ReadingTaskPersistenceTests {
     }
     @Test void pgvectorCandidatesFilterBeforeTopKAndLookupUsesOnlyCurrentPrefix() throws Exception {
         var f=fixture("林舟来到渡口。\n以后才揭露的别名");boundary(f,f.paragraphs.size());index(f);
+        assertThat(((Map<?,?>)tasks.index(f.version)).get("executionMode")).isEqualTo("OFFLINE_FIXTURE");
         boundary(f,2);
         var scope=scopes.capture(f.version);var p=new ReadingWork.Payload();p.scope=scope;
         float[] vector=new float[1024];vector[0]=1;

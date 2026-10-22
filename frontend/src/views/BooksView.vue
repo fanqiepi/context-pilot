@@ -30,11 +30,11 @@ onMounted(load)
       <article v-for="book in books" :key="book.id" class="reading-book-card">
         <div class="reading-book-cover" aria-hidden="true">{{ Array.from(book.title)[0] }}</div>
         <div><h2>{{ book.title }}</h2><p>{{ book.lastReadAt ? `最近阅读 ${new Date(book.lastReadAt).toLocaleString()}` : '还未开始阅读' }}</p><p class="reading-source">{{ book.sourceDescription || '个人导入文本' }}</p></div>
-        <div class="reading-actions"><RouterLink :to="{ path: `/books/${book.id}/read`, query: { version: book.readingVersionId || book.latestVersionId } }" class="reading-primary">继续阅读</RouterLink><RouterLink :to="`/books/${book.id}/notes`">笔记</RouterLink><el-button text @click="remove(book)">移除</el-button></div>
+        <div class="reading-actions"><RouterLink :to="{ path: `/books/${book.id}/read`, query: { version: book.readingVersionId || book.latestVersionId } }" class="reading-primary">继续阅读</RouterLink><RouterLink :to="{ path: `/books/${book.id}/read`, query: { version: book.readingVersionId || book.latestVersionId, assistant: 'recap' } }">回顾后继续</RouterLink><RouterLink :to="{ path: `/books/${book.id}/notes`, query: { version: book.readingVersionId || book.latestVersionId } }">笔记</RouterLink><el-button text @click="remove(book)">移除</el-button></div>
       </article>
     </div>
     <el-empty v-if="!loading && !books.length" description="导入一本 UTF-8 TXT 或 Markdown 小说，开始阅读。" />
     <el-pagination v-if="total > 20" v-model:current-page="page" :total="total" :page-size="20" layout="prev, pager, next" @current-change="load" />
-    <p class="reading-footnote">基础阅读无需 AI。阅读助手已接入已读范围与笔记确认流程，真实 AI 调用尚未开放。</p>
+    <p class="reading-footnote">继续阅读会恢复上次保存的位置；回顾只使用你明确确认的已读范围。基础阅读无需 AI，阅读 AI 仍在验证中。</p>
   </section>
 </template>

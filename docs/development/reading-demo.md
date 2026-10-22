@@ -1,29 +1,23 @@
 # 续读闭环演示与试用脚本
 
-2026-10-20。演示对象为本机/可信网络单用户。界面名仍为“研序｜技术研究 Agent”，ContextPilot 为技术标识。**真实阅读 AI 尚未开放；固定任务只能演示工程交互，不能作为模型回答、防剧透或真实试用证据。**
+2026-10-22。演示对象为本机/可信网络单用户。界面名仍为“研序｜技术研究 Agent”，ContextPilot 为技术标识。**真实阅读 AI 尚未开放；固定任务只能演示工程交互，不能作为模型回答、防剧透或真实试用证据。**
 
 ## 准备
 
 按[本地开发](local-development.md)启动基础阅读；首次演示用自创 [reading-library-demo.txt](../../evals/corpora/reading/reading-library-demo.txt)。不要用最终 TEST 调整 Prompt。用于真实评测的固定资产和报告命令见[阅读工具](../../evals/tools/reading-README.md)。
 
-如果要展示 AI 笔记的工程流程，使用现有隔离测试夹具：
+完整工作台可以一键启动独立离线演示。前置条件：Docker 已启动、JDK 21、Node.js 符合 frontend/package.json，已在 frontend 执行 npm ci。在仓库根目录执行：
 
 ```powershell
-cd backend
-$env:JAVA_HOME='F:\jdk21weizhi\microsoft-jdk-21.0.3-windows-x64\jdk-21.0.3+9'
-.\mvnw.cmd --batch-mode --no-transfer-progress '-Dtest=ReadingNoteProposalPersistenceTests#offlineBrowserFixture' '-Dreading.note.ui=true' test
+.\tools\reading-demo.ps1
+# 端口冲突时：.\tools\reading-demo.ps1 -Port 5213
 ```
 
-它启动 Testcontainers 隔离数据库与 localhost 随机端口，元数据在 `backend/target/reading-note-ui.json`。另一个终端启动前端：
+脚本启动 Testcontainers 一次性数据库、随机 localhost 后端端口，构建前端并仅监听 127.0.0.1；终端输出地址、日志目录及结束命令。点击书架“回顾后继续”即可查看固定回顾、切换人物查证、检查原文、编辑并确认笔记，再返回正文继续读。样本包含桌面、窄屏两本三章短文，以及从第 50 章恢复的 52 章跨页目录样本。
 
-```powershell
-cd frontend
-$fixture = Get-Content ../backend/target/reading-note-ui.json | ConvertFrom-Json
-$env:VITE_API_PROXY_TARGET='http://127.0.0.1:'+$fixture.port
-node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5212 --strictPort
-```
+固定结果只展示一次性数据，网关拒绝新任务/供应商请求；不要把它当作现场生成。生产库及原付费评测库不会被使用。使用终端打印的 Set-Content 完成命令或 Ctrl+C 结束，脚本关闭自己启动的前端，测试回收数据库；若后端退出超时，按输出日志核查。演示最多等待一小时，未主动结束会报告测试失败。不要同时运行其他 Maven 测试或覆盖 frontend/dist。
 
-结束时关闭测试标签和 Vite，将 `backend/target/reading-note-ui.done` 写为 `done`，夹具会退出并回收容器。不要将随机测试端口或固定任务暴露给公网，不往日常数据库灌演示完成态。
+本轮实测与截图见[工作台验证](../evaluation/reading-workspace-verification.md)。一键脚本替代此前手工拼接随机后端端口和启动前端的步骤。
 
 ## 演示顺序
 
@@ -57,6 +51,6 @@ node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5212 --strictPort
 
 ## 求职说明可用措辞
 
-> 实现单用户小说阅读闭环：版本化导入、独立续读位置与段落级已读范围、受范围约束的任务和引用、持久笔记提案与原子幂等确认。使用 PostgreSQL 集成测试验证事务、隔离和范围回退，建立冻结语料及人工评分工具。真实阅读模型适配与语义验收尚未完成。
+> 实现单用户小说阅读闭环：版本化导入、独立续读位置与段落级已读范围、受范围约束的任务和引用、持久笔记提案与原子幂等确认。使用 PostgreSQL 集成测试验证事务、隔离和范围回退，建立冻结语料及人工评分工具。真实模型适配已有协议与 DEBUG 观测，语义缺陷仍待复核，正式验收尚未完成。
 
 容量实测可附上机器、冷热状态和服务层口径，引用[本轮验证](../evaluation/reading-experience-verification.md)。不使用“绝对不剧透”“语义准确率已达标”“真实读者通过”或“产品已上线”等尚无证据的描述。

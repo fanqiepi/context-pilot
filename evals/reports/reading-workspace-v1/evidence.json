@@ -1,0 +1,77 @@
+{
+  "version": "reading-workspace-v1",
+  "date": "2026-10-22",
+  "mode": "OFFLINE_FIXTURE",
+  "semanticAcceptance": false,
+  "realReaderCount": 0,
+  "providerCalls": 0,
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 900
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844
+    }
+  },
+  "checks": {
+    "desktopPreview": {
+      "noteCount": 0,
+      "resumeRevision": 1,
+      "paragraphOrdinal": 2,
+      "offset": 3,
+      "readBoundary": 2
+    },
+    "desktopConfirmed": {
+      "noteCount": 1,
+      "userEdited": true,
+      "evidenceIds": [
+        "E1"
+      ]
+    },
+    "desktopNextChapter": {
+      "chapter": 2,
+      "paragraphOrdinal": 4,
+      "offset": 0,
+      "readBoundary": 2
+    },
+    "crossDirectoryPage": {
+      "from": 50,
+      "to": 51,
+      "visibleDirectoryOrdinals": [
+        51,
+        52
+      ],
+      "returnTo": 50
+    },
+    "mobileScopeRollback": {
+      "readBoundary": 0,
+      "resumeRevision": 1,
+      "paragraphOrdinal": 2,
+      "offset": 3,
+      "noteCount": 1,
+      "visibility": "HIDDEN_BY_SCOPE",
+      "title": null,
+      "body": null
+    },
+    "mobileRefreshedNextChapter": {
+      "chapter": 2,
+      "readBoundary": 0,
+      "positionSaved": true
+    },
+    "launcherFinal": {
+      "bookCount": 3,
+      "httpStatus": 200,
+      "shutdown": "NORMAL"
+    }
+  },
+  "screenshots": {
+    "chapter-51.png": "61bd69597b2e5b3adb1d209a913b14915eb8accfab0607aa9d93f2f091566865",
+    "desktop-recap.png": "3ac897aadfa8c799abb1f2d5f7240c6756761f013a63d667713c8c7dd80219f3",
+    "mobile-continue.png": "9b5066b1c0b3aee2cd6b9b211a6d34f72239e66a814ca0e55edd6cdf871a3684",
+    "mobile-note-saved.png": "f56656578948ecf218ab41b4299a2e2a13c491483e5c5b952a9638a811a91e51",
+    "mobile-recap.png": "7511d486d53945d580dc731c47f76dbad9892ab545220aa8ea6078ab159eeabf",
+    "mobile-scope-hidden.png": "d91275d8fe73b0fdf620cd79941400339107533b46bcd70917f824b4ee9e6081"
+  }
+}

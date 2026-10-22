@@ -17,6 +17,7 @@
 | [阅读供应商协议验证](evaluation/reading-provider-verification.md) | 2026-10-22 本地 HTTP 适配、用量审计与 acceptance-v2；真实调用仍阻断 |
 | [阅读真实调用授权准备](evaluation/reading-live-authorization-preparation.md) | 官方模型/端点/价格、候选批次与费用估算；账户条件和授权执行门禁尚未齐备 |
 | [阅读预算预警与停止](evaluation/reading-budget-alerts.md) | 本地日志、持久停止原因、供应商预警说明与 acceptance-v4 |
+| [阅读完整性离线修复](evaluation/reading-completeness-verification.md) | acceptance-v8 / reading-evidence-v3；修正 FULL/PARTIAL 提示规则，真实效果尚未复测 |
 | [阅读最终批次准备](evaluation/reading-live-batch-preparation.md) | 实际隔离库绑定、最终计划哈希与待确认的 20 元固定批次；尚未付费执行 |
 | [阅读授权采集门禁](evaluation/reading-live-gates-verification.md) / [采集操作](../evals/tools/reading-live-README.md) | 默认关闭的固定批次授权、上下文容量预留、V32 与采集器；真实执行仍需独立授权 |
 
