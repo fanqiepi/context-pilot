@@ -35,7 +35,7 @@ class ReadingLiveAuthorizationTests {
         plan=root.resolve("plan.json");Files.write(plan,json.writeValueAsBytes(proposal));approval=root.resolve("approval.json");
         approved=new LinkedHashMap<>();approved.put("schema","reading-live-approval-v1");approved.put("status","APPROVED");approved.put("authorizationId",UUID.randomUUID());
         approved.put("planSha256",ReadingText.hash(Files.readAllBytes(plan)));approved.put("accountConditionsConfirmed",true);approved.put("pricingVersion",ReadingLiveBatch.PRICE);
-        approved.put("maxCalls",346);approved.put("limitCny","20");approved.put("authorizedAt","2026-10-22T03:00:00Z");approved.put("expiresAt","2026-10-23T02:00:00Z");approved.put("pricingVerifiedAt","2026-10-22T03:00:00Z");writeApproval();
+        approved.put("maxCalls",346);approved.put("limitCny","30");approved.put("providerLimitsCny",Map.of("DEEPSEEK","20","DASHSCOPE","10"));approved.put("authorizedAt","2026-10-22T03:00:00Z");approved.put("expiresAt","2026-10-23T02:00:00Z");approved.put("pricingVerifiedAt","2026-10-22T03:00:00Z");writeApproval();
     }
     void writeApproval() throws Exception { Files.write(approval,json.writeValueAsBytes(approved)); }
     ReadingLiveBatch load(){return ReadingLiveBatch.load(root,plan,approval,clock);}
@@ -60,9 +60,17 @@ class ReadingLiveAuthorizationTests {
     @Test void duplicateJsonCannotGrantApproval() throws Exception {
         Files.writeString(approval,"{\"status\":\"NOT_AUTHORIZED\",\"status\":\"APPROVED\"}");assertThatThrownBy(this::load).isInstanceOf(ReadingException.class);
     }
+    @Test void providerLimitsCannotBorrowOrExceedApprovedAmounts() throws Exception {
+        for(var limits:List.of(Map.of("DEEPSEEK","20.01","DASHSCOPE","9.99"),Map.of("DEEPSEEK","19","DASHSCOPE","11"),Map.of("DEEPSEEK","30"))) {
+            approved.put("providerLimitsCny",limits);writeApproval();
+            assertThatThrownBy(this::load).isInstanceOf(ReadingException.class);
+        }
+    }
     @Test void authorizationBindsRequestVersionBoundaryQuestionAndCorpus() {
         var batch=load();var mapper=mock(ReadingTaskMapper.class);var books=mock(BookMapper.class);var states=mock(ReadingStateService.class);UUID owner=UUID.randomUUID();
-        when(states.owner()).thenReturn(owner);when(mapper.ledger(batch.id,owner)).thenReturn(Map.of("approval_digest",batch.digest,"limit_amount",batch.limit,"pricing_version",ReadingLiveBatch.PRICE));
+        when(states.owner()).thenReturn(owner);when(mapper.ledger(batch.id,owner)).thenReturn(Map.of("approval_digest",batch.digest,"limit_amount",batch.limit,"pricing_version",ReadingLiveBatch.PRICE,"call_limit",154));
+        when(mapper.ledger(batch.embeddingId(),owner)).thenReturn(Map.of("approval_digest",batch.embeddingDigest(),"limit_amount",batch.embeddingLimit,"pricing_version",ReadingLiveBatch.PRICE,"call_limit",192));
+        when(mapper.liveAvailable(batch.embeddingId(),owner,batch.embeddingDigest())).thenReturn(1);
         when(mapper.liveAvailable(batch.id,owner,batch.digest)).thenReturn(1);
         var gate=new ReadingLiveAuthorization(mapper,books,states,batch,false);
         var item=batch.entries.entrySet().stream().filter(e->e.getValue().caseId().equals("debug-005")).findFirst().orElseThrow();var e=item.getValue();
@@ -70,6 +78,8 @@ class ReadingLiveAuthorizationTests {
         var p=new ReadingWork.Payload();p.scope=new ReadingScopeService.Snapshot(owner,e.bookId(),e.versionId(),e.boundary(),1,1,OffsetDateTime.now(clock));p.mode=e.mode();p.question=e.question();
         when(states.version(owner,e.versionId())).thenReturn(new BookRows.Version(e.versionId(),owner,e.bookId(),e.fileHash(),"text",e.parserId(),1,"options",4,e.paragraphs().size(),100,OffsetDateTime.now(clock),0));
         for(var part:e.paragraphs())when(books.paragraph(e.versionId(),part.id())).thenReturn(new BookRows.Paragraph(part.id(),e.versionId(),UUID.randomUUID(),part.ordinal(),1,"fixture",7,part.hash()));
+        assertThat(gate.pricing("ANSWER").authorizationId()).isEqualTo(batch.id);
+        assertThat(gate.pricing("INDEX_0").authorizationId()).isEqualTo(batch.embeddingId());
         gate.authorize(w,p);assertThat(p.liveApprovalDigest).isEqualTo(batch.digest);
         p.question="不同问题";assertThatThrownBy(()->gate.authorize(w,p)).isInstanceOf(ReadingException.class);p.question=e.question();
         w.clientRequestId=UUID.randomUUID();assertThatThrownBy(()->gate.authorize(w,p)).isInstanceOf(ReadingException.class);w.clientRequestId=item.getKey();

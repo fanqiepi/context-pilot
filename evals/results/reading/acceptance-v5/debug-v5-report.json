@@ -1,0 +1,645 @@
+{
+  "version": "reading-acceptance-v5",
+  "mode": "LIVE_END_TO_END",
+  "total": 108,
+  "groups": [
+    {
+      "split": "DEBUG",
+      "repeat": 1,
+      "taskType": "RECAP",
+      "total": 4,
+      "observed": 4,
+      "failed": 0,
+      "notRun": 0,
+      "reviewed": 0,
+      "facts": {
+        "pooled": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "macro": null,
+        "rated": 0,
+        "empty": 0,
+        "unreviewed": 4
+      },
+      "citations": {
+        "pooled": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "macro": null,
+        "rated": 0,
+        "empty": 0,
+        "unreviewed": 4
+      },
+      "usable": {
+        "numerator": 0,
+        "denominator": 4,
+        "rate": 0
+      },
+      "correctRefusal": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null
+      },
+      "recapRecall": {
+        "overall": {
+          "pooled": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          },
+          "macro": null,
+          "rated": 0,
+          "empty": 0,
+          "unreviewed": 4
+        },
+        "perCase": [
+          {
+            "caseId": "debug-001",
+            "status": "OBSERVED",
+            "recall": null
+          },
+          {
+            "caseId": "debug-002",
+            "status": "OBSERVED",
+            "recall": null
+          },
+          {
+            "caseId": "debug-003",
+            "status": "OBSERVED",
+            "recall": null
+          },
+          {
+            "caseId": "debug-004",
+            "status": "OBSERVED",
+            "recall": null
+          }
+        ]
+      },
+      "latency": {
+        "samples": 4,
+        "missing": 0,
+        "p95Ms": 3335
+      }
+    },
+    {
+      "split": "DEBUG",
+      "repeat": 1,
+      "taskType": "CHARACTER_LOOKUP",
+      "total": 8,
+      "observed": 8,
+      "failed": 0,
+      "notRun": 0,
+      "reviewed": 0,
+      "facts": {
+        "pooled": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "macro": null,
+        "rated": 0,
+        "empty": 0,
+        "unreviewed": 8
+      },
+      "citations": {
+        "pooled": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "macro": null,
+        "rated": 0,
+        "empty": 0,
+        "unreviewed": 8
+      },
+      "usable": {
+        "numerator": 0,
+        "denominator": 6,
+        "rate": 0
+      },
+      "correctRefusal": {
+        "numerator": 0,
+        "denominator": 2,
+        "rate": 0
+      },
+      "recapRecall": null,
+      "latency": {
+        "samples": 8,
+        "missing": 0,
+        "p95Ms": 4317
+      }
+    },
+    {
+      "split": "TEST",
+      "repeat": 1,
+      "taskType": "RECAP",
+      "total": 16,
+      "observed": 0,
+      "failed": 0,
+      "notRun": 16,
+      "reviewed": 0,
+      "facts": {
+        "pooled": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "macro": null,
+        "rated": 0,
+        "empty": 0,
+        "unreviewed": 16
+      },
+      "citations": {
+        "pooled": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "macro": null,
+        "rated": 0,
+        "empty": 0,
+        "unreviewed": 16
+      },
+      "usable": {
+        "numerator": 0,
+        "denominator": 16,
+        "rate": 0
+      },
+      "correctRefusal": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null
+      },
+      "recapRecall": {
+        "overall": {
+          "pooled": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          },
+          "macro": null,
+          "rated": 0,
+          "empty": 0,
+          "unreviewed": 16
+        },
+        "perCase": [
+          {
+            "caseId": "test-001",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-002",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-003",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-004",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-005",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-006",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-007",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-008",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-009",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-010",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-011",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-012",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-013",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-014",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-015",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-016",
+            "status": "NOT_RUN",
+            "recall": null
+          }
+        ]
+      },
+      "latency": {
+        "samples": 0,
+        "missing": 16,
+        "p95Ms": null
+      }
+    },
+    {
+      "split": "TEST",
+      "repeat": 1,
+      "taskType": "CHARACTER_LOOKUP",
+      "total": 32,
+      "observed": 0,
+      "failed": 0,
+      "notRun": 32,
+      "reviewed": 0,
+      "facts": {
+        "pooled": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "macro": null,
+        "rated": 0,
+        "empty": 0,
+        "unreviewed": 32
+      },
+      "citations": {
+        "pooled": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "macro": null,
+        "rated": 0,
+        "empty": 0,
+        "unreviewed": 32
+      },
+      "usable": {
+        "numerator": 0,
+        "denominator": 21,
+        "rate": 0
+      },
+      "correctRefusal": {
+        "numerator": 0,
+        "denominator": 11,
+        "rate": 0
+      },
+      "recapRecall": null,
+      "latency": {
+        "samples": 0,
+        "missing": 32,
+        "p95Ms": null
+      }
+    },
+    {
+      "split": "TEST",
+      "repeat": 2,
+      "taskType": "RECAP",
+      "total": 16,
+      "observed": 0,
+      "failed": 0,
+      "notRun": 16,
+      "reviewed": 0,
+      "facts": {
+        "pooled": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "macro": null,
+        "rated": 0,
+        "empty": 0,
+        "unreviewed": 16
+      },
+      "citations": {
+        "pooled": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "macro": null,
+        "rated": 0,
+        "empty": 0,
+        "unreviewed": 16
+      },
+      "usable": {
+        "numerator": 0,
+        "denominator": 16,
+        "rate": 0
+      },
+      "correctRefusal": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null
+      },
+      "recapRecall": {
+        "overall": {
+          "pooled": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          },
+          "macro": null,
+          "rated": 0,
+          "empty": 0,
+          "unreviewed": 16
+        },
+        "perCase": [
+          {
+            "caseId": "test-001",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-002",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-003",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-004",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-005",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-006",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-007",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-008",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-009",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-010",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-011",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-012",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-013",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-014",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-015",
+            "status": "NOT_RUN",
+            "recall": null
+          },
+          {
+            "caseId": "test-016",
+            "status": "NOT_RUN",
+            "recall": null
+          }
+        ]
+      },
+      "latency": {
+        "samples": 0,
+        "missing": 16,
+        "p95Ms": null
+      }
+    },
+    {
+      "split": "TEST",
+      "repeat": 2,
+      "taskType": "CHARACTER_LOOKUP",
+      "total": 32,
+      "observed": 0,
+      "failed": 0,
+      "notRun": 32,
+      "reviewed": 0,
+      "facts": {
+        "pooled": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "macro": null,
+        "rated": 0,
+        "empty": 0,
+        "unreviewed": 32
+      },
+      "citations": {
+        "pooled": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "macro": null,
+        "rated": 0,
+        "empty": 0,
+        "unreviewed": 32
+      },
+      "usable": {
+        "numerator": 0,
+        "denominator": 21,
+        "rate": 0
+      },
+      "correctRefusal": {
+        "numerator": 0,
+        "denominator": 11,
+        "rate": 0
+      },
+      "recapRecall": null,
+      "latency": {
+        "samples": 0,
+        "missing": 32,
+        "p95Ms": null
+      }
+    }
+  ],
+  "latencyByMode": [
+    {
+      "split": "DEBUG",
+      "repeat": 1,
+      "mode": "RECAP",
+      "planned": 4,
+      "samples": 4,
+      "missing": 0,
+      "technicalFailures": 0,
+      "p95Ms": 3335
+    },
+    {
+      "split": "DEBUG",
+      "repeat": 1,
+      "mode": "DIRECT",
+      "planned": 4,
+      "samples": 4,
+      "missing": 0,
+      "technicalFailures": 0,
+      "p95Ms": 1893
+    },
+    {
+      "split": "DEBUG",
+      "repeat": 1,
+      "mode": "MULTI_QUERY",
+      "planned": 4,
+      "samples": 4,
+      "missing": 0,
+      "technicalFailures": 0,
+      "p95Ms": 4317
+    },
+    {
+      "split": "TEST",
+      "repeat": 1,
+      "mode": "RECAP",
+      "planned": 16,
+      "samples": 0,
+      "missing": 16,
+      "technicalFailures": 0,
+      "p95Ms": null
+    },
+    {
+      "split": "TEST",
+      "repeat": 1,
+      "mode": "DIRECT",
+      "planned": 11,
+      "samples": 0,
+      "missing": 11,
+      "technicalFailures": 0,
+      "p95Ms": null
+    },
+    {
+      "split": "TEST",
+      "repeat": 1,
+      "mode": "MULTI_QUERY",
+      "planned": 21,
+      "samples": 0,
+      "missing": 21,
+      "technicalFailures": 0,
+      "p95Ms": null
+    },
+    {
+      "split": "TEST",
+      "repeat": 2,
+      "mode": "RECAP",
+      "planned": 16,
+      "samples": 0,
+      "missing": 16,
+      "technicalFailures": 0,
+      "p95Ms": null
+    },
+    {
+      "split": "TEST",
+      "repeat": 2,
+      "mode": "DIRECT",
+      "planned": 11,
+      "samples": 0,
+      "missing": 11,
+      "technicalFailures": 0,
+      "p95Ms": null
+    },
+    {
+      "split": "TEST",
+      "repeat": 2,
+      "mode": "MULTI_QUERY",
+      "planned": 21,
+      "samples": 0,
+      "missing": 21,
+      "technicalFailures": 0,
+      "p95Ms": null
+    }
+  ],
+  "reviewStatus": "INCOMPLETE",
+  "unresolvedAttempts": 0,
+  "unassignedIndexCalls": 0,
+  "spoilers": [],
+  "calls": {
+    "total": 35,
+    "generation": 16,
+    "embedding": 19,
+    "unknown": 0,
+    "usage": {
+      "inputTokens": {
+        "knownSubtotal": 5043,
+        "unknownCalls": 0
+      },
+      "outputTokens": {
+        "knownSubtotal": 1082,
+        "unknownCalls": 0
+      },
+      "reservedCny": {
+        "knownSubtotal": 40.80896,
+        "unknownCalls": 0
+      },
+      "settledCny": {
+        "knownSubtotal": 0.017730999999999997,
+        "unknownCalls": 0
+      }
+    }
+  },
+  "acceptance": "NOT_DETERMINED",
+  "limitations": [
+    "Manual annotations are not independently verified by this tool.",
+    "OFFLINE_FIXTURE is never real-model semantic evidence. Terminal matches are not quality scores.",
+    "No automatic acceptance: compare the active roadmap and retain reader, protocol, budget and performance gates.",
+    "Known cost subtotals exclude unknown usage; they are not a final bill."
+  ],
+  "rawSha256": "603c1f8d94414c267ef2bbd6d17544926022da372a9991748215322c81039a4c"
+}

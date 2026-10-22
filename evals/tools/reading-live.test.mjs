@@ -39,7 +39,7 @@ test('transport uncertainty remains a failed observation and stops without retry
   const summary=report(dataset,config,raw);assert.equal(summary.unresolvedAttempts,1);assert.equal(summary.reviewStatus,'INCOMPLETE');
 });
 test('old locks and data remain separate files',()=>{
-  for(const name of ['acceptance-v1.lock.json','acceptance-v2.lock.json'])assert(fs.existsSync(path.join(ROOT,'evals/configs/reading',name)));
+  for(const name of ['acceptance-v1.lock.json','acceptance-v2.lock.json','acceptance-v3.lock.json'])assert(fs.existsSync(path.join(ROOT,'evals/configs/reading',name)));
 });
 test('successful local collector fixture keeps sources, timing and shared index costs once',async()=>{
   const bindings=dataset.corpora.map(c=>({corpusId:c.id,corpusSha256:c.sha256,bookId:'book-'+c.id,versionId:c.id,paragraphs:c.paragraphs.map(p=>({id:p.id,ordinal:p.ordinal,sha256:p.sha256}))}));

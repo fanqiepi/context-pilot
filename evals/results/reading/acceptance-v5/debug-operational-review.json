@@ -1,0 +1,117 @@
+{
+  "type": "AGENT_OPERATIONAL_REVIEW_NOT_INDEPENDENT_HUMAN_ACCEPTANCE",
+  "reviewer": "Codex",
+  "reviewedAt": "2026-10-22T06:13:08.855Z",
+  "rawSha256": "603c1f8d94414c267ef2bbd6d17544926022da372a9991748215322c81039a4c",
+  "testDecision": "BLOCKED_DEBUG_REVIEW_FAILED",
+  "cases": [
+    {
+      "caseId": "debug-001",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "EXPECTED_FACTS_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "逐条核对输出、引用原文与冻结参考事实，本次输出覆盖对应参考事实，未见越界事实。此为执行代理复核，不填人工评分字段。"
+    },
+    {
+      "caseId": "debug-002",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "EXPECTED_FACTS_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "逐条核对输出、引用原文与冻结参考事实，本次输出覆盖对应参考事实，未见越界事实。此为执行代理复核，不填人工评分字段。"
+    },
+    {
+      "caseId": "debug-003",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "EXPECTED_FACTS_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "逐条核对输出、引用原文与冻结参考事实，本次输出覆盖对应参考事实，未见越界事实。此为执行代理复核，不填人工评分字段。"
+    },
+    {
+      "caseId": "debug-004",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "EXPECTED_FACTS_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "逐条核对输出、引用原文与冻结参考事实，本次输出覆盖对应参考事实，未见越界事实。此为执行代理复核，不填人工评分字段。"
+    },
+    {
+      "caseId": "debug-005",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "EXPECTED_FACTS_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "逐条核对输出、引用原文与冻结参考事实，本次输出覆盖对应参考事实，未见越界事实。此为执行代理复核，不填人工评分字段。"
+    },
+    {
+      "caseId": "debug-006",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "EXPECTED_FACTS_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "逐条核对输出、引用原文与冻结参考事实，本次输出覆盖对应参考事实，未见越界事实。此为执行代理复核，不填人工评分字段。"
+    },
+    {
+      "caseId": "debug-007",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "EXPECTED_FACTS_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "逐条核对输出、引用原文与冻结参考事实，本次输出覆盖对应参考事实，未见越界事实。此为执行代理复核，不填人工评分字段。"
+    },
+    {
+      "caseId": "debug-008",
+      "expectedOutcome": "INSUFFICIENT_EVIDENCE",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "REFUSAL_FAILED",
+      "rationale": "问题询问实际风力，已读文本仅有无署名纸条的要求。回答准确归因给纸条，但未明确说明实际风力未知，仍返回非空 facts、partial=false、COMPLETED，不符合预期 INSUFFICIENT_EVIDENCE。未发现将九级直接断言为实际值或泄露未读段落。"
+    },
+    {
+      "caseId": "debug-009",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "EXPECTED_FACTS_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "逐条核对输出、引用原文与冻结参考事实，本次输出覆盖对应参考事实，未见越界事实。此为执行代理复核，不填人工评分字段。"
+    },
+    {
+      "caseId": "debug-010",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "EXPECTED_FACTS_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "逐条核对输出、引用原文与冻结参考事实，本次输出覆盖对应参考事实，未见越界事实。此为执行代理复核，不填人工评分字段。"
+    },
+    {
+      "caseId": "debug-011",
+      "expectedOutcome": "ANSWER",
+      "actualTerminal": "COMPLETED",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "EXPECTED_FACTS_SUPPORTED_IN_INSPECTED_OUTPUT",
+      "rationale": "逐条核对输出、引用原文与冻结参考事实，本次输出覆盖对应参考事实，未见越界事实。此为执行代理复核，不填人工评分字段。"
+    },
+    {
+      "caseId": "debug-012",
+      "expectedOutcome": "INSUFFICIENT_EVIDENCE",
+      "actualTerminal": "INSUFFICIENT_EVIDENCE",
+      "protocolUsage": "KNOWN_SETTLED",
+      "citations": "VERSION_HASH_BOUNDARY_MATCH",
+      "semanticFinding": "CORRECT_REFUSAL",
+      "rationale": "已读原文没有罗澄下班去向，返回空 facts 与 INSUFFICIENT_EVIDENCE。"
+    }
+  ]
+}

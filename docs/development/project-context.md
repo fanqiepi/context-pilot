@@ -1,5 +1,9 @@
 # 研序 项目背景
 
+2026-10-22 最新授权：用户明确批准 DeepSeek 20 元、阿里向量模型 10 元，并允许真实调用。执行固定语料批次，两个供应商独立账本、额度不可互借，任一停止阻止整个批次；此前“未授权/待确认”描述仅为历史。当前实现冻结为 acceptance-v5，保留 v1–v4；结果见[本轮执行记录](../evaluation/reading-live-v5-results.md)。
+
+执行结果：真实 DEBUG 已完成 12 题和 6 个索引，35 次 HTTP 有已知用量；debug-008 未正确拒答，两个账本已以 DEBUG_REVIEW_FAILED 持久停止，TEST 96 次保留 NOT_RUN。下一步修复该 DEBUG 缺陷并离线验证，不能沿用旧“请求付费授权”待办或自动重跑停止批次。详细金额、证据、恢复材料及未完成项见上方执行记录。
+
 > 新会话先读本文，再读 [AGENTS.md](../../AGENTS.md)、[新开发路线](novel-reading-roadmap.md)和[当前交接](continuation-handoff.md)，并核对代码、配置和 Git 状态。更新：2026-10-22。
 
 ## 当前方向
@@ -13,6 +17,10 @@
 已批准[业务合同包](../architecture/novel-reading-design.md) `reading-contract-v1-draft1`。2026-10-22 核对 PR #31–#35 均已合并，本轮起点为干净的 `develop/4f13128`，与远程一致。固定语料、评分工具、容量证据和[演示脚本](reading-demo.md)已提交；本轮按用户授权补齐阅读专用 HTTP 客户端、完整请求包装计量、embedding usage 传递和本地协议测试。生产网关仍无条件拒绝真实调用，未获得付费授权；价格、真实供应商可用性及语义/体验验收仍待完成。当前验收实现版本为 `reading-acceptance-v2`，保留 v1 数据集及历史锁，见[协议验证记录](../evaluation/reading-provider-verification.md)。
 
 ## 最新开发状态（2026-10-22）
+
+最新更新：用户追加的预算日志/停止功能已实现，V33 保存预警和首次停止原因，当前冻结版本 acceptance-v4；云端配置说明及工程边界见[预算保护](../evaluation/reading-budget-alerts.md)。此前 v3 计划保持历史，真实调用仍未授权。
+
+最新进展：PR #37 已合并；已在隔离库完成四份固定语料的真实 UUID 绑定和最终计划生成，两个账户的模型开通/按量条件经用户确认。批次仍未授权、调用为零，待用户确认 20 元停止额度及到期时间，见[最终批次准备](../evaluation/reading-live-batch-preparation.md)。
 
 用户要求开始下一阶段开发后，已完成默认关闭的固定批次授权与采集接线：embedding total_tokens 修复、北京专属端点、V32 原子金额/次数预留、本地批准文件与 DEBUG/TEST 采集器。当前实现冻结为 acceptance-v3，v1/v2 保留。没有有效付费授权、没有真实调用；下一步在隔离评测库绑定 UUID/生成最终 plan，复核当时价格与账户适用条件，再请求独立付费授权。详见[门禁工程验证](../evaluation/reading-live-gates-verification.md)。前文及下方的适配/准备轮描述保留为历史记录。
 

@@ -6,8 +6,8 @@ import {execFileSync} from 'node:child_process';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const DATA = 'evals/datasets/reading/acceptance-v1.json';
-const CONFIG = 'evals/configs/reading/acceptance-v3.json';
-const LOCK = 'evals/configs/reading/acceptance-v3.lock.json';
+const CONFIG = 'evals/configs/reading/acceptance-v5.json';
+const LOCK = 'evals/configs/reading/acceptance-v5.lock.json';
 export const hash = value => createHash('sha256').update(value).digest('hex');
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const read = file => JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/^\uFEFF/, ''));
@@ -107,6 +107,7 @@ function sourceFiles() {
       'backend/src/main/resources/db/migration/V30__create_reading_tasks.sql',
       'backend/src/main/resources/db/migration/V31__create_reading_note_proposals.sql',
       'backend/src/main/resources/db/migration/V32__bind_reading_live_authorization.sql',
+      'backend/src/main/resources/db/migration/V33__record_reading_budget_alerts.sql',
       'frontend/src/api/reading.ts', 'frontend/src/styles/reading.css',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/book/ReadingLibraryPersistenceTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingnote/ReadingNoteProposalPersistenceTests.java',

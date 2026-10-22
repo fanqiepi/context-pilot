@@ -25,6 +25,7 @@ public class ReadingAiConfiguration {
             public Pricing pricing(String phase) { requireAuthorized();return live.pricing(phase); }
             public int reservationInputTokens(String phase,int inputBytes) { return ReadingLiveAuthorization.tokenBound(phase); }
             public void haltBatch() { if(live!=null)live.halt(); }
+            public void haltBatch(String reason) { if(live!=null)live.halt(reason); }
             public String generationInput(String prompt,int limit) { return provider.generationInput(prompt,limit); }
             public Response generate(String prompt,int limit,Duration timeout) { requireAuthorized();return provider.generate(prompt,limit,timeout); }
             public List<float[]> embed(List<String> text,Duration timeout) { return embedWithUsage(text,timeout).vectors(); }

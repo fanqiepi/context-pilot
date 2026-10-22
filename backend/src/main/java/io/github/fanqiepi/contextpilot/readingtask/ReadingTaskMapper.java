@@ -58,11 +58,11 @@ public interface ReadingTaskMapper {
         """) @Options(timeout=3)
     void installLive(@Param("id")UUID id,@Param("owner")UUID owner,@Param("amount")java.math.BigDecimal amount,
                      @Param("price")String price,@Param("expires")java.time.OffsetDateTime expires,@Param("digest")String digest,@Param("calls")int calls);
-    @Select("SELECT count(*) FROM reading_spend_ledger WHERE id=#{id} AND owner_id=#{owner} AND approval_digest=#{digest} AND deleted=0 AND expires_at>CURRENT_TIMESTAMP") @Options(timeout=3)
+    @Select("SELECT count(*) FROM reading_spend_ledger WHERE id=#{id} AND owner_id=#{owner} AND approval_digest=#{digest} AND deleted=0 AND stop_reason IS NULL AND expires_at>CURRENT_TIMESTAMP") @Options(timeout=3)
     int liveAvailable(@Param("id")UUID id,@Param("owner")UUID owner,@Param("digest")String digest);
     @Update("""
         UPDATE reading_spend_ledger SET reserved_amount=reserved_amount+#{amount},calls_started=calls_started+1,revision=revision+1,updated_at=CURRENT_TIMESTAMP
-        WHERE id=#{id} AND deleted=0 AND expires_at>CURRENT_TIMESTAMP
+        WHERE id=#{id} AND deleted=0 AND stop_reason IS NULL AND expires_at>CURRENT_TIMESTAMP
         AND reserved_amount+settled_amount+#{amount}<=limit_amount AND pricing_version=#{version}
         AND (call_limit IS NULL OR calls_started<call_limit)
         """) @Options(timeout=3)
@@ -84,8 +84,11 @@ public interface ReadingTaskMapper {
     void settleSpend(@Param("id")UUID id,@Param("reserved")java.math.BigDecimal reserved,@Param("actual")java.math.BigDecimal actual);
     @Update("UPDATE reading_ai_call SET settled_amount=#{amount} WHERE id=#{id} AND settled_amount IS NULL") @Options(timeout=3)
     int settleCall(@Param("id")UUID id,@Param("amount")java.math.BigDecimal amount);
-    @Update("UPDATE reading_spend_ledger SET expires_at=least(expires_at,CURRENT_TIMESTAMP),revision=revision+1 WHERE id=#{id}") @Options(timeout=3)
-    void freezeSpend(UUID id);
+    @Update("UPDATE reading_spend_ledger SET warning_emitted=TRUE,revision=revision+1,updated_at=CURRENT_TIMESTAMP WHERE id=#{id} AND warning_emitted=FALSE AND reserved_amount+settled_amount>=limit_amount*0.8") @Options(timeout=3)
+    int warnSpend(UUID id);
+    @Update("UPDATE reading_spend_ledger SET expires_at=least(expires_at,CURRENT_TIMESTAMP),stop_reason=#{reason},revision=revision+1,updated_at=CURRENT_TIMESTAMP WHERE id=#{id} AND stop_reason IS NULL") @Options(timeout=3)
+    int stopSpend(@Param("id")UUID id,@Param("reason")String reason);
+    default void freezeSpend(UUID id) { stopSpend(id,"BATCH_STOPPED"); }
     @Select("SELECT count(*) FROM reading_ai_call WHERE (task_id=#{id} OR index_job_id=#{id}) AND status IN ('STARTED','UNKNOWN')") @Options(timeout=3)
     int unfinished(UUID id);
     @Select("SELECT count(*) FROM reading_ai_call WHERE (task_id=#{id} OR index_job_id=#{id}) AND phase=#{phase}") @Options(timeout=3)

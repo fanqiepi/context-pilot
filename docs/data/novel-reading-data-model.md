@@ -1,5 +1,9 @@
 # 小说阅读数据合同草案
 
+2026-10-22 分供应商预算：复用 V33 账本，无新增迁移。生成账本 ID=批准 ID；embedding 账本 ID=UUID.nameUUIDFromBytes(批准 ID + ":DASHSCOPE_LEDGER:0")，摘要为 SHA-256(批准摘要 + ":DASHSCOPE")。两个账本独立金额/次数/80% 标记，任何一个停止阻断整批，重复安装不重置。批准文件必须同时提供 providerLimitsCny，顶层 limitCny 必须等于二者之和。
+
+2026-10-22 V33 补充：reading_spend_ledger 新增 warning_emitted BOOLEAN NOT NULL DEFAULT FALSE、stop_reason VARCHAR(64)。告警标记随预留事务提交，停止原因首次写入后保留；旧过期账本不恢复。见[预算日志与停止](../evaluation/reading-budget-alerts.md)。
+
 2026-10-22 授权接线补充：[V32](../../backend/src/main/resources/db/migration/V32__bind_reading_live_authorization.sql) 为 reading_spend_ledger 增加 approval_digest、call_limit、calls_started，为 reading_ai_call 增加 input_token_bound。旧账本允许摘要/次数上限为空；新批次摘要唯一，次数和金额同事务预留，重复安装不重置。payload_json 保存 liveApprovalDigest；usage_json 新增有限 providerModel/providerRequestId，embedding 以 total_tokens 计量。settled_amount 为高峰未命中价格的保守预算记账，不是账单金额；UNKNOWN 保留预留并停止批次。详见[门禁工程验证](../evaluation/reading-live-gates-verification.md)。
 
 以下协议轮记录保留为历史状态。

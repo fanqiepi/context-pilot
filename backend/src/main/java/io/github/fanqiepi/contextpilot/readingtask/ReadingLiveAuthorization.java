@@ -32,13 +32,16 @@ public class ReadingLiveAuthorization {
     }
     public void check() {
         if(batch==null)throw failure("LIVE_AI_NOT_AUTHORIZED");
-        UUID owner=states.owner();
-        mapper.installLive(batch.id,owner,batch.limit,ReadingLiveBatch.PRICE,batch.expiresAt,batch.digest,ReadingLiveBatch.CALL_LIMIT);
-        var row=mapper.ledger(batch.id,owner);
-        if(row==null || !batch.digest.equals(row.get("approval_digest"))
-                || batch.limit.compareTo((BigDecimal)row.get("limit_amount"))!=0
-                || !ReadingLiveBatch.PRICE.equals(row.get("pricing_version")))throw failure("LIVE_APPROVAL_MISMATCH");
-        if(mapper.liveAvailable(batch.id,owner,batch.digest)!=1)throw failure("LIVE_AUTHORIZATION_STOPPED");
+        checkLedger(batch.id,batch.digest,batch.limit,154);
+        checkLedger(batch.embeddingId(),batch.embeddingDigest(),batch.embeddingLimit,192);
+    }
+    private void checkLedger(UUID id,String digest,BigDecimal limit,int calls) {
+        UUID owner=states.owner();mapper.installLive(id,owner,limit,ReadingLiveBatch.PRICE,batch.expiresAt,digest,calls);
+        var row=mapper.ledger(id,owner);
+        if(row==null || !digest.equals(row.get("approval_digest")) || limit.compareTo((BigDecimal)row.get("limit_amount"))!=0
+                || !ReadingLiveBatch.PRICE.equals(row.get("pricing_version")) || ((Number)row.get("call_limit")).intValue()!=calls)
+            throw failure("LIVE_APPROVAL_MISMATCH");
+        if(mapper.liveAvailable(id,owner,digest)!=1)throw failure("LIVE_AUTHORIZATION_STOPPED");
     }
     @Transactional(timeout=5)
     public void authorize(ReadingWork work,ReadingWork.Payload payload) {
@@ -66,11 +69,19 @@ public class ReadingLiveAuthorization {
     public ReadingAiGateway.Pricing pricing(String phase) {
         check();boolean generation=Set.of("PLAN","ANSWER").contains(phase);
         if(!generation && !phase.matches("(SEARCH|INDEX)_\\d+"))throw failure("PRICING_UNKNOWN");
-        return new ReadingAiGateway.Pricing(batch.id,ReadingLiveBatch.PRICE,generation?ReadingLiveBatch.INPUT:ReadingLiveBatch.EMBEDDING,
+        return new ReadingAiGateway.Pricing(generation?batch.id:batch.embeddingId(),ReadingLiveBatch.PRICE,generation?ReadingLiveBatch.INPUT:ReadingLiveBatch.EMBEDDING,
                 generation?ReadingLiveBatch.OUTPUT:BigDecimal.ZERO);
     }
     @Transactional(timeout=5)
-    public void halt() { if(batch!=null && mapper.ledger(batch.id,states.owner())!=null)mapper.freezeSpend(batch.id); }
+    public void halt() { halt("BATCH_STOPPED"); }
+    @Transactional(timeout=5)
+    public void halt(String reason) {
+        if(batch==null)return;
+        for(UUID id:List.of(batch.id,batch.embeddingId())) {
+            var row=mapper.ledger(id,states.owner());
+            if(row!=null)ReadingBudgetLog.stop(mapper,id,null,row,reason);
+        }
+    }
     static int tokenBound(String phase) {
         if(Set.of("PLAN","ANSWER").contains(phase))return ReadingLiveBatch.GENERATION_INPUT_BOUND;
         if(phase.matches("SEARCH_\\d+"))return ReadingLiveBatch.EMBEDDING_LINE_BOUND;
@@ -81,15 +92,26 @@ public class ReadingLiveAuthorization {
     public Map<String,Object> status() {
         if(batch==null)return Map.of("liveAllowed",false,"reason","LIVE_AI_NOT_AUTHORIZED");
         String reason="READY";try{check();}catch(ReadingException e){reason=e.code();}
-        var row=mapper.ledger(batch.id,states.owner());var result=new LinkedHashMap<String,Object>();
+        var row=mapper.ledger(batch.id,states.owner());var embedding=mapper.ledger(batch.embeddingId(),states.owner());var result=new LinkedHashMap<String,Object>();
         result.put("liveAllowed","READY".equals(reason));result.put("reason",reason);result.put("authorizationId",batch.id);
         result.put("planSha256",batch.planHash);result.put("implementationLockSha256",batch.lockHash);
-        result.put("limitCny",batch.limit);result.put("expiresAt",batch.expiresAt);result.put("maxCalls",ReadingLiveBatch.CALL_LIMIT);
-        result.put("callsStarted",row==null?0:row.get("calls_started"));result.put("reservedCny",row==null?null:row.get("reserved_amount"));
-        result.put("budgetValuedCny",row==null?null:row.get("settled_amount"));result.put("debugReviewed",testReviewed);
+        result.put("limitCny",batch.limit.add(batch.embeddingLimit));result.put("expiresAt",batch.expiresAt);result.put("maxCalls",ReadingLiveBatch.CALL_LIMIT);
+        result.put("callsStarted",number(row,"calls_started")+number(embedding,"calls_started"));result.put("reservedCny",amount(row,"reserved_amount").add(amount(embedding,"reserved_amount")));
+        result.put("budgetValuedCny",amount(row,"settled_amount").add(amount(embedding,"settled_amount")));result.put("debugReviewed",testReviewed);
+        result.put("warningThresholdPercent",80);result.put("warningEmitted",warned(row)||warned(embedding));
+        result.put("stopReason",row!=null && row.get("stop_reason")!=null?row.get("stop_reason"):embedding==null?null:embedding.get("stop_reason"));
+        result.put("providers",Map.of("DEEPSEEK",provider(batch.id,batch.limit,row),"DASHSCOPE",provider(batch.embeddingId(),batch.embeddingLimit,embedding)));
         result.put("costBasis","PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE");result.put("reservationBasis","PROVIDER_CONTEXT_CEILING");
         result.put("environment",Map.of("os",System.getProperty("os.name"),"java",System.getProperty("java.version"),"database",mapper.databaseVersion(),
                 "model",ReadingProviderClient.GENERATION_MODEL,"embeddingProfile","dashscope_qwen3_7_1024_v1"));
         return result;
+    }
+    private static long number(Map<String,Object> row,String key) { return row==null?0:((Number)row.get(key)).longValue(); }
+    private static BigDecimal amount(Map<String,Object> row,String key) { return row==null?BigDecimal.ZERO:(BigDecimal)row.get(key); }
+    private static boolean warned(Map<String,Object> row) { return row!=null && Boolean.TRUE.equals(row.get("warning_emitted")); }
+    private static Map<String,Object> provider(UUID id,BigDecimal limit,Map<String,Object> row) {
+        var data=new LinkedHashMap<String,Object>();data.put("authorizationId",id);data.put("limitCny",limit);
+        data.put("reservedCny",amount(row,"reserved_amount"));data.put("budgetValuedCny",amount(row,"settled_amount"));
+        data.put("callsStarted",number(row,"calls_started"));data.put("warningEmitted",warned(row));data.put("stopReason",row==null?null:row.get("stop_reason"));return data;
     }
 }

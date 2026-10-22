@@ -135,7 +135,7 @@ class ReadingProviderProtocolTests {
         }
         assertThat(requests).hasSize(3);
     }
-    @ParameterizedTest @ValueSource(ints={302,401,429,500,503})
+    @ParameterizedTest @ValueSource(ints={302,401,402,429,500,503})
     void httpFailureNeverRetriesOrFollowsRedirectAndDoesNotExposeBody(int code) {
         status=code;response="private-provider-body";
         assertThatThrownBy(()->client.generate(prompt(512),512,TIMEOUT))
