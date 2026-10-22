@@ -106,6 +106,22 @@ class ReadingProviderProtocolTests {
         var result=client.embed(List.of("人物"),TIMEOUT);
         assertThat(requests).hasSize(1);assertThat(result.usage().inputTokens()).isNull();assertThat(result.usage().outputTokens()).isNull();
     }
+    @Test void selectedEmbeddingModelUsesTotalTokensWithoutPromptTokens() {
+        response=embeddings(List.of(embedding(0,1,1024)),Map.of("total_tokens",71));
+        var result=client.embed(List.of("人物"),TIMEOUT);
+        assertThat(result.inputTokens()).isEqualTo(71);assertThat(result.usage().outputTokens()).isZero();
+    }
+    @ParameterizedTest @ValueSource(strings={"{}","{\"prompt_tokens\":71}","{\"total_tokens\":-1}","{\"total_tokens\":1.5}",
+            "{\"total_tokens\":\"71\"}","{\"total_tokens\":71,\"prompt_tokens\":70}","{\"total_tokens\":71,\"prompt_tokens\":null}"})
+    void missingOrConflictingEmbeddingUsageRemainsUnknown(String usage) {
+        response=embeddings(List.of(embedding(0,1,1024)),JSON.readTree(usage));
+        assertThat(client.embed(List.of("人物"),TIMEOUT).inputTokens()).isNull();
+    }
+    @Test void productionEndpointIsExactWorkspaceAllowlist() {
+        assertThat(ReadingProviderClient.EMBEDDING_URI.toString()).isEqualTo("https://llm-90adsh26dbyar5po.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/embeddings");
+        assertThatThrownBy(()->new ReadingProviderClient(ReadingProviderClient.GENERATION_URI,
+                URI.create("https://dashscope.aliyuncs.com/compatible-mode/v1/embeddings"),"fixture","fixture")).isInstanceOf(ReadingException.class);
+    }
     @ParameterizedTest @ValueSource(strings={"length","content_filter","tool_calls"})
     void preservesNonSuccessFinishForRunnerRejectionAndUsageAudit(String finish) {
         response=chat(finish,Map.of("prompt_tokens",30,"completion_tokens",512));
@@ -199,7 +215,7 @@ class ReadingProviderProtocolTests {
         assertThat(requests).isEmpty();
     }
     @Test void productionGatewayStaysClosedEvenWithCredentialsAndTransportPresent() {
-        var gateway=new ReadingAiConfiguration().readingAiGateway("fixture-generation","fixture-embedding");
+        var gateway=new ReadingAiConfiguration().readingAiGateway("fixture-generation","fixture-embedding",null);
         assertThat(gateway.offline()).isFalse();
         assertThatThrownBy(gateway::requireAuthorized).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.code()).isEqualTo("LIVE_AI_NOT_AUTHORIZED"));
         assertThatThrownBy(()->gateway.generate(prompt(512),512,TIMEOUT)).isInstanceOf(ReadingException.class);

@@ -12,6 +12,10 @@
 
 已批准[业务合同包](../architecture/novel-reading-design.md) `reading-contract-v1-draft1`。2026-10-22 核对 PR #31–#35 均已合并，本轮起点为干净的 `develop/4f13128`，与远程一致。固定语料、评分工具、容量证据和[演示脚本](reading-demo.md)已提交；本轮按用户授权补齐阅读专用 HTTP 客户端、完整请求包装计量、embedding usage 传递和本地协议测试。生产网关仍无条件拒绝真实调用，未获得付费授权；价格、真实供应商可用性及语义/体验验收仍待完成。当前验收实现版本为 `reading-acceptance-v2`，保留 v1 数据集及历史锁，见[协议验证记录](../evaluation/reading-provider-verification.md)。
 
+## 最新开发状态（2026-10-22）
+
+用户要求开始下一阶段开发后，已完成默认关闭的固定批次授权与采集接线：embedding total_tokens 修复、北京专属端点、V32 原子金额/次数预留、本地批准文件与 DEBUG/TEST 采集器。当前实现冻结为 acceptance-v3，v1/v2 保留。没有有效付费授权、没有真实调用；下一步在隔离评测库绑定 UUID/生成最终 plan，复核当时价格与账户适用条件，再请求独立付费授权。详见[门禁工程验证](../evaluation/reading-live-gates-verification.md)。前文及下方的适配/准备轮描述保留为历史记录。
+
 ## 已有能力与证据
 
 2026-10-22 后续核对起点为干净的 `develop/144726e`，远程 develop 相同。本轮完成[公开模型/端点/价格核实与授权准备](../evaluation/reading-live-authorization-preparation.md)：旧 DeepSeek 请求名有兼容依据，北京 DashScope 共享端点仍支持；用户随后确认 DeepSeek 人民币计费、百炼北京地域及业务空间专属端点；账户权限尚未实测，付费授权仍为零。代码仍固定共享端点，后续接线需明确最终端点。发现 embedding 用量字段与当前官方文档不一致，需在真实调用前修复；授权接线、采集入口及可靠费用上界仍待补齐。此记录更新公开资料状态，不覆盖 acceptance-v2 的历史锁，也不代表生产已开放。

@@ -10,7 +10,7 @@ public class ReadingWork {
     public String requestHash,type,status,payloadJson,errorCode;
     public long revision,activeMillis;
     public int requiredBoundary,deleted;
-    public OffsetDateTime queuedAt,startedAt;
+    public OffsetDateTime queuedAt,startedAt,updatedAt;
     public static final Set<String> TERMINAL=Set.of("CANCELLED","INVALIDATED","FAILED","COMPLETED","PARTIAL","INSUFFICIENT_EVIDENCE","READY");
     public boolean terminal() { return TERMINAL.contains(status); }
 
@@ -20,6 +20,7 @@ public class ReadingWork {
     public record Result(List<Fact> facts,boolean partial) {}
     public static class Payload {
         public Snapshot scope;
+        public String liveApprovalDigest;
         public String mode,question,profile="dashscope_qwen3_7_1024_v1";
         public int chapterCount=3,fromOrdinal=1,targetBoundary,completedParagraph,searches,modelCalls,embeddingCalls,inputCharacters,inputBytes;
         public List<String> queries;

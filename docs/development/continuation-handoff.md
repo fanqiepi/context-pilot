@@ -1,32 +1,29 @@
 # 小说阅读开发交接
 
-更新：2026-10-22。用户已批准 `reading-contract-v1-draft1`，本次要求核实线上模型/端点与价格并准备授权；只完成公开资料核实及候选批次文档，没有启用真实调用。每轮只推进一个大功能点，相关检查通过并审阅 diff 后主动创建本地提交，使用中文提交信息，再停止并提醒发起 PR；执行细则见 [AGENTS.md](../../AGENTS.md)。**整项体验和语义验收仍未完成。**
+更新：2026-10-22。用户要求开始下一阶段开发，本轮完成一个能力：真实调用前的固定批次授权与采集接线。开发授权不包含付费执行；没有有效批准文件，真实生成/embedding 调用仍为零。相关检查通过并审阅完整 diff 后主动本地提交，再停止并提醒 PR；不自动推送、建 PR 或合并。
 
-## 起点与 Git
+## 起点与当前实现
 
-先读[项目背景](project-context.md)、[AGENTS.md](../../AGENTS.md)、[唯一路线](novel-reading-roadmap.md)，再核对 Git 和平台。本轮起点为干净的 `develop/144726e`，`git ls-remote` 核对远程 develop 相同，已包含适配提交 `1ab0968` 和提交规范 `144726e`。本轮没有查询新的 PR 状态；PR #31–#35 已合并是上一轮记录。最终工作区及远程状态以 Git 为准。
+先读[项目背景](project-context.md)、[AGENTS.md](../../AGENTS.md)、[唯一路线](novel-reading-roadmap.md)。本轮起点为干净的 develop/d6f3f05，本地已有两次文档提交，未推送；最终 Git/远程状态需重新核对，不据历史记录推断 PR 已合并。
 
-## 本轮交付
+- 用户已确认 DeepSeek 人民币计费、百炼北京地域与业务空间专属 Base URL，原始记录见[授权准备](../evaluation/reading-live-authorization-preparation.md)，无需重复询问。
+- 阅读客户端已固定到该专属端点，并修复 total_tokens 审计；旧知识库 Spring AI 共享端点未改。
+- 新增 V32 批准摘要/次数约束和输入 token 预留上界；金额与次数原子预留、同批准重复安装不重置、UNKNOWN 保留预留并停止批次。
+- 默认 READING_LIVE_ENABLED=false；只有本地有效 plan/approval、未过期价格/授权、固定源码/资产/语料/题目绑定和后端凭据齐备才可执行。新增 HTTP 接口查询状态，没有创建或增额入口。
+- 当前冻结版本为 reading-acceptance-v3，保留 v1/v2 配置/锁和全部 v1 语料、题目、评分。逻辑 Prompt 未改。新实现需重新构建，不能使用旧进程冒充新锁。
+- 本机采集器分离 bind、prepare、DEBUG 与 TEST，追加保存 journal，失败或响应不确定即停；TEST 需 DEBUG 成功且人工复核后显式放行。
 
-[授权准备记录](../evaluation/reading-live-authorization-preparation.md)已列明：官方模型映射、固定端点兼容依据、人民币公开单价、108 条 case/repeat、增量索引清单与条件性费用估算。DeepSeek 旧请求名实际映射到 V4.1-Flash-1017，代码请求名不变；DashScope 现有地址仍支持北京地域。用户随后确认人民币计费、北京地域及控制台专属端点，详见授权准备记录；账户权限和真实请求仍未验证，没有授权付费。
+细节、测试与局限见[门禁工程验证](../evaluation/reading-live-gates-verification.md)，步骤见[采集操作](../../evals/tools/reading-live-README.md)。此前[本地协议](../evaluation/reading-provider-verification.md)和[价格准备](../evaluation/reading-live-authorization-preparation.md)保留历史结论。
 
-新发现：官方文档中 `qwen3.7-text-embedding` 用量仅含 `total_tokens`，当前客户端只读 `prompt_tokens`。缺失会保留 UNKNOWN，不能宣称真实 usage 已贯通。生产授权/计价实现、case/repeat 约束及在线采集器仍缺；本轮记录差异，不改代码或旧锁。
+## 费用口径
 
-## 上一轮实现（保留）
-
-- 阅读专用 `ReadingProviderClient`：固定 DeepSeek 生成和 DashScope embedding 协议，通过小型业务抽象隔离供应商。复用已有 Reactor Netty/WebClient，无新增依赖；不更改旧 Spring AI 调用。
-- 生成请求显式限制输出、关闭思考及流式输出；应用/HTTP 无重试、无重定向；整体截止覆盖连接、响应头和响应体，线程中断取消请求。验证响应大小、结构、向量维度/顺序/有限数值，异常只返回安全码。
-- 完整生成请求包装参与输入上限及费用预留；embedding usage 传入原有账本。供应商调用完成后的本地检索失败不抹去已取得的 usage；截断结果保留 usage 但不得发布。
-- 本地 HTTP 捕获真实序列化请求，隔离 PostgreSQL 集成测试贯通索引、人物查证、审计和截断发布门禁；详细结果见[协议验证](../evaluation/reading-provider-verification.md)。
-- 当前冻结清单为 `reading-acceptance-v2`，复用未修改的 `reading-acceptance-v1` 语料/题目/评分；旧配置与锁保留，不把源码变化覆盖进旧锁。无新迁移、业务 API 或前端行为。
-
-`ReadingAiConfiguration` 仍无条件返回 `LIVE_AI_NOT_AUTHORIZED`。配置现有密钥不会开放阅读调用。本地协议测试只能证明发送字段与客户端行为，不能证明供应商实际接受模型、执行输出限制或正确计费。
+此前约 17.58 元是字节预测，不是可靠上界。本轮真实预留按供应商公开上下文容量计算，全部调用最大预留之和约 364.68 元；这不提高路线拟议停止额度，也不是账单。顺序调用以返回 usage 按高峰未命中单价结算并释放差额；预算不足停止，不承诺完成、不自动追加。保守预算记账与实际账单分开报告。
 
 ## 下一步
 
-1. 用户已补充确认 DeepSeek 人民币计费、百炼北京地域及控制台业务空间专属 Base URL，完整地址见[授权准备记录](../evaluation/reading-live-authorization-preparation.md)。无需重复询问币种/地域。代码仍固定共享端点，后续将最终所选端点绑定到允许列表和批次；账户权限、按量方案及请求支持未实测，不索取密钥。
-2. 在既定阅读范围内完成付费前离线门禁：修复 embedding 用量，验证 token 上界，补计价/授权/采集接线并强制绑定候选批次。区分按保守单价记账与真实账单，UNKNOWN 保留预留；协议异常停止推进。实现变更生成新锁，保留 v1/v2。
-3. 以上材料和检查齐备后，展示最终 case/repeat、索引、调用数、额度、准确到期时间及新锁，再请求独立付费授权。当前候选批次和估算不构成授权，也不能绕过生产拒绝语句。
-4. 获授权后才执行真实协议/模型采集与人工语义复核，再补真实读者反馈、浏览器冷/热性能和新录屏。
+1. 在隔离评测数据库以默认关闭的后端执行 bind/prepare，取得真实 UUID 和最终 plan 哈希；这些步骤只有导入/业务持久化，不调用模型。当前没有可直接执行的已批准批次。
+2. 复核当时官方价格以及账户按量方案/模型权限等适用条件，准备准确授权起止时间；已确认的人民币/北京信息不重复询问。
+3. 展示最终 plan/实现锁、case/repeat 与索引清单、调用上限、预留方式和停止额度，最后请求独立付费授权。未获得授权前不改批准状态，不启用真实开关，不运行 DEBUG/TEST。
+4. 获授权后先 DEBUG；异常即停。人工协议/用量/语义复核后才 TEST。保留失败及 UNKNOWN；不使用 TEST 调 Prompt。随后按路线补语义评分、真实试用、浏览器冷/热性能与录屏。
 
-付费授权仍为零，真实生成/embedding 调用为零。旧 V1–V5 验收基线保留；旧研究扩展、升级调优及录屏继续暂停。不得使用 TEST 调 Prompt，不以本地协议或固定任务结果宣称真实防剧透/语义验收通过。
+旧 V1–V5 基线保留；旧研究场景扩展、升级调优及旧录屏继续暂停。整项小说阅读 AI 语义/体验验收仍未完成。

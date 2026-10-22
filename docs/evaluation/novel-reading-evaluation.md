@@ -1,5 +1,9 @@
 # 小说阅读验收方案草案
 
+2026-10-22 授权接线补充：当前实现冻结为 reading-acceptance-v3，保留 v1/v2 锁与 v1 语料/题目/评分。新增本地 plan/approval、独立 DEBUG/TEST 采集及追加 journal；未知提交/观测标 FAILED/UNRESOLVED，不伪造任务 UUID 或免费用量；孤立索引费用也计入汇总。预留按供应商上下文容量，实际 token 与保守预算结算/最终账单分开。真实调用未获授权，见[门禁工程验证](reading-live-gates-verification.md)和[采集操作](../../evals/tools/reading-live-README.md)。
+
+以下 v2 协议轮记录保留为历史状态。
+
 2026-10-22：当前实现冻结为 `reading-acceptance-v2`，复用未修改的 v1 语料、题目和评分协议；v1 配置及锁保留为历史证据。新增阅读客户端本地 HTTP 协议测试和数据库用量/截断集成门禁，见[协议验证](reading-provider-verification.md)。本地请求捕获不证明供应商实际支持固定模型、端点或输出上限；真实调用、价格核实、独立授权和语义验收仍未完成。
 
 版本：`reading-contract-v1-draft1`，2026-10-20 用户已确认。**验收方法已批准，实际证据另行记录；真实付费评估尚未授权。** 数字门槛和运行预算唯一维护在[新路线](../development/novel-reading-roadmap.md)；本文件定义样本、计分与证据方法。工程通过不能替代真实模型观察或人工语义验收。

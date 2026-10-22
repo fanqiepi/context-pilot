@@ -6,8 +6,8 @@ import {execFileSync} from 'node:child_process';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const DATA = 'evals/datasets/reading/acceptance-v1.json';
-const CONFIG = 'evals/configs/reading/acceptance-v2.json';
-const LOCK = 'evals/configs/reading/acceptance-v2.lock.json';
+const CONFIG = 'evals/configs/reading/acceptance-v3.json';
+const LOCK = 'evals/configs/reading/acceptance-v3.lock.json';
 export const hash = value => createHash('sha256').update(value).digest('hex');
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const read = file => JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/^\uFEFF/, ''));
@@ -106,19 +106,21 @@ function sourceFiles() {
       'backend/src/main/resources/db/migration/V29__create_reading_library.sql',
       'backend/src/main/resources/db/migration/V30__create_reading_tasks.sql',
       'backend/src/main/resources/db/migration/V31__create_reading_note_proposals.sql',
+      'backend/src/main/resources/db/migration/V32__bind_reading_live_authorization.sql',
       'frontend/src/api/reading.ts', 'frontend/src/styles/reading.css',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/book/ReadingLibraryPersistenceTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingnote/ReadingNoteProposalPersistenceTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingTaskPolicyTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingTaskPersistenceTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingProviderProtocolTests.java',
+      'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingLiveAuthorizationTests.java',
       ...walk('frontend/src/components').filter(f=>/Reading/.test(f)),
       ...walk('frontend/src/views').filter(f=>/Book/.test(f))]);
 }
 export function freeze(dataset, config, output) {
   validateAssets(dataset, config);
   const assets = [DATA, CONFIG, config.scoring, config.roadmap, config.evaluation,
-    'evals/tools/reading-eval.mjs', 'evals/tools/reading-assets.mjs',
+    'evals/tools/reading-eval.mjs', 'evals/tools/reading-assets.mjs', 'evals/tools/reading-live.mjs', 'evals/tools/reading-live.test.mjs',
     ...walk('evals/corpora/reading/acceptance-v1')];
   const fingerprints = files => Object.fromEntries([...new Set(files)].sort().map(file => [file, hash(fs.readFileSync(path.join(ROOT, file)))]));
   const lock = {version: config.version, datasetVersion: dataset.version, createdAt: new Date().toISOString(),
@@ -209,7 +211,8 @@ export function report(dataset, config, raw) {
     }
     const o = row.observation;
     check(o && typeof o.answer === 'string' && present(o.terminal) && Array.isArray(o.citations) && Array.isArray(o.calls), 'Incomplete observation');
-    if (raw.mode === 'LIVE_END_TO_END') check(present(o.taskId) && present(o.traceId), 'Missing live task provenance');
+    if (raw.mode === 'LIVE_END_TO_END') check((present(o.taskId) && present(o.traceId))
+      || (row.status==='FAILED' && o.errorCode==='COLLECTOR_OBSERVATION_INCOMPLETE' && o.provenanceStatus==='UNRESOLVED' && present(o.clientRequestId)), 'Missing live task provenance');
     unique(o.citations.map(citation => citation.id), 'observed citation');
     for (const citation of o.citations) check(present(citation.id) && present(citation.text), 'Invalid citation');
     check(o.elapsedMs === null || finite(o.elapsedMs), 'Invalid timing');
@@ -249,7 +252,23 @@ export function report(dataset, config, raw) {
           perCase:group.map(r=>({caseId:r.caseId,status:r.status,recall:r.score?.recall??null}))} : null,
         latency:{samples:timings.length,missing:group.length-timings.length,p95Ms:timings.length ? timings[Math.ceil(timings.length*.95)-1] : null}});
     }
-  const calls = rows.flatMap(r=>r.observation?.calls ?? []);
+  const indexObservations=raw.indexObservations??[];
+  check(Array.isArray(indexObservations),'Invalid index audit');unique(indexObservations.map(i=>i.jobId),'index job audit');
+  for(const index of indexObservations) {
+    check(present(index.jobId)&&Array.isArray(index.calls),'Incomplete index audit');
+    check(index.calls.every(c=>c.kind==='EMBEDDING'&&c.indexJobId===index.jobId),'Invalid index attribution');
+    if(index.attributedTo) {
+      const attributed=rows.find(r=>`${r.caseId}/${r.repeat}`===index.attributedTo);
+      check(attributed?.observation&&JSON.stringify(attributed.observation.calls.filter(c=>c.indexJobId===index.jobId))===JSON.stringify(index.calls),'Index audit attribution mismatch');
+    }
+  }
+  const orphanIndexCalls=indexObservations.filter(i=>!i.attributedTo).flatMap(i=>i.calls);
+  const calls = [...rows.flatMap(r=>r.observation?.calls ?? []),...orphanIndexCalls];
+  for(const call of calls) {
+    check(['GENERATION','EMBEDDING'].includes(call.kind)&&['SUCCEEDED','FAILED','UNKNOWN'].includes(call.status),'Invalid call audit');
+    for(const k of ['inputTokens','outputTokens','reservedCny','settledCny'])check(call[k]===null||finite(call[k]),'Invalid audit amount');
+    if(call.status==='UNKNOWN')check(call.settledCny===null,'Unknown index calls cannot be settled');
+  }
   const usage = Object.fromEntries(['inputTokens','outputTokens','reservedCny','settledCny'].map(k => [k,{
     knownSubtotal:calls.reduce((n,c)=>n+(c[k]??0),0),unknownCalls:calls.filter(c=>c[k]===null).length}]));
   const spoilers = rows.filter(r=>r.score?.spoiler).map(r=>`${r.caseId}/${r.repeat}`);
@@ -265,6 +284,8 @@ export function report(dataset, config, raw) {
   return {version:raw.version, mode:raw.mode, total:rows.length, groups,
     latencyByMode,
     reviewStatus:spoilers.length ? 'BLOCKED_SPOILER' : rows.every(r=>r.score) ? 'REVIEW_COMPLETE' : 'INCOMPLETE',
+    unresolvedAttempts:rows.filter(r=>r.observation?.provenanceStatus==='UNRESOLVED').length,
+    unassignedIndexCalls:orphanIndexCalls.length,
     spoilers, calls:{total:calls.length,generation:calls.filter(c=>c.kind==='GENERATION').length,
       embedding:calls.filter(c=>c.kind==='EMBEDDING').length,unknown:calls.filter(c=>c.status==='UNKNOWN').length,usage},
     acceptance:'NOT_DETERMINED',

@@ -11,17 +11,24 @@ import java.util.UUID;
  * the reading-specific output limits. Tests supply an offline implementation of this port.
  */
 public interface ReadingAiGateway {
-    record Response(String text,Long inputTokens,Long outputTokens,String finishReason) {
-        public Response(String text,Long inputTokens,Long outputTokens) { this(text,inputTokens,outputTokens,"stop"); }
+    record Response(String text,Long inputTokens,Long outputTokens,String finishReason,String model,String requestId) {
+        public Response(String text,Long inputTokens,Long outputTokens,String finishReason) { this(text,inputTokens,outputTokens,finishReason,null,null); }
+        public Response(String text,Long inputTokens,Long outputTokens) { this(text,inputTokens,outputTokens,"stop",null,null); }
     }
     record Pricing(UUID authorizationId,String version,BigDecimal inputTokenRate,BigDecimal outputTokenRate) {}
-    record EmbeddingResponse(List<float[]> vectors,Long inputTokens) {
-        public Response usage() { return new Response("",inputTokens,inputTokens==null?null:0L); }
+    record EmbeddingResponse(List<float[]> vectors,Long inputTokens,String model,String requestId) {
+        public EmbeddingResponse(List<float[]> vectors,Long inputTokens) { this(vectors,inputTokens,null,null); }
+        public Response usage() { return new Response("",inputTokens,inputTokens==null?null:0L,"stop",model,requestId); }
     }
     /** Exact serialized generation input, including the provider envelope, for bounds/reservation. */
     default String generationInput(String prompt,int outputTokens) { return prompt; }
     /** Only test fixtures may opt out of the spend ledger. No production offline bean is registered. */
     default boolean offline() { return false; }
+    default void authorizeWork(ReadingWork work,ReadingWork.Payload payload) {
+        if(!offline())throw ReadingTaskPolicy.failure("LIVE_AI_NOT_AUTHORIZED");
+    }
+    default int reservationInputTokens(String phase,int inputBytes) { return inputBytes; }
+    default void haltBatch() {}
     default Pricing pricing(String phase) { throw ReadingTaskPolicy.failure("PRICING_UNKNOWN"); }
     void requireAuthorized();
     Response generate(String prompt,int outputTokens,Duration timeout);
