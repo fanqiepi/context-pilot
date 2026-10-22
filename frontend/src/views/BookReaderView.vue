@@ -10,6 +10,7 @@ const route = useRoute(), bookId = String(route.params.bookId)
 const book = ref<Book>(), versions = ref<Version[]>([]), versionId = ref('')
 const state = ref<ReadingState>(), chapters = ref<Chapter[]>([]), chapterId = ref(''), chapterTitle = ref<string | null>(null)
 const paragraphs = ref<Paragraph[]>([]), nextCursor = ref<string | null>(null), chapterPage = ref(1)
+const chapterOrdinal = ref(0), switchingChapter = ref(false)
 const notes = ref<Note[]>([]), bookmarks = ref<Bookmark[]>([]), notesPage = ref(1), notesTotal = ref(0), bookmarkPage = ref(1), bookmarkTotal = ref(0)
 const loading = ref(false), error = ref(''), saving = ref(false), saveStatus = ref(''), conflict = ref(false)
 const directory = ref(false), records = ref(route.path.endsWith('/notes')), settings = ref(false)
@@ -34,7 +35,7 @@ let saveTimer: ReturnType<typeof setTimeout> | undefined
 let savePromise: Promise<void> | undefined, disposed = false, navigating = false
 let channel: BroadcastChannel | undefined
 let failedRequest: { clientRequestId: string; expectedResumeRevision: number; paragraphId: string; offset: number } | null = null
-type ParagraphPage = { paragraphs: Paragraph[]; nextCursor: string | null; title: string | null }
+type ParagraphPage = { paragraphs: Paragraph[]; nextCursor: string | null; title: string | null; chapterOrdinal: number }
 function base() { return `/versions/${versionId.value}` }
 
 async function init() {
@@ -45,6 +46,7 @@ async function init() {
     versionId.value = String(route.query.version || book.value.readingVersionId || book.value.latestVersionId)
     if (!versions.value.some(v => v.id === versionId.value)) versionId.value = book.value.latestVersionId
     await loadVersion()
+    assistant.value = route.query.assistant === 'recap'
   } catch (e) { error.value = errorMessage(e) } finally { loading.value = false }
 }
 async function loadVersion() {
@@ -52,7 +54,7 @@ async function loadVersion() {
   suspendedDraft = null
   const generation = scopeGeneration
   readerRequest++; navigating = false
-  paragraphs.value = []; chapters.value = []; notes.value = []; bookmarks.value = []; pending.value = null
+  paragraphs.value = []; chapters.value = []; notes.value = []; bookmarks.value = []; pending.value = null; chapterOrdinal.value = 0
   failedRequest = null; conflict.value = false; selected.value = undefined
   state.value = await readingGet<ReadingState>(`${base()}/state`)
   chapterPage.value = 1; notesPage.value = 1; bookmarkPage.value = 1
@@ -93,13 +95,31 @@ async function openChapter(id: string, paragraphId?: string, offset = 0, persist
     if (persist) { await flush(); if (pending.value || conflict.value) throw new Error('请先处理未保存的位置') }
     const result = await readingGet<ParagraphPage>(`${base()}/chapters/${id}/paragraphs`, paragraphId ? { atParagraphId: paragraphId } : {})
     if (version !== versionId.value || request !== readerRequest || disposed) return
-    chapterId.value = id; chapterTitle.value = generation === scopeGeneration ? result.title : null; paragraphs.value = result.paragraphs; nextCursor.value = result.nextCursor
+    chapterId.value = id; chapterOrdinal.value = result.chapterOrdinal; chapterTitle.value = generation === scopeGeneration ? result.title : null; paragraphs.value = result.paragraphs; nextCursor.value = result.nextCursor
     selected.value = result.paragraphs[0]; directory.value = false
     await nextTick()
     if (paragraphId) scrollToParagraph(paragraphId, offset)
     else if (persist) document.querySelector('.reading-text')?.scrollIntoView({ block: 'start' })
     if (persist && selected.value) position(selected.value, offset)
   } catch (e) { if (request === readerRequest) error.value = errorMessage(e) } finally { if (request === readerRequest) navigating = false }
+}
+async function adjacentChapter(direction: -1 | 1) {
+  if (switchingChapter.value || navigating || !chapterOrdinal.value) return
+  const target = chapterOrdinal.value + direction, version = versionId.value, current = chapterId.value
+  if (target < 1 || target > (currentVersion.value?.chapterCount || 0)) return
+  switchingChapter.value = true
+  try {
+    // Fetch the bounded directory page containing the target, including page 50/51 transitions.
+    const result = await readingGet<Page<Chapter>>(`${base()}/chapters`, { page: Math.ceil(target / 50) })
+    if (disposed || version !== versionId.value || current !== chapterId.value) return
+    const chapter = result.items.find(c => c.chapterOrdinal === target)
+    if (!chapter) throw new Error('暂时无法加载相邻章节，请重试')
+    await openChapter(chapter.id)
+  } catch (e) { error.value = errorMessage(e) } finally { switchingChapter.value = false }
+}
+async function openDirectory() {
+  chapterPage.value = Math.max(1, Math.ceil(chapterOrdinal.value / 50))
+  await loadChapters(); directory.value = true
 }
 async function loadMore() {
   if (!nextCursor.value || loading.value) return
@@ -332,26 +352,32 @@ onUnmounted(() => { disposed = true; events?.close(); clearTimeout(saveTimer); c
   <section class="reading-reader" :class="{ 'reading-dark': dark }">
     <header class="reading-toolbar">
       <RouterLink to="/books">← 书架</RouterLink><h1>{{ book?.title || '阅读' }}</h1>
-      <el-button @click="directory = true">目录</el-button><el-button @click="assistant = true">阅读助手</el-button><el-button @click="records = true">书签与笔记</el-button><el-button @click="settings = true">阅读设置</el-button>
+      <el-button @click="openDirectory">目录</el-button><el-button @click="assistant = true">阅读助手</el-button><el-button @click="records = true">书签与笔记</el-button><el-button @click="settings = true">阅读设置</el-button>
     </header>
     <el-alert v-if="error" :title="error" type="error" show-icon @close="error = ''" />
-    <div class="reading-status"><span>{{ saveStatus }}</span><el-button v-if="pending && !conflict" text :loading="saving" @click="flush">立即保存</el-button><span>已读边界：{{ state?.readBoundary || 0 }} 段</span></div>
+    <div class="reading-status" aria-live="polite"><span>{{ saveStatus }}</span><el-button v-if="pending && !conflict" text :loading="saving" @click="flush">立即保存</el-button><span v-if="chapterOrdinal">第 {{ chapterOrdinal }} / {{ currentVersion?.chapterCount }} 章</span><span>已读边界：{{ state?.readBoundary || 0 }} 段</span></div>
     <el-alert v-if="!scopeReady && !loading" title="正在重新校验已读范围，相关记录与预览暂时隐藏。" type="info" :closable="false" />
     <el-alert v-if="conflict" title="另一个页面已更新阅读位置。请选择如何继续。" type="warning" :closable="false">
       <el-button @click="resolveConflict(false)">采用已存位置</el-button><el-button @click="resolveConflict(true)">从此处继续</el-button>
     </el-alert>
     <div class="reading-inline-actions"><el-button :disabled="!selected" @click="bookmark">添加书签</el-button><el-button @click="newNote(false)">手写笔记</el-button><el-button @mousedown.prevent @click="newNote(true)">选文摘录</el-button></div>
     <article v-loading="loading" class="reading-text" :style="{ fontSize: `${font}px`, lineHeight }">
-      <h2>{{ (scopeReady && chapterTitle) || '正文 · 章节标题默认隐藏' }}</h2>
+      <h2>{{ (scopeReady && chapterTitle) || `第 ${chapterOrdinal || '—'} 章 · 标题未展开` }}</h2>
       <div v-for="p in paragraphs" :key="p.id" :data-paragraph="p.id" class="reading-paragraph" :class="{ 'reading-selected': selected?.id === p.id }">
         <p data-text @mouseup="position(p, selectedOffset(p))">{{ p.text }}</p>
         <div class="reading-paragraph-actions"><small>第 {{ p.paragraphOrdinal }} 段</small><button @click="markRead(p)">{{ p.paragraphOrdinal < (state?.readBoundary || 0) ? '重设已读范围到这里' : '已读到这里' }}</button><button v-if="scopeReady && p.paragraphOrdinal <= (state?.readBoundary || 0)" @click="previewSource(`${base()}/paragraphs/${p.id}/preview`)">查看原文</button></div>
       </div>
       <el-button v-if="nextCursor" :loading="loading" @click="loadMore">加载本章后续段落</el-button>
-      <p v-else class="reading-chapter-end">本章正文已加载完 <template v-if="paragraphs.length && paragraphs[paragraphs.length - 1]!.paragraphOrdinal > (state?.readBoundary || 0)">· <button @click="markRead(paragraphs[paragraphs.length - 1]!)">读完本章</button></template> · <button @click="directory = true">选择下一章</button></p>
+      <p v-else class="reading-chapter-end">本章正文已加载完 <template v-if="paragraphs.length && paragraphs[paragraphs.length - 1]!.paragraphOrdinal > (state?.readBoundary || 0)">· <button @click="markRead(paragraphs[paragraphs.length - 1]!)">确认读完本章</button></template></p>
+      <nav v-if="chapterOrdinal" class="reading-chapter-navigation" aria-label="章节切换">
+        <el-button :disabled="chapterOrdinal <= 1 || switchingChapter || loading" @click="adjacentChapter(-1)">上一章</el-button>
+        <el-button @click="openDirectory">第 {{ chapterOrdinal }} 章 · 目录</el-button>
+        <el-button :disabled="chapterOrdinal >= (currentVersion?.chapterCount || 0) || switchingChapter || loading" @click="adjacentChapter(1)">下一章</el-button>
+      </nav>
     </article>
     <el-drawer v-model="assistant" title="回顾前情与人物查证" size="min(94vw, 560px)">
       <ReadingAssistant :version-id="versionId" :state="state" :ready="scopeReady" :open="assistant" @continue="s => { assistant = false; void openChapter(s.chapterId, s.paragraphId, s.startOffset) }" @close="assistant = false" @saved="loadRecords" />
+      <template #footer><el-button type="primary" @click="assistant = false">回到正文继续阅读</el-button></template>
     </el-drawer>
     <el-drawer v-model="directory" title="目录与版本" direction="ltr" size="min(90vw, 380px)">
       <el-select :model-value="versionId" @change="switchVersion"><el-option v-for="(v, index) in versions" :key="v.id" :value="v.id" :label="`版本 ${versions.length - index} · ${v.chapterCount} 章`" /></el-select>

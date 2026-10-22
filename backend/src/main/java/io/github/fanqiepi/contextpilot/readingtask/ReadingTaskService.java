@@ -134,6 +134,7 @@ public class ReadingTaskService {
         return scopes.current(version,s->{
             int ready=mapper.readyBoundary(version,s.boundaryOrdinal(),new Payload().profile);
             var result=new LinkedHashMap<String,Object>();
+            result.put("executionMode",ai.offline()?"OFFLINE_FIXTURE":authorized()?"EVALUATION_ONLY":"DISABLED");
             result.putAll(Map.of("profile",new Payload().profile,"readyBoundary",ready,"requestedBoundary",s.boundaryOrdinal(),
                     "ready",s.boundaryOrdinal()>0 && ready==s.boundaryOrdinal(),"dataAsOf",s.dataAsOf(),"liveAllowed",authorized()));
             var active=mapper.activeIndexWork(s.ownerId(),version);result.put("activeJob",active==null?null:view(active,s));return result;

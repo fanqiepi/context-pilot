@@ -8,7 +8,7 @@
 .reading-book-card h2 { margin: 0 0 12px; font-size: 21px; overflow-wrap: anywhere; }
 .reading-book-card p { font-size: 12px; color: #697773; }
 .reading-book-cover { width: 52px; height: 76px; display: grid; place-items: center; background: #dbe7d9; color: #345e4c; border-radius: 3px 8px 8px 3px; font-size: 26px; box-shadow: inset 5px 0 #bacfbb; }
-.reading-actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; }
+.reading-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 .reading-source { max-height: 4em; overflow: hidden; }
 .reading-footnote { color: #75827d; font-size: 13px; margin-top: 30px; }
 .reading-import { max-width: 800px; }
@@ -38,6 +38,20 @@
 .reading-record p { white-space: pre-wrap; overflow-wrap: anywhere; }
 .reading-dark { background: #202a27; color: #d2d9ce; }
 .reading-dark .reading-text h2 { border-color: #3c4941; }
+.reading-chapter-navigation { display: flex; justify-content: space-between; gap: 8px; margin: 28px 0 0; font-family: sans-serif; }
+.reading-chapter-navigation .el-button + .el-button { margin-left: 0; }
+.reading-assistant-scope { padding: 16px; border-radius: 10px; background: #eef4ee; color: #345749; margin-bottom: 16px; }
+.reading-assistant-scope p { margin: 8px 0 0; font-size: 13px; line-height: 1.7; }
+.reading-assistant-tabs { margin-top: 22px; }
+.reading-assistant section > .el-select { max-width: 240px; margin: 0 8px 12px 0; }
+.reading-assistant section > .el-button { margin: 8px 0; }
+.reading-assistant .el-radio-group { display: flex; margin: 12px 0; }
+.reading-assistant-hint { font-size: 13px; line-height: 1.7; color: #6c7a71; }
+.reading-answer { padding: 18px; margin-top: 20px; border: 1px solid #dce5da; border-radius: 12px; background: #fffdf7; line-height: 1.85; overflow-wrap: anywhere; }
+.reading-answer h3 { margin-top: 0; }
+.reading-history-question { font-size: 13px; margin: 4px 0; color: #607267; }
+.reading-task-details { font-size: 12px; color: #697970; margin-top: 20px; }
+.reading-task-details summary { cursor: pointer; padding: 8px 0; }
 @media (max-width: 650px) {
   .reading-library { padding: 22px 12px; }.reading-heading { align-items: flex-start; }.reading-heading h1 { font-size: 28px; }
   .reading-reader { padding: 12px 8px 48px; }.reading-toolbar { gap: 6px; }.reading-toolbar h1 { flex-basis: 70%; }

@@ -157,6 +157,8 @@ class ReadingLibraryPersistenceTests {
         assertThat(version.characterCount()).isEqualTo(5_000_000);
         var lastChapter=books.chapters(result.versionId(),20,50).items().getLast();
         var rows=books.paragraphs(result.versionId(),lastChapter.id(),null,100,false);
+        assertThat(rows.chapterOrdinal()).isEqualTo(1000);
+        assertThat(rows.title()).isNull(); // Numeric navigation must not expose an unread title.
         assertThat(rows.paragraphs().stream().mapToInt(BookRows.Paragraph::codePointCount).sum()).isLessThanOrEqualTo(20000);
         var last=rows.paragraphs().getLast();
         states.resume(result.versionId(),new ReadingStateService.Resume(UUID.randomUUID(),0L,last.id(),500));

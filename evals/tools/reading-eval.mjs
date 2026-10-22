@@ -6,8 +6,8 @@ import {execFileSync} from 'node:child_process';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const DATA = 'evals/datasets/reading/acceptance-v1.json';
-const CONFIG = 'evals/configs/reading/acceptance-v8.json';
-const LOCK = 'evals/configs/reading/acceptance-v8.lock.json';
+const CONFIG = 'evals/configs/reading/acceptance-v9.json';
+const LOCK = 'evals/configs/reading/acceptance-v9.lock.json';
 export const hash = value => createHash('sha256').update(value).digest('hex');
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const read = file => JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/^\uFEFF/, ''));
@@ -102,7 +102,7 @@ function walk(relative) {
 function sourceFiles() {
   return ['book', 'readingstate', 'readingnote', 'readingtask'].flatMap(capability =>
     walk(`backend/src/main/java/io/github/fanqiepi/contextpilot/${capability}`))
-    .concat(['backend/pom.xml', 'backend/src/main/resources/application.yml',
+    .concat(['tools/reading-demo.ps1', 'backend/pom.xml', 'backend/src/main/resources/application.yml',
       'backend/src/main/resources/db/migration/V29__create_reading_library.sql',
       'backend/src/main/resources/db/migration/V30__create_reading_tasks.sql',
       'backend/src/main/resources/db/migration/V31__create_reading_note_proposals.sql',
