@@ -43,6 +43,8 @@ class ReadingTaskPersistenceTests {
         final List<String> prompts=new CopyOnWriteArrayList<>();
         final AtomicInteger calls=new AtomicInteger(),embeddings=new AtomicInteger();
         public boolean offline(){return live==null;}
+        public String executionMode(){return live!=null && live.readerTrial()?"READER_TRIAL":ReadingAiGateway.super.executionMode();}
+        public Map<String,Object> authorizationStatus(){return live==null?Map.of():live.status();}
         public void requireAuthorized(){if(live!=null)live.check();if(!allowed)throw ReadingTaskPolicy.failure("LIVE_AI_NOT_AUTHORIZED");}
         public void authorizeWork(ReadingWork w,ReadingWork.Payload p){if(live!=null)live.authorize(w,p);}
         public Pricing pricing(String phase){return live.pricing(phase);}
@@ -122,6 +124,18 @@ class ReadingTaskPersistenceTests {
         var w=await(true,created.id(),"READY","FAILED");assertThat(w.status).as(w.errorCode).isEqualTo("READY");
     }
     @Test void localHttpProtocolFlowsThroughIndexLookupUsageAndTruncationGate() throws Exception {
+        protocolFlow(false);
+    }
+    @Test void readerTrialUsesIndependentDurableLedgersForFreeformIndexAndLookupAndStopsOnFailure() throws Exception {
+        protocolFlow(true);
+    }
+    void protocolFlow(boolean trial) throws Exception {
+        ReadingLiveBatch batch=null;
+        if(trial) {
+            UUID id=UUID.randomUUID();batch=new ReadingLiveBatch(id,ReadingText.hash(id.toString()),null,"lock",new java.math.BigDecimal("20"),new java.math.BigDecimal("10"),
+                    java.time.OffsetDateTime.now().minusMinutes(1),java.time.OffsetDateTime.now().plusHours(1),Map.of());
+            ai.live=new ReadingLiveAuthorization(mapper,bookMapper,states,batch,false,true);
+        }
         var http=com.sun.net.httpserver.HttpServer.create(new java.net.InetSocketAddress("127.0.0.1",0),0);
         var json=tools.jackson.databind.json.JsonMapper.builder().build();var httpCalls=new AtomicInteger();
         var finish=new java.util.concurrent.atomic.AtomicReference<>("stop");
@@ -147,6 +161,16 @@ class ReadingTaskPersistenceTests {
             var created=tasks.create(new ReadingTaskService.Create(UUID.randomUUID(),f.version,states.get(f.version).scopeRevision(),"CHARACTER_LOOKUP",null,"林舟是谁","DIRECT"));
             assertThat(await(false,created.id(),"COMPLETED","FAILED").status).isEqualTo("COMPLETED");
             assertThat(httpCalls).hasValue(3); // One batch, one query embedding, one answer.
+            if(trial) {
+                assertThat(((Map<?,?>)tasks.index(f.version)).get("authorization")).isNotNull();
+                assertThat(((Map<?,?>)tasks.index(f.version)).get("executionMode")).isEqualTo("READER_TRIAL");
+                assertThat(mapper.ledger(batch.id,states.owner())).containsEntry("calls_started",1).containsEntry("call_limit",100);
+                assertThat(mapper.ledger(batch.id,states.owner()).get("predecessor_id")).isNull();
+                assertThat(mapper.ledger(batch.embeddingId(),states.owner())).containsEntry("calls_started",2).containsEntry("call_limit",200);
+                ai.live=new ReadingLiveAuthorization(mapper,bookMapper,states,batch,false,true);ai.live.check();
+                assertThat(mapper.ledger(batch.id,states.owner())).containsEntry("calls_started",1);
+                boundary(f,1);assertThat(view(created.id()).get("visibility")).isEqualTo("HIDDEN_BY_SCOPE");boundary(f,2);
+            }
             assertThat(jdbc.queryForObject("SELECT usage_json->>'inputTokens' FROM reading_ai_call WHERE task_id=? AND phase='SEARCH_0'",String.class,created.id())).isEqualTo("7");
             assertThat(jdbc.queryForObject("SELECT usage_json->>'outputTokens' FROM reading_ai_call WHERE task_id=? AND phase='SEARCH_0'",String.class,created.id())).isEqualTo("0");
             var payload=ReadingTaskService.payload(mapper.get(false,created.id()));
@@ -157,6 +181,12 @@ class ReadingTaskPersistenceTests {
             assertThat(view(truncated.id()).get("validatedResult")).isNull();
             assertThat(jdbc.queryForObject("SELECT usage_json->>'outputTokens' FROM reading_ai_call WHERE task_id=?",String.class,truncated.id())).isEqualTo("8");
             assertThat(httpCalls).hasValue(4);
+            if(trial) {
+                assertThat(ai.live.status()).containsEntry("liveAllowed",false).containsEntry("stopReason","OUTPUT_INVALID");
+                assertThatThrownBy(()->tasks.create(recapRequest(f))).isInstanceOf(ReadingException.class);
+                var restarted=new ReadingLiveAuthorization(mapper,bookMapper,states,batch,false,true);
+                assertThatThrownBy(restarted::check).isInstanceOf(ReadingException.class);assertThat(httpCalls).hasValue(4);
+            }
         } finally { ai.protocol=null;http.stop(0); }
     }
     @Test void recapPersistsCompleteOrderedEvidenceAndCitationWithoutUnreadTextOrPositionWrites() throws Exception {

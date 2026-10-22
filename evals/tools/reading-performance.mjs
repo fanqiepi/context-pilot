@@ -42,7 +42,7 @@ export function startServer(session, port, dist = path.join(ROOT, 'frontend/dist
   const sha = data => createHash('sha256').update(data).digest('hex');
   const report = () => ({ version: 'reading-performance-v1', recordedAt: new Date().toISOString(), fixture,
     environment: { os: os.version(), cpu: os.cpus()[0]?.model, memoryBytes: os.totalmem(), node: process.version },
-    implementationLockSha256: sha(fs.readFileSync(path.join(ROOT, 'evals/configs/reading/acceptance-v9.lock.json'))),
+    implementationLockSha256: sha(fs.readFileSync(path.join(ROOT, 'evals/configs/reading/acceptance-v10.lock.json'))),
     builtIndexSha256: sha(fs.readFileSync(path.join(dist, 'index.html'))),
     service: { paragraphP95Ms: p95(fixture.paragraphSamplesMs), positionWriteP95Ms: p95(fixture.positionWriteSamplesMs) },
     browser: summarize(samples,fixture.fixture.resumeParagraph), samples,

@@ -24,6 +24,8 @@ public interface ReadingAiGateway {
     default String generationInput(String prompt,int outputTokens) { return prompt; }
     /** Only test fixtures may opt out of the spend ledger. No production offline bean is registered. */
     default boolean offline() { return false; }
+    default String executionMode() { return offline()?"OFFLINE_FIXTURE":"EVALUATION_ONLY"; }
+    default java.util.Map<String,Object> authorizationStatus() { return java.util.Map.of(); }
     default void authorizeWork(ReadingWork work,ReadingWork.Payload payload) {
         if(!offline())throw ReadingTaskPolicy.failure("LIVE_AI_NOT_AUTHORIZED");
     }

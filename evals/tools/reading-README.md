@@ -1,5 +1,7 @@
 # 阅读验收工具
 
+2026-10-22 当前实现为 acceptance-v10，新增独立本机真人试读；固定评测仍为 DEBUG_RETEST，未安装新评测批准文件，旧账本仍停止。使用当前配置和锁，下面 v9 说明保留历史范围。试读不进入固定数据集评分，见 [试读入口](../../docs/development/reading-reader-trial.md)。
+
 Node.js 22；从仓库根目录执行，无新增依赖，无 HTTP、模型或 embedding 调用。
 
 ```powershell

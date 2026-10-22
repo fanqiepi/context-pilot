@@ -128,13 +128,14 @@ public class ReadingTaskService {
         try { ai.requireAuthorized();allowed=true; } catch(ReadingException e) { allowed=false; }
         String cost=allowed && !ai.offline()?ReadingLiveBatch.EMBEDDING.multiply(java.math.BigDecimal.valueOf((long)batches*16*ReadingLiveBatch.EMBEDDING_LINE_BOUND)).toPlainString():null;
         return new Estimate(ready,target,s.boundaryOrdinal(),segments,chars,batches,profile,hash,allowed,cost,
-                !allowed?"LIVE_AI_NOT_AUTHORIZED":ai.offline()?"离线测试适配器；不代表真实费用估算":"仅限批准评测条目；金额为上下文上限预留，非账单");
+                !allowed?"LIVE_AI_NOT_AUTHORIZED":ai.offline()?"离线测试适配器；不代表真实费用估算":"金额为上下文上限预留，非账单；受当前独立授权限制");
     }
     public Object index(UUID version) {
         return scopes.current(version,s->{
             int ready=mapper.readyBoundary(version,s.boundaryOrdinal(),new Payload().profile);
             var result=new LinkedHashMap<String,Object>();
-            result.put("executionMode",ai.offline()?"OFFLINE_FIXTURE":authorized()?"EVALUATION_ONLY":"DISABLED");
+            result.put("executionMode",ai.offline()?"OFFLINE_FIXTURE":authorized()?ai.executionMode():"DISABLED");
+            if("READER_TRIAL".equals(ai.executionMode()))result.put("authorization",ai.authorizationStatus());
             result.putAll(Map.of("profile",new Payload().profile,"readyBoundary",ready,"requestedBoundary",s.boundaryOrdinal(),
                     "ready",s.boundaryOrdinal()>0 && ready==s.boundaryOrdinal(),"dataAsOf",s.dataAsOf(),"liveAllowed",authorized()));
             var active=mapper.activeIndexWork(s.ownerId(),version);result.put("activeJob",active==null?null:view(active,s));return result;

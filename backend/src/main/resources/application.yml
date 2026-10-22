@@ -42,6 +42,9 @@ spring:
 
 contextpilot:
   reading:
+    # Local human trial uses its own approval and durable provider ledgers; mutually exclusive with evaluation.
+    trial-enabled: ${READING_TRIAL_ENABLED:false}
+    trial-approval: ${READING_TRIAL_APPROVAL:}
     # Evaluation only; credentials alone never enable calls. Keep approval files local/ignored.
     live-enabled: ${READING_LIVE_ENABLED:false}
     live-repository: ${READING_LIVE_REPOSITORY:..}

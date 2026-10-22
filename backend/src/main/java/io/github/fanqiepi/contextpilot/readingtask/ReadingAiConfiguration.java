@@ -14,6 +14,8 @@ public class ReadingAiConfiguration {
                                      @Value("${spring.ai.openai.api-key:}") String embeddingKey,ReadingLiveAuthorization live) {
         var provider=new ReadingProviderClient(generationKey,embeddingKey);
         return new ReadingAiGateway() {
+            public String executionMode() { return live!=null && live.readerTrial()?"READER_TRIAL":"EVALUATION_ONLY"; }
+            public java.util.Map<String,Object> authorizationStatus() { return live==null?java.util.Map.of():live.status(); }
             public void requireAuthorized() {
                 if(live==null)throw ReadingException.conflict("LIVE_AI_NOT_AUTHORIZED","阅读 AI 尚未获得付费授权，基础阅读仍可使用");
                 live.check();

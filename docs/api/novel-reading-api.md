@@ -1,5 +1,7 @@
 # 小说阅读 API 合同草案
 
+2026-10-22 真人试读（acceptance-v10）：原索引状态 GET /api/reading/versions/{id}/index 增加 executionMode=READER_TRIAL 与 authorization（供应商额度、已计价/预留、expiresAt、reason/stopReason）。只有有效独立授权才能创建真实任务，既有创建/确认接口与范围校验不变。GET /api/reading/evaluation/status 复用为运维只读状态，executionScope=READER_TRIAL_LOCAL；没有 HTTP 授权或续期接口。
+
 2026-10-22 续读工作台补充：GET /versions/{versionId}/chapters/{chapterId}/paragraphs 响应增加 chapterOrdinal（1 起），用于恢复到目录分页之外时正确显示当前章和相邻章；未读 title 仍为 null。GET /versions/{versionId}/index 增加 executionMode=OFFLINE_FIXTURE/EVALUATION_ONLY/DISABLED，分别表示离线替身、已批准固定评测、关闭；它是界面说明，不授予调用权限。liveAllowed 及服务端每次请求的批准、范围和预算检查继续有效；EVALUATION_ONLY 不允许页面随机创建自由任务。无新写接口。
 
 2026-10-22 acceptance-v7 的本地 plan/approval 必须绑定 executionScope=DEBUG_RETEST，批准文件另含 previousAuthorizationId/previousApprovalDigest。状态接口新增 executionScope/previousAuthorizationId 并按批次返回调用上限；不提供 HTTP 授权/增额接口。仅接受冻结 DEBUG 请求，INDEX、TEST 或其他请求不在允许清单内，即使开启 debug-reviewed 也不能放行。前置账本不匹配/有未知预留返回 LIVE_PREDECESSOR_MISMATCH，已被其他批次承接返回 LIVE_BUDGET_ALREADY_TRANSFERRED；其余服务端门禁不变。

@@ -3,6 +3,7 @@
 data/uploads/*
 !data/uploads/.gitkeep
 data/test-documents/
+/data/reading-trial/
 
 # IDE and local editor state
 .idea/

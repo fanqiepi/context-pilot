@@ -15,13 +15,14 @@ type Task = {
   coverage?: { requestedRange: number[]; completeness: string; completedParagraph: number; targetBoundary: number }
   budget?: { modelCalls: number; embeddingCalls: number; activeMillis: number; limitMillis: number }
 }
-type Index = { ready: boolean; readyBoundary: number; requestedBoundary: number; liveAllowed: boolean; executionMode: 'OFFLINE_FIXTURE' | 'EVALUATION_ONLY' | 'DISABLED'; activeJob: Task | null }
+type Authorization = { expiresAt: string; reason: string; stopReason?: string; providers: Record<string, { limitCny: number; budgetValuedCny: number; reservedCny: number }> }
+type Index = { ready: boolean; readyBoundary: number; requestedBoundary: number; liveAllowed: boolean; executionMode: 'OFFLINE_FIXTURE' | 'READER_TRIAL' | 'EVALUATION_ONLY' | 'DISABLED'; activeJob: Task | null; authorization?: Authorization }
 type Estimate = { fromBoundary: number; targetBoundary: number; requestedBoundary: number; segments: number; characters: number; batches: number; estimateHash: string; liveAllowed: boolean; estimatedCost: string | null }
 type Citation = { sources: ReadingSource[]; scopeRevision: number; visibilityEpoch: number }
 const tasks = ref<Task[]>([]), current = ref<Task>(), indexJob = ref<Task>(), index = ref<Index>(), estimate = ref<Estimate>()
 const page = ref(1), question = ref(''), mode = ref('DIRECT'), chapterCount = ref(3), busy = ref(false), error = ref('')
 const activeTab = ref('recap'), loaded = ref(false)
-const canCreate = computed(() => index.value?.executionMode === 'OFFLINE_FIXTURE' && index.value.liveAllowed)
+const canCreate = computed(() => !!index.value?.liveAllowed && ['OFFLINE_FIXTURE', 'READER_TRIAL'].includes(index.value.executionMode))
 const coverageLabels: Record<string, string> = { FULL_WINDOW: '已覆盖本次回顾窗口', SEARCH_MATCHES: '基于已读范围内的检索依据', PARTIAL: '部分问题仍缺少依据', NONE: '尚无可展示的回答' }
 const sources = ref<ReadingSource[]>([]), preview = ref(false), previewPath = ref(''), connected = ref(true)
 let generation = 0, selection = 0, citationRequest = 0, historyRequest = 0, events: EventSource | undefined, timer: ReturnType<typeof setTimeout> | undefined
@@ -34,6 +35,8 @@ const errors: Record<string, string> = {
   TIMEOUT: '本任务已到执行截止时间。', SCOPE_CHANGED: '已读范围曾回退，请重新确认范围后创建任务。',
   LIVE_AI_NOT_AUTHORIZED: '当前未开放新的 AI 任务。你仍可阅读正文、查看已有结果和保存笔记。',
   LIVE_BATCH_MISMATCH: '当前调用仅限已批准的固定评测任务，请继续阅读或查看已有结果。',
+  LIVE_AUTHORIZATION_STOPPED: '本次试读授权已到期或停止，请查看费用状态。不能自动重启。',
+  BUDGET_EXHAUSTED: '剩余额度不足以预留下一次调用，或已达到调用次数上限。本次试读已停止。',
 }
 function clear() {
   generation++; selection++; citationRequest++; historyRequest++; events?.close(); clearTimeout(timer)
@@ -101,7 +104,7 @@ async function create(type: string) {
   if (!props.ready || !props.state || !canCreate.value) return
   const g = generation
   try {
-    await ElMessageBox.confirm(`允许使用正文开头至第 ${props.state.readBoundary} 段。${type === 'RECAP' ? `回顾最近 ${chapterCount.value} 个已读章节，一次生成。` : `人物查证：${mode.value === 'DIRECT' ? '一次检索、一次回答' : '一次规划、最多三次检索、一次回答'}。`}真实调用须另获费用授权。`, '确认任务范围', { confirmButtonText: '创建任务', cancelButtonText: '返回阅读' })
+    await ElMessageBox.confirm(`允许使用正文开头至第 ${props.state.readBoundary} 段。${type === 'RECAP' ? `回顾最近 ${chapterCount.value} 个已读章节，一次生成。` : `人物查证：${mode.value === 'DIRECT' ? '一次检索、一次回答' : '一次规划、最多三次检索、一次回答'}。`}${index.value?.executionMode === 'READER_TRIAL' ? '问题和所需已读正文会发送至已配置的模型供应商，费用从本次试读预算扣除。' : '这是固定离线演示，不产生模型费用。'}`, '确认任务范围', { confirmButtonText: '创建任务', cancelButtonText: '返回阅读' })
     if (!valid(g)) return
     busy.value = true; error.value = ''
     const t = await readingPost<Task>('/tasks', { clientRequestId: crypto.randomUUID(), versionId: props.versionId, expectedScopeRevision: props.state.scopeRevision, type,
@@ -177,7 +180,13 @@ onUnmounted(clear)
   <div class="reading-assistant">
     <div class="reading-assistant-scope"><strong>只看你已读过的内容</strong><p>从开头至第 {{ state?.readBoundary || 0 }} 段。回顾和查证不会推进阅读进度。</p></div>
     <el-alert v-if="index?.executionMode === 'OFFLINE_FIXTURE'" title="固定离线演示：结果用于体验流程，不是现场模型生成，也不代表语义验收。" type="warning" :closable="false" />
+    <el-alert v-else-if="index?.executionMode === 'READER_TRIAL'" title="真人试读：确认后调用真实模型，仅使用你确认的已读范围。回答质量仍需你核对。" type="info" :closable="false" />
     <el-alert v-else-if="index" :title="index.executionMode === 'EVALUATION_ONLY' ? '阅读 AI 正在固定评测中，暂不开放自由提问；已有结果仍可查看。' : '阅读 AI 仍在验证中，当前未开放新任务。你可以查看已有结果，或直接回到正文。'" type="info" :closable="false" />
+    <div v-if="index?.authorization" class="reading-trial-budget">
+      <p>试读授权截至 {{ new Date(index.authorization.expiresAt).toLocaleString() }}；状态：{{ index.authorization.stopReason || index.authorization.reason }}</p>
+      <p v-for="(provider, name) in index.authorization.providers" :key="name">{{ name === 'DEEPSEEK' ? 'DeepSeek' : '阿里向量' }}：上限 ¥{{ provider.limitCny }}，已计价 ¥{{ provider.budgetValuedCny }}，预留 ¥{{ provider.reservedCny }}</p>
+      <small>按保守单价计价，非供应商账单。到期、费用或次数不足、调用异常后停止，不自动重试。</small>
+    </div>
     <el-alert v-if="error" :title="error" type="error" @close="error = ''" />
     <el-alert v-if="!ready || !connected" title="连接或范围正在重验，结果暂时隐藏。" type="warning" :closable="false" />
     <template v-if="ready">
