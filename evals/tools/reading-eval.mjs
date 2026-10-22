@@ -6,8 +6,8 @@ import {execFileSync} from 'node:child_process';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const DATA = 'evals/datasets/reading/acceptance-v1.json';
-const CONFIG = 'evals/configs/reading/acceptance-v5.json';
-const LOCK = 'evals/configs/reading/acceptance-v5.lock.json';
+const CONFIG = 'evals/configs/reading/acceptance-v6.json';
+const LOCK = 'evals/configs/reading/acceptance-v6.lock.json';
 export const hash = value => createHash('sha256').update(value).digest('hex');
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const read = file => JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/^\uFEFF/, ''));
@@ -121,7 +121,7 @@ function sourceFiles() {
 export function freeze(dataset, config, output) {
   validateAssets(dataset, config);
   const assets = [DATA, CONFIG, config.scoring, config.roadmap, config.evaluation,
-    'evals/tools/reading-eval.mjs', 'evals/tools/reading-assets.mjs', 'evals/tools/reading-live.mjs', 'evals/tools/reading-live.test.mjs',
+    'evals/tools/reading-eval.mjs', 'evals/tools/reading-assets.mjs', 'evals/tools/reading-live.mjs', 'evals/tools/reading-live.test.mjs', 'evals/results/reading/acceptance-v5/debug-v5.json',
     ...walk('evals/corpora/reading/acceptance-v1')];
   const fingerprints = files => Object.fromEntries([...new Set(files)].sort().map(file => [file, hash(fs.readFileSync(path.join(ROOT, file)))]));
   const lock = {version: config.version, datasetVersion: dataset.version, createdAt: new Date().toISOString(),

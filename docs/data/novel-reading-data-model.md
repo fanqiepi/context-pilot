@@ -1,5 +1,7 @@
 # 小说阅读数据合同草案
 
+2026-10-22 拒答修复不变更数据库：新 answerability 仅为人物查证的模型响应字段；服务端验证后转为既有 Result(facts, partial) 和任务终态。旧结果、不可变笔记提案、调用 usage 和历史审计保持；没有迁移或旧数据回填。停止中的 v5 评测账本不重置。
+
 2026-10-22 分供应商预算：复用 V33 账本，无新增迁移。生成账本 ID=批准 ID；embedding 账本 ID=UUID.nameUUIDFromBytes(批准 ID + ":DASHSCOPE_LEDGER:0")，摘要为 SHA-256(批准摘要 + ":DASHSCOPE")。两个账本独立金额/次数/80% 标记，任何一个停止阻断整批，重复安装不重置。批准文件必须同时提供 providerLimitsCny，顶层 limitCny 必须等于二者之和。
 
 2026-10-22 V33 补充：reading_spend_ledger 新增 warning_emitted BOOLEAN NOT NULL DEFAULT FALSE、stop_reason VARCHAR(64)。告警标记随预留事务提交，停止原因首次写入后保留；旧过期账本不恢复。见[预算日志与停止](../evaluation/reading-budget-alerts.md)。

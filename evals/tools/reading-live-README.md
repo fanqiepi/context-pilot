@@ -1,6 +1,6 @@
 # 阅读固定批次采集入口
 
-本工具只操作本机 `http://127.0.0.1:端口` 的阅读 API，供应商凭据仍只在后端。默认不开启真实调用，没有批准文件时不能采集。所有命令从仓库根目录执行，Node.js 22，无新依赖。当前批次已获用户明确批准，执行证据见[执行记录](../../docs/evaluation/reading-live-v5-results.md)；通用操作仍须对应授权。
+本工具只操作本机 `http://127.0.0.1:端口` 的阅读 API，供应商凭据仍只在后端。默认不开启真实调用，没有批准文件时不能采集。所有命令从仓库根目录执行，Node.js 22，无新依赖。v5 已获用户批准并执行 DEBUG，但因语义失败持久停止，见[执行记录](../../docs/evaluation/reading-live-v5-results.md)。当前 v6 为离线拒答修复，没有安装新的可执行 plan/approval，不能用模板额度重置此前消耗。
 
 ## 准备（不调用模型）
 
@@ -11,7 +11,7 @@ node evals/tools/reading-live.mjs bind http://127.0.0.1:8080 backend/target/read
 node evals/tools/reading-live.mjs prepare backend/target/reading-bindings.json backend/target/reading-live-plan.json
 ```
 
-`prepare` 校验 acceptance-v5 资产和源码锁，写新 plan 及 `reading-live-plan.json.approval.json`。两个文件均拒绝覆盖。批准模板为 `NOT_AUTHORIZED`，时间为空；不是创建授权的接口。计划绑定版本锁、语料文件与段落哈希、真实 book/version/paragraph UUID、固定供应商端点。题目/repeat 和增量索引只从冻结数据集派生，不允许文件中注入任意新任务。
+`prepare` 校验 acceptance-v6 资产和源码锁，写新 plan 及 `reading-live-plan.json.approval.json`。两个文件均拒绝覆盖。批准模板为 `NOT_AUTHORIZED`，时间为空；不是创建授权的接口。计划绑定版本锁、语料文件与段落哈希、真实 book/version/paragraph UUID、固定供应商端点。题目/repeat 和增量索引只从冻结数据集派生，不允许文件中注入任意新任务。
 
 服务端与脚本使用相同的确定性 clientRequestId（batchId + entryId + repeat），数据库现有唯一键保证重复请求不新建任务。修改源码、数据、端点或绑定之后须重新准备并审核，不能修改旧锁让校验通过。
 
@@ -46,7 +46,7 @@ node evals/tools/reading-eval.mjs report backend/target/reading-test.json
 
 ## 费用口径
 
-新增本地 80% 日志提醒、持久停止原因与供应商控制台配置说明见[预算预警与停止](../../docs/evaluation/reading-budget-alerts.md)。当前 v5 需要 V33；旧 v3/v4 plan 保持原字节且不适用于 v5，复用已绑定的语料 UUID 重新 prepare，不重复导入。
+新增本地 80% 日志提醒、持久停止原因与供应商控制台配置说明见[预算预警与停止](../../docs/evaluation/reading-budget-alerts.md)。当前 v6 需要 V33；旧 v3/v4/v5 plan 保持原字节且不适用于 v6，复用已绑定的语料 UUID 重新 prepare，不重复导入。
 
 字节估算仅用于历史预测，不能当作已验证 token 上界。实际预留改用供应商公开上下文上限：生成每次按完整上下文上限加已限制的输出预留；单查询 embedding 按单行上限，索引每批按最多行数上限预留。没有匹配 tokenizer 的证明也不会低估输入。具体参数、算术及假设见[工程验证](../../docs/evaluation/reading-live-gates-verification.md)。
 
