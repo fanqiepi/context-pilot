@@ -36,22 +36,25 @@ class ReadingTaskPersistenceTests {
     }
     static class FakeAi implements ReadingAiGateway {
         volatile ReadingProviderClient protocol;
+        volatile ReadingAiGateway direct;
         volatile ReadingLiveAuthorization live;
         volatile boolean allowed=true,blockEmbedding=false;volatile String finish="stop";volatile String answer="{\"facts\":[{\"text\":\"林舟来到渡口。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}";
         volatile String plan="{\"queries\":[\"林舟\",\"渡口\"]}";
         volatile CountDownLatch entered,release;
         final List<String> prompts=new CopyOnWriteArrayList<>();
         final AtomicInteger calls=new AtomicInteger(),embeddings=new AtomicInteger();
-        public boolean offline(){return live==null;}
-        public String executionMode(){return live!=null && live.readerTrial()?"READER_TRIAL":ReadingAiGateway.super.executionMode();}
+        public boolean offline(){return direct==null && live==null;}
+        public boolean budgetRequired(){return direct==null && !offline();}
+        public String executionMode(){return direct!=null?direct.executionMode():live!=null && live.readerTrial()?"READER_TRIAL":ReadingAiGateway.super.executionMode();}
         public Map<String,Object> authorizationStatus(){return live==null?Map.of():live.status();}
-        public void requireAuthorized(){if(live!=null)live.check();if(!allowed)throw ReadingTaskPolicy.failure("LIVE_AI_NOT_AUTHORIZED");}
-        public void authorizeWork(ReadingWork w,ReadingWork.Payload p){if(live!=null)live.authorize(w,p);}
+        public void requireAuthorized(){if(direct!=null)direct.requireAuthorized();if(live!=null)live.check();if(!allowed)throw ReadingTaskPolicy.failure("LIVE_AI_NOT_AUTHORIZED");}
+        public void authorizeWork(ReadingWork w,ReadingWork.Payload p){if(direct!=null)direct.authorizeWork(w,p);if(live!=null)live.authorize(w,p);}
         public Pricing pricing(String phase){return live.pricing(phase);}
         public int reservationInputTokens(String phase,int bytes){return live==null?bytes:ReadingLiveAuthorization.tokenBound(phase);}
         public void haltBatch(){if(live!=null)live.halt();}
         public void haltBatch(String reason){if(live!=null)live.halt(reason);}
         public Response generate(String prompt,int limit,Duration timeout) {
+            if(direct!=null)return direct.generate(prompt,limit,timeout);
             if(protocol!=null)return protocol.generate(prompt,limit,timeout);
             requireAuthorized();calls.incrementAndGet();prompts.add(prompt);
             waitForRelease();
@@ -72,6 +75,7 @@ class ReadingTaskPersistenceTests {
         }
         public String generationInput(String prompt,int limit) { return protocol==null?prompt:protocol.generationInput(prompt,limit); }
         public EmbeddingResponse embedWithUsage(List<String> texts,Duration timeout) {
+            if(direct!=null)return direct.embedWithUsage(texts,timeout);
             return protocol==null?ReadingAiGateway.super.embedWithUsage(texts,timeout):protocol.embed(texts,timeout);
         }
         void block(){entered=new CountDownLatch(1);release=new CountDownLatch(1);}
@@ -93,7 +97,7 @@ class ReadingTaskPersistenceTests {
     @Autowired WebApplicationContext web;
     @org.springframework.boot.test.web.server.LocalServerPort int port;
     record Fixture(UUID book,UUID version,List<BookRows.Paragraph> paragraphs) {}
-    @BeforeEach void reset() { ai.live=null;ai.protocol=null;ai.allowed=true;ai.blockEmbedding=false;ai.finish="stop";ai.unblock();ai.prompts.clear();ai.calls.set(0);ai.embeddings.set(0);ai.answer="{\"facts\":[{\"text\":\"林舟来到渡口。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}"; }
+    @BeforeEach void reset() { ai.direct=null;ai.live=null;ai.protocol=null;ai.allowed=true;ai.blockEmbedding=false;ai.finish="stop";ai.unblock();ai.prompts.clear();ai.calls.set(0);ai.embeddings.set(0);ai.answer="{\"facts\":[{\"text\":\"林舟来到渡口。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}"; }
     @AfterEach void unblock(){ai.unblock();}
     Fixture fixture(String body) {
         byte[] bytes=("第一章 渡口\n"+UUID.randomUUID()+"\n"+body+"\n第二章 秘密标题\n未读身份秘密").getBytes(StandardCharsets.UTF_8);
@@ -129,12 +133,28 @@ class ReadingTaskPersistenceTests {
     @Test void readerTrialUsesIndependentDurableLedgersForFreeformIndexAndLookupAndStopsOnFailure() throws Exception {
         protocolFlow(true);
     }
+    @Test void directSwitchRunsIndexLookupAndRecapWithoutMoneyLedgerOrAutomaticRetry() throws Exception {
+        protocolFlow(false,true);
+    }
+    ReadingLiveAuthorization trialAuthorization(ReadingLiveBatch batch) {
+        // Match production interception: direct construction hides rollback-only failures in status reads.
+        var advice=new org.springframework.transaction.interceptor.TransactionInterceptor();
+        advice.setTransactionManager(transactions);
+        advice.setTransactionAttributeSource(new org.springframework.transaction.annotation.AnnotationTransactionAttributeSource());
+        var proxy=new org.springframework.aop.framework.ProxyFactory(new ReadingLiveAuthorization(mapper,bookMapper,states,batch,false,true));
+        proxy.addAdvice(advice);
+        return (ReadingLiveAuthorization)proxy.getProxy();
+    }
     void protocolFlow(boolean trial) throws Exception {
+        protocolFlow(trial,false);
+    }
+    void protocolFlow(boolean trial,boolean direct) throws Exception {
+        int ledgerCount=jdbc.queryForObject("SELECT count(*) FROM reading_spend_ledger",Integer.class);
         ReadingLiveBatch batch=null;
         if(trial) {
             UUID id=UUID.randomUUID();batch=new ReadingLiveBatch(id,ReadingText.hash(id.toString()),null,"lock",new java.math.BigDecimal("20"),new java.math.BigDecimal("10"),
                     java.time.OffsetDateTime.now().minusMinutes(1),java.time.OffsetDateTime.now().plusHours(1),Map.of());
-            ai.live=new ReadingLiveAuthorization(mapper,bookMapper,states,batch,false,true);
+            ai.live=trialAuthorization(batch);
         }
         var http=com.sun.net.httpserver.HttpServer.create(new java.net.InetSocketAddress("127.0.0.1",0),0);
         var json=tools.jackson.databind.json.JsonMapper.builder().build();var httpCalls=new AtomicInteger();
@@ -153,6 +173,7 @@ class ReadingTaskPersistenceTests {
         });http.start();
         String base="http://127.0.0.1:"+http.getAddress().getPort();
         ai.protocol=new ReadingProviderClient(java.net.URI.create(base+"/chat/completions"),java.net.URI.create(base+"/embeddings"),"fixture","fixture");
+        if(direct)ai.direct=new ReadingAiConfiguration().gateway(ai.protocol,"fixture","fixture",null,true);
         try {
             var f=fixture("林舟来到渡口。\n后文秘密");boundary(f,2);index(f);
             ai.answer="{\"answerability\":\"FULL\",\"facts\":[{\"text\":\"林舟来到渡口。\",\"evidenceIds\":[\"E1\"]}]}";
@@ -167,7 +188,7 @@ class ReadingTaskPersistenceTests {
                 assertThat(mapper.ledger(batch.id,states.owner())).containsEntry("calls_started",1).containsEntry("call_limit",100);
                 assertThat(mapper.ledger(batch.id,states.owner()).get("predecessor_id")).isNull();
                 assertThat(mapper.ledger(batch.embeddingId(),states.owner())).containsEntry("calls_started",2).containsEntry("call_limit",200);
-                ai.live=new ReadingLiveAuthorization(mapper,bookMapper,states,batch,false,true);ai.live.check();
+                ai.live=trialAuthorization(batch);ai.live.check();
                 assertThat(mapper.ledger(batch.id,states.owner())).containsEntry("calls_started",1);
                 boundary(f,1);assertThat(view(created.id()).get("visibility")).isEqualTo("HIDDEN_BY_SCOPE");boundary(f,2);
             }
@@ -181,13 +202,31 @@ class ReadingTaskPersistenceTests {
             assertThat(view(truncated.id()).get("validatedResult")).isNull();
             assertThat(jdbc.queryForObject("SELECT usage_json->>'outputTokens' FROM reading_ai_call WHERE task_id=?",String.class,truncated.id())).isEqualTo("8");
             assertThat(httpCalls).hasValue(4);
+            if(direct) {
+                assertThat((Map<String,Object>)tasks.index(f.version)).containsEntry("liveAllowed",true).containsEntry("executionMode","DIRECT_LIVE");
+                assertThat(tasks.estimate(f.version,states.get(f.version).scopeRevision()).estimatedCost()).isNull();
+                finish.set("stop");ai.answer="{\"facts\":[{\"text\":\"林舟来到渡口。\",\"evidenceIds\":[\"E1\"]}],\"partial\":false}";
+                var recap=tasks.create(recapRequest(f));assertThat(await(false,recap.id(),"COMPLETED","FAILED").status).isEqualTo("COMPLETED");
+                assertThat(httpCalls).hasValue(5);
+                assertThat(jdbc.queryForObject("SELECT count(*) FROM reading_spend_ledger",Integer.class)).isEqualTo(ledgerCount);
+                assertThat(jdbc.queryForObject("SELECT count(*) FROM reading_ai_call WHERE task_id=? AND authorization_id IS NULL AND reserved_amount IS NULL AND settled_amount IS NULL AND usage_json->>'inputTokens'='12'",Integer.class,recap.id())).isEqualTo(1);
+                assertThat(((Map<?,?>)view(recap.id()).get("usage")).get("reservationMethod")).isEqualTo("NONE");
+            }
             if(trial) {
                 assertThat(ai.live.status()).containsEntry("liveAllowed",false).containsEntry("stopReason","OUTPUT_INVALID");
+                var mvc=org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup(web).build();
+                mvc.perform(get("/api/reading/versions/{id}/index",f.version))
+                        .andExpect(status().isOk()).andExpect(jsonPath("$.liveAllowed").value(false))
+                        .andExpect(jsonPath("$.authorization.stopReason").value("OUTPUT_INVALID"));
+                mvc.perform(get("/api/reading/versions/{id}/index-estimate",f.version)
+                        .param("expectedScopeRevision",Long.toString(states.get(f.version).scopeRevision())))
+                        .andExpect(status().isOk()).andExpect(jsonPath("$.liveAllowed").value(false));
                 assertThatThrownBy(()->tasks.create(recapRequest(f))).isInstanceOf(ReadingException.class);
-                var restarted=new ReadingLiveAuthorization(mapper,bookMapper,states,batch,false,true);
+                assertThat(jdbc.queryForObject("SELECT count(*) FROM reading_task WHERE version_id=?",Integer.class,f.version)).isEqualTo(2);
+                var restarted=trialAuthorization(batch);
                 assertThatThrownBy(restarted::check).isInstanceOf(ReadingException.class);assertThat(httpCalls).hasValue(4);
             }
-        } finally { ai.protocol=null;http.stop(0); }
+        } finally { ai.direct=null;ai.protocol=null;http.stop(0); }
     }
     @Test void recapPersistsCompleteOrderedEvidenceAndCitationWithoutUnreadTextOrPositionWrites() throws Exception {
         var f=fixture("林舟来到渡口。\n青禾递给他一封信。");boundary(f,2);

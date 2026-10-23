@@ -1,5 +1,7 @@
 # 小说阅读 API 合同草案
 
+2026-10-23 DIRECT_LIVE：索引状态 executionMode 增加 DIRECT_LIVE；liveAllowed 取决于日常开关和密钥检查，不返回试读 authorization 预算面板。估算保留片段/批次数，estimatedCost 为 null。只读 evaluation/status 在该模式返回 liveAllowed、reason、executionScope=DIRECT_LIVE、budgetEnforced=false。创建/确认/范围接口不变，无 HTTP 修改开关接口。无金额预留的任务 usage.reservationMethod=NONE、costBasis=NOT_PRICED；历史有预留调用仍按实际记录显示。
+
 2026-10-22 真人试读（acceptance-v10）：原索引状态 GET /api/reading/versions/{id}/index 增加 executionMode=READER_TRIAL 与 authorization（供应商额度、已计价/预留、expiresAt、reason/stopReason）。只有有效独立授权才能创建真实任务，既有创建/确认接口与范围校验不变。GET /api/reading/evaluation/status 复用为运维只读状态，executionScope=READER_TRIAL_LOCAL；没有 HTTP 授权或续期接口。
 
 2026-10-22 续读工作台补充：GET /versions/{versionId}/chapters/{chapterId}/paragraphs 响应增加 chapterOrdinal（1 起），用于恢复到目录分页之外时正确显示当前章和相邻章；未读 title 仍为 null。GET /versions/{versionId}/index 增加 executionMode=OFFLINE_FIXTURE/EVALUATION_ONLY/DISABLED，分别表示离线替身、已批准固定评测、关闭；它是界面说明，不授予调用权限。liveAllowed 及服务端每次请求的批准、范围和预算检查继续有效；EVALUATION_ONLY 不允许页面随机创建自由任务。无新写接口。

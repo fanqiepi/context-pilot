@@ -1,6 +1,8 @@
 # 阅读验收工具
 
-2026-10-22 当前实现为 acceptance-v10，新增独立本机真人试读；固定评测仍为 DEBUG_RETEST，未安装新评测批准文件，旧账本仍停止。使用当前配置和锁，下面 v9 说明保留历史范围。试读不进入固定数据集评分，见 [试读入口](../../docs/development/reading-reader-trial.md)。
+同日后续用户批准 DIRECT_LIVE 日常单开关模式，不设金额预算。当前 acceptance-v11 同时包含该模式和停止查询修复；固定评测采集规则不变。日常使用见[开关说明](../../docs/development/reading-direct-models.md)，不使用旧评测/试读脚本。
+
+2026-10-23 当前实现为 acceptance-v11，离线修复试读停止后的状态查询事务异常；Prompt 不变。v10 首次真人回顾已连通 DeepSeek，但结果校验失败，两份试读账本停止。未安装新批准、未恢复或重试。固定评测仍为 DEBUG_RETEST，旧账本保持停止。使用当前配置和锁，下面历史说明保留原范围。详见[失败记录](../../docs/evaluation/reading-trial-failure-verification.md)和[试读入口](../../docs/development/reading-reader-trial.md)。
 
 Node.js 22；从仓库根目录执行，无新增依赖，无 HTTP、模型或 embedding 调用。
 

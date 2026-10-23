@@ -48,7 +48,10 @@ public class ReadingLiveAuthorization {
     public boolean readerTrial() { return readerTrial; }
     private int generationCalls() { return readerTrial?ReadingReaderTrial.GENERATION_CALLS:batch.generationCalls(); }
     private int embeddingCalls() { return readerTrial?ReadingReaderTrial.EMBEDDING_CALLS:batch.embeddingCalls(); }
-    @Transactional(timeout=5)
+    // A denied gate is also read by status/estimate inside the scope transaction.
+    // Catching that expected domain error must not poison the enclosing read transaction.
+    // Callers that let it escape still roll back; database failures still mark rollback-only.
+    @Transactional(timeout=5,noRollbackFor=ReadingException.class)
     public void check() {
         if(batch==null)throw failure("LIVE_AI_NOT_AUTHORIZED");
         if(batch.debugRetest()) {

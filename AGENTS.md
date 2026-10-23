@@ -1,5 +1,9 @@
 # ContextPilot repository guidance
 
+2026-10-23 后续用户指令优先：日常阅读模型调用只由 `contextpilot.reading.ai-enabled` true/false 控制，不设金额预算、批准文件或授权期限。DIRECT_LIVE 与历史试读/固定评测模式互斥；保留旧停止账本、失败证据、单任务次数/超时/范围/输出校验与零自动重试。用户要求关闭试读前后端并自行启动，已停止 5201/18081，不再代启。下方试读预算要求仅适用于历史受控批次，不得重新施加给已批准的日常模式。
+
+2026-10-23 真人试读已因首次回顾 `OUTPUT_INVALID` 停止：DeepSeek 1 次、保守结算 0.02221000 元，向量 0 次、未知/预留 0。原始输出未持久化，不能猜测具体校验失败原因。当前有界离线修复停止状态查询的 `UnexpectedRollbackException`，新实现 acceptance-v11 / reading-evidence-v3；保留 v1–v10 锁与全部停止账本，不安装新批准、不自动恢复或重测。详见当前交接和 `docs/evaluation/reading-trial-failure-verification.md`。
+
 2026-10-22 真人试读接线：用户要求配置真实链路，并另行明确同意 DeepSeek 20 元、阿里向量 10 元的独立预算，启用后 24 小时、仅本机人工操作。使用 READER_TRIAL_LOCAL 独立批准文件及持久账本，默认关闭；与固定评测模式互斥，旧四个账本和失败证据不变、不借余额。试读入口 127.0.0.1:5201 / 后端 18081，独立持久数据库及上传目录；保留日常环境。不得自动运行 DEBUG/TEST、续期、重置或重试停止的试读。当前实现 acceptance-v10 / reading-evidence-v3；试读开放不代表真实语义或读者验收通过。
 
 ## 当前开发方式：以大功能点为主（2026-10-22）

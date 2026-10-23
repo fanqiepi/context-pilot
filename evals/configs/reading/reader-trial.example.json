@@ -2,7 +2,7 @@
   "schema": "reading-reader-trial-v1",
   "status": "NOT_AUTHORIZED",
   "executionScope": "READER_TRIAL_LOCAL",
-  "version": "reading-acceptance-v10",
+  "version": "reading-acceptance-v11",
   "authorizationId": null,
   "independentBudget": true,
   "accountConditionsConfirmed": false,

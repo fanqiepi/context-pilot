@@ -16,13 +16,13 @@ type Task = {
   budget?: { modelCalls: number; embeddingCalls: number; activeMillis: number; limitMillis: number }
 }
 type Authorization = { expiresAt: string; reason: string; stopReason?: string; providers: Record<string, { limitCny: number; budgetValuedCny: number; reservedCny: number }> }
-type Index = { ready: boolean; readyBoundary: number; requestedBoundary: number; liveAllowed: boolean; executionMode: 'OFFLINE_FIXTURE' | 'READER_TRIAL' | 'EVALUATION_ONLY' | 'DISABLED'; activeJob: Task | null; authorization?: Authorization }
+type Index = { ready: boolean; readyBoundary: number; requestedBoundary: number; liveAllowed: boolean; executionMode: 'OFFLINE_FIXTURE' | 'DIRECT_LIVE' | 'READER_TRIAL' | 'EVALUATION_ONLY' | 'DISABLED'; activeJob: Task | null; authorization?: Authorization }
 type Estimate = { fromBoundary: number; targetBoundary: number; requestedBoundary: number; segments: number; characters: number; batches: number; estimateHash: string; liveAllowed: boolean; estimatedCost: string | null }
 type Citation = { sources: ReadingSource[]; scopeRevision: number; visibilityEpoch: number }
 const tasks = ref<Task[]>([]), current = ref<Task>(), indexJob = ref<Task>(), index = ref<Index>(), estimate = ref<Estimate>()
 const page = ref(1), question = ref(''), mode = ref('DIRECT'), chapterCount = ref(3), busy = ref(false), error = ref('')
 const activeTab = ref('recap'), loaded = ref(false)
-const canCreate = computed(() => !!index.value?.liveAllowed && ['OFFLINE_FIXTURE', 'READER_TRIAL'].includes(index.value.executionMode))
+const canCreate = computed(() => !!index.value?.liveAllowed && ['OFFLINE_FIXTURE', 'READER_TRIAL', 'DIRECT_LIVE'].includes(index.value.executionMode))
 const coverageLabels: Record<string, string> = { FULL_WINDOW: '已覆盖本次回顾窗口', SEARCH_MATCHES: '基于已读范围内的检索依据', PARTIAL: '部分问题仍缺少依据', NONE: '尚无可展示的回答' }
 const sources = ref<ReadingSource[]>([]), preview = ref(false), previewPath = ref(''), connected = ref(true)
 let generation = 0, selection = 0, citationRequest = 0, historyRequest = 0, events: EventSource | undefined, timer: ReturnType<typeof setTimeout> | undefined
@@ -104,7 +104,7 @@ async function create(type: string) {
   if (!props.ready || !props.state || !canCreate.value) return
   const g = generation
   try {
-    await ElMessageBox.confirm(`允许使用正文开头至第 ${props.state.readBoundary} 段。${type === 'RECAP' ? `回顾最近 ${chapterCount.value} 个已读章节，一次生成。` : `人物查证：${mode.value === 'DIRECT' ? '一次检索、一次回答' : '一次规划、最多三次检索、一次回答'}。`}${index.value?.executionMode === 'READER_TRIAL' ? '问题和所需已读正文会发送至已配置的模型供应商，费用从本次试读预算扣除。' : '这是固定离线演示，不产生模型费用。'}`, '确认任务范围', { confirmButtonText: '创建任务', cancelButtonText: '返回阅读' })
+    await ElMessageBox.confirm(`允许使用正文开头至第 ${props.state.readBoundary} 段。${type === 'RECAP' ? `回顾最近 ${chapterCount.value} 个已读章节，一次生成。` : `人物查证：${mode.value === 'DIRECT' ? '一次检索、一次回答' : '一次规划、最多三次检索、一次回答'}。`}${index.value?.executionMode === 'READER_TRIAL' ? '问题和所需已读正文会发送至已配置的模型供应商，费用从本次试读预算扣除。' : index.value?.executionMode === 'DIRECT_LIVE' ? '问题和所需已读正文会发送至已配置的模型供应商，按供应商实际用量计费。' : '这是固定离线演示，不产生模型费用。'}`, '确认任务范围', { confirmButtonText: '创建任务', cancelButtonText: '返回阅读' })
     if (!valid(g)) return
     busy.value = true; error.value = ''
     const t = await readingPost<Task>('/tasks', { clientRequestId: crypto.randomUUID(), versionId: props.versionId, expectedScopeRevision: props.state.scopeRevision, type,
@@ -181,6 +181,7 @@ onUnmounted(clear)
     <div class="reading-assistant-scope"><strong>只看你已读过的内容</strong><p>从开头至第 {{ state?.readBoundary || 0 }} 段。回顾和查证不会推进阅读进度。</p></div>
     <el-alert v-if="index?.executionMode === 'OFFLINE_FIXTURE'" title="固定离线演示：结果用于体验流程，不是现场模型生成，也不代表语义验收。" type="warning" :closable="false" />
     <el-alert v-else-if="index?.executionMode === 'READER_TRIAL'" title="真人试读：确认后调用真实模型，仅使用你确认的已读范围。回答质量仍需你核对。" type="info" :closable="false" />
+    <el-alert v-else-if="index?.executionMode === 'DIRECT_LIVE'" title="真实模型已启用：仅使用你确认的已读范围，按供应商实际用量计费。" type="info" :closable="false" />
     <el-alert v-else-if="index" :title="index.executionMode === 'EVALUATION_ONLY' ? '阅读 AI 正在固定评测中，暂不开放自由提问；已有结果仍可查看。' : '阅读 AI 仍在验证中，当前未开放新任务。你可以查看已有结果，或直接回到正文。'" type="info" :closable="false" />
     <div v-if="index?.authorization" class="reading-trial-budget">
       <p>试读授权截至 {{ new Date(index.authorization.expiresAt).toLocaleString() }}；状态：{{ index.authorization.stopReason || index.authorization.reason }}</p>
@@ -210,7 +211,8 @@ onUnmounted(clear)
       <div v-if="estimate">
         <p v-if="estimate.segments">本批处理第 {{ estimate.fromBoundary + 1 }}–{{ estimate.targetBoundary }} 段，{{ estimate.characters }} 字、{{ estimate.segments }} 片段、{{ estimate.batches }} 次 embedding 请求。</p>
         <p v-else>当前已读范围的索引已完整就绪，无需重复建立。</p>
-        <p>费用上界：{{ estimate.estimatedCost || '尚无已核实计价与授权，不能开启真实调用' }}</p>
+        <p v-if="index?.executionMode === 'DIRECT_LIVE'">按供应商实际用量计费；未设置金额预算。</p>
+        <p v-else>费用上界：{{ estimate.estimatedCost || '尚无已核实计价与授权，不能开启真实调用' }}</p>
         <el-button :disabled="!estimate.liveAllowed || estimate.segments === 0" :loading="busy" @click="createIndex">确认建立本批索引</el-button>
       </div>
       <div v-if="indexJob">

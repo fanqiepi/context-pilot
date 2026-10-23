@@ -42,6 +42,8 @@ spring:
 
 contextpilot:
   reading:
+    # Daily reading: true calls the configured models; false disables calls. No monetary budget or approval file.
+    ai-enabled: ${READING_AI_ENABLED:false}
     # Local human trial uses its own approval and durable provider ledgers; mutually exclusive with evaluation.
     trial-enabled: ${READING_TRIAL_ENABLED:false}
     trial-approval: ${READING_TRIAL_APPROVAL:}

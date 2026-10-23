@@ -41,7 +41,7 @@ try {
         '--spring.datasource.url=jdbc:postgresql://127.0.0.1:15434/context_pilot_reader_trial', '--spring.datasource.username=context_pilot',
         '--spring.datasource.password=reader_trial_local_only', '--spring.ai.model.chat=none', '--spring.ai.model.embedding=none', '--spring.ai.vectorstore.type=none',
         '--contextpilot.document.processing.enabled=false', '--contextpilot.task-workspace.enabled=false', '--contextpilot.upgrade-research.enabled=false',
-        '--contextpilot.reading.live-enabled=false', '--contextpilot.reading.trial-enabled=true',
+        '--contextpilot.reading.ai-enabled=false', '--contextpilot.reading.live-enabled=false', '--contextpilot.reading.trial-enabled=true',
         ('"--contextpilot.reading.live-repository=' + $repository + '"'), ('"--contextpilot.reading.trial-approval=' + $approval + '"'),
         ('"--contextpilot.storage.root=' + (Join-Path $repository 'data/reading-trial/uploads') + '"'))
     $backendProcess = Start-Process -FilePath $java -WindowStyle Hidden -PassThru -WorkingDirectory $backend -ArgumentList $arguments -RedirectStandardOutput (Join-Path $session 'backend.log') -RedirectStandardError (Join-Path $session 'backend-error.log')

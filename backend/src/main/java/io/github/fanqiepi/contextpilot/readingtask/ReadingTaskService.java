@@ -126,9 +126,9 @@ public class ReadingTaskService {
         String hash=ReadingText.hash(ReadingText.json(List.of(s.ownerId(),s.versionId(),s.scopeRevision(),s.visibilityEpoch(),ready,target,segments,chars,batches,profile)));
         boolean allowed;
         try { ai.requireAuthorized();allowed=true; } catch(ReadingException e) { allowed=false; }
-        String cost=allowed && !ai.offline()?ReadingLiveBatch.EMBEDDING.multiply(java.math.BigDecimal.valueOf((long)batches*16*ReadingLiveBatch.EMBEDDING_LINE_BOUND)).toPlainString():null;
+        String cost=allowed && ai.budgetRequired()?ReadingLiveBatch.EMBEDDING.multiply(java.math.BigDecimal.valueOf((long)batches*16*ReadingLiveBatch.EMBEDDING_LINE_BOUND)).toPlainString():null;
         return new Estimate(ready,target,s.boundaryOrdinal(),segments,chars,batches,profile,hash,allowed,cost,
-                !allowed?"LIVE_AI_NOT_AUTHORIZED":ai.offline()?"离线测试适配器；不代表真实费用估算":"金额为上下文上限预留，非账单；受当前独立授权限制");
+                !allowed?"LIVE_AI_NOT_AUTHORIZED":ai.offline()?"离线测试适配器；不代表真实费用估算":!ai.budgetRequired()?"真实模型调用；未设置金额预算，费用以供应商账单为准":"金额为上下文上限预留，非账单；受当前独立授权限制");
     }
     public Object index(UUID version) {
         return scopes.current(version,s->{
@@ -192,8 +192,10 @@ public class ReadingTaskService {
         }
         var usage=new LinkedHashMap<String,Object>();usage.put("usageStatus",known && !calls.isEmpty()?"ACTUAL":"UNKNOWN");
         usage.put("inputTokens",known && !calls.isEmpty()?inputs:null);usage.put("outputTokens",known && !calls.isEmpty()?outputs:null);
-        usage.put("calls",calls);usage.put("tokenEstimateMethod","UTF8_BYTES_ESTIMATE");usage.put("reservationMethod",ai.offline()?"OFFLINE_FIXTURE":"PROVIDER_CONTEXT_CEILING");
-        usage.put("costBasis","PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE");v.put("usage",usage);
+        usage.put("calls",calls);usage.put("tokenEstimateMethod","UTF8_BYTES_ESTIMATE");
+        boolean reserved=calls.stream().anyMatch(c->c.get("reservedAmount")!=null);
+        usage.put("reservationMethod",reserved?"PROVIDER_CONTEXT_CEILING":"NONE");
+        usage.put("costBasis",reserved?"PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE":"NOT_PRICED");v.put("usage",usage);
         return v;
     }
     public Object list(UUID version,int page,int size) {
@@ -295,7 +297,7 @@ public class ReadingTaskService {
                 if(p.embeddingCalls>=(index?32:"MULTI_QUERY".equals(p.mode)?3:1))throw failure("BUDGET_EXHAUSTED");p.embeddingCalls++;
             }
             UUID call=UUID.randomUUID();mapper.call(call,index?null:id,index?id:null,token,p.modelCalls+p.embeddingCalls,phase,ReadingText.length(input),bytes(input),outputLimit);
-            if(!ai.offline())spend.reserve(w.ownerId,call,ai.pricing(phase),ai.reservationInputTokens(phase,bytes(input)),outputLimit);
+            if(ai.budgetRequired())spend.reserve(w.ownerId,call,ai.pricing(phase),ai.reservationInputTokens(phase,bytes(input)),outputLimit);
             save(index,w,p);return call;
         });
     }
