@@ -1,5 +1,26 @@
 # ContextPilot repository guidance
 
+2026-10-23 回顾长度与 SSE 补修：任务 09f93b3d-45ad-43f7-9bce-bda9db7353dc 已确认 FACT_TEXT_LIMIT，正常结束生成，非 JSON_SCHEMA。用户随后明确只需百字回顾：Prompt v6 改为约 100 字、2–3 要点，服务端总字数上限 160（人物查证不变）。修复发送失败后 complete 再刷损坏响应及全局 ApiExceptionHandler 追加 JSON 的遗漏路径，隔离单连接异常。当前 acceptance-v17，未真实调用或代启；下一步先由用户重启并查看已有任务验证连接，后续手动日常回顾验证长度改善，见 docs/evaluation/reading-recap-length-stream-verification.md。
+
+2026-10-23 多章回顾格式修复：现场两章/三章任务既有成功也有 JSON_SCHEMA 失败，三次报告均 finishReason=stop；旧回答未保留，具体结构错误不可追溯。Prompt v5 明确统一扁平 facts/partial 合同，回顾按类型检查并持久化细分原因，未放宽校验或自动重试。当前 acceptance-v16，真实改善尚未验证。下一步用户自行重启并手动验证相同范围的多章回顾，按具体错误码继续定位，见 docs/evaluation/reading-recap-schema-verification.md。
+
+2026-10-23 SSE 修复：用户截图显示回顾完成，数据库最近三次回顾也均 COMPLETED。日志是 ReadingHttpAdvice 将已提交 text/event-stream 再写为 JSON 引发的二次异常，原始触发原因未留在所给日志中。现识别断连并禁止对已提交响应追加错误 JSON，未改变任务结果或重跑模型。实现 acceptance-v15 / Prompt v4；下一步用户重启后仅查看已有结果、开关助手验证连接，见 docs/evaluation/reading-sse-error-verification.md。
+
+
+2026-10-23 回顾失败诊断修复：用户任务 1c5f4739-d33d-4945-8bb4-bcab28a4135c 返回实际 6097/979 token 后 OUTPUT_INVALID；旧数据缺少结束原因，不能确诊。现统一记录停止日志、持久化 failureReason 与白名单 finishReason，页面展示具体类别。当前 acceptance-v14 / Prompt v4；未重试或代启。下一步由用户重启并手动发起日常任务，用明确诊断定位实际故障，详见 docs/evaluation/reading-failure-diagnostics-verification.md。
+
+
+2026-10-23 用户要求沿用原 Application：已删除新增 IDEA 启动项，在现有 application.yml 内自动导入本地配置，支持仓库根目录/backend 启动。日常仍只修改本地 ai-enabled true/false 并重启原后端；普通测试默认 offline。当前冻结 acceptance-v13，Prompt v4 不变，详见 docs/development/reading-direct-models.md。
+
+
+2026-10-23 阅读体验修复：首次回顾在助手内确认保存位置作为连续已读范围，滚动/跳转不自动扩大 AI 边界；输出 Prompt reading-evidence-v4 明确原有字数限制，增加无正文诊断，冻结 acceptance-v12。真实故障原因尚待现场错误码/任务编号验证，不宣称真实可用或语义通过。下一步见 docs/evaluation/reading-recap-usability-verification.md，禁止自动重试历史停止批次。
+
+2026-10-23 后续用户指令优先：日常阅读模型调用只由 `contextpilot.reading.ai-enabled` true/false 控制，不设金额预算、批准文件或授权期限。DIRECT_LIVE 与历史试读/固定评测模式互斥；保留旧停止账本、失败证据、单任务次数/超时/范围/输出校验与零自动重试。用户要求关闭试读前后端并自行启动，已停止 5201/18081，不再代启。下方试读预算要求仅适用于历史受控批次，不得重新施加给已批准的日常模式。
+
+2026-10-23 真人试读已因首次回顾 `OUTPUT_INVALID` 停止：DeepSeek 1 次、保守结算 0.02221000 元，向量 0 次、未知/预留 0。原始输出未持久化，不能猜测具体校验失败原因。当前有界离线修复停止状态查询的 `UnexpectedRollbackException`，新实现 acceptance-v11 / reading-evidence-v3；保留 v1–v10 锁与全部停止账本，不安装新批准、不自动恢复或重测。详见当前交接和 `docs/evaluation/reading-trial-failure-verification.md`。
+
+2026-10-22 真人试读接线：用户要求配置真实链路，并另行明确同意 DeepSeek 20 元、阿里向量 10 元的独立预算，启用后 24 小时、仅本机人工操作。使用 READER_TRIAL_LOCAL 独立批准文件及持久账本，默认关闭；与固定评测模式互斥，旧四个账本和失败证据不变、不借余额。试读入口 127.0.0.1:5201 / 后端 18081，独立持久数据库及上传目录；保留日常环境。不得自动运行 DEBUG/TEST、续期、重置或重试停止的试读。当前实现 acceptance-v10 / reading-evidence-v3；试读开放不代表真实语义或读者验收通过。
+
 ## 当前开发方式：以大功能点为主（2026-10-22）
 
 - 以用户可实际使用、能够完整展示的大功能点组织开发；每轮围绕一个完整用户目标，连续完成所需实现、集成、文档和必要验证，再集中交付。
@@ -8,7 +29,7 @@
 - 每次完成一个大功能点后，必须说明：本阶段交付了什么、验证结果与未完成项、**下一个阶段具体做什么**。下一阶段要写明用户目标、主要范围、完成标准，以及依赖或需另行授权的事项；不能只说“继续优化”“继续测试”或只提醒提交 PR。同步当前交接文档，避免后续会话重新拆成零碎任务。
 - 大功能点完成并集中验证后再提醒用户发起 PR；内部小步骤不单独触发 PR 提醒。用户明确要求的独立文档或规则修改仍直接完成并按约定本地提交，无需为此扩展产品开发范围。
 
-Current delivery adds a repeatable isolated long-book performance workflow to the interrupted-reading workspace. Production remains acceptance-v9 / reading-evidence-v3 with unchanged source/asset locks. Desktop/narrow-screen samples and 5M-character/1000-chapter pagination/position evidence are in `docs/evaluation/reading-performance-verification.md`; earlier workspace evidence remains in `docs/evaluation/reading-workspace-verification.md`. No paid calls or new approval were installed; v1–v9 locks and stopped ledgers remain untouched. Formal semantic acceptance, actual reader feedback, recording and broader cold-device/network performance remain outstanding. The next coherent delivery is a reproducible reading demonstration and reader-trial package; see the current handoff for scope, completion criteria and paid-retest boundaries. Historical notes below retain their dated scope.
+Current delivery adds a repeatable isolated long-book performance workflow to the interrupted-reading workspace. Production remains acceptance-v9 / reading-evidence-v3 with unchanged source/asset locks. Desktop/narrow-screen samples and 5M-character/1000-chapter pagination/position evidence are in `docs/evaluation/reading-performance-verification.md`; earlier workspace evidence remains in `docs/evaluation/reading-workspace-verification.md`. No paid calls or new approval were installed; v1–v9 locks and stopped ledgers remain untouched. On 2026-10-22 the user explicitly cancelled desktop/narrow-screen demonstration recording: do not schedule recording or treat it as an outstanding delivery gate. Core approved reading capabilities are implemented, but formal semantic acceptance and actual reader feedback remain incomplete; broader cold-device/network performance is unmeasured. Next work concerns reading-AI quality and reader validation, not new feature expansion. See the current handoff for scope, completion criteria and paid-retest boundaries. Historical notes below retain their dated scope.
 
 ## Latest offline completeness repair (2026-10-22)
 

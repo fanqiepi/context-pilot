@@ -6,8 +6,8 @@ import {execFileSync} from 'node:child_process';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const DATA = 'evals/datasets/reading/acceptance-v1.json';
-const CONFIG = 'evals/configs/reading/acceptance-v9.json';
-const LOCK = 'evals/configs/reading/acceptance-v9.lock.json';
+const CONFIG = 'evals/configs/reading/acceptance-v17.json';
+const LOCK = 'evals/configs/reading/acceptance-v17.lock.json';
 export const hash = value => createHash('sha256').update(value).digest('hex');
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const read = file => JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/^\uFEFF/, ''));
@@ -102,15 +102,21 @@ function walk(relative) {
 function sourceFiles() {
   return ['book', 'readingstate', 'readingnote', 'readingtask'].flatMap(capability =>
     walk(`backend/src/main/java/io/github/fanqiepi/contextpilot/${capability}`))
-    .concat(['tools/reading-demo.ps1', 'backend/pom.xml', 'backend/src/main/resources/application.yml',
+    .concat(['tools/reading-demo.ps1', 'tools/reading-trial.ps1', 'deploy/reading-trial.compose.yml', 'evals/configs/reading/reader-trial.example.json',
+      'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingReaderTrialTests.java', 'backend/pom.xml', 'backend/src/main/resources/application.yml',
       'backend/src/main/resources/db/migration/V29__create_reading_library.sql',
       'backend/src/main/resources/db/migration/V30__create_reading_tasks.sql',
       'backend/src/main/resources/db/migration/V31__create_reading_note_proposals.sql',
       'backend/src/main/resources/db/migration/V32__bind_reading_live_authorization.sql',
       'backend/src/main/resources/db/migration/V33__record_reading_budget_alerts.sql',
       'backend/src/main/resources/db/migration/V34__link_reading_budget_successor.sql',
-      'frontend/src/api/reading.ts', 'frontend/src/styles/reading.css',
+      'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingLocalConfigurationTests.java',
+      'backend/src/test/resources/application.properties', 'backend/config/application-local-secrets.example.yml',
+      'frontend/tests/reading-assistant.test.mjs', 'frontend/src/api/reading.ts', 'frontend/src/styles/reading.css',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/book/ReadingLibraryPersistenceTests.java',
+      'backend/src/test/java/io/github/fanqiepi/contextpilot/book/ReadingHttpAdviceTests.java',
+      'backend/src/main/java/io/github/fanqiepi/contextpilot/common/ApiExceptionHandler.java',
+      'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingTaskEventsTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingnote/ReadingNoteProposalPersistenceTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingTaskPolicyTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingLookupCompletenessTests.java',

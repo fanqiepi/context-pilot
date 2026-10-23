@@ -5,35 +5,62 @@ import ReadingNoteProposal from '@/components/ReadingNoteProposal.vue'
 import { errorMessage } from '@/api/client'
 import { readingGet, readingPost, readingDelete, type ReadingState, type ReadingSource } from '@/api/reading'
 
-const props = defineProps<{ versionId: string; state?: ReadingState; ready: boolean; open: boolean }>()
+const props = defineProps<{ versionId: string; state?: ReadingState; ready: boolean; open: boolean; confirmBoundary: (paragraphId: string, revision: number) => Promise<ReadingState> }>()
 const emit = defineEmits<{ continue: [source: ReadingSource]; close: []; saved: [] }>()
 type Task = {
-  id: string; type?: string; status: string; revision: number; visibility: string; errorCode?: string
+  id: string; type?: string; status: string; revision: number; visibility: string; errorCode?: string; failureReason?: string
   question?: string; message?: string; currentScopeRevision?: number; visibilityEpoch?: number
   scope?: { boundaryOrdinal: number }
   validatedResult?: { facts: { text: string; evidenceIds: string[] }[]; partial: boolean }
   coverage?: { requestedRange: number[]; completeness: string; completedParagraph: number; targetBoundary: number }
   budget?: { modelCalls: number; embeddingCalls: number; activeMillis: number; limitMillis: number }
 }
-type Index = { ready: boolean; readyBoundary: number; requestedBoundary: number; liveAllowed: boolean; executionMode: 'OFFLINE_FIXTURE' | 'EVALUATION_ONLY' | 'DISABLED'; activeJob: Task | null }
+type Authorization = { expiresAt: string; reason: string; stopReason?: string; providers: Record<string, { limitCny: number; budgetValuedCny: number; reservedCny: number }> }
+type Index = { ready: boolean; readyBoundary: number; requestedBoundary: number; liveAllowed: boolean; executionMode: 'OFFLINE_FIXTURE' | 'DIRECT_LIVE' | 'READER_TRIAL' | 'EVALUATION_ONLY' | 'DISABLED'; activeJob: Task | null; authorization?: Authorization }
 type Estimate = { fromBoundary: number; targetBoundary: number; requestedBoundary: number; segments: number; characters: number; batches: number; estimateHash: string; liveAllowed: boolean; estimatedCost: string | null }
 type Citation = { sources: ReadingSource[]; scopeRevision: number; visibilityEpoch: number }
 const tasks = ref<Task[]>([]), current = ref<Task>(), indexJob = ref<Task>(), index = ref<Index>(), estimate = ref<Estimate>()
 const page = ref(1), question = ref(''), mode = ref('DIRECT'), chapterCount = ref(3), busy = ref(false), error = ref('')
 const activeTab = ref('recap'), loaded = ref(false)
-const canCreate = computed(() => index.value?.executionMode === 'OFFLINE_FIXTURE' && index.value.liveAllowed)
+const useResume = ref(false)
+const targetBoundary = computed(() => (!props.state?.readBoundary || useResume.value) ? props.state?.resumePosition?.paragraphOrdinal || 0 : props.state.readBoundary)
+const canCreate = computed(() => !!index.value?.liveAllowed && ['OFFLINE_FIXTURE', 'READER_TRIAL', 'DIRECT_LIVE'].includes(index.value.executionMode))
 const coverageLabels: Record<string, string> = { FULL_WINDOW: '已覆盖本次回顾窗口', SEARCH_MATCHES: '基于已读范围内的检索依据', PARTIAL: '部分问题仍缺少依据', NONE: '尚无可展示的回答' }
 const sources = ref<ReadingSource[]>([]), preview = ref(false), previewPath = ref(''), connected = ref(true)
 let generation = 0, selection = 0, citationRequest = 0, historyRequest = 0, events: EventSource | undefined, timer: ReturnType<typeof setTimeout> | undefined
+let openSession = 0
+watch(() => [props.versionId, props.open], () => { openSession++; useResume.value = false })
 const terminal = (t: Task) => ['COMPLETED', 'PARTIAL', 'INSUFFICIENT_EVIDENCE', 'FAILED', 'CANCELLED', 'INVALIDATED', 'READY'].includes(t.status)
 const labels: Record<string, string> = { QUEUED: '排队中', RUNNING: '正在整理', PAUSED: '已暂停', CANCELLED: '已取消', INVALIDATED: '已读范围已变化', FAILED: '暂未完成', COMPLETED: '已完成', PARTIAL: '部分回答', INSUFFICIENT_EVIDENCE: '证据不足', READY: '已读内容已准备好' }
 const errors: Record<string, string> = {
+  OUTPUT_INVALID: '模型回答未通过格式、长度或引用校验，未展示未经验证的内容。可提供任务编号协助定位；不会自动重试。',
   COVERAGE_LIMIT: '窗口超过完整回顾上限，请选择一章或两章。',
   INDEX_NOT_READY: '请先为当前已读范围补齐索引。',
   INTERRUPTED_CALL: '调用结果未形成可恢复检查点，不能自动重发。请核对调用记录后主动创建新任务。',
   TIMEOUT: '本任务已到执行截止时间。', SCOPE_CHANGED: '已读范围曾回退，请重新确认范围后创建任务。',
   LIVE_AI_NOT_AUTHORIZED: '当前未开放新的 AI 任务。你仍可阅读正文、查看已有结果和保存笔记。',
   LIVE_BATCH_MISMATCH: '当前调用仅限已批准的固定评测任务，请继续阅读或查看已有结果。',
+  LIVE_AUTHORIZATION_STOPPED: '本次试读授权已到期或停止，请查看费用状态。不能自动重启。',
+  BUDGET_EXHAUSTED: '剩余额度不足以预留下一次调用，或已达到调用次数上限。本次试读已停止。',
+}
+const failureReasons: Record<string, string> = {
+  GENERATION_LENGTH: '模型达到生成长度上限，回答未完整生成。',
+  GENERATION_CONTENT_FILTER: '模型供应商拦截了本次回答，无法展示。',
+  GENERATION_FINISH_REASON: '模型未正常结束生成。',
+  GENERATION_TOKEN_LIMIT: '模型返回的用量超过本任务输出上限。',
+  GENERATION_EMPTY: '模型没有返回回答内容。',
+  FACT_TEXT_LIMIT: '回答文字超过长度上限。',
+  EVIDENCE_IDS: '回答的引用缺失、重复或不属于本次证据。',
+  JSON_SCHEMA: '回答格式不符合约定。',
+  JSON_SYNTAX: '回答不是单个合法 JSON 对象，或包含重复字段。',
+  JSON_ROOT_FIELDS: '回答顶层结构不符合约定，或包含额外字段。',
+  JSON_FACT_FIELDS: '回答的事实条目结构不符合约定，或包含额外字段。',
+  RECAP_PARTIAL_MISSING: '回顾回答缺少完整性标记。',
+  RECAP_PARTIAL_TYPE: '回顾回答的完整性标记类型错误。',
+  FACTS_SHAPE: '回答的事实列表缺失、类型错误或条目过多。',
+  FACT_TEXT: '回答的事实文字缺失或格式错误。',
+  EVIDENCE_IDS_TYPE: '回答的引用列表类型错误。',
+  RECAP_PARTIAL: '模型未完成整个回顾范围。',
 }
 function clear() {
   generation++; selection++; citationRequest++; historyRequest++; events?.close(); clearTimeout(timer)
@@ -98,17 +125,30 @@ function subscribe(id: string, g: number) {
   }
 }
 async function create(type: string) {
-  if (!props.ready || !props.state || !canCreate.value) return
-  const g = generation
+  if (busy.value || !props.ready || !props.state || !canCreate.value) return
+  let g = generation
+  const version = props.versionId, scope = props.state.scopeRevision, session = openSession
+  const boundary = type === 'RECAP' ? targetBoundary.value : props.state.readBoundary
+  const resume = props.state.resumePosition
+  const updateBoundary = boundary !== props.state.readBoundary
+  if (!boundary) return
+  busy.value = true
   try {
-    await ElMessageBox.confirm(`允许使用正文开头至第 ${props.state.readBoundary} 段。${type === 'RECAP' ? `回顾最近 ${chapterCount.value} 个已读章节，一次生成。` : `人物查证：${mode.value === 'DIRECT' ? '一次检索、一次回答' : '一次规划、最多三次检索、一次回答'}。`}真实调用须另获费用授权。`, '确认任务范围', { confirmButtonText: '创建任务', cancelButtonText: '返回阅读' })
+    await ElMessageBox.confirm(`允许使用正文开头至第 ${boundary} 段。${updateBoundary ? '确认表示此前所有段落（含当前整段及跳过的内容）都已读完，并保存为 AI 已读范围。' : ''}${type === 'RECAP' ? `回顾最近 ${chapterCount.value} 个已读章节，一次生成。` : `人物查证：${mode.value === 'DIRECT' ? '一次检索、一次回答' : '一次规划、最多三次检索、一次回答'}。`}${index.value?.executionMode === 'READER_TRIAL' ? '问题和所需已读正文会发送至已配置的模型供应商，费用从本次试读预算扣除。' : index.value?.executionMode === 'DIRECT_LIVE' ? '问题和所需已读正文会发送至已配置的模型供应商，按供应商实际用量计费。' : '这是固定离线演示，不产生模型费用。'}`, '确认任务范围', { confirmButtonText: '确认并创建任务', cancelButtonText: '返回阅读' })
     if (!valid(g)) return
-    busy.value = true; error.value = ''
-    const t = await readingPost<Task>('/tasks', { clientRequestId: crypto.randomUUID(), versionId: props.versionId, expectedScopeRevision: props.state.scopeRevision, type,
+    error.value = ''
+    let confirmedScope = scope
+    if (updateBoundary && resume) {
+      const confirmed = await props.confirmBoundary(resume.paragraphId, scope)
+      g = generation
+      if (!valid(g) || session !== openSession || version !== props.versionId || props.state.scopeRevision !== confirmed.scopeRevision) return
+      confirmedScope = confirmed.scopeRevision
+    }
+    const t = await readingPost<Task>('/tasks', { clientRequestId: crypto.randomUUID(), versionId: version, expectedScopeRevision: confirmedScope, type,
       ...(type === 'RECAP' ? { chapterCount: chapterCount.value } : { question: question.value, mode: mode.value }) })
     if (!valid(g)) return
     await select(t); await load()
-  } catch (e) { if (valid(g) && e !== 'cancel' && e !== 'close') error.value = errorMessage(e) } finally { busy.value = false }
+  } catch (e) { if (props.open && version === props.versionId && e !== 'cancel' && e !== 'close') error.value = errorMessage(e) } finally { busy.value = false }
 }
 async function estimateIndex() {
   const g = generation
@@ -177,17 +217,26 @@ onUnmounted(clear)
   <div class="reading-assistant">
     <div class="reading-assistant-scope"><strong>只看你已读过的内容</strong><p>从开头至第 {{ state?.readBoundary || 0 }} 段。回顾和查证不会推进阅读进度。</p></div>
     <el-alert v-if="index?.executionMode === 'OFFLINE_FIXTURE'" title="固定离线演示：结果用于体验流程，不是现场模型生成，也不代表语义验收。" type="warning" :closable="false" />
+    <el-alert v-else-if="index?.executionMode === 'READER_TRIAL'" title="真人试读：确认后调用真实模型，仅使用你确认的已读范围。回答质量仍需你核对。" type="info" :closable="false" />
+    <el-alert v-else-if="index?.executionMode === 'DIRECT_LIVE'" title="真实模型已启用：仅使用你确认的已读范围，按供应商实际用量计费。" type="info" :closable="false" />
     <el-alert v-else-if="index" :title="index.executionMode === 'EVALUATION_ONLY' ? '阅读 AI 正在固定评测中，暂不开放自由提问；已有结果仍可查看。' : '阅读 AI 仍在验证中，当前未开放新任务。你可以查看已有结果，或直接回到正文。'" type="info" :closable="false" />
+    <div v-if="index?.authorization" class="reading-trial-budget">
+      <p>试读授权截至 {{ new Date(index.authorization.expiresAt).toLocaleString() }}；状态：{{ index.authorization.stopReason || index.authorization.reason }}</p>
+      <p v-for="(provider, name) in index.authorization.providers" :key="name">{{ name === 'DEEPSEEK' ? 'DeepSeek' : '阿里向量' }}：上限 ¥{{ provider.limitCny }}，已计价 ¥{{ provider.budgetValuedCny }}，预留 ¥{{ provider.reservedCny }}</p>
+      <small>按保守单价计价，非供应商账单。到期、费用或次数不足、调用异常后停止，不自动重试。</small>
+    </div>
     <el-alert v-if="error" :title="error" type="error" @close="error = ''" />
     <el-alert v-if="!ready || !connected" title="连接或范围正在重验，结果暂时隐藏。" type="warning" :closable="false" />
     <template v-if="ready">
-      <el-alert v-if="!state?.readBoundary" title="先在正文中选择“已读到这里”，明确允许回顾的范围。" type="info" :closable="false" />
+      <el-alert v-if="!state?.readBoundary" title="阅读位置自动保存。点击回顾时可直接确认以已保存的位置作为已读范围，无需返回正文标记；请确认当前整段已读完。" type="info" :closable="false" />
       <el-tabs v-model="activeTab" class="reading-assistant-tabs"><el-tab-pane label="前情回顾" name="recap" /><el-tab-pane label="人物查证" name="character" /><el-tab-pane label="历史记录" name="history" /></el-tabs>
       <section v-show="activeTab === 'recap'" aria-label="前情回顾设置">
       <h3>前情回顾</h3>
       <p class="reading-assistant-hint">先捡起最近的事件，再带着上下文继续阅读。</p>
       <el-select v-model="chapterCount" aria-label="回顾章节数量"><el-option v-for="n in 3" :key="n" :value="n" :label="`最近 ${n} 个已读章节`" /></el-select>
-      <el-button :disabled="!state?.readBoundary || !canCreate" :loading="busy" @click="create('RECAP')">确认范围并回顾</el-button>
+      <el-checkbox v-if="state?.readBoundary && (state.resumePosition?.paragraphOrdinal || 0) > state.readBoundary" v-model="useResume">将已读范围更新到已保存的位置（第 {{ state.resumePosition?.paragraphOrdinal }} 段）</el-checkbox>
+      <p v-if="!targetBoundary">尚无已保存的阅读位置，请先阅读正文。</p>
+      <el-button :disabled="!targetBoundary || !canCreate" :loading="busy" @click="create('RECAP')">确认范围并回顾</el-button>
       </section>
       <section v-show="activeTab === 'character'" aria-label="人物查证设置">
       <h3>人物查证</h3>
@@ -201,7 +250,8 @@ onUnmounted(clear)
       <div v-if="estimate">
         <p v-if="estimate.segments">本批处理第 {{ estimate.fromBoundary + 1 }}–{{ estimate.targetBoundary }} 段，{{ estimate.characters }} 字、{{ estimate.segments }} 片段、{{ estimate.batches }} 次 embedding 请求。</p>
         <p v-else>当前已读范围的索引已完整就绪，无需重复建立。</p>
-        <p>费用上界：{{ estimate.estimatedCost || '尚无已核实计价与授权，不能开启真实调用' }}</p>
+        <p v-if="index?.executionMode === 'DIRECT_LIVE'">按供应商实际用量计费；未设置金额预算。</p>
+        <p v-else>费用上界：{{ estimate.estimatedCost || '尚无已核实计价与授权，不能开启真实调用' }}</p>
         <el-button :disabled="!estimate.liveAllowed || estimate.segments === 0" :loading="busy" @click="createIndex">确认建立本批索引</el-button>
       </div>
       <div v-if="indexJob">
@@ -228,7 +278,7 @@ onUnmounted(clear)
           <h3>{{ current.type === 'RECAP' ? '前情回顾' : '人物查证' }} · {{ labels[current.status] || current.status }}</h3>
           <p class="reading-assistant-hint">截至第 {{ current.scope?.boundaryOrdinal }} 段 · {{ coverageLabels[current.coverage?.completeness || 'NONE'] }}</p>
           <p v-if="current.question">{{ current.question }}</p>
-          <p v-if="current.errorCode">{{ errors[current.errorCode] || current.errorCode }}</p><p v-if="current.message">{{ current.message }}</p>
+          <p v-if="current.errorCode">{{ errors[current.errorCode] || current.errorCode }}<br /><template v-if="current.failureReason">具体原因：{{ failureReasons[current.failureReason] || current.failureReason }}<br /></template>任务编号：{{ current.id }}</p><p v-if="current.message">{{ current.message }}</p>
           <p v-for="(fact, n) in current.validatedResult?.facts" :key="n">{{ fact.text }} <el-button v-for="id in fact.evidenceIds" :key="id" text @click="citation(id)">[{{ id }}] 原文</el-button></p>
           <ReadingNoteProposal v-if="state && ['COMPLETED', 'PARTIAL'].includes(current.status) && current.validatedResult?.facts.length" :key="current.id" :task-id="current.id" :task-type="current.type || 'RECAP'" :facts="current.validatedResult.facts" :state="state" @saved="emit('saved')" />
           <details v-if="current.budget" class="reading-task-details"><summary>任务详情</summary><p>生成 {{ current.budget.modelCalls }} 次、检索向量调用 {{ current.budget.embeddingCalls }} 次；累计执行 {{ (current.budget.activeMillis / 1000).toFixed(1) }} 秒。未知用量不按零费用记账。</p></details>

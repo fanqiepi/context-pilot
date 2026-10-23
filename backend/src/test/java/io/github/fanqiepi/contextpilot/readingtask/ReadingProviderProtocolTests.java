@@ -19,6 +19,23 @@ import static org.assertj.core.api.Assertions.*;
 /** Every request goes to loopback, with synthetic credentials and text. No provider account involved. */
 @Timeout(15)
 class ReadingProviderProtocolTests {
+    @Test void directSwitchNeedsOnlyKeysAndNeverTouchesLegacyAuthorization() {
+        var legacy=org.mockito.Mockito.mock(ReadingLiveAuthorization.class);
+        var config=new ReadingAiConfiguration();
+        var direct=config.readingAiGateway("generation-key","embedding-key",legacy,true,false,false);
+        direct.requireAuthorized();
+        assertThat(direct.offline()).isFalse();assertThat(direct.budgetRequired()).isFalse();
+        assertThat(direct.executionMode()).isEqualTo("DIRECT_LIVE");
+        assertThat(direct.authorizationStatus()).containsEntry("liveAllowed",true).containsEntry("budgetEnforced",false);
+        direct.authorizeWork(new ReadingWork(),new ReadingWork.Payload());direct.haltBatch("OUTPUT_INVALID");
+        var old=new ReadingWork.Payload();old.liveApprovalDigest="stopped-approval";
+        assertThatThrownBy(()->direct.authorizeWork(new ReadingWork(),old)).isInstanceOf(ReadingException.class);
+        org.mockito.Mockito.verifyNoInteractions(legacy);
+        assertThatThrownBy(()->config.readingAiGateway("","embedding-key",null,true,false,false).requireAuthorized()).isInstanceOf(ReadingException.class);
+        assertThatThrownBy(()->config.readingAiGateway("generation-key","embedding-key",null,false,false,false).requireAuthorized()).isInstanceOf(ReadingException.class);
+        assertThatThrownBy(()->config.readingAiGateway("generation-key","embedding-key",legacy,true,true,false)).isInstanceOf(ReadingException.class);
+        assertThatThrownBy(()->config.readingAiGateway("generation-key","embedding-key",legacy,true,false,true)).isInstanceOf(ReadingException.class);
+    }
     static final JsonMapper JSON=JsonMapper.builder().build();
     static final Duration TIMEOUT=Duration.ofSeconds(5);
     HttpServer server;
@@ -181,14 +198,16 @@ class ReadingProviderProtocolTests {
     }
     @ParameterizedTest @ValueSource(strings={"{}","not-json","{\"choices\":[],\"choices\":[]}","{} {}"})
     void malformedOrAmbiguousResponseFailsClosed(String body) {
-        response=body;assertThatThrownBy(()->client.generate(prompt(512),512,TIMEOUT)).isInstanceOf(ReadingException.class);
+        response=body;assertThatThrownBy(()->client.generate(prompt(512),512,TIMEOUT))
+                .isInstanceOfSatisfying(ReadingTaskPolicy.InvalidOutput.class,e->assertThat(e.reason()).isEqualTo("{}".equals(body)?"PROVIDER_CHOICES":"PROVIDER_JSON"));
         assertThat(requests).hasSize(1);
     }
     @Test void oversizedResponseAndWrongContentTypeAreRejected() {
         response=" ".repeat(32769);
         assertThatThrownBy(()->client.generate(prompt(512),512,TIMEOUT)).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.code()).isEqualTo("OUTPUT_INVALID"));
         contentType="text/event-stream";response="data: {}";
-        assertThatThrownBy(()->client.generate(prompt(512),512,TIMEOUT)).isInstanceOf(ReadingException.class);
+        assertThatThrownBy(()->client.generate(prompt(512),512,TIMEOUT))
+                .isInstanceOfSatisfying(ReadingTaskPolicy.InvalidOutput.class,e->assertThat(e.reason()).isEqualTo("PROVIDER_CONTENT_TYPE"));
         assertThat(requests).hasSize(2);
     }
     @Test void malformedUtf8IsNotReplacedSilently() {
@@ -215,7 +234,7 @@ class ReadingProviderProtocolTests {
         assertThat(requests).isEmpty();
     }
     @Test void productionGatewayStaysClosedEvenWithCredentialsAndTransportPresent() {
-        var gateway=new ReadingAiConfiguration().readingAiGateway("fixture-generation","fixture-embedding",null);
+        var gateway=new ReadingAiConfiguration().readingAiGateway("fixture-generation","fixture-embedding",null,false,false,false);
         assertThat(gateway.offline()).isFalse();
         assertThatThrownBy(gateway::requireAuthorized).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.code()).isEqualTo("LIVE_AI_NOT_AUTHORIZED"));
         assertThatThrownBy(()->gateway.generate(prompt(512),512,TIMEOUT)).isInstanceOf(ReadingException.class);

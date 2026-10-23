@@ -1,5 +1,13 @@
 # 小说阅读 API 合同草案
 
+2026-10-23 用户调整回顾篇幅：新 RECAP 结果约 100 字、通常 2–3 要点，所有 facts.text 合计硬上限 160 Unicode 字符（含标点等）；一至三章共用篇幅。请求/响应字段、引用和历史结果不变，人物查证仍为 600。超限仍为 OUTPUT_INVALID / FACT_TEXT_LIMIT，不截断或自动重试。
+
+2026-10-23 多章回顾：既有 failureReason 新增安全细分码 JSON_SYNTAX、JSON_ROOT_FIELDS、JSON_FACT_FIELDS、RECAP_PARTIAL_MISSING、RECAP_PARTIAL_TYPE、EVIDENCE_IDS_TYPE，复用 FACTS_SHAPE/FACT_TEXT；旧 JSON_SCHEMA 不回填。创建请求和 validatedResult 不变，详见[格式修复验证](../evaluation/reading-recap-schema-verification.md)。
+
+2026-10-23 DIRECT_LIVE：索引状态 executionMode 增加 DIRECT_LIVE；liveAllowed 取决于日常开关和密钥检查，不返回试读 authorization 预算面板。估算保留片段/批次数，estimatedCost 为 null。只读 evaluation/status 在该模式返回 liveAllowed、reason、executionScope=DIRECT_LIVE、budgetEnforced=false。创建/确认/范围接口不变，无 HTTP 修改开关接口。无金额预留的任务 usage.reservationMethod=NONE、costBasis=NOT_PRICED；历史有预留调用仍按实际记录显示。
+
+2026-10-22 真人试读（acceptance-v10）：原索引状态 GET /api/reading/versions/{id}/index 增加 executionMode=READER_TRIAL 与 authorization（供应商额度、已计价/预留、expiresAt、reason/stopReason）。只有有效独立授权才能创建真实任务，既有创建/确认接口与范围校验不变。GET /api/reading/evaluation/status 复用为运维只读状态，executionScope=READER_TRIAL_LOCAL；没有 HTTP 授权或续期接口。
+
 2026-10-22 续读工作台补充：GET /versions/{versionId}/chapters/{chapterId}/paragraphs 响应增加 chapterOrdinal（1 起），用于恢复到目录分页之外时正确显示当前章和相邻章；未读 title 仍为 null。GET /versions/{versionId}/index 增加 executionMode=OFFLINE_FIXTURE/EVALUATION_ONLY/DISABLED，分别表示离线替身、已批准固定评测、关闭；它是界面说明，不授予调用权限。liveAllowed 及服务端每次请求的批准、范围和预算检查继续有效；EVALUATION_ONLY 不允许页面随机创建自由任务。无新写接口。
 
 2026-10-22 acceptance-v7 的本地 plan/approval 必须绑定 executionScope=DEBUG_RETEST，批准文件另含 previousAuthorizationId/previousApprovalDigest。状态接口新增 executionScope/previousAuthorizationId 并按批次返回调用上限；不提供 HTTP 授权/增额接口。仅接受冻结 DEBUG 请求，INDEX、TEST 或其他请求不在允许清单内，即使开启 debug-reviewed 也不能放行。前置账本不匹配/有未知预留返回 LIVE_PREDECESSOR_MISMATCH，已被其他批次承接返回 LIVE_BUDGET_ALREADY_TRANSFERRED；其余服务端门禁不变。
@@ -119,9 +127,11 @@
 
 人物请求将 type 改为 `CHARACTER_LOOKUP`，仅额外接受 `question` 与 `mode: DIRECT | MULTI_QUERY`。不接受自由聊天历史、全书范围或 planner budget；回顾不接受任意系统指令。创建时 expectedScopeRevision 必须等于服务端当前值，scope 快照由服务端生成；推进后不会扩大该任务范围。
 
-task 视图固定包含 `id,type,status,revision,scope,coverage,budget,usage,errorCode,traceId,visibility,dataAsOf`。coverage 含 requestedRange/evidenceRanges/completeness（`FULL_WINDOW/SEARCH_MATCHES/PARTIAL/NONE`）；人物命中不能称全已读事实穷尽。usage 未知字段为 null 且 `usageStatus=UNKNOWN`，不能填零。
+task 视图固定包含 `id,type,status,revision,scope,coverage,budget,usage,errorCode,traceId,visibility,dataAsOf`。可见视图另含可空 `failureReason`（安全校验类别）；`usage.calls[]` 另含可空 `finishReason`（白名单结束状态，其他归为 other）。旧记录缺失时不推断回填；范围隐藏时不返回这些字段。coverage 含 requestedRange/evidenceRanges/completeness（`FULL_WINDOW/SEARCH_MATCHES/PARTIAL/NONE`）；人物命中不能称全已读事实穷尽。usage 未知字段为 null 且 `usageStatus=UNKNOWN`，不能填零。
 
 SSE 事件 `snapshot -> progress* -> result? -> done`；result 仅来自已持久化且当前可见的结构化结果，绝不发送模型原始 token。事件 id 为 taskId/revision，本轮重连从当前受限快照恢复，不使用 Last-Event-ID 重放旧结果。发送前与边界收缩使用同一发布序列，已开始发送的响应不能宣称可撤回。
+
+连接失效或响应已提交后的异常不会追加普通 JSON 错误体，也不改变持久化任务状态；连接断开后客户端可重新获取受限快照。首次响应尚未提交时，原有 4xx/503 JSON 错误合同保持不变。
 
 入队满返回 429 `QUEUE_FULL`，不创建会自动运行的隐性后台重试。数据库已创建但尚未可靠派发时收敛到 PAUSED 并供显式恢复。模型调用未启用/未获授权返回 409 `LIVE_AI_NOT_AUTHORIZED`；索引不足 409 `INDEX_NOT_READY`；范围未设置 409 `READ_BOUNDARY_REQUIRED`。其他终态失败码按架构设计返回，技术失败不混为拒答。
 

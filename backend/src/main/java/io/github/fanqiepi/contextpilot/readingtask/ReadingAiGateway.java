@@ -7,8 +7,8 @@ import java.util.UUID;
 
 /**
  * One invocation is exactly one HTTP request, with no SDK/HTTP retry or hidden splitting.
- * Production remains fail-closed until a separately authorized, priced adapter can guarantee
- * the reading-specific output limits. Tests supply an offline implementation of this port.
+ * Daily live calls use the explicit configuration switch; legacy batches retain their approval
+ * and spend ledgers. All modes retain reading-specific output limits.
  */
 public interface ReadingAiGateway {
     record Response(String text,Long inputTokens,Long outputTokens,String finishReason,String model,String requestId) {
@@ -22,8 +22,12 @@ public interface ReadingAiGateway {
     }
     /** Exact serialized generation input, including the provider envelope, for bounds/reservation. */
     default String generationInput(String prompt,int outputTokens) { return prompt; }
-    /** Only test fixtures may opt out of the spend ledger. No production offline bean is registered. */
+    /** Only test fixtures identify themselves as offline. */
     default boolean offline() { return false; }
+    /** Legacy approved batches reserve money; daily direct calls only record actual usage. */
+    default boolean budgetRequired() { return !offline(); }
+    default String executionMode() { return offline()?"OFFLINE_FIXTURE":"EVALUATION_ONLY"; }
+    default java.util.Map<String,Object> authorizationStatus() { return java.util.Map.of(); }
     default void authorizeWork(ReadingWork work,ReadingWork.Payload payload) {
         if(!offline())throw ReadingTaskPolicy.failure("LIVE_AI_NOT_AUTHORIZED");
     }

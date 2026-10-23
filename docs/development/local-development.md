@@ -1,5 +1,9 @@
 # 本地开发
 
+2026-10-23 日常阅读真实调用使用[单开关配置](reading-direct-models.md)：本机 `backend/config/application-local-secrets.yml` 的 `contextpilot.reading.ai-enabled: true/false`，不需要金额预算、批准文件或期限。启动时使用 local-secrets profile。旧试读端口已关闭，用户自行启动日常前后端。
+
+真人小说阅读试读使用[独立试读入口](reading-reader-trial.md)：`tools/reading-trial.ps1`，本机页面 5201、后端 18081、独立持久数据库 15434。它读取现有本地密钥与单独批准文件，保留日常环境及已停止评测账本；启动本身不调用模型。
+
 ## 前置条件
 
 - JDK 21

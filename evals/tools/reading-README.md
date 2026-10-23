@@ -1,5 +1,24 @@
 # 阅读验收工具
 
+2026-10-23 回顾长度与 SSE 补修：任务 09f93b3d-45ad-43f7-9bce-bda9db7353dc 已确认 FACT_TEXT_LIMIT，正常结束生成，非 JSON_SCHEMA。用户随后明确只需百字回顾：Prompt v6 改为约 100 字、2–3 要点，服务端总字数上限 160（人物查证不变）。修复发送失败后 complete 再刷损坏响应及全局 ApiExceptionHandler 追加 JSON 的遗漏路径，隔离单连接异常。当前 acceptance-v17，未真实调用或代启；下一步先由用户重启并查看已有任务验证连接，后续手动日常回顾验证长度改善，见 docs/evaluation/reading-recap-length-stream-verification.md。
+
+2026-10-23 多章回顾格式修复：现场两章/三章任务既有成功也有 JSON_SCHEMA 失败，三次报告均 finishReason=stop；旧回答未保留，具体结构错误不可追溯。Prompt v5 明确统一扁平 facts/partial 合同，回顾按类型检查并持久化细分原因，未放宽校验或自动重试。当前 acceptance-v16，真实改善尚未验证。下一步用户自行重启并手动验证相同范围的多章回顾，按具体错误码继续定位，见 docs/evaluation/reading-recap-schema-verification.md。
+
+2026-10-23 SSE 修复：用户截图显示回顾完成，数据库最近三次回顾也均 COMPLETED。日志是 ReadingHttpAdvice 将已提交 text/event-stream 再写为 JSON 引发的二次异常，原始触发原因未留在所给日志中。现识别断连并禁止对已提交响应追加错误 JSON，未改变任务结果或重跑模型。实现 acceptance-v15 / Prompt v4；下一步用户重启后仅查看已有结果、开关助手验证连接，见 docs/evaluation/reading-sse-error-verification.md。
+
+
+2026-10-23 回顾失败诊断修复：用户任务 1c5f4739-d33d-4945-8bb4-bcab28a4135c 返回实际 6097/979 token 后 OUTPUT_INVALID；旧数据缺少结束原因，不能确诊。现统一记录停止日志、持久化 failureReason 与白名单 finishReason，页面展示具体类别。当前 acceptance-v14 / Prompt v4；未重试或代启。下一步由用户重启并手动发起日常任务，用明确诊断定位实际故障，详见 docs/evaluation/reading-failure-diagnostics-verification.md。
+
+
+2026-10-23 用户要求沿用原 Application：已删除新增 IDEA 启动项，在现有 application.yml 内自动导入本地配置，支持仓库根目录/backend 启动。日常仍只修改本地 ai-enabled true/false 并重启原后端；普通测试默认 offline。当前冻结 acceptance-v13，Prompt v4 不变，详见 docs/development/reading-direct-models.md。
+
+
+2026-10-23 当前默认配置/锁为 acceptance-v12，Prompt reading-evidence-v4。回顾入口与输出约束修复仅有离线证据，历史 v1–v11 保留。前端交互回归：在 frontend 执行 node --test tests/reading-assistant.test.mjs。
+
+同日后续用户批准 DIRECT_LIVE 日常单开关模式，不设金额预算。当前 acceptance-v11 同时包含该模式和停止查询修复；固定评测采集规则不变。日常使用见[开关说明](../../docs/development/reading-direct-models.md)，不使用旧评测/试读脚本。
+
+2026-10-23 当前实现为 acceptance-v11，离线修复试读停止后的状态查询事务异常；Prompt 不变。v10 首次真人回顾已连通 DeepSeek，但结果校验失败，两份试读账本停止。未安装新批准、未恢复或重试。固定评测仍为 DEBUG_RETEST，旧账本保持停止。使用当前配置和锁，下面历史说明保留原范围。详见[失败记录](../../docs/evaluation/reading-trial-failure-verification.md)和[试读入口](../../docs/development/reading-reader-trial.md)。
+
 Node.js 22；从仓库根目录执行，无新增依赖，无 HTTP、模型或 embedding 调用。
 
 ```powershell

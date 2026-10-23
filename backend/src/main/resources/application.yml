@@ -42,6 +42,11 @@ spring:
 
 contextpilot:
   reading:
+    # Daily reading: true calls the configured models; false disables calls. No monetary budget or approval file.
+    ai-enabled: ${READING_AI_ENABLED:false}
+    # Local human trial uses its own approval and durable provider ledgers; mutually exclusive with evaluation.
+    trial-enabled: ${READING_TRIAL_ENABLED:false}
+    trial-approval: ${READING_TRIAL_APPROVAL:}
     # Evaluation only; credentials alone never enable calls. Keep approval files local/ignored.
     live-enabled: ${READING_LIVE_ENABLED:false}
     live-repository: ${READING_LIVE_REPOSITORY:..}
@@ -129,3 +134,14 @@ knife4j:
   enable: true
   setting:
     language: zh_cn
+
+---
+# Load the ignored local configuration when using the existing Application entry.
+# Support both repository-root (IDE) and backend (Maven) working directories.
+spring:
+  config:
+    activate:
+      on-profile: "default | local-secrets"
+    import:
+      - optional:file:./config/application-local-secrets.yml
+      - optional:file:./backend/config/application-local-secrets.yml

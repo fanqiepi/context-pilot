@@ -96,7 +96,7 @@ async function openChapter(id: string, paragraphId?: string, offset = 0, persist
     const result = await readingGet<ParagraphPage>(`${base()}/chapters/${id}/paragraphs`, paragraphId ? { atParagraphId: paragraphId } : {})
     if (version !== versionId.value || request !== readerRequest || disposed) return
     chapterId.value = id; chapterOrdinal.value = result.chapterOrdinal; chapterTitle.value = generation === scopeGeneration ? result.title : null; paragraphs.value = result.paragraphs; nextCursor.value = result.nextCursor
-    selected.value = result.paragraphs[0]; directory.value = false
+    selected.value = result.paragraphs.find(p => p.id === paragraphId) || result.paragraphs[0]; directory.value = false
     await nextTick()
     if (paragraphId) scrollToParagraph(paragraphId, offset)
     else if (persist) document.querySelector('.reading-text')?.scrollIntoView({ block: 'start' })
@@ -159,7 +159,24 @@ function onScroll() {
   const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-paragraph]'))
   const node = nodes.find(n => { const r = n.getBoundingClientRect(); return r.bottom > 140 && r.top < window.innerHeight })
   const paragraph = paragraphs.value.find(p => p.id === node?.dataset.paragraph)
-  if (paragraph && paragraph.id !== selected.value?.id) position(paragraph)
+  if (paragraph && paragraph.id !== (pending.value || state.value?.resumePosition)?.paragraphId) position(paragraph)
+}
+async function openAssistant() {
+  onScroll()
+  await flush()
+  assistant.value = true
+}
+async function confirmAssistantBoundary(paragraphId: string, expectedScopeRevision: number) {
+  await flush()
+  if (pending.value || conflict.value) throw new Error('请先处理未保存的阅读位置')
+  const result = await readingPut<{ state: ReadingState }>(`${base()}/read-boundary`, {
+    clientRequestId: crypto.randomUUID(), expectedScopeRevision, lastReadParagraphId: paragraphId, confirmContiguousPrefix: true,
+  })
+  mergeState(result.state)
+  channel?.postMessage(versionId.value)
+  await focus()
+  if (!scopeReady.value) throw new Error('已读范围校验未完成，请稍后再试')
+  return result.state
 }
 async function flush() {
   clearTimeout(saveTimer)
@@ -352,7 +369,7 @@ onUnmounted(() => { disposed = true; events?.close(); clearTimeout(saveTimer); c
   <section class="reading-reader" :class="{ 'reading-dark': dark }">
     <header class="reading-toolbar">
       <RouterLink to="/books">← 书架</RouterLink><h1>{{ book?.title || '阅读' }}</h1>
-      <el-button @click="openDirectory">目录</el-button><el-button @click="assistant = true">阅读助手</el-button><el-button @click="records = true">书签与笔记</el-button><el-button @click="settings = true">阅读设置</el-button>
+      <el-button @click="openDirectory">目录</el-button><el-button @click="openAssistant">阅读助手</el-button><el-button @click="records = true">书签与笔记</el-button><el-button @click="settings = true">阅读设置</el-button>
     </header>
     <el-alert v-if="error" :title="error" type="error" show-icon @close="error = ''" />
     <div class="reading-status" aria-live="polite"><span>{{ saveStatus }}</span><el-button v-if="pending && !conflict" text :loading="saving" @click="flush">立即保存</el-button><span v-if="chapterOrdinal">第 {{ chapterOrdinal }} / {{ currentVersion?.chapterCount }} 章</span><span>已读边界：{{ state?.readBoundary || 0 }} 段</span></div>
@@ -376,7 +393,7 @@ onUnmounted(() => { disposed = true; events?.close(); clearTimeout(saveTimer); c
       </nav>
     </article>
     <el-drawer v-model="assistant" title="回顾前情与人物查证" size="min(94vw, 560px)">
-      <ReadingAssistant :version-id="versionId" :state="state" :ready="scopeReady" :open="assistant" @continue="s => { assistant = false; void openChapter(s.chapterId, s.paragraphId, s.startOffset) }" @close="assistant = false" @saved="loadRecords" />
+      <ReadingAssistant :version-id="versionId" :state="state" :ready="scopeReady" :open="assistant" :confirm-boundary="confirmAssistantBoundary" @continue="s => { assistant = false; void openChapter(s.chapterId, s.paragraphId, s.startOffset) }" @close="assistant = false" @saved="loadRecords" />
       <template #footer><el-button type="primary" @click="assistant = false">回到正文继续阅读</el-button></template>
     </el-drawer>
     <el-drawer v-model="directory" title="目录与版本" direction="ltr" size="min(90vw, 380px)">

@@ -1,5 +1,11 @@
 # 小说阅读数据合同草案
 
+2026-10-23 失败诊断补充：任务/索引 `payload_json.failureReason` 保存固定安全类别；`reading_ai_call.usage_json.finishReason` 保存白名单结束状态（stop/length/content_filter/tool_calls/function_call/insufficient_system_resource，其他为 other，缺失为 missing；无响应为 null）。使用既有 JSONB，无新迁移。旧任务不推断回填，不保存原始输出或异常正文。
+
+2026-10-23 DIRECT_LIVE：无新表或迁移；reading_ai_call 继续保存请求元数据和实际 token，用既有可空 authorization_id/reserved_amount/settled_amount 表示没有本地金额预留及结算，不创建 reading_spend_ledger，不伪造费用为零。旧账本、历史任务和已停止授权不改写，旧批准任务不可转入日常模式继续执行。
+
+2026-10-22 真人试读（acceptance-v10）：无新表或迁移。沿用 reading_spend_ledger 和 reading_ai_call；独立两个供应商账本使用独立授权 ID/digest，predecessor_id 为 NULL，金额不可互借；重启沿用原账本，停止不能通过重启清除。试读数据位于独立持久库，旧评测数据不变。
+
 2026-10-22 续读工作台没有新增表、字段或迁移；chapterOrdinal 来自既有章节序号，executionMode 是派生响应字段。演示书籍和固定任务仅位于一次性 Testcontainers 数据库，不向日常库或付费评测库写入。
 
 2026-10-22 V34 已实现 reading_spend_ledger.predecessor_id（自引用外键、唯一键及禁止自引用 CHECK）。唯一约束包含逻辑删除行，旧账本不能重复承接。服务端在事务内锁定两个旧供应商账本，要求主体/摘要/人民币/计价匹配、已停止、预留为零，新额度严格等于旧额度减已结算金额；分别创建新账本，保留旧消耗。没有新增书籍、结果或笔记字段。

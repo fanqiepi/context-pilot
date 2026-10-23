@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -99,8 +100,19 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponse> handleUnexpected(Exception exception, HttpServletRequest request) {
+    public ResponseEntity<ApiErrorResponse> handleUnexpected(Exception exception, HttpServletRequest request, HttpServletResponse response) {
         String requestId = requestId(request);
+        // Async error dispatch can reach the global advice without the original controller mapping.
+        // A broken or committed response cannot be replaced with a JSON error body.
+        if (exception instanceof org.springframework.web.context.request.async.AsyncRequestNotUsableException
+                || org.springframework.web.util.DisconnectedClientHelper.isClientDisconnectedException(exception)) {
+            LOGGER.debug("request.connection.closed type={} requestId={}", exception.getClass().getSimpleName(), requestId);
+            return null;
+        }
+        if (response.isCommitted()) {
+            LOGGER.warn("request.response.committed type={} requestId={}", exception.getClass().getSimpleName(), requestId);
+            return null;
+        }
         LOGGER.error("Unhandled request error, requestId={}", requestId, exception);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiErrorResponse("INTERNAL_ERROR", "An unexpected error occurred", requestId));

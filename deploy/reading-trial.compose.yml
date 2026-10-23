@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.2-pg17-bookworm
+    environment:
+      POSTGRES_DB: context_pilot_reader_trial
+      POSTGRES_USER: context_pilot
+      POSTGRES_PASSWORD: reader_trial_local_only
+    ports:
+      - "127.0.0.1:15434:5432"
+    volumes:
+      - reader_trial_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U context_pilot -d context_pilot_reader_trial"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+volumes:
+  reader_trial_data:

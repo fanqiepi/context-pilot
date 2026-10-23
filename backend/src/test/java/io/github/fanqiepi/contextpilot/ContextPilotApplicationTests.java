@@ -34,6 +34,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @SpringBootTest(properties = {
         "spring.ai.model.chat=none",
         "spring.ai.model.embedding=none",
+        "spring.ai.vectorstore.type=none",
         "spring.flyway.enabled=false",
         "contextpilot.research.enabled=false",
         "spring.autoconfigure.exclude="
@@ -41,7 +42,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 + "org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration"
 })
 class ContextPilotApplicationTests {
-    // This smoke test excludes database auto-configuration; keep services real and mock persistence.
+    // This smoke test excludes database/vector-store auto-configuration; keep services real and mock persistence.
     @MockitoBean
     private BookMapper bookMapper;
 

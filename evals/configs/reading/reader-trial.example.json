@@ -1,0 +1,22 @@
+{
+  "schema": "reading-reader-trial-v1",
+  "status": "NOT_AUTHORIZED",
+  "executionScope": "READER_TRIAL_LOCAL",
+  "version": "reading-acceptance-v11",
+  "authorizationId": null,
+  "independentBudget": true,
+  "accountConditionsConfirmed": false,
+  "implementationLockSha256": null,
+  "pricingVersion": "reading-cny-20261022-v1",
+  "pricingVerifiedAt": null,
+  "authorizedAt": null,
+  "expiresAt": null,
+  "providerLimitsCny": { "DEEPSEEK": "20", "DASHSCOPE": "10" },
+  "generationCallLimit": 100,
+  "embeddingCallLimit": 200,
+  "generationModel": "deepseek-v4-flash",
+  "embeddingModel": "qwen3.7-text-embedding",
+  "embeddingDimensions": 1024,
+  "generationEndpoint": "https://api.deepseek.com/chat/completions",
+  "embeddingEndpoint": "https://llm-90adsh26dbyar5po.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/embeddings"
+}

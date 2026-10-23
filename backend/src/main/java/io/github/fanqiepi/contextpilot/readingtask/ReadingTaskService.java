@@ -126,15 +126,16 @@ public class ReadingTaskService {
         String hash=ReadingText.hash(ReadingText.json(List.of(s.ownerId(),s.versionId(),s.scopeRevision(),s.visibilityEpoch(),ready,target,segments,chars,batches,profile)));
         boolean allowed;
         try { ai.requireAuthorized();allowed=true; } catch(ReadingException e) { allowed=false; }
-        String cost=allowed && !ai.offline()?ReadingLiveBatch.EMBEDDING.multiply(java.math.BigDecimal.valueOf((long)batches*16*ReadingLiveBatch.EMBEDDING_LINE_BOUND)).toPlainString():null;
+        String cost=allowed && ai.budgetRequired()?ReadingLiveBatch.EMBEDDING.multiply(java.math.BigDecimal.valueOf((long)batches*16*ReadingLiveBatch.EMBEDDING_LINE_BOUND)).toPlainString():null;
         return new Estimate(ready,target,s.boundaryOrdinal(),segments,chars,batches,profile,hash,allowed,cost,
-                !allowed?"LIVE_AI_NOT_AUTHORIZED":ai.offline()?"离线测试适配器；不代表真实费用估算":"仅限批准评测条目；金额为上下文上限预留，非账单");
+                !allowed?"LIVE_AI_NOT_AUTHORIZED":ai.offline()?"离线测试适配器；不代表真实费用估算":!ai.budgetRequired()?"真实模型调用；未设置金额预算，费用以供应商账单为准":"金额为上下文上限预留，非账单；受当前独立授权限制");
     }
     public Object index(UUID version) {
         return scopes.current(version,s->{
             int ready=mapper.readyBoundary(version,s.boundaryOrdinal(),new Payload().profile);
             var result=new LinkedHashMap<String,Object>();
-            result.put("executionMode",ai.offline()?"OFFLINE_FIXTURE":authorized()?"EVALUATION_ONLY":"DISABLED");
+            result.put("executionMode",ai.offline()?"OFFLINE_FIXTURE":authorized()?ai.executionMode():"DISABLED");
+            if("READER_TRIAL".equals(ai.executionMode()))result.put("authorization",ai.authorizationStatus());
             result.putAll(Map.of("profile",new Payload().profile,"readyBoundary",ready,"requestedBoundary",s.boundaryOrdinal(),
                     "ready",s.boundaryOrdinal()>0 && ready==s.boundaryOrdinal(),"dataAsOf",s.dataAsOf(),"liveAllowed",authorized()));
             var active=mapper.activeIndexWork(s.ownerId(),version);result.put("activeJob",active==null?null:view(active,s));return result;
@@ -166,6 +167,7 @@ public class ReadingTaskService {
         var v=new LinkedHashMap<String,Object>();v.put("id",w.id);v.put("status",w.status);v.put("revision",w.revision);
         if(!ReadingScopeService.visible(current,w.versionId,w.requiredBoundary)) { v.put("visibility","HIDDEN_BY_SCOPE");return v; }
         var p=payload(w);v.put("visibility","VISIBLE");v.put("type",w.type);v.put("errorCode",w.errorCode);v.put("traceId",w.traceId);
+        v.put("failureReason",p.failureReason);
         v.put("scope",Map.of("versionId",w.versionId,"boundaryOrdinal",p.scope.boundaryOrdinal(),"scopeRevision",p.scope.scopeRevision(),"visibilityEpoch",p.scope.visibilityEpoch()));
         v.put("currentScopeRevision",current.scopeRevision());v.put("visibilityEpoch",current.visibilityEpoch());
         v.put("queuedAt",w.queuedAt);v.put("elapsedMillis",Math.max(0,Duration.between(w.queuedAt,w.terminal()?w.updatedAt:OffsetDateTime.now()).toMillis()));
@@ -184,6 +186,7 @@ public class ReadingTaskService {
             call.put("inputTokens",actual.get("inputTokens"));call.put("outputTokens",actual.get("outputTokens"));
             call.put("usageStatus",actual.getOrDefault("usageStatus",null)==null?"UNKNOWN":actual.get("usageStatus"));
             call.put("providerModel",actual.get("providerModel"));call.put("providerRequestId",actual.get("providerRequestId"));
+            call.put("finishReason",actual.get("finishReason"));
             call.put("estimatedInputTokens",raw.get("input_bytes"));call.put("reservedAmount",raw.get("reserved_amount"));call.put("settledAmount",raw.get("settled_amount"));
             call.put("reservedInputTokens",raw.get("input_token_bound"));call.put("authorizationId",raw.get("authorization_id"));
             if(actual.get("inputTokens") instanceof Number in && actual.get("outputTokens") instanceof Number out){inputs+=in.longValue();outputs+=out.longValue();}else known=false;
@@ -191,8 +194,10 @@ public class ReadingTaskService {
         }
         var usage=new LinkedHashMap<String,Object>();usage.put("usageStatus",known && !calls.isEmpty()?"ACTUAL":"UNKNOWN");
         usage.put("inputTokens",known && !calls.isEmpty()?inputs:null);usage.put("outputTokens",known && !calls.isEmpty()?outputs:null);
-        usage.put("calls",calls);usage.put("tokenEstimateMethod","UTF8_BYTES_ESTIMATE");usage.put("reservationMethod",ai.offline()?"OFFLINE_FIXTURE":"PROVIDER_CONTEXT_CEILING");
-        usage.put("costBasis","PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE");v.put("usage",usage);
+        usage.put("calls",calls);usage.put("tokenEstimateMethod","UTF8_BYTES_ESTIMATE");
+        boolean reserved=calls.stream().anyMatch(c->c.get("reservedAmount")!=null);
+        usage.put("reservationMethod",reserved?"PROVIDER_CONTEXT_CEILING":"NONE");
+        usage.put("costBasis",reserved?"PEAK_UNCACHED_BUDGET_VALUE_NOT_INVOICE":"NOT_PRICED");v.put("usage",usage);
         return v;
     }
     public Object list(UUID version,int page,int size) {
@@ -211,7 +216,7 @@ public class ReadingTaskService {
                 checkScope(p,s);
                 if(mapper.unfinished(id)>0)throw failure("INTERRUPTED_CALL");
                 if(elapsed(w)>=deadline(w))throw failure("BUDGET_EXHAUSTED");
-                ai.requireAuthorized();w.status="QUEUED";w.errorCode=null;w.executionId=UUID.randomUUID();w.queuedAt=OffsetDateTime.now();
+                ai.requireAuthorized();w.status="QUEUED";w.errorCode=null;p.failureReason=null;w.executionId=UUID.randomUUID();w.queuedAt=OffsetDateTime.now();
                 dispatchAfterCommit(index,w.id);
             } else { settle(w);w.status="CANCEL".equals(r.command())?"CANCELLED":"PAUSED";w.executionId=null;mapper.unknown(id); }
             save(index,w,p);mapper.command(UUID.randomUUID(),s.ownerId(),index?null:id,index?id:null,r.clientRequestId(),hash,r.command(),w.revision);
@@ -294,13 +299,14 @@ public class ReadingTaskService {
                 if(p.embeddingCalls>=(index?32:"MULTI_QUERY".equals(p.mode)?3:1))throw failure("BUDGET_EXHAUSTED");p.embeddingCalls++;
             }
             UUID call=UUID.randomUUID();mapper.call(call,index?null:id,index?id:null,token,p.modelCalls+p.embeddingCalls,phase,ReadingText.length(input),bytes(input),outputLimit);
-            if(!ai.offline())spend.reserve(w.ownerId,call,ai.pricing(phase),ai.reservationInputTokens(phase,bytes(input)),outputLimit);
+            if(ai.budgetRequired())spend.reserve(w.ownerId,call,ai.pricing(phase),ai.reservationInputTokens(phase,bytes(input)),outputLimit);
             save(index,w,p);return call;
         });
     }
     void callFinished(UUID call,String status,ReadingAiGateway.Response response) {
         var usage=new LinkedHashMap<String,Object>();usage.put("inputTokens",response==null?null:response.inputTokens());usage.put("outputTokens",response==null?null:response.outputTokens());
         usage.put("providerModel",response==null?null:response.model());usage.put("providerRequestId",response==null?null:response.requestId());
+        usage.put("finishReason",response==null?null:safeFinishReason(response.finishReason()));
         usage.put("usageStatus",response!=null && response.inputTokens()!=null && response.outputTokens()!=null?"ACTUAL":"UNKNOWN");
         mapper.finishCall(call,status,ReadingText.json(usage));
         spend.settle(states.owner(),call,response);
@@ -334,13 +340,21 @@ public class ReadingTaskService {
         });
     }
     void stop(boolean index,UUID id,UUID token,String status,String code) {
+        stop(index,id,token,status,code,code);
+    }
+    void stop(boolean index,UUID id,UUID token,String status,String code,String reason) {
         var first=mapper.get(index,id);if(first==null)return;
-        try { scopes.current(first.versionId,s->{stopLocked(index,id,token,status,code);return null;}); }
+        try { scopes.current(first.versionId,s->{stopLocked(index,id,token,status,code,reason);return null;}); }
         catch(ReadingException e) { if(e.status()!=404)throw e;stopLocked(index,id,token,"INVALIDATED","RESOURCE_REMOVED"); }
     }
     private void stopLocked(boolean index,UUID id,UUID token,String status,String code) {
+        stopLocked(index,id,token,status,code,code);
+    }
+    private void stopLocked(boolean index,UUID id,UUID token,String status,String code,String reason) {
         var w=mapper.get(index,id);if(w==null || w.terminal() || (token!=null && !token.equals(w.executionId)))return;
-        settle(w);w.status=status;w.errorCode=code;w.executionId=null;mapper.unknown(id);save(index,w,payload(w));
+        var p=payload(w);p.failureReason=ReadingBudgetLog.safeReason(reason);
+        settle(w);w.status=status;w.errorCode=code;w.executionId=null;mapper.unknown(id);save(index,w,p);
+        ReadingBudgetLog.workStopped(w,p.failureReason);
         if(!ai.offline() && payload(w).liveApprovalDigest!=null)ai.haltBatch(code);
     }
     void recover() {
