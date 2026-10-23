@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ContextPilot 本地阅读" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="io.github.fanqiepi.contextpilot.ContextPilotApplication" />
+    <module name="contextpilot-backend" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend" />
+    <envs>
+      <env name="SPRING_PROFILES_ACTIVE" value="local-secrets" />
+    </envs>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
