@@ -1,5 +1,7 @@
 # 小说阅读开发交接
 
+2026-10-23 最新用户验证：用户测试后确认“现在已经正常输出了，后端没有任何报错”。百字回顾与 SSE 补修已有实际使用成功反馈，本轮故障按该反馈收尾；实现仍为 acceptance-v17 / Prompt v6，无新增代码或模型调用。不推定未报告的章节组合、重复次数或正式语义通过。下一阶段目标是确认百字回顾帮助接读，范围为关键前情、人物处境、引用跳转与已读边界，完成标准为简短、准确且足以继续阅读；依赖日常使用反馈，不自动复测。详见[验证记录](../evaluation/reading-recap-length-stream-verification.md)。下方重启/现场验证待办保留为历史记录。
+
 2026-10-23 回顾长度与 SSE 补修：任务 09f93b3d-45ad-43f7-9bce-bda9db7353dc 已确认 FACT_TEXT_LIMIT，正常结束生成，非 JSON_SCHEMA。用户随后明确只需百字回顾：Prompt v6 改为约 100 字、2–3 要点，服务端总字数上限 160（人物查证不变）。修复发送失败后 complete 再刷损坏响应及全局 ApiExceptionHandler 追加 JSON 的遗漏路径，隔离单连接异常。当前 acceptance-v17，未真实调用或代启；下一步先由用户重启并查看已有任务验证连接，后续手动日常回顾验证长度改善，见 docs/evaluation/reading-recap-length-stream-verification.md。
 
 2026-10-23 多章回顾格式修复：现场两章/三章任务既有成功也有 JSON_SCHEMA 失败，三次报告均 finishReason=stop；旧回答未保留，具体结构错误不可追溯。Prompt v5 明确统一扁平 facts/partial 合同，回顾按类型检查并持久化细分原因，未放宽校验或自动重试。当前 acceptance-v16，真实改善尚未验证。下一步用户自行重启并手动验证相同范围的多章回顾，按具体错误码继续定位，见 docs/evaluation/reading-recap-schema-verification.md。

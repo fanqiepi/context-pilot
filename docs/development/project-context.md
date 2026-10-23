@@ -1,5 +1,7 @@
 # 研序 项目背景
 
+2026-10-23 最新反馈：用户确认修复后回顾正常输出、后端没有报错，本轮故障已有实际使用成功证据并收尾。实现仍为 acceptance-v17 / Prompt v6；下一步关注百字回顾内容是否准确、引用有效且有助续读，不自动追加模型调用。具体范围及证据局限见[当前交接](continuation-handoff.md)和[验证记录](../evaluation/reading-recap-length-stream-verification.md)。
+
 2026-10-23 回顾长度与 SSE 补修：任务 09f93b3d-45ad-43f7-9bce-bda9db7353dc 已确认 FACT_TEXT_LIMIT，正常结束生成，非 JSON_SCHEMA。用户随后明确只需百字回顾：Prompt v6 改为约 100 字、2–3 要点，服务端总字数上限 160（人物查证不变）。修复发送失败后 complete 再刷损坏响应及全局 ApiExceptionHandler 追加 JSON 的遗漏路径，隔离单连接异常。当前 acceptance-v17，未真实调用或代启；下一步先由用户重启并查看已有任务验证连接，后续手动日常回顾验证长度改善，见 docs/evaluation/reading-recap-length-stream-verification.md。
 
 2026-10-23 多章回顾格式修复：现场两章/三章任务既有成功也有 JSON_SCHEMA 失败，三次报告均 finishReason=stop；旧回答未保留，具体结构错误不可追溯。Prompt v5 明确统一扁平 facts/partial 合同，回顾按类型检查并持久化细分原因，未放宽校验或自动重试。当前 acceptance-v16，真实改善尚未验证。下一步用户自行重启并手动验证相同范围的多章回顾，按具体错误码继续定位，见 docs/evaluation/reading-recap-schema-verification.md。
