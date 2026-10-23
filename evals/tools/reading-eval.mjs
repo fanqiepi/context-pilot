@@ -6,8 +6,8 @@ import {execFileSync} from 'node:child_process';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const DATA = 'evals/datasets/reading/acceptance-v1.json';
-const CONFIG = 'evals/configs/reading/acceptance-v16.json';
-const LOCK = 'evals/configs/reading/acceptance-v16.lock.json';
+const CONFIG = 'evals/configs/reading/acceptance-v17.json';
+const LOCK = 'evals/configs/reading/acceptance-v17.lock.json';
 export const hash = value => createHash('sha256').update(value).digest('hex');
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const read = file => JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/^\uFEFF/, ''));
@@ -115,6 +115,8 @@ function sourceFiles() {
       'frontend/tests/reading-assistant.test.mjs', 'frontend/src/api/reading.ts', 'frontend/src/styles/reading.css',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/book/ReadingLibraryPersistenceTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/book/ReadingHttpAdviceTests.java',
+      'backend/src/main/java/io/github/fanqiepi/contextpilot/common/ApiExceptionHandler.java',
+      'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingTaskEventsTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingnote/ReadingNoteProposalPersistenceTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingTaskPolicyTests.java',
       'backend/src/test/java/io/github/fanqiepi/contextpilot/readingtask/ReadingLookupCompletenessTests.java',

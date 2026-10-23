@@ -1,5 +1,7 @@
 # 小说阅读 API 合同草案
 
+2026-10-23 用户调整回顾篇幅：新 RECAP 结果约 100 字、通常 2–3 要点，所有 facts.text 合计硬上限 160 Unicode 字符（含标点等）；一至三章共用篇幅。请求/响应字段、引用和历史结果不变，人物查证仍为 600。超限仍为 OUTPUT_INVALID / FACT_TEXT_LIMIT，不截断或自动重试。
+
 2026-10-23 多章回顾：既有 failureReason 新增安全细分码 JSON_SYNTAX、JSON_ROOT_FIELDS、JSON_FACT_FIELDS、RECAP_PARTIAL_MISSING、RECAP_PARTIAL_TYPE、EVIDENCE_IDS_TYPE，复用 FACTS_SHAPE/FACT_TEXT；旧 JSON_SCHEMA 不回填。创建请求和 validatedResult 不变，详见[格式修复验证](../evaluation/reading-recap-schema-verification.md)。
 
 2026-10-23 DIRECT_LIVE：索引状态 executionMode 增加 DIRECT_LIVE；liveAllowed 取决于日常开关和密钥检查，不返回试读 authorization 预算面板。估算保留片段/批次数，estimatedCost 为 null。只读 evaluation/status 在该模式返回 liveAllowed、reason、executionScope=DIRECT_LIVE、budgetEnforced=false。创建/确认/范围接口不变，无 HTTP 修改开关接口。无金额预留的任务 usage.reservationMethod=NONE、costBasis=NOT_PRICED；历史有预留调用仍按实际记录显示。

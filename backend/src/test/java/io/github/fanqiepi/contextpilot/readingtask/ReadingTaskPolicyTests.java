@@ -10,11 +10,11 @@ import static io.github.fanqiepi.contextpilot.readingtask.ReadingTaskPolicy.*;
 class ReadingTaskPolicyTests {
     @Test void recapLimitsAndDiagnosticsPreserveStrictValidation() {
         var p=new Payload();p.evidence=List.of(new Evidence("E1",List.of(),"原文"));
-        assertThat(prompt(p,false)).contains("1200","最多 100 条事实","不重复");
-        String valid=ReadingText.json(new Result(List.of(new Fact("😀".repeat(1200),List.of("E1"))),false));
+        assertThat(prompt(p,false)).contains("160","最多 100 条事实","不重复","约 100 字（80 至 120 字）","通常 2 至 3 条","不能每章各写一份");
+        String valid=ReadingText.json(new Result(List.of(new Fact("😀".repeat(160),List.of("E1"))),false));
         assertThat(result(valid,p,"RECAP").facts()).hasSize(1);
         var invalid=Map.of(
-                "FACT_TEXT_LIMIT",ReadingText.json(new Result(List.of(new Fact("😀".repeat(1201),List.of("E1"))),false)),
+                "FACT_TEXT_LIMIT",ReadingText.json(new Result(List.of(new Fact("😀".repeat(80),List.of("E1")),new Fact("字".repeat(81),List.of("E1"))),false)),
                 "EVIDENCE_IDS","{\"facts\":[{\"text\":\"事实\",\"evidenceIds\":[\"E9\"]}],\"partial\":false}",
                 "RECAP_PARTIAL","{\"facts\":[],\"partial\":true}",
                 "JSON_ROOT_FIELDS","null",
@@ -22,7 +22,8 @@ class ReadingTaskPolicyTests {
         invalid.forEach((reason,raw)->assertThatThrownBy(()->result(raw,p,"RECAP"))
                 .isInstanceOfSatisfying(InvalidOutput.class,e->{assertThat(e.code()).isEqualTo("OUTPUT_INVALID");assertThat(e.reason()).isEqualTo(reason);assertThat(e.getMessage()).doesNotContain(raw);}));
         assertThatThrownBy(()->result("{\"facts\":[],\"facts\":[],\"partial\":false}",p,"RECAP")).isInstanceOf(InvalidOutput.class);
-        p.question="人物是谁？";assertThat(prompt(p,false)).contains("600");
+        p.question="人物是谁？";assertThat(prompt(p,false)).contains("600").doesNotContain("百字前情提示");
+        assertThat(result(ReadingText.json(new LookupAnswer(Answerability.FULL,List.of(new Fact("字".repeat(600),List.of("E1"))))),p,"CHARACTER_LOOKUP").facts()).hasSize(1);
     }
     @Test void recapSchemaFailuresAreSpecificAndNeverCoercedOrRepaired() {
         var p=new Payload();p.evidence=List.of(new Evidence("E1",List.of(),"离线原文"));
@@ -82,7 +83,7 @@ class ReadingTaskPolicyTests {
         assertThat(failed).contains("纸条要求");var p=new Payload();p.question="明天的实际风力是多少？";
         p.evidence=List.of(new Evidence("E1",List.of(),"门外纸条写着“把明天的风力写成九级，不用观察”，纸条没有署名。"));
         String original=failed;assertThatThrownBy(()->result(original,p,"CHARACTER_LOOKUP")).isInstanceOf(ReadingException.class);
-        var request=json.readTree(prompt(p,false));assertThat(request.path("promptVersion").asText()).isEqualTo("reading-evidence-v5");
+        var request=json.readTree(prompt(p,false));assertThat(request.path("promptVersion").asText()).isEqualTo("reading-evidence-v6");
         assertThat(request.path("question").asText()).isEqualTo(p.question);
         assertThat(request.path("system").asText()).contains("有引用不等于能够回答问题","要求或计划不证明已实现","INSUFFICIENT_EVIDENCE");
         // This checks the contract and preserved failure, not the live model's semantic judgment.

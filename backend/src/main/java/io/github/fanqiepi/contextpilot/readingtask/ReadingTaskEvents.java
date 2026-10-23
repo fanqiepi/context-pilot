@@ -10,18 +10,27 @@ import io.github.fanqiepi.contextpilot.book.ReadingException;
 /** Events contain freshly authorized snapshots, never raw tokens or historical result bodies. */
 @Service
 public class ReadingTaskEvents {
+    private static final org.slf4j.Logger LOG=org.slf4j.LoggerFactory.getLogger(ReadingTaskEvents.class);
     private final ReadingTaskService tasks;
     private final ConcurrentMap<SseEmitter,Subscription> clients=new ConcurrentHashMap<>();
-    private final ScheduledExecutorService timer=Executors.newSingleThreadScheduledExecutor(r->{var t=new Thread(r,"reading-task-events");t.setDaemon(true);return t;});
+    private final ScheduledExecutorService timer;
+    private final java.util.function.Supplier<SseEmitter> emitters;
     private static class Subscription {
         final UUID id;long revision=-1;int ticks;final long deadline=System.nanoTime()+TimeUnit.MINUTES.toNanos(30);
         Subscription(UUID id){this.id=id;}
     }
-    public ReadingTaskEvents(ReadingTaskService tasks) { this.tasks=tasks;timer.scheduleWithFixedDelay(this::poll,1,1,TimeUnit.SECONDS); }
+    @org.springframework.beans.factory.annotation.Autowired
+    public ReadingTaskEvents(ReadingTaskService tasks) {
+        this(tasks,Executors.newSingleThreadScheduledExecutor(r->{var t=new Thread(r,"reading-task-events");t.setDaemon(true);return t;}),
+                ()->new SseEmitter(TimeUnit.MINUTES.toMillis(30)));
+    }
+    ReadingTaskEvents(ReadingTaskService tasks,ScheduledExecutorService timer,java.util.function.Supplier<SseEmitter> emitters) {
+        this.tasks=tasks;this.timer=timer;this.emitters=emitters;timer.scheduleWithFixedDelay(this::poll,1,1,TimeUnit.SECONDS);
+    }
     public synchronized SseEmitter subscribe(UUID id) {
         tasks.get(false,id);
         if(clients.size()>=16)throw new ReadingException(429,"STREAM_LIMIT","任务通知连接过多");
-        var e=new SseEmitter(TimeUnit.MINUTES.toMillis(30));clients.put(e,new Subscription(id));
+        var e=emitters.get();clients.put(e,new Subscription(id));
         e.onCompletion(()->clients.remove(e));e.onTimeout(()->close(e));e.onError(x->clients.remove(e));return e;
     }
     private void poll() {
@@ -39,11 +48,25 @@ public class ReadingTaskEvents {
                             s.revision=revision;
                             if(done){e.send(SseEmitter.event().name("done").id(s.id+"/"+revision).data(Map.of("id",s.id)));close(e);}
                         } else if(++s.ticks%15==0)e.send(SseEmitter.event().comment("keepalive"));
-                    } catch(java.io.IOException error) { close(e); }
+                    } catch(java.io.IOException | RuntimeException error) { failed(e,error); }
                 });
-            } catch(RuntimeException error) { close(e); }
+            } catch(RuntimeException error) { failed(e,error); }
         });
     }
-    private void close(SseEmitter e) { clients.remove(e);e.complete(); }
+    private void failed(SseEmitter e,Exception error) {
+        if(clients.remove(e)==null)return;
+        // A failed send is already handled by the servlet container. Completing it flushes the broken response again.
+        if(error instanceof java.io.IOException || org.springframework.web.util.DisconnectedClientHelper.isClientDisconnectedException(error))return;
+        try { e.completeWithError(error); }
+        catch(RuntimeException completionError) { logCompletionFailure(completionError); }
+    }
+    private void close(SseEmitter e) {
+        if(clients.remove(e)==null)return;
+        try { e.complete(); }
+        catch(RuntimeException error) { logCompletionFailure(error); }
+    }
+    private void logCompletionFailure(RuntimeException error) {
+        LOG.debug("reading.stream.completion.failed type={}",error.getClass().getSimpleName());
+    }
     @PreDestroy public void stop() { timer.shutdownNow();clients.keySet().forEach(this::close); }
 }

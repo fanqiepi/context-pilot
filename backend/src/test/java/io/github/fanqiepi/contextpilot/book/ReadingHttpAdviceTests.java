@@ -17,6 +17,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(OutputCaptureExtension.class)
 class ReadingHttpAdviceTests {
+    @org.springframework.web.bind.annotation.RestController
+    static class GlobalStreamController {
+        SseEmitter emitter;
+        @org.springframework.web.bind.annotation.GetMapping("/test/global-stream")
+        SseEmitter stream() { return emitter; }
+        @org.springframework.web.bind.annotation.GetMapping("/test/global-failure")
+        void fail() { throw new IllegalStateException("ordinary error"); }
+    }
+    @Test void globalFallbackAlsoHandlesBrokenAndCommittedAsyncResponses(CapturedOutput output) throws Exception {
+        var controller=new GlobalStreamController();
+        var mvc=MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new ReadingHttpAdvice(),
+                new io.github.fanqiepi.contextpilot.common.ApiExceptionHandler()).build();
+        for(Exception error:new Exception[]{new AsyncRequestNotUsableException("private disconnect"),
+                new IllegalStateException("private stream error")}) {
+            controller.emitter=new SseEmitter(1000L);
+            var pending=mvc.perform(get("/test/global-stream")).andExpect(request().asyncStarted()).andReturn();
+            controller.emitter.send(SseEmitter.event().name("snapshot").data(Map.of("status","FAILED")));
+            String original=pending.getResponse().getContentAsString();
+            controller.emitter.completeWithError(error);
+            mvc.perform(asyncDispatch(pending)).andExpect(status().isOk()).andExpect(content().string(original));
+        }
+        assertThat(output.getAll()).doesNotContain("HttpMessageNotWritableException","Failure in @ExceptionHandler","private disconnect","private stream error");
+        mvc.perform(get("/test/global-failure")).andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.code").value("INTERNAL_ERROR"));
+    }
     @Test void committedStreamErrorsNeverAppendJsonOrFailAgain(CapturedOutput output) throws Exception {
         for(Exception error:new Exception[]{new AsyncRequestNotUsableException("private disconnect"),
                 new AsyncRequestTimeoutException(),new IllegalStateException("private internal detail"),

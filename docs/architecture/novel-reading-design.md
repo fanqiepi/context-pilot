@@ -1,5 +1,7 @@
 # 小说阅读业务合同草案
 
+2026-10-23 用户要求百字回顾：Prompt v6 将前情压缩为约 100 字、通常 2–3 要点，覆盖整个已读窗口的主要进展；服务端 facts.text 合计上限 160 Unicode 字符。一至三章共用篇幅，保留关键因果/限定/引用，不以细节罗列替代续读提示。人物查证仍为 600 字；历史结果不重写。范围完整不代表逐项复述全部原文细节，见[本轮验证](../evaluation/reading-recap-length-stream-verification.md)。
+
 2026-10-23 用户批准日常 DIRECT_LIVE 模式（acceptance-v11）：`contextpilot.reading.ai-enabled` 为唯一日常调用开关，true 且密钥齐全即可生成/embedding，无金额预算、批准文件或期限；false 禁止日常新调用。与历史 trial-enabled/live-enabled 互斥，旧受控流程保持原合同。ReadingAiGateway.budgetRequired 区分是否预留金额，不能将真实调用伪装成 offline。记录实际 usage，保留范围、单任务调用/时限和输出校验。配置启动时读取，修改后需用户重启后端。
 
 2026-10-22 真人试读接线（acceptance-v10）：ReadingReaderTrial 校验独立本地批准文件、localhost 绑定、模型/端点、实现锁、24 小时有效期及单独预算；ReadingLiveAuthorization 复用持久账本与停止保护。READER_TRIAL 与固定评测互斥，允许用户通过原接口创建自由任务；服务层范围快照、段落证据、调用预算和笔记确认不变。启动脚本使用独立持久数据库与上传目录，关闭无关研究和文档处理调用。
