@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import io.github.fanqiepi.contextpilot.chat.ChatRequest;
 import io.github.fanqiepi.contextpilot.common.ConflictException;
+import io.github.fanqiepi.contextpilot.document.DocumentStatus;
+import io.github.fanqiepi.contextpilot.document.EmbeddingIndexProperties;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseCreateRequest;
 import io.github.fanqiepi.contextpilot.knowledgebase.KnowledgeBaseService;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +60,8 @@ class ResearchStartPersistenceTests {
     @Autowired private KnowledgeBaseService knowledgeBaseService;
     @Autowired private JdbcTemplate jdbcTemplate;
     @Autowired private WebApplicationContext applicationContext;
+    @Autowired private ResearchDocumentMapper documentMapper;
+    @Autowired private EmbeddingIndexProperties indexProperties;
 
     @BeforeEach
     void cleanResearchData() {
@@ -136,6 +140,7 @@ class ResearchStartPersistenceTests {
 
     private UUID document(UUID knowledgeBaseId, String filename) {
         UUID documentId = UUID.randomUUID();
+        var profile = indexProperties.currentProfile();
         jdbcTemplate.update("""
                 INSERT INTO source_document (
                     id, knowledge_base_id, original_filename, file_type, media_type,
@@ -144,18 +149,21 @@ class ResearchStartPersistenceTests {
                     embedding_dimensions, embedding_profile_version, indexed_at,
                     created_at, updated_at, deleted
                 ) VALUES (?, ?, ?, 'MARKDOWN', 'text/markdown', 10, ?, ?, 'SUCCEEDED', 1,
-                    'dashscope_qwen3_7_1024_v1', 'DASHSCOPE', 'qwen3.7-text-embedding',
-                    1024, 'v1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
+                    ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
                 """, documentId, knowledgeBaseId, filename, "research/" + documentId,
-                "a".repeat(64));
+                "a".repeat(64), profile.id(), profile.provider(), profile.model(), profile.dimensions(), profile.version());
         String metadata = """
                 {"document_id":"%s","knowledge_base_id":"%s",\
-                "embedding_profile_id":"dashscope_qwen3_7_1024_v1","original_filename":"%s",\
+                "embedding_profile_id":"%s","original_filename":"%s",\
                 "chunk_index":0}
-                """.formatted(documentId, knowledgeBaseId, filename).replace("\\\n", "");
+                """.formatted(documentId, knowledgeBaseId, profile.id(), filename).replace("\\\n", "");
         jdbcTemplate.update(
                 "INSERT INTO vector_store (id, content, metadata, embedding) VALUES (?, ?, CAST(? AS json), CAST(? AS vector))",
                 UUID.randomUUID(), filename + " evidence", metadata, zeroVector());
+        var fact=documentMapper.selectFacts(List.of(documentId),profile.id()).getFirst();
+        assertThat(fact.getEmbeddingProfileId()).isEqualTo(profile.id());
+        assertThat(fact.getStatus()).isEqualTo(DocumentStatus.SUCCEEDED);
+        assertThat(fact.isCurrentVectorPresent()).as("fixture vector matches current profile").isTrue();
         return documentId;
     }
 

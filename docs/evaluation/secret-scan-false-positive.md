@@ -1,5 +1,17 @@
 # 评估源码指纹的密钥扫描误报（2026-10-19）
 
+## 阅读配置示例指纹误报（2026-10-23）
+
+PR #42（head `860ebb1`）的[密钥检查](https://github.com/fanqiepi/context-pilot/actions/runs/39935790278/job/120354884132)失败。GitHub 诊断连接未能读取原始日志，公开 Actions API 确认任务失败；以下详情来自本地 Gitleaks 8.30.1 完整历史复现。
+
+修复前扫描 93 个提交，有 5 条 generic-api-key 命中，均位于 `evals/configs/reading/acceptance-v13.lock.json` 至 `acceptance-v17.lock.json` 的第 31 行：`sourceHashes` 中公开配置示例 `backend/config/application-local-secrets.example.yml` 的 SHA-256。逐条读取告警所在提交的原始 Git blob 字节并计算 SHA-256，5 条均与锁文件值一致。被扫描值是文件指纹，不是密钥；实际本地配置 `backend/config/application-local-secrets.yml` 仍被 Git 忽略。本次命中未发现实际凭据泄漏。
+
+只给 generic-api-key 添加 AND 例外：文件路径须为 `evals/configs/reading/acceptance-v数字.lock.json`，整行须为该示例文件的精确字段名及已验证固定指纹。保留全部默认规则，不豁免目录、文件或任意哈希，不改写历史和冻结锁。
+
+验证结果：完整 93 个提交扫描 0 命中、退出码 0。独立合成探针中，精确匹配 0 命中；换指纹、换字段、移到其他路径各 1 命中；同一行追加模拟凭据为 2 命中（指纹与附加值均被检测），均如预期退出 1。探针和报告仅在 gitignored 的 `backend/target/` 下。远端结果须以推送修复后的 CI 为准；同一 PR 的后端失败另行排查，不能用密钥检查本地通过替代后端测试结论。
+
+以下保留历史误报记录。
+
 PR #30 对应的 [CI 运行](https://github.com/fanqiepi/context-pilot/actions/runs/39231193059) 中，后端、前端检查通过，Gitleaks 报告泄漏。GitHub 公开 API 可读取失败状态，但原始任务日志需要授权；以下结论来自本地完整 Git 历史复现，不声称已读取远端全部命中详情。
 
 使用官方发布的 Gitleaks 8.30.1（下载包 SHA-256 与官方 checksums 一致），在 48c3c00 执行 `gitleaks git . --redact`，扫描 60 个提交，得到 128 个 generic-api-key 命中。逐条读取命中提交的 JSON 行，再对该提交对应 Java 文件的 Git blob 计算 SHA-256，128 项全部一致，涉及以下两个源码指纹字段：
