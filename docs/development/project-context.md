@@ -1,5 +1,8 @@
 # 研序 项目背景
 
+2026-10-23 用户要求沿用原 Application：已删除新增 IDEA 启动项，在现有 application.yml 内自动导入本地配置，支持仓库根目录/backend 启动。日常仍只修改本地 ai-enabled true/false 并重启原后端；普通测试默认 offline。当前冻结 acceptance-v13，Prompt v4 不变，详见 docs/development/reading-direct-models.md。
+
+
 2026-10-23 阅读反馈修复：位置自动保存与 AI 范围保持独立，首次回顾可在助手内直接确认保存位置；Prompt v4 补齐既有输出上限，日志增加不含正文的校验分类。离线回归通过，当前真实失败原因尚待用户错误码/任务编号确认，不宣称回顾已真实修复。实现冻结 acceptance-v12；下一阶段为用户自行启动后的单次回顾现场验证，详见[本轮记录](../evaluation/reading-recap-usability-verification.md)。
 
 

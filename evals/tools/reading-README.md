@@ -1,5 +1,8 @@
 # 阅读验收工具
 
+2026-10-23 用户要求沿用原 Application：已删除新增 IDEA 启动项，在现有 application.yml 内自动导入本地配置，支持仓库根目录/backend 启动。日常仍只修改本地 ai-enabled true/false 并重启原后端；普通测试默认 offline。当前冻结 acceptance-v13，Prompt v4 不变，详见 docs/development/reading-direct-models.md。
+
+
 2026-10-23 当前默认配置/锁为 acceptance-v12，Prompt reading-evidence-v4。回顾入口与输出约束修复仅有离线证据，历史 v1–v11 保留。前端交互回归：在 frontend 执行 node --test tests/reading-assistant.test.mjs。
 
 同日后续用户批准 DIRECT_LIVE 日常单开关模式，不设金额预算。当前 acceptance-v11 同时包含该模式和停止查询修复；固定评测采集规则不变。日常使用见[开关说明](../../docs/development/reading-direct-models.md)，不使用旧评测/试读脚本。

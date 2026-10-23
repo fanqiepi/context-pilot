@@ -134,3 +134,14 @@ knife4j:
   enable: true
   setting:
     language: zh_cn
+
+---
+# Load the ignored local configuration when using the existing Application entry.
+# Support both repository-root (IDE) and backend (Maven) working directories.
+spring:
+  config:
+    activate:
+      on-profile: "default | local-secrets"
+    import:
+      - optional:file:./config/application-local-secrets.yml
+      - optional:file:./backend/config/application-local-secrets.yml

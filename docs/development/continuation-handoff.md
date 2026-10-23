@@ -1,6 +1,6 @@
 # 小说阅读开发交接
 
-2026-10-23 最新现场定位：用户截图中的回顾按钮禁用由运行后端未开放引起。18080 与 5200 代理均返回 `liveAllowed=false / LIVE_AI_NOT_AUTHORIZED`；本地 ai-enabled=true，但 IDEA 原启动项未激活 local-secrets。新增共享启动项 `.run/ContextPilot-local.run.xml`（ContextPilot 本地阅读），固定 backend 工作目录及 local-secrets profile。用户自行停止旧后端并选择此项重启，再核对只读状态 READY/DIRECT_LIVE；未代启或调用模型。此次仅启动配置/文档修复，acceptance-v12 生产源码与锁不变。下一步先确认运行配置生效、按钮可用，再由用户发起回顾验证输出，详见[日常开关](reading-direct-models.md)。
+2026-10-23 最新用户纠正：撤销新增的 IDEA Application 启动项，改为现有 application.yml 自动导入本地配置（默认/local-secrets profile，兼容仓库根目录及 backend 工作目录）。继续使用原 ContextPilotApplication，日常开关仍在被 Git 忽略的 backend/config/application-local-secrets.yml 中。普通测试默认 offline，避免继承本机密钥和开关。当前冻结 acceptance-v13，Prompt v4 不变；用户自行重启后先确认 DIRECT_LIVE/按钮可用，再发起实际回顾验证。未代启或调用供应商，见[日常开关](reading-direct-models.md)。
 
 2026-10-23 阅读反馈修复：位置自动保存与 AI 范围保持独立，首次回顾可在助手内直接确认保存位置；Prompt v4 补齐既有输出上限，日志增加不含正文的校验分类。离线回归通过，当前真实失败原因尚待用户错误码/任务编号确认，不宣称回顾已真实修复。实现冻结 acceptance-v12；下一阶段为用户自行启动后的单次回顾现场验证，详见[本轮记录](../evaluation/reading-recap-usability-verification.md)。
 
