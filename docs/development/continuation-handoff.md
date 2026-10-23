@@ -1,5 +1,8 @@
 # 小说阅读开发交接
 
+2026-10-23 回顾失败诊断修复：用户任务 1c5f4739-d33d-4945-8bb4-bcab28a4135c 返回实际 6097/979 token 后 OUTPUT_INVALID；旧数据缺少结束原因，不能确诊。现统一记录停止日志、持久化 failureReason 与白名单 finishReason，页面展示具体类别。当前 acceptance-v14 / Prompt v4；未重试或代启。下一步由用户重启并手动发起日常任务，用明确诊断定位实际故障，详见 docs/evaluation/reading-failure-diagnostics-verification.md。
+
+
 2026-10-23 最新用户纠正：撤销新增的 IDEA Application 启动项，改为现有 application.yml 自动导入本地配置（默认/local-secrets profile，兼容仓库根目录及 backend 工作目录）。继续使用原 ContextPilotApplication，日常开关仍在被 Git 忽略的 backend/config/application-local-secrets.yml 中。普通测试默认 offline，避免继承本机密钥和开关。当前冻结 acceptance-v13，Prompt v4 不变；用户自行重启后先确认 DIRECT_LIVE/按钮可用，再发起实际回顾验证。未代启或调用供应商，见[日常开关](reading-direct-models.md)。
 
 2026-10-23 阅读反馈修复：位置自动保存与 AI 范围保持独立，首次回顾可在助手内直接确认保存位置；Prompt v4 补齐既有输出上限，日志增加不含正文的校验分类。离线回归通过，当前真实失败原因尚待用户错误码/任务编号确认，不宣称回顾已真实修复。实现冻结 acceptance-v12；下一阶段为用户自行启动后的单次回顾现场验证，详见[本轮记录](../evaluation/reading-recap-usability-verification.md)。
@@ -44,3 +47,5 @@
 完成标准：保留真实反馈与失败，按唯一路线至少 5 人中 4 人认为回顾有助接读；正式语义和 AI 性能评分另按原门禁验收，不能以试读通过替代 DEBUG/TEST。依赖实际参与者及当前授权窗口；过期、停止或新增费用范围须另行明确授权，不自动续期或恢复。固定 DEBUG 重测仍需用户主动发起并按其独立前置账本规则准备。
 
 本大功能点集中交付后提醒用户发起 PR；不自动推送、创建 PR 或合并。
+
+本次失败诊断验证：后端 70 通过、1 项既有夹具跳过；前端构建与 5 项交互测试通过。首次回归测试失败源于旧夹具字段缺失，修正夹具后复验通过。见本轮诊断记录；不代表旧真实回顾根因已确诊。

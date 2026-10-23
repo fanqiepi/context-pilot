@@ -37,12 +37,10 @@ public class ReadingTaskRunner {
         } catch(CancellationException ignored) {
             // The command that invalidated this execution already owns its durable state.
         } catch(Exception error) {
-            if(error instanceof ReadingTaskPolicy.InvalidOutput invalid)
-                org.slf4j.LoggerFactory.getLogger(ReadingTaskRunner.class).warn(
-                        "event=READING_OUTPUT_INVALID workId={} reason={} retry=false",id,invalid.reason());
             String code=error instanceof ReadingException e?e.code():error instanceof TimeoutException?"TIMEOUT":"PROVIDER_UNAVAILABLE";
+            String reason=error instanceof ReadingTaskPolicy.InvalidOutput invalid?invalid.reason():code;
             ReadingBudgetLog.providerRejected(id,code);
-            service.stop(index,id,token,"SCOPE_CHANGED".equals(code)?"INVALIDATED":"FAILED",code);
+            service.stop(index,id,token,"SCOPE_CHANGED".equals(code)?"INVALIDATED":"FAILED",code,reason);
         }
     }
     private void task(ReadingWork initial,UUID token) throws Exception {
@@ -86,9 +84,15 @@ public class ReadingTaskRunner {
         var response=bounded(false,w.id,token,timeout,(left,audit)->{
             var result=ai.generate(prompt,outputLimit,left);audit.accept(result);return result;
         },call);
-        if(response==null || response.text()==null || !"stop".equalsIgnoreCase(response.finishReason())
-                || (response.outputTokens()!=null && response.outputTokens()>outputLimit))throw failure("OUTPUT_INVALID");
-        limit(response.text(),32768,32768,"OUTPUT_INVALID");return response;
+        if(response==null || response.text()==null)throw invalidOutput("GENERATION_EMPTY");
+        if(!"stop".equalsIgnoreCase(response.finishReason()))throw invalidOutput(switch(safeFinishReason(response.finishReason())) {
+            case "length" -> "GENERATION_LENGTH";
+            case "content_filter" -> "GENERATION_CONTENT_FILTER";
+            default -> "GENERATION_FINISH_REASON";
+        });
+        if(response.outputTokens()!=null && response.outputTokens()>outputLimit)throw invalidOutput("GENERATION_TOKEN_LIMIT");
+        if(ReadingText.length(response.text())>32768 || bytes(response.text())>32768)throw invalidOutput("RESPONSE_SIZE");
+        return response;
     }
     private void index(ReadingWork initial,UUID token) throws Exception {
         UUID id=initial.id;

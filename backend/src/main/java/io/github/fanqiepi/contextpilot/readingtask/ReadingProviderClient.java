@@ -76,13 +76,13 @@ final class ReadingProviderClient {
     ReadingAiGateway.Response generate(String prompt,int outputTokens,Duration timeout) {
         JsonNode root=post(generationUri,generationKey,generationInput(prompt,outputTokens),timeout,32768);
         var choices=root.path("choices");
-        if(!choices.isArray() || choices.size()!=1)throw failure("OUTPUT_INVALID");
+        if(!choices.isArray() || choices.size()!=1)throw invalidOutput("PROVIDER_CHOICES");
         var choice=choices.get(0);var message=choice.path("message");
         if(!"assistant".equals(message.path("role").asText()) || !message.path("content").isTextual()
-                || message.hasNonNull("tool_calls") || message.hasNonNull("function_call"))throw failure("OUTPUT_INVALID");
+                || message.hasNonNull("tool_calls") || message.hasNonNull("function_call"))throw invalidOutput("PROVIDER_MESSAGE");
         String text=message.path("content").asText(),finish=choice.path("finish_reason").asText();
-        if(text.isBlank() || finish.isBlank())throw failure("OUTPUT_INVALID");
-        limit(text,32768,32768,"OUTPUT_INVALID");
+        if(text.isBlank() || finish.isBlank())throw invalidOutput("PROVIDER_EMPTY_CONTENT_OR_FINISH");
+        if(ReadingText.length(text)>32768 || bytes(text)>32768)throw invalidOutput("RESPONSE_SIZE");
         // Preserve length/content_filter and actual usage for audit. The runner refuses publication.
         return new ReadingAiGateway.Response(text,token(root.path("usage"),"prompt_tokens"),
                 token(root.path("usage"),"completion_tokens"),finish,metadata(root,"model"),metadata(root,"id"));
@@ -99,12 +99,12 @@ final class ReadingProviderClient {
         request.put("dimensions",1024);request.put("encoding_format","float");
         // Binary vectors are larger than generated text; cap this distinct envelope at 1 MiB.
         var root=post(embeddingUri,embeddingKey,JSON.writeValueAsString(request),timeout,1024*1024);
-        var data=root.path("data");if(!data.isArray() || data.size()!=texts.size())throw failure("OUTPUT_INVALID");
+        var data=root.path("data");if(!data.isArray() || data.size()!=texts.size())throw invalidOutput("EMBEDDING_COUNT");
         float[][] ordered=new float[texts.size()][];
         for(var item:data) {
             var index=item.path("index");var values=item.path("embedding");
             if(!index.isIntegralNumber() || !index.canConvertToInt() || index.intValue()<0 || index.intValue()>=ordered.length
-                    || ordered[index.intValue()]!=null || !values.isArray() || values.size()!=1024)throw failure("OUTPUT_INVALID");
+                    || ordered[index.intValue()]!=null || !values.isArray() || values.size()!=1024)throw invalidOutput("EMBEDDING_SHAPE");
             var vector=new float[1024];
             for(int i=0;i<1024;i++) {
                 try { if(!values.get(i).isNumber())throw failure("OUTPUT_INVALID");vector[i]=values.get(i).floatValue(); }
@@ -140,10 +140,10 @@ final class ReadingProviderClient {
                     .exchangeToMono(response->{
                         if(response.statusCode().value()!=200)return Mono.error(failure("PROVIDER_HTTP_"+response.statusCode().value()));
                         var type=response.headers().contentType().orElse(null);
-                        if(type==null || !MediaType.APPLICATION_JSON.isCompatibleWith(type))return Mono.error(failure("OUTPUT_INVALID"));
+                        if(type==null || !MediaType.APPLICATION_JSON.isCompatibleWith(type))return Mono.error(invalidOutput("PROVIDER_CONTENT_TYPE"));
                         return response.bodyToMono(byte[].class);
                     }).timeout(timeout).block();
-            if(bytes==null || bytes.length>responseLimit)throw failure("OUTPUT_INVALID");
+            if(bytes==null || bytes.length>responseLimit)throw invalidOutput("PROVIDER_RESPONSE_SIZE");
             String text=StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
                     .onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(bytes)).toString();
             return parse(text);
@@ -152,8 +152,8 @@ final class ReadingProviderClient {
             for(Throwable cause=error;cause!=null;cause=cause.getCause()) {
                 if(cause instanceof ReadingException safe)throw safe;
                 if(cause instanceof TimeoutException)throw failure("TIMEOUT");
-                if(cause instanceof DataBufferLimitException)throw failure("OUTPUT_INVALID");
-                if(cause instanceof java.nio.charset.CharacterCodingException)throw failure("OUTPUT_INVALID");
+                if(cause instanceof DataBufferLimitException)throw invalidOutput("PROVIDER_RESPONSE_SIZE");
+                if(cause instanceof java.nio.charset.CharacterCodingException)throw invalidOutput("PROVIDER_UTF8");
             }
             // Never retain provider exception bodies, request content or credentials in a cause/message.
             throw failure("PROVIDER_UNAVAILABLE");
@@ -161,6 +161,6 @@ final class ReadingProviderClient {
     }
     private static JsonNode parse(String text) {
         try { var node=JSON.readTree(text);if(node==null || !node.isObject())throw failure("OUTPUT_INVALID");return node; }
-        catch(RuntimeException error) { throw failure("OUTPUT_INVALID"); }
+        catch(RuntimeException error) { throw invalidOutput("PROVIDER_JSON"); }
     }
 }

@@ -123,7 +123,7 @@
 
 人物请求将 type 改为 `CHARACTER_LOOKUP`，仅额外接受 `question` 与 `mode: DIRECT | MULTI_QUERY`。不接受自由聊天历史、全书范围或 planner budget；回顾不接受任意系统指令。创建时 expectedScopeRevision 必须等于服务端当前值，scope 快照由服务端生成；推进后不会扩大该任务范围。
 
-task 视图固定包含 `id,type,status,revision,scope,coverage,budget,usage,errorCode,traceId,visibility,dataAsOf`。coverage 含 requestedRange/evidenceRanges/completeness（`FULL_WINDOW/SEARCH_MATCHES/PARTIAL/NONE`）；人物命中不能称全已读事实穷尽。usage 未知字段为 null 且 `usageStatus=UNKNOWN`，不能填零。
+task 视图固定包含 `id,type,status,revision,scope,coverage,budget,usage,errorCode,traceId,visibility,dataAsOf`。可见视图另含可空 `failureReason`（安全校验类别）；`usage.calls[]` 另含可空 `finishReason`（白名单结束状态，其他归为 other）。旧记录缺失时不推断回填；范围隐藏时不返回这些字段。coverage 含 requestedRange/evidenceRanges/completeness（`FULL_WINDOW/SEARCH_MATCHES/PARTIAL/NONE`）；人物命中不能称全已读事实穷尽。usage 未知字段为 null 且 `usageStatus=UNKNOWN`，不能填零。
 
 SSE 事件 `snapshot -> progress* -> result? -> done`；result 仅来自已持久化且当前可见的结构化结果，绝不发送模型原始 token。事件 id 为 taskId/revision，本轮重连从当前受限快照恢复，不使用 Last-Event-ID 重放旧结果。发送前与边界收缩使用同一发布序列，已开始发送的响应不能宣称可撤回。
 

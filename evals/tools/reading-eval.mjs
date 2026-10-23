@@ -6,8 +6,8 @@ import {execFileSync} from 'node:child_process';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const DATA = 'evals/datasets/reading/acceptance-v1.json';
-const CONFIG = 'evals/configs/reading/acceptance-v13.json';
-const LOCK = 'evals/configs/reading/acceptance-v13.lock.json';
+const CONFIG = 'evals/configs/reading/acceptance-v14.json';
+const LOCK = 'evals/configs/reading/acceptance-v14.lock.json';
 export const hash = value => createHash('sha256').update(value).digest('hex');
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const read = file => JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/^\uFEFF/, ''));

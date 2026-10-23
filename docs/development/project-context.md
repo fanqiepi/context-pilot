@@ -1,5 +1,8 @@
 # 研序 项目背景
 
+2026-10-23 回顾失败诊断修复：用户任务 1c5f4739-d33d-4945-8bb4-bcab28a4135c 返回实际 6097/979 token 后 OUTPUT_INVALID；旧数据缺少结束原因，不能确诊。现统一记录停止日志、持久化 failureReason 与白名单 finishReason，页面展示具体类别。当前 acceptance-v14 / Prompt v4；未重试或代启。下一步由用户重启并手动发起日常任务，用明确诊断定位实际故障，详见 docs/evaluation/reading-failure-diagnostics-verification.md。
+
+
 2026-10-23 用户要求沿用原 Application：已删除新增 IDEA 启动项，在现有 application.yml 内自动导入本地配置，支持仓库根目录/backend 启动。日常仍只修改本地 ai-enabled true/false 并重启原后端；普通测试默认 offline。当前冻结 acceptance-v13，Prompt v4 不变，详见 docs/development/reading-direct-models.md。
 
 

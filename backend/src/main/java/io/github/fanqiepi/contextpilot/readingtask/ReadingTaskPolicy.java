@@ -23,7 +23,12 @@ public final class ReadingTaskPolicy {
         private InvalidOutput(String reason) { super(409,"OUTPUT_INVALID","阅读任务输出未通过校验");this.reason=reason; }
         public String reason() { return reason; }
     }
-    private static InvalidOutput invalidOutput(String reason) { return new InvalidOutput(reason); }
+    static InvalidOutput invalidOutput(String reason) { return new InvalidOutput(reason); }
+    static String safeFinishReason(String reason) {
+        if(reason==null)return "missing";
+        String normalized=reason.toLowerCase(Locale.ROOT);
+        return Set.of("stop","length","content_filter","tool_calls","function_call","insufficient_system_resource").contains(normalized)?normalized:"other";
+    }
     public static int bytes(String value) { return value.getBytes(StandardCharsets.UTF_8).length; }
     public static void limit(String text,int chars,int bytes,String code) {
         if(ReadingText.length(text)>chars || bytes(text)>bytes) throw failure(code);
@@ -90,7 +95,7 @@ public final class ReadingTaskPolicy {
             var queries=new ArrayList<String>();
             for(String q:plan.queries()) { if(q==null || q.isBlank() || q.indexOf('\0')>=0)throw failure("OUTPUT_INVALID");limit(q,256,1024,"OUTPUT_INVALID");queries.add(q.strip()); }
             if(new HashSet<>(queries).size()!=queries.size())throw failure("OUTPUT_INVALID");return queries;
-        } catch(RuntimeException e) { throw failure("OUTPUT_INVALID"); }
+        } catch(RuntimeException e) { throw invalidOutput("PLAN_SCHEMA"); }
     }
     public static Result result(String raw,Payload p,String type) {
         try {

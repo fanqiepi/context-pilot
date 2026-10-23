@@ -198,14 +198,16 @@ class ReadingProviderProtocolTests {
     }
     @ParameterizedTest @ValueSource(strings={"{}","not-json","{\"choices\":[],\"choices\":[]}","{} {}"})
     void malformedOrAmbiguousResponseFailsClosed(String body) {
-        response=body;assertThatThrownBy(()->client.generate(prompt(512),512,TIMEOUT)).isInstanceOf(ReadingException.class);
+        response=body;assertThatThrownBy(()->client.generate(prompt(512),512,TIMEOUT))
+                .isInstanceOfSatisfying(ReadingTaskPolicy.InvalidOutput.class,e->assertThat(e.reason()).isEqualTo("{}".equals(body)?"PROVIDER_CHOICES":"PROVIDER_JSON"));
         assertThat(requests).hasSize(1);
     }
     @Test void oversizedResponseAndWrongContentTypeAreRejected() {
         response=" ".repeat(32769);
         assertThatThrownBy(()->client.generate(prompt(512),512,TIMEOUT)).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.code()).isEqualTo("OUTPUT_INVALID"));
         contentType="text/event-stream";response="data: {}";
-        assertThatThrownBy(()->client.generate(prompt(512),512,TIMEOUT)).isInstanceOf(ReadingException.class);
+        assertThatThrownBy(()->client.generate(prompt(512),512,TIMEOUT))
+                .isInstanceOfSatisfying(ReadingTaskPolicy.InvalidOutput.class,e->assertThat(e.reason()).isEqualTo("PROVIDER_CONTENT_TYPE"));
         assertThat(requests).hasSize(2);
     }
     @Test void malformedUtf8IsNotReplacedSilently() {

@@ -10,6 +10,16 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 final class ReadingBudgetLog {
     private static final org.slf4j.Logger LOG=LoggerFactory.getLogger(ReadingBudgetLog.class);
     private ReadingBudgetLog() {}
+    static void workStopped(ReadingWork work,String reason) {
+        String message="event=READING_WORK_STOPPED workId="+work.id+" traceId="+work.traceId
+                +" type="+safeReason(work.type)+" status="+safeReason(work.status)+" code="+safeReason(work.errorCode)
+                +" reason="+safeReason(reason)+" retry=false";
+        if(TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override public void afterCommit() { LOG.warn(message); }
+            });
+        } else LOG.warn(message);
+    }
     static String safeReason(String reason) {
         return reason!=null && reason.matches("[A-Z0-9_]{1,64}")?reason:"BATCH_STOPPED";
     }

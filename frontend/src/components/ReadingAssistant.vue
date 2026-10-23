@@ -8,7 +8,7 @@ import { readingGet, readingPost, readingDelete, type ReadingState, type Reading
 const props = defineProps<{ versionId: string; state?: ReadingState; ready: boolean; open: boolean; confirmBoundary: (paragraphId: string, revision: number) => Promise<ReadingState> }>()
 const emit = defineEmits<{ continue: [source: ReadingSource]; close: []; saved: [] }>()
 type Task = {
-  id: string; type?: string; status: string; revision: number; visibility: string; errorCode?: string
+  id: string; type?: string; status: string; revision: number; visibility: string; errorCode?: string; failureReason?: string
   question?: string; message?: string; currentScopeRevision?: number; visibilityEpoch?: number
   scope?: { boundaryOrdinal: number }
   validatedResult?: { facts: { text: string; evidenceIds: string[] }[]; partial: boolean }
@@ -42,6 +42,17 @@ const errors: Record<string, string> = {
   LIVE_BATCH_MISMATCH: '当前调用仅限已批准的固定评测任务，请继续阅读或查看已有结果。',
   LIVE_AUTHORIZATION_STOPPED: '本次试读授权已到期或停止，请查看费用状态。不能自动重启。',
   BUDGET_EXHAUSTED: '剩余额度不足以预留下一次调用，或已达到调用次数上限。本次试读已停止。',
+}
+const failureReasons: Record<string, string> = {
+  GENERATION_LENGTH: '模型达到生成长度上限，回答未完整生成。',
+  GENERATION_CONTENT_FILTER: '模型供应商拦截了本次回答，无法展示。',
+  GENERATION_FINISH_REASON: '模型未正常结束生成。',
+  GENERATION_TOKEN_LIMIT: '模型返回的用量超过本任务输出上限。',
+  GENERATION_EMPTY: '模型没有返回回答内容。',
+  FACT_TEXT_LIMIT: '回答文字超过长度上限。',
+  EVIDENCE_IDS: '回答的引用缺失、重复或不属于本次证据。',
+  JSON_SCHEMA: '回答格式不符合约定。',
+  RECAP_PARTIAL: '模型未完成整个回顾范围。',
 }
 function clear() {
   generation++; selection++; citationRequest++; historyRequest++; events?.close(); clearTimeout(timer)
@@ -259,7 +270,7 @@ onUnmounted(clear)
           <h3>{{ current.type === 'RECAP' ? '前情回顾' : '人物查证' }} · {{ labels[current.status] || current.status }}</h3>
           <p class="reading-assistant-hint">截至第 {{ current.scope?.boundaryOrdinal }} 段 · {{ coverageLabels[current.coverage?.completeness || 'NONE'] }}</p>
           <p v-if="current.question">{{ current.question }}</p>
-          <p v-if="current.errorCode">{{ errors[current.errorCode] || current.errorCode }}<br />任务编号：{{ current.id }}</p><p v-if="current.message">{{ current.message }}</p>
+          <p v-if="current.errorCode">{{ errors[current.errorCode] || current.errorCode }}<br /><template v-if="current.failureReason">具体原因：{{ failureReasons[current.failureReason] || current.failureReason }}<br /></template>任务编号：{{ current.id }}</p><p v-if="current.message">{{ current.message }}</p>
           <p v-for="(fact, n) in current.validatedResult?.facts" :key="n">{{ fact.text }} <el-button v-for="id in fact.evidenceIds" :key="id" text @click="citation(id)">[{{ id }}] 原文</el-button></p>
           <ReadingNoteProposal v-if="state && ['COMPLETED', 'PARTIAL'].includes(current.status) && current.validatedResult?.facts.length" :key="current.id" :task-id="current.id" :task-type="current.type || 'RECAP'" :facts="current.validatedResult.facts" :state="state" @saved="emit('saved')" />
           <details v-if="current.budget" class="reading-task-details"><summary>任务详情</summary><p>生成 {{ current.budget.modelCalls }} 次、检索向量调用 {{ current.budget.embeddingCalls }} 次；累计执行 {{ (current.budget.activeMillis / 1000).toFixed(1) }} 秒。未知用量不按零费用记账。</p></details>

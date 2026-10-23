@@ -21,6 +21,7 @@ public class ReadingWork {
     public static class Payload {
         public Snapshot scope;
         public String liveApprovalDigest;
+        public String failureReason;
         public String mode,question,profile="dashscope_qwen3_7_1024_v1";
         public int chapterCount=3,fromOrdinal=1,targetBoundary,completedParagraph,searches,modelCalls,embeddingCalls,inputCharacters,inputBytes;
         public List<String> queries;

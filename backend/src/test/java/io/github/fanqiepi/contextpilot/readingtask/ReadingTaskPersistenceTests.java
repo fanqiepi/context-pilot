@@ -328,9 +328,36 @@ class ReadingTaskPersistenceTests {
         var f=fixture("字".repeat(25000));boundary(f,f.paragraphs.size()-1);
         assertThatThrownBy(()->tasks.create(recapRequest(f))).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.code()).isEqualTo("COVERAGE_LIMIT"));
         assertThat(ai.calls).hasValue(0);
-        var small=fixture("林舟来到渡口。");boundary(small,2);ai.answer="{\"facts\":[{\"text\":\"伪造\",\"evidenceIds\":[\"E999\"]}]}";
+        var small=fixture("林舟来到渡口。");boundary(small,2);ai.answer="{\"facts\":[{\"text\":\"伪造\",\"evidenceIds\":[\"E999\"]}],\"partial\":false}";
         var created=tasks.create(recapRequest(small));var failed=await(false,created.id(),"FAILED");
         assertThat(failed.errorCode).isEqualTo("OUTPUT_INVALID");assertThat(view(created.id()).get("validatedResult")).isNull();
+        assertThat(view(created.id()).get("failureReason")).isEqualTo("EVIDENCE_IDS");
+    }
+    @Test
+    @org.junit.jupiter.api.extension.ExtendWith(org.springframework.boot.test.system.OutputCaptureExtension.class)
+    void generationFailuresHaveDurableReasonsUsageAndSafeLogs(org.springframework.boot.test.system.CapturedOutput output) throws Exception {
+        var f=fixture("林舟来到渡口。");boundary(f,2);
+        var cases=Map.of("length","GENERATION_LENGTH","content_filter","GENERATION_CONTENT_FILTER",
+                "private-provider-detail\nsecret","GENERATION_FINISH_REASON");
+        int expectedCalls=0;
+        for(var entry:cases.entrySet()) {
+            ai.finish=entry.getKey();var created=tasks.create(recapRequest(f));
+            var failed=await(false,created.id(),"FAILED");
+            assertThat(failed.errorCode).isEqualTo("OUTPUT_INVALID");
+            assertThat(ReadingTaskService.payload(mapper.get(false,created.id())).failureReason).isEqualTo(entry.getValue());
+            assertThat(view(created.id()).get("failureReason")).isEqualTo(entry.getValue());
+            assertThat(view(created.id()).get("validatedResult")).isNull();
+            assertThat(jdbc.queryForObject("SELECT usage_json->>'finishReason' FROM reading_ai_call WHERE task_id=?",String.class,created.id()))
+                    .isEqualTo(entry.getKey().startsWith("private")?"other":entry.getKey());
+            long until=System.nanoTime()+TimeUnit.SECONDS.toNanos(3);
+            while(!output.getAll().contains("reason="+entry.getValue()) && System.nanoTime()<until)Thread.sleep(10);
+            assertThat(output.getAll()).contains("event=READING_WORK_STOPPED","workId="+created.id(),"traceId="+failed.traceId,"reason="+entry.getValue());
+            assertThat(ai.calls).hasValue(++expectedCalls);
+        }
+        assertThat(output.getAll()).doesNotContain("private-provider-detail","林舟来到渡口");
+        boundary(f,1);
+        assertThat(view(jdbc.queryForObject("SELECT id FROM reading_task WHERE version_id=? ORDER BY updated_at DESC LIMIT 1",UUID.class,f.version)))
+                .doesNotContainKeys("failureReason","usage");
     }
     @Test void indexEstimationStopsAtCompleteParagraphAndReusesPaidSegments() throws Exception {
         var f=fixture(("字".repeat(3999)+"\n").repeat(30));boundary(f,f.paragraphs.size()-1);
