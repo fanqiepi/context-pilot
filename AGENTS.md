@@ -1,5 +1,7 @@
 # ContextPilot repository guidance
 
+2026-10-23 阅读体验修复：首次回顾在助手内确认保存位置作为连续已读范围，滚动/跳转不自动扩大 AI 边界；输出 Prompt reading-evidence-v4 明确原有字数限制，增加无正文诊断，冻结 acceptance-v12。真实故障原因尚待现场错误码/任务编号验证，不宣称真实可用或语义通过。下一步见 docs/evaluation/reading-recap-usability-verification.md，禁止自动重试历史停止批次。
+
 2026-10-23 后续用户指令优先：日常阅读模型调用只由 `contextpilot.reading.ai-enabled` true/false 控制，不设金额预算、批准文件或授权期限。DIRECT_LIVE 与历史试读/固定评测模式互斥；保留旧停止账本、失败证据、单任务次数/超时/范围/输出校验与零自动重试。用户要求关闭试读前后端并自行启动，已停止 5201/18081，不再代启。下方试读预算要求仅适用于历史受控批次，不得重新施加给已批准的日常模式。
 
 2026-10-23 真人试读已因首次回顾 `OUTPUT_INVALID` 停止：DeepSeek 1 次、保守结算 0.02221000 元，向量 0 次、未知/预留 0。原始输出未持久化，不能猜测具体校验失败原因。当前有界离线修复停止状态查询的 `UnexpectedRollbackException`，新实现 acceptance-v11 / reading-evidence-v3；保留 v1–v10 锁与全部停止账本，不安装新批准、不自动恢复或重测。详见当前交接和 `docs/evaluation/reading-trial-failure-verification.md`。

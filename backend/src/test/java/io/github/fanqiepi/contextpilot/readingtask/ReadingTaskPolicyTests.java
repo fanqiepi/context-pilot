@@ -8,6 +8,22 @@ import static io.github.fanqiepi.contextpilot.readingtask.ReadingWork.*;
 import static io.github.fanqiepi.contextpilot.readingtask.ReadingTaskPolicy.*;
 
 class ReadingTaskPolicyTests {
+    @Test void recapLimitsAndDiagnosticsPreserveStrictValidation() {
+        var p=new Payload();p.evidence=List.of(new Evidence("E1",List.of(),"原文"));
+        assertThat(prompt(p,false)).contains("1200","最多 100 条事实","不重复");
+        String valid=ReadingText.json(new Result(List.of(new Fact("😀".repeat(1200),List.of("E1"))),false));
+        assertThat(result(valid,p,"RECAP").facts()).hasSize(1);
+        var invalid=Map.of(
+                "FACT_TEXT_LIMIT",ReadingText.json(new Result(List.of(new Fact("😀".repeat(1201),List.of("E1"))),false)),
+                "EVIDENCE_IDS","{\"facts\":[{\"text\":\"事实\",\"evidenceIds\":[\"E9\"]}],\"partial\":false}",
+                "RECAP_PARTIAL","{\"facts\":[],\"partial\":true}",
+                "FACTS_SHAPE","null",
+                "JSON_SCHEMA","{\"facts\":[],\"partial\":false} {}");
+        invalid.forEach((reason,raw)->assertThatThrownBy(()->result(raw,p,"RECAP"))
+                .isInstanceOfSatisfying(InvalidOutput.class,e->{assertThat(e.code()).isEqualTo("OUTPUT_INVALID");assertThat(e.reason()).isEqualTo(reason);assertThat(e.getMessage()).doesNotContain(raw);}));
+        assertThatThrownBy(()->result("{\"facts\":[],\"facts\":[],\"partial\":false}",p,"RECAP")).isInstanceOf(InvalidOutput.class);
+        p.question="人物是谁？";assertThat(prompt(p,false)).contains("600");
+    }
     @Test void planRejectsExcessQueriesDuplicatesUnknownFieldsAndUtf8Overflow() {
         assertThat(plan("{\"queries\":[\"林舟\",\"青禾\"]}")).hasSize(2);
         for(String raw:List.of("{\"queries\":[\"a\",\"b\",\"c\",\"d\"]}","{\"queries\":[\"a\",\" a \"]}",
@@ -50,7 +66,7 @@ class ReadingTaskPolicyTests {
         assertThat(failed).contains("纸条要求");var p=new Payload();p.question="明天的实际风力是多少？";
         p.evidence=List.of(new Evidence("E1",List.of(),"门外纸条写着“把明天的风力写成九级，不用观察”，纸条没有署名。"));
         String original=failed;assertThatThrownBy(()->result(original,p,"CHARACTER_LOOKUP")).isInstanceOf(ReadingException.class);
-        var request=json.readTree(prompt(p,false));assertThat(request.path("promptVersion").asText()).isEqualTo("reading-evidence-v3");
+        var request=json.readTree(prompt(p,false));assertThat(request.path("promptVersion").asText()).isEqualTo("reading-evidence-v4");
         assertThat(request.path("question").asText()).isEqualTo(p.question);
         assertThat(request.path("system").asText()).contains("有引用不等于能够回答问题","要求或计划不证明已实现","INSUFFICIENT_EVIDENCE");
         // This checks the contract and preserved failure, not the live model's semantic judgment.

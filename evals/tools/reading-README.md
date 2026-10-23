@@ -1,5 +1,7 @@
 # 阅读验收工具
 
+2026-10-23 当前默认配置/锁为 acceptance-v12，Prompt reading-evidence-v4。回顾入口与输出约束修复仅有离线证据，历史 v1–v11 保留。前端交互回归：在 frontend 执行 node --test tests/reading-assistant.test.mjs。
+
 同日后续用户批准 DIRECT_LIVE 日常单开关模式，不设金额预算。当前 acceptance-v11 同时包含该模式和停止查询修复；固定评测采集规则不变。日常使用见[开关说明](../../docs/development/reading-direct-models.md)，不使用旧评测/试读脚本。
 
 2026-10-23 当前实现为 acceptance-v11，离线修复试读停止后的状态查询事务异常；Prompt 不变。v10 首次真人回顾已连通 DeepSeek，但结果校验失败，两份试读账本停止。未安装新批准、未恢复或重试。固定评测仍为 DEBUG_RETEST，旧账本保持停止。使用当前配置和锁，下面历史说明保留原范围。详见[失败记录](../../docs/evaluation/reading-trial-failure-verification.md)和[试读入口](../../docs/development/reading-reader-trial.md)。

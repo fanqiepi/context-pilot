@@ -37,6 +37,9 @@ public class ReadingTaskRunner {
         } catch(CancellationException ignored) {
             // The command that invalidated this execution already owns its durable state.
         } catch(Exception error) {
+            if(error instanceof ReadingTaskPolicy.InvalidOutput invalid)
+                org.slf4j.LoggerFactory.getLogger(ReadingTaskRunner.class).warn(
+                        "event=READING_OUTPUT_INVALID workId={} reason={} retry=false",id,invalid.reason());
             String code=error instanceof ReadingException e?e.code():error instanceof TimeoutException?"TIMEOUT":"PROVIDER_UNAVAILABLE";
             ReadingBudgetLog.providerRejected(id,code);
             service.stop(index,id,token,"SCOPE_CHANGED".equals(code)?"INVALIDATED":"FAILED",code);

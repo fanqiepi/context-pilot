@@ -1,5 +1,8 @@
 # 研序 项目背景
 
+2026-10-23 阅读反馈修复：位置自动保存与 AI 范围保持独立，首次回顾可在助手内直接确认保存位置；Prompt v4 补齐既有输出上限，日志增加不含正文的校验分类。离线回归通过，当前真实失败原因尚待用户错误码/任务编号确认，不宣称回顾已真实修复。实现冻结 acceptance-v12；下一阶段为用户自行启动后的单次回顾现场验证，详见[本轮记录](../evaluation/reading-recap-usability-verification.md)。
+
+
 2026-10-23 最新规则：用户要求日常阅读仅用 true/false 开启模型，不设置金额预算。已接入 DIRECT_LIVE，本地 ai-enabled=true，历史试读账本不改。按用户要求停止 5201/18081 前后端，后续用户自行启动，见[日常开关](reading-direct-models.md)。旧试读授权/期限要求不再适用于此日常模式；固定评测和失败证据保持原状。
 
 2026-10-23 真人试读首个回顾失败：DeepSeek 已连通并返回 usage，结果校验报 `OUTPUT_INVALID`，结算 0.02221000 元、无未知预留，试读账本已停止。另发现停止状态查询被事务回滚异常掩盖为 `READING_RETRYABLE`，当前离线修复见[失败记录](../evaluation/reading-trial-failure-verification.md)及当前交接；不自动恢复或重试。
