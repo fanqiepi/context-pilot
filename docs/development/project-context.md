@@ -1,5 +1,7 @@
 # 研序 项目背景
 
+2026-10-23 多章回顾格式修复：现场两章/三章任务既有成功也有 JSON_SCHEMA 失败，三次报告均 finishReason=stop；旧回答未保留，具体结构错误不可追溯。Prompt v5 明确统一扁平 facts/partial 合同，回顾按类型检查并持久化细分原因，未放宽校验或自动重试。当前 acceptance-v16，真实改善尚未验证。下一步用户自行重启并手动验证相同范围的多章回顾，按具体错误码继续定位，见 docs/evaluation/reading-recap-schema-verification.md。
+
 2026-10-23 SSE 修复：用户截图显示回顾完成，数据库最近三次回顾也均 COMPLETED。日志是 ReadingHttpAdvice 将已提交 text/event-stream 再写为 JSON 引发的二次异常，原始触发原因未留在所给日志中。现识别断连并禁止对已提交响应追加错误 JSON，未改变任务结果或重跑模型。实现 acceptance-v15 / Prompt v4；下一步用户重启后仅查看已有结果、开关助手验证连接，见 docs/evaluation/reading-sse-error-verification.md。
 
 

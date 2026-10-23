@@ -324,6 +324,28 @@ class ReadingTaskPersistenceTests {
         assertThat(await(false,queued.id(),"COMPLETED","FAILED").status).isEqualTo("COMPLETED");
         var b=mapper.get(false,blocker.id());tasks.command(false,b.id,new ReadingTaskService.Command(UUID.randomUUID(),b.revision,"CANCEL"));
     }
+    @Test void oneTwoAndThreeChapterRecapsUseSameContractAndPersistSchemaFailureWithoutRetry() throws Exception {
+        var f=fixture("首章事件。\n第二章 途中\n次章事件。\n第三章 到达\n末章事件。");boundary(f,f.paragraphs.size()-1);
+        String valid=ai.answer;int expectedCalls=0;
+        for(int chapters=1;chapters<=3;chapters++) {
+            ai.answer=valid;
+            var success=tasks.create(new ReadingTaskService.Create(UUID.randomUUID(),f.version,states.get(f.version).scopeRevision(),"RECAP",chapters,null,null));
+            assertThat(await(false,success.id(),"COMPLETED","FAILED").status).isEqualTo("COMPLETED");
+            var payload=ReadingTaskService.payload(mapper.get(false,success.id()));
+            String evidence=payload.evidence.stream().map(ReadingWork.Evidence::text).collect(java.util.stream.Collectors.joining());
+            assertThat(evidence).contains("末章事件").doesNotContain("未读身份秘密");
+            if(chapters>=2)assertThat(evidence).contains("次章事件");else assertThat(evidence).doesNotContain("次章事件");
+            if(chapters==3)assertThat(evidence).contains("首章事件");else assertThat(evidence).doesNotContain("首章事件");
+            assertThat(ai.calls).hasValue(++expectedCalls);
+            ai.answer="{\"facts\":[]}";
+            var failure=tasks.create(new ReadingTaskService.Create(UUID.randomUUID(),f.version,states.get(f.version).scopeRevision(),"RECAP",chapters,null,null));
+            assertThat(await(false,failure.id(),"FAILED").errorCode).isEqualTo("OUTPUT_INVALID");
+            assertThat(view(failure.id()).get("failureReason")).isEqualTo("RECAP_PARTIAL_MISSING");
+            assertThat(view(failure.id()).get("validatedResult")).isNull();
+            assertThat(jdbc.queryForObject("SELECT count(*) FROM reading_ai_call WHERE task_id=?",Integer.class,failure.id())).isEqualTo(1);
+            assertThat(ai.calls).hasValue(++expectedCalls);
+        }
+    }
     @Test void oversizeCoverageAndInvalidModelOutputFailBeforePublication() throws Exception {
         var f=fixture("字".repeat(25000));boundary(f,f.paragraphs.size()-1);
         assertThatThrownBy(()->tasks.create(recapRequest(f))).isInstanceOfSatisfying(ReadingException.class,e->assertThat(e.code()).isEqualTo("COVERAGE_LIMIT"));

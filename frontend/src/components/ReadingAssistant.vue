@@ -52,6 +52,14 @@ const failureReasons: Record<string, string> = {
   FACT_TEXT_LIMIT: '回答文字超过长度上限。',
   EVIDENCE_IDS: '回答的引用缺失、重复或不属于本次证据。',
   JSON_SCHEMA: '回答格式不符合约定。',
+  JSON_SYNTAX: '回答不是单个合法 JSON 对象，或包含重复字段。',
+  JSON_ROOT_FIELDS: '回答顶层结构不符合约定，或包含额外字段。',
+  JSON_FACT_FIELDS: '回答的事实条目结构不符合约定，或包含额外字段。',
+  RECAP_PARTIAL_MISSING: '回顾回答缺少完整性标记。',
+  RECAP_PARTIAL_TYPE: '回顾回答的完整性标记类型错误。',
+  FACTS_SHAPE: '回答的事实列表缺失、类型错误或条目过多。',
+  FACT_TEXT: '回答的事实文字缺失或格式错误。',
+  EVIDENCE_IDS_TYPE: '回答的引用列表类型错误。',
   RECAP_PARTIAL: '模型未完成整个回顾范围。',
 }
 function clear() {

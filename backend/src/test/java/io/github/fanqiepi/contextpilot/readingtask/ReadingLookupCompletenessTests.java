@@ -54,7 +54,7 @@ class ReadingLookupCompletenessTests {
         var complete=result(ReadingText.json(new LookupAnswer(Answerability.FULL,facts)),p,"CHARACTER_LOOKUP");
         assertThat(complete.partial()).isFalse();assertThat(complete.facts()).containsExactlyElementsOf(facts);
         var request=JSON.readTree(prompt(p,false));
-        assertThat(request.path("promptVersion").asText()).isEqualTo("reading-evidence-v4");
+        assertThat(request.path("promptVersion").asText()).isEqualTo("reading-evidence-v5");
         assertThat(request.path("evidence").size()).isEqualTo(evidence.size());
         assertThat(request.path("system").asText()).contains("单一事项有明确答案即可 FULL","不能把组织遗漏当成证据缺口",
                 "另一项确实缺少依据","与直接叙述分别引用").doesNotContain("罗澄","孟秋","陶禾","debug-");
