@@ -1,5 +1,8 @@
 # 阅读验收工具
 
+2026-10-23 SSE 修复：用户截图显示回顾完成，数据库最近三次回顾也均 COMPLETED。日志是 ReadingHttpAdvice 将已提交 text/event-stream 再写为 JSON 引发的二次异常，原始触发原因未留在所给日志中。现识别断连并禁止对已提交响应追加错误 JSON，未改变任务结果或重跑模型。实现 acceptance-v15 / Prompt v4；下一步用户重启后仅查看已有结果、开关助手验证连接，见 docs/evaluation/reading-sse-error-verification.md。
+
+
 2026-10-23 回顾失败诊断修复：用户任务 1c5f4739-d33d-4945-8bb4-bcab28a4135c 返回实际 6097/979 token 后 OUTPUT_INVALID；旧数据缺少结束原因，不能确诊。现统一记录停止日志、持久化 failureReason 与白名单 finishReason，页面展示具体类别。当前 acceptance-v14 / Prompt v4；未重试或代启。下一步由用户重启并手动发起日常任务，用明确诊断定位实际故障，详见 docs/evaluation/reading-failure-diagnostics-verification.md。
 
 

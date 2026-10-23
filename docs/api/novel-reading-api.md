@@ -127,6 +127,8 @@ task 视图固定包含 `id,type,status,revision,scope,coverage,budget,usage,err
 
 SSE 事件 `snapshot -> progress* -> result? -> done`；result 仅来自已持久化且当前可见的结构化结果，绝不发送模型原始 token。事件 id 为 taskId/revision，本轮重连从当前受限快照恢复，不使用 Last-Event-ID 重放旧结果。发送前与边界收缩使用同一发布序列，已开始发送的响应不能宣称可撤回。
 
+连接失效或响应已提交后的异常不会追加普通 JSON 错误体，也不改变持久化任务状态；连接断开后客户端可重新获取受限快照。首次响应尚未提交时，原有 4xx/503 JSON 错误合同保持不变。
+
 入队满返回 429 `QUEUE_FULL`，不创建会自动运行的隐性后台重试。数据库已创建但尚未可靠派发时收敛到 PAUSED 并供显式恢复。模型调用未启用/未获授权返回 409 `LIVE_AI_NOT_AUTHORIZED`；索引不足 409 `INDEX_NOT_READY`；范围未设置 409 `READ_BOUNDARY_REQUIRED`。其他终态失败码按架构设计返回，技术失败不混为拒答。
 
 ## 笔记与独立确认
